@@ -31,6 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_sol_skin_scalar    ../engine/source/output/h3d/h3d_results/h3d_sol_skin_scalar.F
       !||    initbuf                ../engine/share/resol/initbuf.F
       !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod            ../engine/share/resol/initbuf.F
@@ -65,6 +66,7 @@ C-----------------------------------------------
       USE TABLE_MOD
       USE LOADS_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

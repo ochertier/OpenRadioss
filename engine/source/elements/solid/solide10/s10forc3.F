@@ -57,7 +57,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    s10upd11t12            ../engine/source/elements/solid/solide10/s10upd11t12.F
       !||    s4therm_itet1          ../engine/source/elements/solid/solide4/s4therm-itet1.F
       !||    s8e_sigp               ../engine/source/elements/solid/solide8e/s8e_sig.F
-      !||    scre_sig3              ../engine/source/elements/solid/solide/scre_sig3.F
+      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sgcoor10               ../engine/source/elements/solid/solide10/sgcoor10.F
       !||    sgeodel3               ../engine/source/elements/solid/solide/sgeodel3.F
       !||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
@@ -75,10 +75,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sxfillopt              ../engine/source/elements/solid/solide10/sxfillopt.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sensor_mod             ../engine/share/modules/sensor_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
@@ -113,6 +115,8 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE SENSOR_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
+      USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -186,7 +190,7 @@ C     REAL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,IP,LCO,NF1,NF2,IFLAG,IOFFS,IPTR,IPTS,IPTT,ILAY
+      INTEGER I,J,IP,LCO,NF1,NF2,IFLAG,IOFFS,IPTR,IPTS,IPTT,ILAY,IMAT
       INTEGER IBID,IBIDON(1),NNEGA,INDEX(MVSIZ),ITET,iel,ISM12_11
 C-----
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ)
@@ -244,7 +248,7 @@ C
      .    MFZZ(MVSIZ,5),MFZX(MVSIZ,5),MFXZ(MVSIZ,5),DIVDE(MVSIZ),
      .    NU(MVSIZ),FAC(MVSIZ),FACP(MVSIZ),E0(MVSIZ),C1,DVM(MVSIZ),
      .    VISP(MVSIZ),FACDB,RBID(MVSIZ),SIGP(NEL,6),
-     .    FLD(MVSIZ),STI_C(MVSIZ),CAQ,LL(MVSIZ),OFFG,FQMAX
+     .    FLD(MVSIZ),STI_C(MVSIZ),LL(MVSIZ),OFFG(MVSIZ),FQMAX
 c
       my_real VARNL(NEL),DELTAX4(MVSIZ)
 c     Flag Bolt Preloading
@@ -252,6 +256,7 @@ c     Flag Bolt Preloading
       INTEGER SZ_IX
       my_real, 
      .  DIMENSION(:), POINTER :: BPRELD
+      my_real, dimension(mvsiz) :: fheat
 C-----
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -316,9 +321,8 @@ c
       BETA(4,5)=ONE_OVER_6
       BETA(5,5)=FOURTH
 C   
-      DO I=LFT,LLT
-        TEMPEL(I) = ZERO
-      END DO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
       IF (JTHE < 0) THEM(LFT:LLT,1:10) = ZERO
 C      
       IF (ICP==1) THEN
@@ -653,7 +657,7 @@ C
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT,    fheat      )
 C
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
 C-----------  return to global system    
@@ -710,19 +714,35 @@ C          switched to small strain
         ENDDO
 C
         IF (JTHE < 0 .AND. ISOLNOD == 10) THEN
-          CALL S10THERM(
-     1   PM,        MXT,       NC,        VOLN,
-     2   PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),NX(1,1,IP),
-     3   DT1,       TEMP,      TEMPEL,    DIE,
-     4   THEM,      GBUF%OFF,  LBUF%OFF,  NEL)
+          IMAT = MXT(1)
+          IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+            CALL S10THERM(
+     1           PM,        IMAT,       NC,        VOLN,
+     2           PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),NX(1,1,IP),
+     3           DT1,       TEMP,      TEMPEL,    FHEAT,
+     4           THEM,      GBUF%OFF,  LBUF%OFF,  NEL)
+          ELSE
+            CALL S10THERM(
+     1           PM,        IMAT,       NC,        VOLN,
+     2           PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),NX(1,1,IP),
+     3           DT1,       TEMP,      TEMPEL,    DIE,
+     4           THEM,      GBUF%OFF,  LBUF%OFF,  NEL)
+          END IF
         ENDIF
 c----------
       ENDDO   ! end integration point loop
 
       IF (JTHE < 0 .AND. ISOLNOD == 4) THEN
-          CALL S4THERM_ITET1(PM   ,MXT    ,NC   ,NEL  ,
-     .                       XX   ,YY     ,ZZ   ,DT1  ,DIE ,
-     .                       TEMP ,THEM   ,GBUF%OFF   ,LBUF%OFF) 
+          IMAT = MXT(1)
+          IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+            CALL S4THERM_ITET1(PM   ,IMAT   ,NC   ,NEL  ,
+     .                         XX   ,YY     ,ZZ   ,DT1  ,FHEAT ,
+     .                         TEMP ,THEM   ,GBUF%OFF   ,LBUF%OFF)
+          ELSE
+            CALL S4THERM_ITET1(PM   ,IMAT   ,NC   ,NEL  ,
+     .                         XX   ,YY     ,ZZ   ,DT1  ,DIE ,
+     .                         TEMP ,THEM   ,GBUF%OFF   ,LBUF%OFF)
+          END IF
       ENDIF
 c-----------------------------
       IF (JLAG+JALE+JEUL /= 0) THEN
@@ -792,19 +812,13 @@ C----------------------------
 C     distorsion control  
 C----------------------------
       IF (ISCTL > 0) THEN
-         CNS2=ZEP05
-         MX = MXT(1)
-         C1 =PM(32,MX)+ONEP333*PM(22,MX)
-         FQMAX = EP03
-         IF (MTN==42.OR.MTN==69) FQMAX = FOURTY
-         DO I=LFT,LLT
-          LL(I) = VOLN(I)**THIRD
-          OFFG = MIN(ABS(GBUF%OFF(I)),OFF(I))
-          CAQ=CNS2*GBUF%RHO(I)*LL(I)
-          FLD(I)=FOURTH*CAQ*CXX(I)*OFFG
-          STI_C(I) = C1 * LL(I) *OFFG
-         ENDDO
-         CALL SCRE_SIG3(GBUF%SIG, C1, ISTAB,GBUF%OFF,ISMSTR ,NEL)
+         OFFG(1:NEL) = MIN(OFF(1:NEL),ABS(GBUF%OFF(1:NEL))) ! no offg for tetra10 
+         CALL SDISTOR_INI(                                      
+     1                NEL      ,STI_C    ,NPROPM     ,NUMMAT  ,       
+     2                ISMSTR   ,MXT      ,ISTAB      ,PM      ,       
+     3                GBUF%SIG ,GBUF%RHO ,CXX        ,OFFG    ,       
+     4                GBUF%OFF ,LL       ,VOLN       ,FLD     ,       
+     5                CNS2     ,FQMAX    )
          IF (ISMSTR>=11)  ! XX,YY,ZZ now current conf.
      *     CALL S10GET_X3(
      1          X,     XDP,      DR,    NUMNOD,
@@ -817,7 +831,8 @@ C----------------------------
      .          FX ,     FY ,     FZ ,     
      .          XX0,     YY0,     ZZ0,
      .         CNS2,   ISTAB,    LL  ,
-     .        FQMAX,    NEL )
+     .        FQMAX,    NEL ,GBUF%EINT_DISTOR,
+     .          DT1)
       ENDIF
 c-----------------------------
       IF(NFILSOL/=0) CALL SXFILLOPT(

@@ -51,6 +51,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod        ../engine/share/modules/drape_mod.F
+      !||    dt_mod           ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod     ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
@@ -80,7 +82,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      L            IEL_CRK,IADC_CRK,ELCUTC,
      M            SENSORS,IXEL ,STACK   ,
      N            ISUBSTACK,UXINT_MEAN,UYINT_MEAN,UZINT_MEAN,NLEVXF,
-     O            NODEDGE,CRKEDGE,DRAPE_SH4N,IPRI  ,NLOC_DMG,INDX_DRAPE, IGRE)
+     O            NODEDGE,CRKEDGE,DRAPE_SH4N,IPRI  ,NLOC_DMG,INDX_DRAPE, IGRE,
+     P            DT     )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -92,6 +95,8 @@ C-----------------------------------------------
       USE DRAPE_MOD  
       USE NLOCAL_REG_MOD  
       USE SENSOR_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -149,6 +154,7 @@ C     REAL
       TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -205,6 +211,9 @@ C---
       my_real,
      .  DIMENSION(:) ,POINTER  ::  DIR_A,DIR_B
       TARGET :: DIRA,DIRB
+!     variables for heat transfer
+      my_real, dimension(mvsiz) :: fheat
+!
 C---
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(G_BUFEL_) ,POINTER :: GBUF
@@ -410,8 +419,7 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
           TEMPEL(I) = ZERO
         ENDDO
 C
-        IF (JTHE > 0) CALL TEMPCG(JFT  ,JLT   ,PM  ,MAT ,IXC,
-     .                            TEMP ,TEMPEL)
+        IF (JTHE > 0) CALL TEMPCG(NUMNOD, NEL  ,IXC ,TEMP ,TEMPEL)
 C-----------------------------
         IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
 C-----------------------------
@@ -429,7 +437,7 @@ C-----------------------------
      B    NGL       ,ZCFAC     ,SHF       ,GS        ,EPSDG     ,
      C    KFTS      ,IHBE      ,ALPE      ,
      D    DIR_A     ,DIR_B     ,IGEO      ,
-     E    IPM       ,IFAILURE  ,NPG       ,
+     E    IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F    TEMPEL    ,DIE       ,JTHE      ,IEXPAN    ,TEMPG     ,
      G    IBID      ,BID       ,
      H    BID       ,BID       ,BID       ,BID       ,BID       ,
@@ -441,7 +449,7 @@ C-----------------------------
      N    ISMSTR    ,IR        ,IS        ,NLAYER    ,NPTT      ,
      O    IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P    BID       ,ITASK     ,DRAPE_SH4N  ,VARNL     ,NLOC_DMG ,
-     R    INDX_DRAPE ,THKE, SEDRAPE  ,NUMEL_DRAPE)
+     R    INDX_DRAPE ,THKE, SEDRAPE  ,NUMEL_DRAPE,DT   )
 C-----------------------------
         IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
 C-----------------------------
@@ -549,10 +557,16 @@ C----------------------------
 C-------------------------
 c     Thermique des coques 
 C--------------------------
-        IF (JTHE > 0) THEN
-          CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
-     .                PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
-     .                TEMP  ,TEMPEL,DIE   , THEM) 
+        IF (JTHE /= 0) THEN
+          IF (MAT_ELEM%MAT_PARAM(MAT(1))%HEAT_FLAG == 1) THEN
+            CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
+     .                  PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
+     .                  TEMP  ,TEMPEL,FHEAT  ,THEM    ) 
+          ELSE
+            CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
+     .                  PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
+     .                  TEMP  ,TEMPEL,DIE    ,THEM    ) 
+          END IF
         ENDIF
 C--------------------------
 C     THERMAL TIME STEP       --- to be added --- (see cforc3.F)

@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mulawc                    ../engine/source/materials/mat_share/mulawc.F
       !||    usermat_shell             ../engine/source/materials/mat_share/usermat_shell.F
       !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod              ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod              ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    stack_mod                 ../engine/share/modules/stack_mod.F
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

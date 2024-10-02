@@ -157,7 +157,6 @@ C=======================================================================
       !||    imp_updst                        ../engine/source/implicit/imp_pcg.F
       !||    ini_tmax                         ../engine/source/output/ini_outmax.F
       !||    int18_law151_update              ../engine/source/interfaces/int18/int18_law151_update.F
-      !||    inter7_collision_detection       ../engine/source/interfaces/inter7_collision_detection.F
       !||    inter_color_coarse_voxel         ../engine/source/interfaces/generic/inter_color_coarse_voxel.F
       !||    inter_color_voxel                ../engine/source/interfaces/generic/inter_color_voxel.F
       !||    inter_count_node_curv            ../engine/source/interfaces/generic/inter_count_node_curv.F
@@ -432,6 +431,7 @@ C=======================================================================
       !||    get_table_value_dydx             ../engine/source/user_interface/utable.F
       !||    imp_stop                         ../engine/source/implicit/imp_solv.F
       !||    multi_muscl_fluxes_computation   ../engine/source/multifluid/multi_muscl_fluxes_computation.F
+      !||    printcpu                         ../engine/source/system/timer.F
       !||--- calls      -----------------------------------------------------
       !||====================================================================
       SUBROUTINE MY_FLUSH(IUNIT)
@@ -512,112 +512,6 @@ c         MKL_DYN = omp_get_nested()
 c         OMP_NEST = mkl_get_dynamic()
 #endif
       RETURN
-      END
-
-#if CPP_mach == CPP_p4linux964 || CPP_mach == CPP_p4win64
-ccc|| CPP_mach == CPP_p4win64  || CPP_mach == CPP_p4win32 || CPP_mach==CPP_macosx64
-      !||====================================================================
-      !||    check_kmp_stack    ../engine/source/system/machine.F
-      !||--- called by ------------------------------------------------------
-      !||    set_stack_values   ../engine/source/system/machine.F
-      !||====================================================================
-      SUBROUTINE CHECK_KMP_STACK()
-C-----------------------------------------------
-#ifdef __INTEL_COMPILER
-      use omp_lib
-C-----------------------------------------------      
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "task_c.inc"     
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER   (KIND=KMP_SIZE_T_KIND)  NEWSIZ
-      CHARACTER*256 KMP_STACKSIZE_VALUE
- 
-      KMP_SET = 0
- 
-      CALL GETENV('KMP_STACKSIZE',KMP_STACKSIZE_VALUE)
-C      
-         IF (KMP_STACKSIZE_VALUE(1:1) == ' ') THEN
-         KMP_SET = 1
-         NEWSIZ = 134217728
-         CALL KMP_SET_STACKSIZE_S(NEWSIZ)
-      ELSE
-         KMPSTSIZ = KMP_GET_STACKSIZE()
-         IF (KMPSTSIZ < 134217728)THEN
-           KMP_SET = 2
-         ENDIF
-      ENDIF
-#elif 1
-#include      "implicit_f.inc"
-
-#endif
-      RETURN
-      END
-      !||====================================================================
-      !||    get_kmp_stack   ../engine/source/system/machine.F
-      !||====================================================================
-      SUBROUTINE GET_KMP_STACK( )
-C-----------------------------------------------
-C   I m p l i c i t   T y p e s
-C-----------------------------------------------
-#ifdef __INTEL_COMPILER
-      use omp_lib
-#include      "implicit_f.inc"
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
-      INTEGER  KMPSTSIZ,NEWSIZ
-C         
-      KMPSTSIZ = KMP_GET_STACKSIZE()
-      print*,'KMPSTSIZ=',KMPSTSIZ
-
-#elif 1
-
-#endif
-      RETURN
-      END
-#elif 1
-      !||====================================================================
-      !||    check_kmp_stack    ../engine/source/system/machine.F
-      !||--- called by ------------------------------------------------------
-      !||    set_stack_values   ../engine/source/system/machine.F
-      !||====================================================================
-      SUBROUTINE CHECK_KMP_STACK( )
-      RETURN
-      END
-C
-      !||====================================================================
-      !||    get_kmp_stack   ../engine/source/system/machine.F
-      !||====================================================================
-      SUBROUTINE GET_KMP_STACK( )
-      RETURN
-      END
-#endif
-
-      !||====================================================================
-      !||    set_stack_values   ../engine/source/system/machine.F
-      !||--- called by ------------------------------------------------------
-      !||    radioss2           ../engine/source/engine/radioss2.F
-      !||--- calls      -----------------------------------------------------
-      !||    check_kmp_stack    ../engine/source/system/machine.F
-      !||====================================================================
-      SUBROUTINE SET_STACK_VALUES( )
-#include      "implicit_f.inc"
-#include      "task_c.inc"
-C Check & Set Stacksize value
-       INTEGER Stack
-
-       CALL SET_STACK_C(Stack)
-       STACKSIZ = Stack
-
-C Check KMP_STACKSIZE Value
-       CALL  CHECK_KMP_STACK( )
       END
 
       !||====================================================================

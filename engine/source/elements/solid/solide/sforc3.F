@@ -68,7 +68,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    scoor3                 ../engine/source/elements/solid/solide/scoor3.F
       !||    scoor3_fvm             ../engine/source/ale/alefvm/scoor3_fvm.F
       !||    scoor_cp2sp            ../engine/source/elements/solid/solidez/scoor_cp2sp.F
-      !||    scre_sig3              ../engine/source/elements/solid/solide/scre_sig3.F
       !||    scumu3                 ../engine/source/elements/solid/solide/scumu3.F
       !||    scumu3p                ../engine/source/elements/solid/solide/scumu3p.F
       !||    sdefo3                 ../engine/source/elements/solid/solide/sdefo3.F
@@ -76,6 +75,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sderi3                 ../engine/source/elements/solid/solide/sderi3.F
       !||    sderit3                ../engine/source/elements/solid/solide/sderit3.F
       !||    sderito3               ../engine/source/elements/solid/solide/sderito3.F
+      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
       !||    sdlenmax               ../engine/source/elements/solid/solide/sdlenmax.F
       !||    sfillopt               ../engine/source/elements/solid/solide/sfillopt.F
@@ -109,10 +109,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sensor_mod             ../engine/share/modules/sensor_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
@@ -159,6 +161,8 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ALE_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
+      USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -246,9 +250,8 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,LCO,NF1,IFLAG,NUVAR,IBID,IPTR,IPTS,IPTT,
-     .        ILAY,ITET,IFVM_SKIP,NNOD
-      INTEGER NBF1,NBF2,NBF3, IALEFVM_MAT,II(6)
+      INTEGER I,NF1,NUVAR,IBID,IPTR,IPTS,IPTT,ILAY,ITET,IFVM_SKIP,NNOD
+      INTEGER NBF1,NBF2,NBF3, IALEFVM_MAT
 C
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),INOD(8)
       my_real
@@ -264,10 +267,11 @@ C
      . JAC4(MVSIZ), JAC5(MVSIZ), JAC6(MVSIZ),
      . VDX(MVSIZ) , VDY(MVSIZ) , VDZ(MVSIZ),SSP_EQ(MVSIZ),
      . AIRE(MVSIZ),FQVIS(MVSIZ), FCXX(MVSIZ)
+      my_real, dimension(mvsiz) :: fheat
 C
       my_real :: STI(MVSIZ), WXX(MVSIZ) , WYY(MVSIZ) , WZZ(MVSIZ)
       my_real :: MUVOID(MVSIZ)  ! used in case of SPH 
-      my_real :: SIGY(MVSIZ),ET(MVSIZ),R3_FREE(MVSIZ),R4_FREE(MVSIZ)
+      my_real :: SIGY(MVSIZ),ET(MVSIZ),R3_FREE(MVSIZ)
 C
 C Connectivities
       INTEGER NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ), 
@@ -314,9 +318,6 @@ C
      .  VGXA(MVSIZ),VGYA(MVSIZ),VGZA(MVSIZ), VGA2(MVSIZ),
      .  DXY(MVSIZ),DYX(MVSIZ),DYZ(MVSIZ),
      .  DZY(MVSIZ),DZX(MVSIZ),DXZ(MVSIZ),
-     .  G1X(MVSIZ),G2X(MVSIZ),G3X(MVSIZ),
-     .  G1Y(MVSIZ),G2Y(MVSIZ),G3Y(MVSIZ),
-     .  G1Z(MVSIZ),G2Z(MVSIZ),G3Z(MVSIZ),
      .  R11(MVSIZ),R12(MVSIZ),R13(MVSIZ),                        
      .  R21(MVSIZ),R22(MVSIZ),R23(MVSIZ),                        
      .  R31(MVSIZ),R32(MVSIZ),R33(MVSIZ),HH(MVSIZ),GAMA(MVSIZ,6),
@@ -331,8 +332,7 @@ C
 C
       my_real
      . VXR(MVSIZ),VYR(MVSIZ),VZR(MVSIZ),FR_WAV(MVSIZ),
-     . SXY(MVSIZ),SYX(MVSIZ),SYZ(MVSIZ),SZY(MVSIZ),SZX(MVSIZ),
-     . SXZ(MVSIZ),TEMPEL(MVSIZ),THEM(MVSIZ,8),DIE(MVSIZ)
+     . TEMPEL(MVSIZ),THEM(MVSIZ,8),DIE(MVSIZ)
 C
       my_real
      .  MX1(MVSIZ),MY1(MVSIZ),MZ1(MVSIZ),
@@ -369,7 +369,7 @@ C
      .  FDYY(MVSIZ) ,FDYZ(MVSIZ)  ,FDZX(MVSIZ)  ,FDZY(MVSIZ),
      .  FDZZ(MVSIZ) ,FD4(MVSIZ)   ,FD5(MVSIZ)   ,FD6(MVSIZ) ,
      .  FWXX(MVSIZ) ,FWYY(MVSIZ) ,FWZZ(MVSIZ)  ,FVXR(MVSIZ),
-     .  FVYR(MVSIZ) ,FVZR(MVSIZ) ,FDVOL(MVSIZ),FVOLN(MVSIZ),
+     .  FVYR(MVSIZ) ,FVZR(MVSIZ) ,FVOLN(MVSIZ),
      .  FVD2(MVSIZ)
 C
       my_real
@@ -407,10 +407,9 @@ C
      .  FDELTAX(MVSIZ) ,FLUX0(MVSIZ,6),FLU01(MVSIZ)
       my_real, DIMENSION(:), ALLOCATABLE :: VAR_REG
       my_real :: NL_NBNOD
-      my_real :: DT2T_lay(2)
       my_real :: CONDE(MVSIZ),AMU(MVSIZ),DIVDE(MVSIZ),L_MAX(MVSIZ),
      .           STI_C(MVSIZ),LL(MVSIZ),FLD(MVSIZ),
-     .           CNS2,RHO0_1,NU,C1,CAQ,FQMAX
+     .           CNS2,C1,CAQ,FQMAX
       my_real, DIMENSION(:), POINTER :: EINT
       my_real :: ELEM_MASS
       my_real :: SUM_EPS(9),SUM_M,SUM_VOL
@@ -436,7 +435,8 @@ C=======================================================================
       ISM12_11 = ELBUF_TAB(NG)%BUFLY(1)%L_SIGL
       INLOC = IPARG(78)
       ALLOCATE(VAR_REG(NEL))
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
 C
       IBOLTP = IPARG1(72) !IPARG(72,NG)
       NBPRELD = GBUF%G_BPRELD
@@ -822,13 +822,13 @@ C Total strain option doesn't change the reference configuration
        ENDIF
       END IF
 C
-      IF(JTHE < 0) THEN 
+      IF (JTHE < 0) THEN 
 C Element Temperature
         DO I=1,NEL
-           TEMPEL(I) = ONE_OVER_8 *(  TEMP(NC1(I)) + TEMP(NC2(I))  
-     .                              + TEMP(NC3(I)) + TEMP(NC4(I)) 
-     .                              + TEMP(NC5(I)) + TEMP(NC6(I)) 
-     .                              + TEMP(NC7(I)) + TEMP(NC8(I)))       
+          TEMPEL(I) = ONE_OVER_8 *(  TEMP(NC1(I)) + TEMP(NC2(I))  
+     .                             + TEMP(NC3(I)) + TEMP(NC4(I)) 
+     .                             + TEMP(NC5(I)) + TEMP(NC6(I)) 
+     .                             + TEMP(NC7(I)) + TEMP(NC8(I)))       
         ENDDO
       ENDIF
 C
@@ -1013,7 +1013,7 @@ C
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT         ,    fheat      )
 C
       IF (ISMSTR == 12.AND.IDTMIN(1)==3) THEN
         IF (ISM12_11==0.AND.JCVT==0) THEN
@@ -1200,7 +1200,7 @@ C Anti hourglass forces
      I   GBUF%HOURG,PARTSAV,IPARTS, NFT,
      J   MTN,     JLAG,    EANI   , NGEO ,
      K   IVECTOR ,DT1 ,    MXT,     GEO,
-     L   NEL)
+     L   NEL,     ISCTL )
       ELSE
         CALL SHVIS3(
      1   PM,       GBUF%RHO, OFF,      VX1,
@@ -1566,16 +1566,30 @@ c===========================================================================
 C
       IF (JTHE < 0) THEN
 C Finite element heat transfert forces
-        CALL STHERM(
-     1   PM,      MXT,     VOLN,    NC1,
-     2   NC2,     NC3,     NC4,     NC5,
-     3   NC6,     NC7,     NC8,     PX1,
-     4   PX2,     PX3,     PX4,     PY1,
-     5   PY2,     PY3,     PY4,     PZ1,
-     6   PZ2,     PZ3,     PZ4,     DT1,
-     7   TEMP,    TEMPEL,  DIE,     THEM,
-     8   GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
-     9   GBUF%VOL,NEL)
+        IMAT = MXT(1)
+        IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+          CALL STHERM(
+     1         PM,      IMAT,    VOLN,    NC1,
+     2         NC2,     NC3,     NC4,     NC5,
+     3         NC6,     NC7,     NC8,     PX1,
+     4         PX2,     PX3,     PX4,     PY1,
+     5         PY2,     PY3,     PY4,     PZ1,
+     6         PZ2,     PZ3,     PZ4,     DT1,
+     7         TEMP,    TEMPEL,  FHEAT,   THEM,
+     8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
+     9         GBUF%VOL,NEL     ,NUMNOD )
+        ELSE
+          CALL STHERM(
+     1         PM,      IMAT,    VOLN,    NC1,
+     2         NC2,     NC3,     NC4,     NC5,
+     3         NC6,     NC7,     NC8,     PX1,
+     4         PX2,     PX3,     PX4,     PY1,
+     5         PY2,     PY3,     PY4,     PZ1,
+     6         PZ2,     PZ3,     PZ4,     DT1,
+     7         TEMP,    TEMPEL,  DIE,     THEM,
+     8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
+     9         GBUF%VOL,NEL     ,NUMNOD )
+        END IF
       ENDIF
 C
       IF (JCVT /= 0) THEN
@@ -1607,18 +1621,12 @@ C----------------------------
 C     distorsion control  
 C----------------------------
       IF (ISCTL > 0) THEN
-         CNS2=ZEP05
-         IMAT = MXT(1)
-         C1 =PM(32,IMAT)+ONEP333*PM(22,IMAT)
-         FQMAX = EP03
-         IF (MTN==42.OR.MTN==69) FQMAX = EP02
-         DO I=LFT,LLT
-          LL(I) = VOLN(I)**THIRD
-          CAQ=CNS2*GBUF%RHO(I)*LL(I)
-          FLD(I)=FOURTH*CAQ*CXX(I)*OFF(I)
-          STI_C(I) = C1 * LL(I) *OFF(I)
-         ENDDO
-         CALL SCRE_SIG3(GBUF%SIG, C1, ISTAB,GBUF%OFF,ISMSTR ,NEL)
+         CALL SDISTOR_INI(                                      
+     1                NEL      ,STI_C    ,NPROPM     ,NUMMAT  ,       
+     2                ISMSTR   ,MXT      ,ISTAB      ,PM      ,       
+     3                GBUF%SIG ,GBUF%RHO ,CXX        ,OFF     ,       
+     4                GBUF%OFF ,LL       ,VOLN       ,FLD     ,       
+     5                CNS2     ,FQMAX    )
 C        get actual configuration from x(3,*) for small strain option
 !      xj now is the current config in global sys, xx0 is in global sys excepting ismstr=11 
          IF (ISMSTR == 1.OR.ISMSTR >= 11) 
@@ -1680,7 +1688,8 @@ C        get actual configuration from x(3,*) for small strain option
      .   F31,     F32,     F33,     F34,
      .   F35,     F36,     F37,     F38,
      .   STI,   STI_C,   FLD  ,    CNS2,
-     .   LL ,   ISTAB,   FQMAX,    NEL)
+     .   LL ,   ISTAB,   FQMAX,     NEL,
+     .   GBUF%EINT_DISTOR, DT1)
       ENDIF
 C
       IF(NFILSOL/=0) CALL SFILLOPT(

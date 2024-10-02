@@ -28,6 +28,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    format_mod             ../starter/share/modules1/format_mod.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE ADMLCNT(NIX     ,IX      ,NUMEL       ,IPARTEL ,IPART   ,
      .                   KELTREE ,ELTREE  ,KSONTREE    ,NSONTREE,KLEVTREE,
@@ -39,6 +40,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE FORMAT_MOD , ONLY : FMT_10I
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE READER_OLD_MOD , ONLY : LINE, IREC
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -172,6 +174,7 @@ C-----------------------
       !||--- uses       -----------------------------------------------------
       !||    format_mod             ../starter/share/modules1/format_mod.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE ADMLIST(NIX     ,IX      ,NUMEL   ,IPARTEL     ,IPART   ,
      .                   KELTREE ,ELTREE  ,KSONTREE,NSONTREE    ,KLEVTREE,
@@ -184,6 +187,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
       USE FORMAT_MOD , ONLY : FMT_10I
+      USE READER_OLD_MOD , ONLY : LINE, IREC
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

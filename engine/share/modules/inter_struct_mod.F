@@ -23,6 +23,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    inter_struct_mod               ../engine/share/modules/inter_struct_mod.F
       !||--- called by ------------------------------------------------------
+      !||    compute_voxel_dimensions       ../engine/source/interfaces/intsort/voxel_dimensions.F90
+      !||    fill_voxel_local_partial       ../engine/source/interfaces/intsort/fill_voxel.F90
+      !||    inter7_collision_detection     ../engine/source/interfaces/intsort/inter7_collision_detection.F90
       !||    inter_cell_color               ../engine/source/interfaces/generic/inter_cell_color.F
       !||    inter_check_sort               ../engine/source/interfaces/generic/inter_check_sort.F
       !||    inter_color_voxel              ../engine/source/interfaces/generic/inter_color_voxel.F
@@ -64,10 +67,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
                 INTEGER :: INACTI,INACTII
                 my_real :: CURV_MAX_MAX
                 my_real, DIMENSION(:), ALLOCATABLE :: CURV_MAX     
-                INTEGER :: SIZE_CAND_A      !   size of cand_a array
+                INTEGER :: SIZE_CAND_A      !<   size of cand_a array
                 INTEGER, DIMENSION(:), ALLOCATABLE :: CAND_A  
                 INTEGER, DIMENSION(:), ALLOCATABLE :: NSNFIOLD
                 my_real, DIMENSION(12) :: BOX_LIMIT_MAIN
+                ! voxel structure
+                integer, dimension(:), allocatable :: voxel 
+                integer :: voxel_size
+                integer :: nbx, nby, nbz !< number of voxels in each direction is (nbx+2, nby+2, nbz+2)
+                integer :: nb_voxel_on !< number of non empty voxels
+                integer,dimension(:), allocatable :: list_nb_voxel_on !< list of non empty voxels
+                integer ::  size_node !< size of node arrays next_nod and last_nod
+                integer, dimension(:), allocatable :: next_nod !< next_node(i) is the next node of node i in the same voxel cell
+                integer, dimension(:), allocatable ::  last_nod
+                integer :: istart !< next available space in next_nod and last_nod
             END TYPE inter_struct_type  
         END MODULE INTER_STRUCT_MOD
 

@@ -35,10 +35,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
       !||    aleanim_mod                  ../engine/share/modules/aleanim_mod.F
       !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
+      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    i22tri_mod                   ../common_source/modules/interfaces/cut-cell-search_mod.F
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
       !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
       !||====================================================================
       SUBROUTINE DFUNCS(ELBUF_TAB  ,FUNC      ,IFUNC     ,IPARG    ,GEO     ,
@@ -59,6 +62,9 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD   
       USE ALE_CONNECTIVITY_MOD
       USE ALEANIM_MOD , ONLY : FANI_CELL_
+      USE ELBUFDEF_MOD
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
+      USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,7 +82,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "task_c.inc"
 #include      "spmd_c.inc"
-#include      "mmale51_c.inc"
 #include      "inter22.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -227,26 +232,19 @@ c-----------
      .              EVAR(I) = EVAR(I) * GBUF%FILL(I)                                                
                 ENDDO                                                   
 c-----------
-              ELSEIF(IFUNC == 4)THEN
+              ELSEIF (IFUNC == 4) THEN   ! element temperature
                 DO I=LFT,LLT                                            
-                  IF (IPARG(1,NG)  ==  2 .AND. JTHE  ==  0) THEN       
-                    EVAR(I) = PM(54,IXS(1,NFT+I)) + GBUF%EINT(I)*     
-     .                        GBUF%VOL(I) * PM(53,IXS(1,NFT+I))      
-                  ELSEIF (GBUF%G_TEMP > 0) THEN
-                    IF (MLW == 104) THEN 
-                      DO IL=1,NLAY                                                           
-                        DO IS=1,NPTS                                                         
-                          DO IT=1,NPTT                                                       
-                            DO IR=1,NPTR            
-                              LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)                                                                    
-                              EVAR(I) = EVAR(I) + (ONE/NPTG)*(LBUF%TEMP(I))               
-                            ENDDO                                                          
-                          ENDDO                                                            
-                        ENDDO                                                              
-                      ENDDO                                                                      
-                    ELSE
-                      EVAR(I) = GBUF%TEMP(I)
-                    ENDIF
+                  IF (GBUF%G_TEMP > 0) THEN
+                    DO IL=1,NLAY                                                           
+                      DO IS=1,NPTS                                                         
+                        DO IT=1,NPTT                                                       
+                          DO IR=1,NPTR            
+                            LBUF => ELBUF_TAB(NG)%BUFLY(IL)%LBUF(IR,IS,IT)                                                                    
+                            EVAR(I) = EVAR(I) + LBUF%TEMP(I)/NPTG              
+                          ENDDO                                                          
+                        ENDDO                                                            
+                      ENDDO                                                              
+                    ENDDO                                                                      
                   ENDIF                                                 
                 ENDDO                                                   
 c-----------
@@ -483,7 +481,7 @@ C              IUS = (n-1)'th user variable in UVAR
                  UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM) 
                  ISUBMAT = (IFUNC-282)
                  ISUBMAT = UPARAM(276+ISUBMAT) !bijective order
-                 IUS=N0PHAS+(ISUBMAT-1)*NVPHAS 
+                 IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS 
 !               ELSEIF(MLW==20)THEN
 !                 IUS=1+(IFUNC-10248)
                ENDIF
@@ -1050,7 +1048,7 @@ c-----------
                    UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM) 
                    ISUBMAT = ITRIMAT
                    ISUBMAT = UPARAM(276+ISUBMAT) !bijective order
-                   IUS=N0PHAS+(ISUBMAT-1)*NVPHAS 
+                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS 
                    !
                    LLT       = IPARG(2,NG)                                                 
                    IPOS      = 10                                                          
@@ -1121,7 +1119,7 @@ c-----------
                      !bijection iform=12
                      ISUBMAT   = ITRIMAT
                      ISUBMAT   = UPARAM(276+ISUBMAT) !bijective order
-                     IUS       = N0PHAS+(ISUBMAT-1)*NVPHAS 
+                     IUS       = M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS 
                      !
                      LLT       = IPARG(2,NG)    
                    !all output expect mass en specific energy by mass : output value * vol
@@ -1166,7 +1164,7 @@ c-----------
                    IPOS      = 15
                    ITRIMAT   = 4
                    LLT       = IPARG(2,NG)      
-                   K         = LLT * ((N0PHAS + (ITRIMAT-1)*NVPHAS )+IPOS-1)                             
+                   K         = LLT * ((M51_N0PHAS + (ITRIMAT-1)*M51_NVPHAS )+IPOS-1)                             
                    DO I=LFT,LLT
                      EVAR(I) = -MBUF%VAR(K+I)
                    ENDDO 
@@ -1484,10 +1482,10 @@ c------------------------------------ Color Function
                 NUPARAM= IPM(9,IMAT)                       
                 UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM) 
                 !bijective order           !indexes                  
-                ISUBMAT = UPARAM(276+1);   IU(1)=N0PHAS+(ISUBMAT-1)*NVPHAS 
-                ISUBMAT = UPARAM(276+2);   IU(2)=N0PHAS+(ISUBMAT-1)*NVPHAS
-                ISUBMAT = UPARAM(276+3);   IU(3)=N0PHAS+(ISUBMAT-1)*NVPHAS
-                ISUBMAT = UPARAM(276+4);   IU(4)=N0PHAS+(ISUBMAT-1)*NVPHAS 
+                ISUBMAT = UPARAM(276+1);   IU(1)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS 
+                ISUBMAT = UPARAM(276+2);   IU(2)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                ISUBMAT = UPARAM(276+3);   IU(3)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                ISUBMAT = UPARAM(276+4);   IU(4)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS 
                 MBUF => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)  
                 NFRAC=4   
                 DO  I=1,NEL
@@ -1620,8 +1618,8 @@ c------------------------------------ Tillotson Region id
                 !count number of submaterial based on /EOS/TILLOTSON (IEOS=3)            
                 NTILLOTSON = 0 
                 DO IMAT=1,NLAY
-                  IEOS =  IPM(4, IPM(20 + IMAT,MT) )
-                  IF(IEOS == 3)THEN 
+                  IEOS =  IPM(4, MAT_PARAM(MT)%MULTIMAT%MID(IMAT) )
+                  IF(IEOS == 3)THEN
                     NTILLOTSON = NTILLOTSON + 1 
                     IMAT_TILLOTSON = IMAT 
                   ENDIF 
@@ -1630,7 +1628,7 @@ c------------------------------------ Tillotson Region id
                 IF(NTILLOTSON > 1)THEN 
                   FAC=ONE
                   DO IMAT=1,NLAY
-                    IEOS =  IPM(4,    IPM(20 + IMAT,MT) )
+                    IEOS =  IPM(4,  MAT_PARAM(MT)%MULTIMAT%MID(IMAT)  )
                     IF(IEOS == 3)THEN 
                       EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1,1,1) 
                       NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS

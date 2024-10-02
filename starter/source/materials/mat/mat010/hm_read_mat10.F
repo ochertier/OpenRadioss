@@ -33,6 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
       !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_MAT10(
@@ -44,9 +45,10 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE ELBUFTAG_MOD !MAXEOS
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE READER_OLD_MOD , ONLY : IREC
 C-----------------------------------------------
 C   ROUTINE DESCRIPTION :
 C   ===================

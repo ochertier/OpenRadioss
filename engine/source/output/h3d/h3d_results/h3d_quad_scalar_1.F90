@@ -45,6 +45,7 @@
       !||    constant_mod                   ../common_source/modules/constant_mod.F
       !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod                    ../engine/share/resol/initbuf.F
+      !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
       !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
       !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
@@ -60,7 +61,7 @@
         &  is_written_quad,ipartq,layer_input , npart,&
         &  iuvar_input,h3d_part  ,keyword   ,&
         &  bufmat      ,multi_fvm ,&
-        &  id          )
+        &  id          ,mat_param)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +73,7 @@
           use ale_connectivity_mod, only: t_ale_connectivity
           use alefvm_mod , only:alefvm_param
           use names_and_titles_mod, only: ncharline100
+          use matparam_def_mod , only : matparam_struct_
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -120,7 +122,8 @@
           character(len=ncharline100) :: keyword !< animation keyword for the requested scalar values
           type(multi_fvm_struct), intent(in) :: multi_fvm !< Finite volume method data
           type(t_ale_connectivity), intent(in) :: ale_connect !< ALE connectivity data
-          my_real, target :: bufmat(*) !< ??
+          my_real, target :: bufmat(*) !< additional buffer for material law (old buffer. new one is mat_param)
+          type (matparam_struct_) ,dimension(nummat) ,intent(in) :: mat_param !< material buffer data structure
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -259,9 +262,6 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           ilay = layer_input
           iuvar = iuvar_input
-          do i=1,numelq
-            is_written_quad(i) = 0
-          enddo
           call initbuf(iparg    ,ng      ,&
           &mlw     ,nel     ,nft     ,iad     ,ity     ,&
           &npt     ,jale    ,ismstr  ,jeul    ,jturb   ,&
@@ -1352,7 +1352,7 @@
                   is_written_value(i) = 1
                 enddo
 !--------------------------------------------------
-              elseif(keyword == 'mach')then
+              elseif(keyword == 'MACH')then
 !--------------------------------------------------
                 if (mlw == 151) then
                   do i = 1, nel
@@ -1494,7 +1494,7 @@
                   !count number of submaterial based on /eos/tillotson (ieos=3)
                   ntillotson = 0
                   do imat=1,nlay
-                    ieos =  ipm(4, ipm(20 + imat,mt) )
+                    ieos =  ipm(4, mat_param(mt)%multimat%mid(imat) )
                     if(ieos == 3)then
                       ntillotson = ntillotson + 1
                       imat_tillotson = imat
@@ -1504,7 +1504,7 @@
                   if(ntillotson > 1)then
                     fac=one
                     do imat=1,nlay
-                      ieos =  ipm(4,    ipm(20 + imat,mt) )
+                      ieos =  ipm(4, mat_param(mt)%multimat%mid(imat) )
                       if(ieos == 3)then
                         ebuf => elbuf_tab(ng)%bufly(imat)%eos(1,1,1)
                         nvareos = elbuf_tab(ng)%bufly(imat)%nvar_eos
@@ -1552,7 +1552,7 @@
               endif  ! keyword
 !--------------------------------------------------
               if(called_from_python) then
-                quad_scalar(1:mvsiz) = value(1:mvsiz)
+                quad_scalar(1:nel) = value(1:nel)
               else
                 call h3d_write_scalar(iok_part,is_written_quad,quad_scalar,nel,0,nft,value,is_written_value)
               endif

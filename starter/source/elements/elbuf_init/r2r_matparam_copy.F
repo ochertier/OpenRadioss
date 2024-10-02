@@ -62,7 +62,7 @@ c
         MATPARAM_TAB(I)%NFAIL              = NFAIL
         MATPARAM_TAB(I)%IVISC              = MATPARAM_INI(I)%IVISC
         MATPARAM_TAB(I)%IEOS               = MATPARAM_INI(I)%IEOS
-        MATPARAM_TAB(I)%ITHERM             = MATPARAM_INI(I)%ITHERM
+        MATPARAM_TAB(I)%HEAT_FLAG          = MATPARAM_INI(I)%HEAT_FLAG
         MATPARAM_TAB(I)%COMPRESSIBILITY    = MATPARAM_INI(I)%COMPRESSIBILITY
         MATPARAM_TAB(I)%SMSTR              = MATPARAM_INI(I)%SMSTR
         MATPARAM_TAB(I)%STRAIN_FORMULATION = MATPARAM_INI(I)%STRAIN_FORMULATION
@@ -89,6 +89,12 @@ c
         MATPARAM_TAB(I)%RHO                = MATPARAM_INI(I)%RHO
         MATPARAM_TAB(I)%RHO0               = MATPARAM_INI(I)%RHO0
         MATPARAM_TAB(I)%YOUNG              = MATPARAM_INI(I)%YOUNG
+        MATPARAM_TAB(I)%SHEAR              = MATPARAM_INI(I)%SHEAR
+        MATPARAM_TAB(I)%BULK               = MATPARAM_INI(I)%BULK
+        MATPARAM_TAB(I)%NU                 = MATPARAM_INI(I)%NU
+        MATPARAM_TAB(I)%STIFF_CONTACT      = MATPARAM_INI(I)%STIFF_CONTACT
+        MATPARAM_TAB(I)%STIFF_HGLASS       = MATPARAM_INI(I)%STIFF_HGLASS 
+        MATPARAM_TAB(I)%STIFF_TSTEP        = MATPARAM_INI(I)%STIFF_TSTEP  
 c
         MATPARAM_TAB(I)%COMPATIBILITY_EOS  = MATPARAM_INI(I)%COMPATIBILITY_EOS
 c
@@ -153,7 +159,7 @@ c
         MATPARAM_TAB(I)%NFAIL              = 0
         MATPARAM_TAB(I)%IVISC              = 0
         MATPARAM_TAB(I)%IEOS               = 0
-        MATPARAM_TAB(I)%ITHERM             = 0
+        MATPARAM_TAB(I)%HEAT_FLAG          = 0
         MATPARAM_TAB(I)%COMPRESSIBILITY    = 0
         MATPARAM_TAB(I)%SMSTR              = 0
         MATPARAM_TAB(I)%STRAIN_FORMULATION = 0
@@ -181,6 +187,12 @@ c
         MATPARAM_TAB(I)%RHO                = ZERO
         MATPARAM_TAB(I)%RHO0               = ZERO
         MATPARAM_TAB(I)%YOUNG              = ZERO
+        MATPARAM_TAB(I)%SHEAR              = ZERO
+        MATPARAM_TAB(I)%BULK               = ZERO
+        MATPARAM_TAB(I)%NU                 = ZERO
+        MATPARAM_TAB(I)%STIFF_CONTACT      = ZERO
+        MATPARAM_TAB(I)%STIFF_HGLASS       = ZERO
+        MATPARAM_TAB(I)%STIFF_TSTEP        = ZERO
       ENDDO
 c-----------------------------------------------
       RETURN

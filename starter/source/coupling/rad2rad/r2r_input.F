@@ -21,12 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    r2r_input       ../starter/source/coupling/rad2rad/r2r_input.F
+      !||    r2r_input        ../starter/source/coupling/rad2rad/r2r_input.F
       !||--- called by ------------------------------------------------------
-      !||    r2r_group       ../starter/source/coupling/rad2rad/r2r_group.F
+      !||    r2r_group        ../starter/source/coupling/rad2rad/r2r_group.F
       !||--- uses       -----------------------------------------------------
-      !||    r2r_mod         ../starter/share/modules1/r2r_mod.F
-      !||    restmod         ../starter/share/modules1/restart_mod.F
+      !||    r2r_mod          ../starter/share/modules1/r2r_mod.F
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+      !||    restmod          ../starter/share/modules1/restart_mod.F
       !||====================================================================
       SUBROUTINE R2R_INPUT(IEXTER)
 C-----------------------------------------------
@@ -35,6 +36,8 @@ C-----------------------------------------------
         USE RESTMOD
         USE R2R_MOD
         USE INOUTFILE_MOD
+        USE READER_OLD_MOD , ONLY : NSLASH
+        USE READER_OLD_MOd , ONLY : KR2R
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -67,17 +70,16 @@ C-----------------------------------------------
 C-----Creation of arrays for Links---
 
         COMPT = 1
+        START = NSLASH(KR2R)+1
 
         DO I=0,NSUBDOM
           ADDRESS(I+1)=COMPT
-          START = NSLASH(KR2R)+1
           DO J=START,NR2RLNK
             IF ((IEXTER(3,J)==I).OR.(IEXTER(4,J)==I)) THEN
               TAB_TMP(COMPT)=IEXTER(2,J)
               COMPT = COMPT+1
             ENDIF
           END DO
-
           NB(I+1)=COMPT-ADDRESS(I+1)
         END DO
 

@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    lec_inistate         ../starter/source/elements/initia/lec_inistate.F
       !||--- uses       -----------------------------------------------------
       !||    format_mod           ../starter/share/modules1/format_mod.F90
+      !||    reader_old_mod       ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE LEC_INISTATE_YFILE( 
      1                  NSIGSH    ,NSIGS     ,NSIGSPH   ,NSIGRS    ,NSIGI     ,                 
@@ -36,6 +37,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
         USE FORMAT_MOD
+        USE READER_OLD_MOD , ONLY : LINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,23 +56,15 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NSIGI, NSIGSH, NSIGS, NSIGSPH, NSIGRS, ISIGSH, IUSER
       INTEGER ID_SIGSH(*), ID_SOLID_SIGI(*), ID_QUAD_SIGI(*)
-      my_real
-     .   SIGI(NSIGS,*),SIGSH(MAX(1,NSIGSH),*),
-     .   SIGSP(NSIGI,*),SIGSPH(NSIGSPH,*),SIGRS(NSIGRS,*)
+      my_real SIGI(NSIGS,*),SIGSH(MAX(1,NSIGSH),*),SIGSP(NSIGI,*),SIGSPH(NSIGSPH,*),SIGRS(NSIGRS,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K, N, I,J, IGTYP,
-     .   NUMS,IHBE,NE, ISH3N,IIS,NIP,IPG,NPG,PT,
-     .   J1,JJ1,NU,IP,JJ,NUVAR,
-     .   NVARSH,NUMR,NUMSOLID,KK,
-     .   JJHBE
+      INTEGER K, N, I,J, IGTYP,NUMS,IHBE,NE, ISH3N,IIS,NIP,IPG,NPG,PT,J1,JJ1,NU,IP,JJ,NUVAR,NVARSH,NUMR,NUMSOLID,KK,JJHBE
       INTEGER KN
       INTEGER IS_SOLID,IS_QUAD   
-      my_real
-     .   THKI, EM, EB, H1, H2, H3, R0 , EIN, SMOOTHL
-      my_real
-     .   S(6), SIGLOC(6)
+      my_real THKI, EM, EB, H1, H2, H3, R0 , EIN, SMOOTHL
+      my_real S(6), SIGLOC(6)
 C=======================================================================
 C
 C -- LECTURE OF INITIAL STATE DATA - EXTRACTED FROM INITIA.F

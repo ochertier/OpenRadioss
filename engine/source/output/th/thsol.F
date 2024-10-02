@@ -692,10 +692,8 @@ C--------------------------------------------------
 c             LOOP NEL, Filling TH Buffer
 C-----------------------------------------------------
               IF (MTE == 2) THEN
-                WWA(12)=GBUF%PLA(I)
-                IF ( JTHE  ==  0 ) THEN
-                  WWA(13)= PM(54,IXS(1,NFT+I)) + WWA(8) * WWA(11) * PM(53,IXS(1,NFT+I))
-                ENDIF
+                WWA(12) = GBUF%PLA(I)
+                WWA(13) = GBUF%TEMP(I)
               ELSEIF (MTE == 3) THEN
                 WWA(12)=GBUF%PLA(I)
                 WWA(13)=GBUF%TEMP(I)
@@ -810,6 +808,7 @@ C               Solid spotwelds : damage  DAMA1 ...DAMA4
 
               ELSEIF (MTE == 83) THEN
                 WWA(12)=GBUF%PLA(I)
+                WWA(14)=GBUF%EPSD(I)
                 NUVAR = ELBUF_TAB(NG)%BUFLY(1)%NVAR_MAT
                 DO J=1,NPTR
                   MBUF  => ELBUF_TAB(NG)%BUFLY(1)%MAT(J,1,1)

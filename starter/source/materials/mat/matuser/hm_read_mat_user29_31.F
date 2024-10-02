@@ -34,6 +34,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    format_mod             ../starter/share/modules1/format_mod.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_MAT29_31(ILAW,IUSER_KEY,
@@ -63,10 +64,11 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE MATPARAM_DEF_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
       USE FORMAT_MOD , ONLY : FMT_2F
+      USE READER_OLD_MOD , ONLY : KCUR, KLINE, LINE,KEY0
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -87,7 +89,7 @@ C-----------------------------------------------
       INTEGER NUPARAM 
       INTEGER NUVAR
       INTEGER NFUNC,MAXFUNC
-      TYPE(SUBMODEL_DATA),INTENT(IN)  :: LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN)  :: LSUBMODEL(NSUBMOD)
       INTEGER, DIMENSION(MAXFUNC)     :: IFUNC
       my_real, DIMENSION(100)         :: PARMAT
       my_real, DIMENSION(MAXUPARAM)   :: UPARAM
@@ -160,11 +162,6 @@ C-----------------------------------------------
       CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
 
       RETURN
- 999  CALL ANCMSG(MSGID=55,
-     .            ANMODE=ANINFO,
-     .            MSGTYPE=MSGERROR,
-     .            C1=KEY0(KCUR),
-     .            C2=KLINE,
-     .            C3=LINE)
+ 999  CALL ANCMSG(MSGID=55,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1=KEY0(KCUR),C2=KLINE,C3=LINE)
       CALL ARRET(2)
       END

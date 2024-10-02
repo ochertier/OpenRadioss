@@ -54,10 +54,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,IMAT,NUMMAT,NUMTABL,NUPARAM,NIPARAM,NFAIL,IAD,NFIX,NFIXR,
-     .           LEN,LENR,NMOD,MOD
+      INTEGER :: I,IMAT,NUMMAT,NUMTABL,NUPARAM,NIPARAM,NFAIL,IAD,NFIX,NFIXR,LEN,LENR,NMOD,MOD
       INTEGER ,DIMENSION(NCHARTITLE) :: NAME
       INTEGER ,DIMENSION(:) ,ALLOCATABLE :: IBUF
+      INTEGER :: NBSUBMAT, ISUB
       my_real ,DIMENSION(:) ,ALLOCATABLE :: RBUF
 c=======================================================================
 c     read MATPARAM data
@@ -81,7 +81,7 @@ c
         MAT_ELEM%MAT_PARAM(IMAT)%NFAIL              = IBUF(IAD+ 8)
         MAT_ELEM%MAT_PARAM(IMAT)%IVISC              = IBUF(IAD+ 9)
         MAT_ELEM%MAT_PARAM(IMAT)%IEOS               = IBUF(IAD+10)
-        MAT_ELEM%MAT_PARAM(IMAT)%ITHERM             = IBUF(IAD+11)
+        MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG          = IBUF(IAD+11)
 c
         MAT_ELEM%MAT_PARAM(IMAT)%COMPRESSIBILITY    = IBUF(IAD+12)
         MAT_ELEM%MAT_PARAM(IMAT)%SMSTR              = IBUF(IAD+13)
@@ -101,15 +101,21 @@ c
 c
 c     read real parameters
 c
-      NFIXR = 3
+      NFIXR = 9
       LENR  = NFIXR*NUMMAT
       ALLOCATE (RBUF(LENR) )
       CALL READ_DB (RBUF ,LENR)
       IAD   = 0
       DO IMAT = 1,NUMMAT
-        MAT_ELEM%MAT_PARAM(IMAT)%RHO   = RBUF(IAD + 1)
-        MAT_ELEM%MAT_PARAM(IMAT)%RHO0  = RBUF(IAD + 2)
-        MAT_ELEM%MAT_PARAM(IMAT)%YOUNG = RBUF(IAD + 3)
+        MAT_ELEM%MAT_PARAM(IMAT)%RHO           = RBUF(IAD + 1)
+        MAT_ELEM%MAT_PARAM(IMAT)%RHO0          = RBUF(IAD + 2)
+        MAT_ELEM%MAT_PARAM(IMAT)%YOUNG         = RBUF(IAD + 3)
+        MAT_ELEM%MAT_PARAM(IMAT)%BULK          = RBUF(IAD + 4)
+        MAT_ELEM%MAT_PARAM(IMAT)%SHEAR         = RBUF(IAD + 5)
+        MAT_ELEM%MAT_PARAM(IMAT)%NU            = RBUF(IAD + 6)
+        MAT_ELEM%MAT_PARAM(IMAT)%STIFF_CONTACT = RBUF(IAD + 7)
+        MAT_ELEM%MAT_PARAM(IMAT)%STIFF_HGLASS  = RBUF(IAD + 8)
+        MAT_ELEM%MAT_PARAM(IMAT)%STIFF_TSTEP   = RBUF(IAD + 9)
         IAD = IAD + NFIXR
       END DO
       DEALLOCATE (RBUF)
@@ -185,7 +191,26 @@ c
         ELSE 
           ALLOCATE(MAT_ELEM%MAT_PARAM(IMAT)%MODE(0))
         ENDIF
-      ENDDO       
+      ENDDO
+
+      !Read multimaterial buffer
+      ALLOCATE (IBUF(21) ) !< mex is 21 submaterials
+      ALLOCATE (RBUF(21) )
+      DO IMAT = 1,NUMMAT
+        CALL READ_I_C(IBUF, 1)
+        NBSUBMAT = IBUF(1)
+        MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%NB = NBSUBMAT
+        IF(NBSUBMAT > 0)THEN
+          CALL READ_I_C(IBUF, NBSUBMAT)
+          CALL READ_DB(RBUF, NBSUBMAT)
+          MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%mid = IBUF(1:NBSUBMAT)
+          MAT_ELEM%MAT_PARAM(IMAT)%MULTIMAT%vfrac = RBUF(1:NBSUBMAT)
+        ENDIF
+      ENDDO
+      DEALLOCATE(IBUF)
+      DEALLOCATE(RBUF)
+
+
 c-----------
       RETURN
       END

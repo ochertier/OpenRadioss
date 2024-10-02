@@ -58,7 +58,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    vrrota3                ../engine/source/elements/thickshell/solide6c/vrrota3.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
@@ -93,6 +94,7 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -158,7 +160,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,LCO,NF1,IFLAG,NUVAR,CURRENT_LAYER,
+      INTEGER I,J,LCO,NF1,IFLAG,NUVAR,CURRENT_LAYER,IMAT,
      .   ILAY,NLAY,IR,IS,IT,IP,IBID,MX,L_PLA,L_EPSD
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IBIDON(1)
 c     Variables utilisees dans les routines solides uniquement (en arguments).
@@ -249,6 +251,7 @@ C
      .   N4Y(MVSIZ), N5Y(MVSIZ), N6Y(MVSIZ),
      .   N4Z(MVSIZ), N5Z(MVSIZ), N6Z(MVSIZ),AMU(MVSIZ),AREA(MVSIZ)
       my_real THEM(MVSIZ,6),TEMPEL(MVSIZ),DIE(MVSIZ),CONDEN(MVSIZ)
+      my_real, dimension(mvsiz) :: fheat
       DOUBLE PRECISION 
      .   VOLDP(MVSIZ),FACDP
       INTEGER INLOC,L_NLOC,IPOS(6),INOD(6)
@@ -560,7 +563,8 @@ C--------------------------------------
 C-------------------------------------------
 C Element temperature
 C-------------------------------------------
-      TEMPEL(1:NEL) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
       IF (JTHE < 0) THEN       
         DO I=1,NEL
           TEMPEL(I) = ONE_OVER_6 *(TEMP(NC1(I)) + TEMP(NC2(I))  
@@ -678,9 +682,8 @@ C------------------------------------------------------
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna, OPT_MTN=MTN,OPT_JCVT=JCVT,OPT_ISORTH=ISORTH, 
-     S   OPT_ISORTHG=ISORTHG)
-
+     .   idyna,       DT,         fheat  , OPT_MTN=MTN,OPT_JCVT=JCVT, 
+     .   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 C
         DO I=1,NEL
           STIN(I) = STIN(I)+STI(I)
@@ -757,15 +760,28 @@ C-------------------------
 C Finite element heat transfert  
 C--------------------------
         IF (JTHE < 0) THEN
-          CALL S6CTHERM(
-     1      PM       ,MXT     ,VOLN     ,NC1      ,
-     2      NC2      ,NC3     ,NC4      ,NC5      ,
-     3      NC6      ,PX1     ,PX2      ,PX3      ,
-     4      PX4      ,PY1     ,PY2      ,PY3      ,
-     5      PY4      ,PZ1     ,PZ2      ,PZ3      ,
-     6      PZ4      ,DT1     ,TEMP     ,TEMPEL   ,
-     7      DIE      ,THEM    ,GBUF%OFF ,LBUF%OFF ,
-     8      NEL      )
+          IMAT = MXT(1)
+          IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+            CALL S6CTHERM(
+     1           PM       ,IMAT    ,VOLN     ,NC1      ,
+     2           NC2      ,NC3     ,NC4      ,NC5      ,
+     3           NC6      ,PX1     ,PX2      ,PX3      ,
+     4           PX4      ,PY1     ,PY2      ,PY3      ,
+     5           PY4      ,PZ1     ,PZ2      ,PZ3      ,
+     6           PZ4      ,DT1     ,TEMP     ,TEMPEL   ,
+     7           FHEAT    ,THEM    ,GBUF%OFF ,LBUF%OFF ,
+     8           NEL      )
+          ELSE
+          END IF
+            CALL S6CTHERM(
+     1           PM       ,IMAT    ,VOLN     ,NC1      ,
+     2           NC2      ,NC3     ,NC4      ,NC5      ,
+     3           NC6      ,PX1     ,PX2      ,PX3      ,
+     4           PX4      ,PY1     ,PY2      ,PY3      ,
+     5           PY4      ,PZ1     ,PZ2      ,PZ3      ,
+     6           PZ4      ,DT1     ,TEMP     ,TEMPEL   ,
+     7           DIE      ,THEM    ,GBUF%OFF ,LBUF%OFF ,
+     8           NEL      )
         ENDIF 
         DO I=1,NEL                                        
           OFFG(I)=MIN(OFFG(I),OFF(I))                        

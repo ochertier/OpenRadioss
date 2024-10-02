@@ -33,7 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    submodel_mod                 ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_INTER_HERTZ_TYPE17(
-     1        IPARI       ,FRIGAP       ,NOINT    ,NI       ,NTYP        ,
+     1        IPARI       ,FRIGAP       ,NOINT    ,NTYP     ,
      2        IGRBRIC     ,UNITAB       ,LSUBMODEL,TITR     )
 C============================================================================
 C-----------------------------------------------
@@ -51,7 +51,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
 #include      "scr06_c.inc"
 #include      "com04_c.inc"
 #include      "units_c.inc"

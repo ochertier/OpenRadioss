@@ -85,6 +85,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_dpdb             ../common_source/tools/input_output/write_db.F
       !||    write_elgroup_param    ../engine/source/output/restart/write_elgroup_param.F
       !||    write_i_c              ../common_source/tools/input_output/write_routtines.c
+      !||    write_inivel           ../engine/source/output/restart/write_inivel.F90
       !||    write_intbuf           ../engine/source/output/restart/write_intbuf.F
       !||    write_joint            ../engine/source/output/restart/write_joint.F
       !||    write_matparam         ../engine/source/output/restart/write_matparam.F
@@ -103,6 +104,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    drape_mod              ../engine/share/modules/drape_mod.F
       !||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F
       !||    ecnd_mod               ../engine/share/modules/ecdn_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    group_mod              ../engine/share/modules/group_mod.F
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
@@ -133,6 +135,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    time_mod               ../engine/share/modules/time_mod.F
       !||    unitab_mod             ../common_source/modules/unitab_mod.F
       !||    user_windows_mod       ../common_source/modules/user_windows_mod.F
+      !||    write_inivel_mod       ../engine/source/output/restart/write_inivel.F90
       !||    xfem2vars_mod          ../engine/share/modules/xfem2vars_mod.F
       !||====================================================================
       SUBROUTINE WRRESTP(AF         ,IAF      ,XDP        ,ICH       ,ADDCNE,
@@ -191,6 +194,8 @@ C-----------------------------------------------
       USE STACK_MOD
       USE DRAPE_MOD
       USE TIME_MOD
+      USE ELBUFDEF_MOD
+      use write_inivel_mod , only : write_inivel
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1335,6 +1340,7 @@ C--------------------------------------
         IF(IFCONTP2MAX >0)THEN
           CALL WRITE_DB(FNCONT2_MAX, 3*NUMNOD)
           CALL WRITE_DB(FTCONT2_MAX, 3*NUMNOD)
+          CALL WRITE_DB(NPCONT2_MAX, 3*NUMNOD)
         ENDIF
 
         IF(IFCONT2MIN >0)THEN
@@ -1343,6 +1349,7 @@ C--------------------------------------
         IF(IFCONTP2MIN >0)THEN
           CALL WRITE_DB(FNCONT2_MIN, 3*NUMNOD)
           CALL WRITE_DB(FTCONT2_MIN, 3*NUMNOD)
+          CALL WRITE_DB(NPCONT2_MIN, 3*NUMNOD)
         ENDIF
 C--------Frictional energy output-------
       IF(S_EFRICINT >0)THEN
@@ -1581,6 +1588,9 @@ c
       IF (NLOADP > 0) CALL WRITE_DB(LOADP,LFACLOAD*NLOADP)
       IF (NINTLOADP > 0) CALL WRITE_DB(DGAPLOADINT,NINTER*NLOADP_HYD)
 C
+C /INIVEL w/ T_start or senor_id
+      IF (LOADS%NINIVELT>0) CALL WRITE_INIVEL(LOADS%NINIVELT,LOADS%INIVELT) 
+C                                                         
 C xfem for layerd shell (cracks)
       IF (ICRACK3D > 0) THEN
         CALL CRKXFEM_WREST(INOD_CRKXFEM,IEL_CRKXFEM,NODLEVXF)

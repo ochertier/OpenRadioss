@@ -68,7 +68,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    tshgeodel3             ../engine/source/elements/thickshell/solidec/tshgeodel3.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
@@ -109,6 +110,7 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE SENSOR_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -328,6 +330,7 @@ C Variables utilisees dans les routines solides uniquement (en arguments).
       my_real, DIMENSION(MVSIZ,NNPT) :: SMTT
       my_real, 
      .  DIMENSION(:), POINTER :: EINT
+      my_real, dimension(mvsiz) :: fheat
 C-----
       my_real,
      .  DIMENSION(:,:), ALLOCATABLE :: 
@@ -417,7 +420,8 @@ C=======================================================================
       SZ_IX=NUMELQ+NUMELS+NSVOIS
       SZ_R1_FREE=MVSIZ
       GBUF   => ELBUF_TAB(NG)%GBUF
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
 !
       DO I=1,6
         II(I) = NEL*(I-1)
@@ -950,7 +954,7 @@ C-----------------------------
 C
 C       for heat transfert
 C
-        IF(JTHE < 0 ) THEN
+        IF (JTHE < 0 ) THEN
          CALL S8ZTEMPEL(LFT,LLT,NI,
      1                 ZR,ZS,ZT,
      2                 NC1,NC2,NC3,NC4,NC5,NC6,NC7,NC8,
@@ -1002,8 +1006,8 @@ c
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna,       OPT_MTN=MTN,  OPT_JCVT=JCVT, OPT_ISORTH=ISORTH,
-     *   OPT_ISORTHG=ISORTHG)
+     .   idyna,       DT,         fheat      , OPT_MTN=MTN, OPT_JCVT=JCVT,
+     *   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 C    
         IF (ISTRAIN == 1) THEN 
           CALL SSTRA3(
@@ -1127,20 +1131,36 @@ C----------------------------
 CC-------------------------
 c    finite element heat transfert  
 C--------------------------
-          IF(JTHE < 0) THEN
-            CALL S8ETHERM(
-     1   PM,      MXT,     VOLN,    NI,
-     2   NC1,     NC2,     NC3,     NC4,
-     3   NC5,     NC6,     NC7,     NC8,
-     4   PX1,     PX2,     PX3,     PX4,
-     5   PY1,     PY2,     PY3,     PY4,
-     6   PZ1,     PZ2,     PZ3,     PZ4,
-     7   PX5,     PX6,     PX7,     PX8,
-     8   PY5,     PY6,     PY7,     PY8,
-     9   PZ5,     PZ6,     PZ7,     PZ8,
-     A   DT1,     TEMP,    TEMPEL,  DIE,
-     B   THEM,    GBUF%OFF,LBUF%OFF,PARTSAV,
-     C   IPARTS,  LBUF%VOL,NEL)
+          IF (JTHE < 0) THEN
+            IF (MAT_ELEM%MAT_PARAM(MX)%HEAT_FLAG == 1) THEN
+              CALL S8ETHERM(
+     1             PM,      MX ,    VOLN,    NI,
+     2             NC1,     NC2,     NC3,     NC4,
+     3             NC5,     NC6,     NC7,     NC8,
+     4             PX1,     PX2,     PX3,     PX4,
+     5             PY1,     PY2,     PY3,     PY4,
+     6             PZ1,     PZ2,     PZ3,     PZ4,
+     7             PX5,     PX6,     PX7,     PX8,
+     8             PY5,     PY6,     PY7,     PY8,
+     9             PZ5,     PZ6,     PZ7,     PZ8,
+     A             DT1,     TEMP,    TEMPEL,  FHEAT,
+     B             THEM,    GBUF%OFF,LBUF%OFF,PARTSAV,
+     C             IPARTS,  LBUF%VOL,NEL)
+            ELSE
+              CALL S8ETHERM(
+     1             PM,      MX ,    VOLN,    NI,
+     2             NC1,     NC2,     NC3,     NC4,
+     3             NC5,     NC6,     NC7,     NC8,
+     4             PX1,     PX2,     PX3,     PX4,
+     5             PY1,     PY2,     PY3,     PY4,
+     6             PZ1,     PZ2,     PZ3,     PZ4,
+     7             PX5,     PX6,     PX7,     PX8,
+     8             PY5,     PY6,     PY7,     PY8,
+     9             PZ5,     PZ6,     PZ7,     PZ8,
+     A             DT1,     TEMP,    TEMPEL,  DIE,
+     B             THEM,    GBUF%OFF,LBUF%OFF,PARTSAV,
+     C             IPARTS,  LBUF%VOL,NEL)
+            END IF
           ENDIF 
 c
 C-------------------------

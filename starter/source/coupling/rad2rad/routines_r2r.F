@@ -235,8 +235,14 @@ C---
       !||    hm_read_link       ../starter/source/constraints/rigidlink/hm_read_rlink.F
       !||--- calls      -----------------------------------------------------
       !||    nextsla            ../starter/source/starter/freform.F
+      !||--- uses       -----------------------------------------------------
+      !||    reader_old_mod     ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE SZ_R2R(TAG,VAL)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE READER_OLD_MOD , ONLY : IREC, NSLASH
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -332,6 +338,7 @@ C
       !||    group_mod              ../starter/share/modules1/group_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||    restmod                ../starter/share/modules1/restart_mod.F
       !||====================================================================
       INTEGER FUNCTION R2R_EXIST(TYP,ID)
@@ -343,6 +350,7 @@ C-----------------------------------------------
         USE MESSAGE_MOD
         USE GROUPDEF_MOD
         USE GROUP_MOD
+        USE READER_OLD_MOD , ONLY : KINTER, NSLASH
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -353,7 +361,6 @@ C-----------------------------------------------
 #include      "scr17_c.inc"
 #include      "com04_c.inc"
 C-----------------------------------------------
-!!      TYPE (SUBSET_) , DIMENSION(NSUBS) :: SUBSET
         INTEGER ID,TYP
         INTEGER I,CURS
 C--------------------------------------------------------
@@ -468,6 +475,7 @@ C-----------GAUGES------------------
       !||--- uses       -----------------------------------------------------
       !||    format_mod         ../starter/share/modules1/format_mod.F90
       !||    r2r_mod            ../starter/share/modules1/r2r_mod.F
+      !||    reader_old_mod     ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       INTEGER FUNCTION R2R_LISTCNT(NVAR,TYP)
 C-----------------------------------------------
@@ -475,6 +483,7 @@ C   M o d u l e s
 C-----------------------------------------------
         USE R2R_MOD
         USE FORMAT_MOD , ONLY : FMT_10I
+        USE READER_OLD_MOD , ONLY : LINE, IREC
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

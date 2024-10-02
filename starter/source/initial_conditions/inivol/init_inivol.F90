@@ -48,7 +48,7 @@
       !||--- uses       -----------------------------------------------------
       !||    inivol_def_mod                 ../starter/share/modules1/inivol_mod.F
       !||====================================================================
-     subroutine init_inivol(    NUM_INIVOL,   inivol,   nsurf, igrsurf, &
+     subroutine init_inivol(    num_inivol,   inivol,   nsurf, igrsurf, &
                                 nparg     ,   ngroup,   iparg,  numnod, npart,&
                                 numels    ,     nixs,     ixs,&
                                 numeltg   ,    nixtg,    ixtg,&
@@ -57,8 +57,9 @@
                                 elbuf_tab ,  numels8,   xrefs,&
                                 n2d       ,multi_fvm,  sipart, ipart  , &
                                 i15a      ,     i15b,    i15h, sbufmat, bufmat,&
-                                npropmi   ,   nummat,     ipm, sbufsf , bufsf,&
-                                npropg    ,   numgeo,     geo, mvsiz  , skvol, itab)
+                                npropmi   ,   nummat,     ipm,  sbufsf, bufsf,&
+                                npropg    ,   numgeo,     geo,   mvsiz, skvol , itab, &
+                                mat_param)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -67,7 +68,8 @@
       use inivol_def_mod , only : inivol_struct_
       use groupdef_mod , only : surf_
       use elbufdef_mod , only : elbuf_struct_, buf_mat_
-      use multi_fvm_mod , only : MULTI_FVM_STRUCT
+      use multi_fvm_mod , only : multi_fvm_struct
+      use matparam_def_mod , only : matparam_struct_
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -79,7 +81,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
-      integer,intent(in) :: nsurf, NUM_INIVOL, n2d, sbufmat, npropg, numgeo, mvsiz,skvol          !< array sizes
+      integer,intent(in) :: nsurf, num_inivol, n2d, sbufmat, npropg, numgeo, mvsiz,skvol          !< array sizes
       integer, intent(in) :: nixs,nixtg,nixq,numels,numeltg,numelq, numnod, nparg, ngroup, npart  !< array sizes
       integer,intent(in) :: numels8, nbsubmat, npropmi, nummat, sipart, sbufsf                    !< array sizes
       integer, intent(in) :: ixs(nixs,numels), ixtg(nixtg,numeltg), ixq(nixq,numelq)              !< elems node-connectivity
@@ -98,6 +100,7 @@
       type (inivol_struct_), dimension(NUM_INIVOL), intent(inout) :: inivol                       !< inivol data structure
       type (surf_), dimension(nsurf), intent(in) :: igrsurf                                       !< surface buffer
       integer,intent(in) :: itab(numnod)
+      type (matparam_struct_) ,dimension(nummat) ,intent(in) :: mat_param
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   local variables
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -116,6 +119,7 @@
       integer :: ifrac,idp,idc,idsurf,ireversed,jmid
       integer ::nb_container,nseg_swift_surf,nseg_used,nsurf_invol,imat,NUMEL_TOT,ICUMU,I15_,nuvar,nft
       integer :: ity,isolnod,invol,ii,iad,isize_inivol,sipart_
+      integer :: imid
       my_real, dimension(3) :: size_cell ! cell's size in x/y/z direction
       my_real, dimension(:,:), allocatable :: dis
       my_real :: element_size ! max element size
@@ -131,7 +135,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
-      if (NUM_INIVOL > 0) then
+      if (num_inivol > 0) then
         ntrace0 = 3
         ntrace0 = 2*ntrace0+1
         ntrace  = ntrace0**3
@@ -145,7 +149,7 @@
         !initialize 2d volume fractions
         !POLYGONAL CLIPPING METHOD
         required_2d_polygon_clipping = .false.
-        do ii=1,NUM_INIVOL
+        do ii=1,num_inivol
           if( inivol(ii)%required_2d_polygon_clipping ) required_2d_polygon_clipping = .true.
         end do
         if(required_2d_polygon_clipping)then;
@@ -155,7 +159,7 @@
         end if
 
         ! MAIN LOOP OVER INIVOL OPTIONS
-        do ii=1,NUM_INIVOL
+        do ii=1,num_inivol
 
           required_monte_carlo_method = inivol(ii)%required_monte_carlo_method
           required_2d_polygon_clipping = inivol(ii)%required_2d_polygon_clipping
@@ -177,14 +181,14 @@
               nsegsurf = igrsurf(idsurf)%nseg
               if (igrsurf(idsurf)%type == 0 ) then
                 ! 2D LINE OF SEGMENTS (/SURF/SEG)
-                CALL INIT_INIVOL_2D_POLYGONS(   ii        ,      idc, &
-                                                NUM_INIVOL,   inivol,   nsurf      , igrsurf, &
-                                                nparg     ,   ngroup,   iparg      , numnod,  &
-                                                numeltg   ,    nixtg,    ixtg      , &
-                                                numelq    ,     nixq,     ixq      , &
-                                                x         , nbsubmat, kvol_2d_polyg, &
-                                                sipart    ,    ipart, &
-                                                i15b      ,    i15h ,itab  )
+                CALL init_inivol_2d_polygons(   ii        ,      idc,   mat_param  ,          &
+                                                num_inivol,   inivol,   nsurf      , igrsurf, &
+                                                nparg     ,   ngroup,   iparg      ,  numnod, &
+                                                numeltg   ,    nixtg,    ixtg      ,          &
+                                                numelq    ,     nixq,     ixq      ,          &
+                                                x         , nbsubmat, kvol_2d_polyg,  nummat, &
+                                                sipart    ,    ipart,                         &
+                                                i15b      ,    i15h ,    itab      )
               end if
             end do
           end if
@@ -383,7 +387,8 @@
                   igrsurf(idsurf)%iad_bufr,bufsf       ,nod_norm   ,isolnod              ,nbsubmat             ,&
                   vfrac                   ,icumu       ,idc        ,nb_container         ,nsegsurf             ,&
                   idsurf                  ,swiftsurf   ,segtosurf  ,igrsurf              ,ivolsurf             ,&
-                  nsurf_invol             ,ixq         ,ixtg       ,ity                  ,nel                  ,numel_tot)
+                  nsurf_invol             ,ixq         ,ixtg       ,ity                  ,nel                  ,numel_tot, &
+                  num_inivol              ,inivol      ,ii         )
                   mbuf  => elbuf_tab(ng)%bufly(1)%mat(1,1,1)
                   nuvar =  elbuf_tab(ng)%bufly(1)%nvar_mat
                   nf1   =  nft+1
@@ -411,11 +416,14 @@
             endif
             if(ity == 1)then
               i15_=i15a
+              imid = ixs(1,1+nft)
             elseif(n2d > 0)then
               if(ity == 7)then
                 i15_=i15h
+                imid = ixtg(1,1+nft)
               elseif(ity == 2)then
                 i15_=i15b
+                imid = ixq(1,1+nft)
               else
                 i15_=0
              endif
@@ -426,9 +434,10 @@
             nf1_2d = max(1,min(nf1,numeltg+numelq)) !kvol_2d_polyg  allocated to 1 when n2d=0
             if (.not. required_2d_polygon_clipping) nf1_2d = 1
             call inivol_set( &
-                             mbuf%var  , nuvar      , nel        , kvol(1,nf1) , mtn                         , &
-                             elbuf_tab , ng         , nbsubmat   , multi_fvm   , required_2d_polygon_clipping, &
-                             idp       , ipart(i15_), nft        , kvol_2d_polyg(1,nf1_2d)     )
+                             mbuf%var  , nuvar      , nel        , kvol(1,nf1)             , mtn                         , &
+                             elbuf_tab , ng         , nbsubmat   , multi_fvm               , required_2d_polygon_clipping, &
+                             idp       , ipart(i15_), nft        , kvol_2d_polyg(1,nf1_2d) , imid                        , &
+                             mat_param    )
           enddo ! next ng=1,ngroup
 !-------------
 
@@ -445,14 +454,14 @@
           if(allocated(nod_norm)) deallocate(nod_norm)
           if(allocated(segtosurf))deallocate(segtosurf)
 !---
-        enddo ! next ii=1,NUM_INIVOL
+        enddo ! next ii=1,num_inivol
         deallocate( cell_position )
         deallocate( list_ale_node )
 
       else
         allocate(iphase(0),nbip(0,0),itagnsol(0),knod2surf(0),part_fill(0),ivolsurf(0))
         allocate(swiftsurf(0),nsoltosf(0,0),inod2surf(0),dis(0,0),nod_norm(0),segtosurf(0))
-      endif ! if (NUM_INIVOL > 0)
+      endif ! if (num_inivol > 0)
 
       if(allocated(kvol_2d_polyg))deallocate(kvol_2d_polyg)
 

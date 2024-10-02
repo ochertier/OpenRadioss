@@ -54,7 +54,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    s4therm                ../engine/source/elements/solid/solide4/s4therm.F
       !||    s4upd11t12             ../engine/source/elements/solid/solide4/s4upd11t12.F
       !||    s4voln_m               ../engine/source/elements/solid/solide4_sfem/s4voln_m.F
-      !||    scre_sig3              ../engine/source/elements/solid/solide/scre_sig3.F
+      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sgcoor3                ../engine/source/elements/solid/solide/sgcoor3.F
       !||    sgeodel3               ../engine/source/elements/solid/solide/sgeodel3.F
       !||    smallb3                ../engine/source/elements/solid/solide/smallb3.F
@@ -72,10 +72,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sensor_mod             ../engine/share/modules/sensor_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
@@ -112,6 +114,8 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ALE_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
+      USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -182,7 +186,7 @@ C
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER K,I,IBID,ILCO,NF1,IFLAG,IPTR,IPTS,IPTT,ILAY
+      INTEGER K,I,IBID,ILCO,NF1,IFLAG,IPTR,IPTS,IPTT,ILAY,IMAT
       INTEGER IBIDON(1),ITET,IP
       my_real SUM
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ)
@@ -250,6 +254,7 @@ C-----------------------------------------------
      .  FLD(MVSIZ),STI_C(MVSIZ),CAQ,LL(MVSIZ),C1,MU,FQMAX
       my_real, 
      .  DIMENSION(:), POINTER :: EINT
+      my_real, dimension(mvsiz) :: fheat
 
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -273,7 +278,9 @@ C-----special traitment when switching Ismstr from 12 to 11
       ISM12_11 = ELBUF_TAB(NG)%BUFLY(1)%L_SIGL
       IBID = 0
       IBIDON(1) = 0
-      TEMPEL(1:MVSIZ) = ZERO
+
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
 C
       SZ_IX=NUMELQ+NUMELS+NSVOIS
       IBOLTP = IPARG(72,NG)
@@ -544,10 +551,10 @@ C--------------------------
 C-----------------------------
 C     heat transfert 
 C
-      IF(JTHE < 0 ) THEN
+      IF (JTHE < 0 ) THEN
          DO I = LFT, LLT
            TEMPEL(I) =  FOURTH*( TEMP(NC1(I)) + TEMP(NC2(I))  +
-     .                          TEMP(NC3(I)) + TEMP(NC4(I))  )    
+     .                           TEMP(NC3(I)) + TEMP(NC4(I))  )    
          ENDDO  
       ENDIF
 c-------------------------------------------
@@ -627,7 +634,7 @@ Cpour le fluide en SPMD : BUFVOIS LOI11
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT,    fheat      )
 c
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
 C-----------  return to global system    
@@ -761,15 +768,27 @@ C----------------------------
 C --------------------------
 C  --- heat transfert 
 C --------------------------
-      IF(JTHE < 0 ) THEN     
-        CALL S4THERM (
-     1   PM,      MXT,     VOLN,    NC1,
-     2   NC2,     NC3,     NC4,     PX1,
-     3   PX2,     PX3,     PX4,     PY1,
-     4   PY2,     PY3,     PY4,     PZ1,
-     5   PZ2,     PZ3,     PZ4,     DT1,
-     6   TEMP,    TEMPEL,  DIE,     THEM,
-     7   GBUF%OFF,LBUF%OFF,NEL)
+      IF (JTHE < 0 ) THEN     
+        IMAT = MXT(1)
+        IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+          CALL S4THERM (
+     1         PM,      IMAT,    VOLN,    NC1,
+     2         NC2,     NC3,     NC4,     PX1,
+     3         PX2,     PX3,     PX4,     PY1,
+     4         PY2,     PY3,     PY4,     PZ1,
+     5         PZ2,     PZ3,     PZ4,     DT1,
+     6         TEMP,    TEMPEL,  FHEAT,   THEM,
+     7         GBUF%OFF,LBUF%OFF,NEL)
+        ELSE
+          CALL S4THERM (
+     1         PM,      IMAT,    VOLN,    NC1,
+     2         NC2,     NC3,     NC4,     PX1,
+     3         PX2,     PX3,     PX4,     PY1,
+     4         PY2,     PY3,     PY4,     PZ1,
+     5         PZ2,     PZ3,     PZ4,     DT1,
+     6         TEMP,    TEMPEL,  DIE,    THEM,
+     7         GBUF%OFF,LBUF%OFF,NEL)
+        END IF
       
       ENDIF
 c-------------------------
@@ -789,18 +808,12 @@ C----------------------------
 C     distorsion control  
 C----------------------------
       IF (ISCTL > 0) THEN
-         MU=ZEP05
-         MX = MXT(1)
-         C1 =PM(32,MX)+ONEP333*PM(22,MX)
-         FQMAX = EP03
-         IF (MTN==42.OR.MTN==69) FQMAX = EP02
-         DO I=LFT,LLT
-          LL(I) = VOLN(I)**THIRD
-          CAQ=MU*GBUF%RHO(I)*LL(I)
-          FLD(I)=FOURTH*CAQ*CXX(I)*OFF(I)
-          STI_C(I) = C1 * LL(I) *OFF(I)
-         ENDDO
-         CALL SCRE_SIG3(GBUF%SIG, C1, ISTAB,GBUF%OFF,ISMSTR ,NEL)
+         CALL SDISTOR_INI(                                      
+     1                NEL      ,STI_C    ,NPROPM     ,NUMMAT  ,       
+     2                ISMSTR   ,MXT      ,ISTAB      ,PM      ,       
+     3                GBUF%SIG ,GBUF%RHO ,CXX        ,OFF     ,       
+     4                GBUF%OFF ,LL       ,VOLN       ,FLD     ,       
+     5                MU       ,FQMAX    )
          IF (ISMSTR==1.OR.ISMSTR>=11)  THEN ! XX,YY,ZZ now current conf.
 #include "vectorize.inc"
             DO I=1,NEL
@@ -829,7 +842,8 @@ C----------------------------
      .     F21,       F22,       F23,       F24,
      .     F31,       F32,       F33,       F34,
      .     STI,       FLD,     STI_C,        LL,
-     .      MU,     FQMAX,     ISTAB,      NEL )
+     .      MU,     FQMAX,     ISTAB,      NEL ,
+     . GBUF%EINT_DISTOR,DT1 )
       ENDIF
 C --------------------------
       IF(NFILSOL/=0) CALL S4FILLOPT(

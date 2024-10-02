@@ -33,7 +33,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    starter            ../starter/source/starter/starter.F
       !||--- calls      -----------------------------------------------------
-      !||    set_stack_values   ../starter/source/system/machine.F
       !||    starter0           ../starter/source/starter/starter0.F
       !||--- uses       -----------------------------------------------------
       !||====================================================================
@@ -44,7 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
        CALL QAOPEN('starter')
        CALL QAPRINT('Start',0,0.0_8)
 
-       CALL SET_STACK_VALUES()  ! Initialize Stacksize & KMP_STACKSIZE
+       CALL SOLVER_STACKSIZE()  ! Initialize KMP_STACKSIZE & OMP_STACKSIZE
 
        CALL STARTER0()
 

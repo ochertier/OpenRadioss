@@ -34,12 +34,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    format_mod         ../starter/share/modules1/format_mod.F90
       !||    meshsurfig3d_mod   ../starter/source/elements/ige3d/meshsurfig3d_mod.F
       !||    message_mod        ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod     ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE LECIG3D(ITAB    ,IPART   ,IPARTIG3D  ,IPM     ,IGEO    ,
      .                   KXIG3D  ,IXIG3D  ,ITABM1  ,NCTRLMAX, TABCONPATCH)
+C----------------------------------------------------------
+C     M o d u l e s
+C-----------------------------------------------
       USE MESSAGE_MOD
       USE MESHSURFIG3D_MOD
       USE FORMAT_MOD , ONLY : FMT_10I, FMT_8I, FMT_2I
+      USE READER_OLD_MOD , ONLY : KLINE, KCUR, LINE, KIGE3D, KOPTAD, IREC
 C----------------------------------------------------------
 C     LECTURE ELEMENT ISO GEOMETRIQUE
 C-----------------------------------------------
@@ -112,8 +117,7 @@ c
           READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
          ENDIF
        
-         READ(LINE,ERR=999,FMT=FMT_8I)
-     .   ID,IDX1,IDY1,IDZ1,NCTRL,NRAFX,NRAFY,NRAFZ
+         READ(LINE,ERR=999,FMT=FMT_8I)ID,IDX1,IDY1,IDZ1,NCTRL,NRAFX,NRAFY,NRAFZ
          NBIG3D_PATCH=NBIG3D_PATCH+1
          IREC = IREC + ((NCTRL-1)/10)+2
          READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
@@ -128,13 +132,13 @@ c
          ENDIF
 
         ENDDO
-c
+
         TABCONPATCH(NBPART_IG3D)%L_TAB_IG3D=NBIG3D_PATCH
         ALLOCATE(TABCONPATCH(NBPART_IG3D)%TAB_IG3D(NBIG3D_PATCH))
-c
+
         NBPART_IG3D = 0
         NBIG3D_PATCH = 0
-c
+
         BID =0
         IAD =1
         KCUR=KIGE3D
@@ -154,13 +158,7 @@ c
             IF(IPART(4,J) == ID)IDS=J
           ENDDO
           IF(IDS == 0) THEN
-            CALL ANCMSG(MSGID=402,
-     .                  MSGTYPE=MSGERROR,
-     .                  ANMODE=ANINFO_BLIND_1,
-     .                  C1="IGE3D",
-     .                  I1=ID,
-     .                  I2=ID,
-     .                  PRMOD=MSG_CUMU)
+            CALL ANCMSG(MSGID=402,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_1,C1="IGE3D",I1=ID,I2=ID,PRMOD=MSG_CUMU)
           ENDIF
           TABCONPATCH(NBPART_IG3D)%PID=IDS
          ELSE
@@ -169,7 +167,7 @@ c
           KXIG3D(2,I) =IPART(2,IDS)
           KXIG3D(4,I) =IAD
           IPARTIG3D(I)=IDS
-C
+
           READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
           READ(LINE,ERR=999,FMT=FMT_8I) ID,IDX1,IDY1,IDZ1,NCTRL,NRAFX,NRAFY,NRAFZ
           NBIG3D_PATCH = NBIG3D_PATCH + 1
@@ -180,9 +178,7 @@ C
           KXIG3D(6,I)=IDX1
           KXIG3D(7,I)=IDY1
           KXIG3D(8,I)=IDZ1
-c          KXIG3D(9,I)=IDX1+1
-c          KXIG3D(10,I)=IDY1+1
-c          KXIG3D(11,I)=IDZ1+1
+
           KXIG3D(12,I)=MAX(NRAFX,1)
           KXIG3D(13,I)=MAX(NRAFY,1)
           KXIG3D(14,I)=MAX(NRAFZ,1)
@@ -205,10 +201,7 @@ C
          ENDIF
         ENDDO
 C-----------
-      CALL ANCMSG(MSGID=402,                 
-     .            MSGTYPE=MSGERROR,         
-     .            ANMODE=ANINFO_BLIND_1,    
-     .            PRMOD=MSG_PRINT) 
+      CALL ANCMSG(MSGID=402,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_1,PRMOD=MSG_PRINT)
 C-------------------------------------
 C Recherche des ID doubles
 C-------------------------------------
@@ -229,7 +222,6 @@ C
        WRITE (IOUT,'(4(I10,1X))') I,KXIG3D(5,I),MID,PID
        WRITE (IOUT,'(10(I10,1X))')
      .    (ITAB(IXIG3D(IAD)),IAD=KXIG3D(4,I),KXIG3D(4,I)+KXIG3D(3,I)-1)
-c      call flush(IOUT)
   100 CONTINUE
       IF(I2==NUMELIG3D0)GOTO 200
       I1=I1+50

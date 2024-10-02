@@ -21,24 +21,28 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    spmd_cell_exchange   ../engine/source/mpi/generic/spmd_cell_exchange.F
+      !||    spmd_cell_exchange         ../engine/source/mpi/generic/spmd_cell_exchange.F
       !||--- called by ------------------------------------------------------
-      !||    inter_sort_07        ../engine/source/interfaces/int07/inter_sort_07.F
+      !||    inter_sort_07              ../engine/source/interfaces/int07/inter_sort_07.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../engine/source/output/message/message.F
-      !||    arret                ../engine/source/system/arret.F
-      !||    startime             ../engine/source/system/timer.F
-      !||    stoptime             ../engine/source/system/timer.F
+      !||    ancmsg                     ../engine/source/output/message/message.F
+      !||    arret                      ../engine/source/system/arret.F
+      !||    fill_voxel_local_partial   ../engine/source/interfaces/intsort/fill_voxel.F90
+      !||    fill_voxel_remote          ../engine/source/interfaces/intsort/fill_voxel.F90
+      !||    startime                   ../engine/source/system/timer.F
+      !||    stoptime                   ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
-      !||    inter_sorting_mod    ../engine/share/modules/inter_sorting_mod.F
-      !||    inter_struct_mod     ../engine/share/modules/inter_struct_mod.F
-      !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod        ../common_source/modules/ale/multi_fvm_mod.F
-      !||    tri7box              ../engine/share/modules/tri7box.F
+      !||    fill_voxel_mod             ../engine/source/interfaces/intsort/fill_voxel.F90
+      !||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
+      !||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
+      !||    message_mod                ../engine/share/message_module/message_mod.F
+      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F
+      !||    tri7box                    ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE SPMD_CELL_EXCHANGE( NIN,ISENDTO,IRCVFROM,NSNR,IGAP,
-     1                               IFQ,INACTI,NSNFIOLD,INTTH,ITYP,
-     2                               ITIED,NMN,INTER_STRUCT,SORT_COMM )
+      SUBROUTINE SPMD_CELL_EXCHANGE( NIN,ISENDTO,IRCVFROM,NSN,NSNR,IGAP,
+     1                               IFQ,INACTI,NSNFIOLD,INTTH,ITYP,STFNS, NSV,
+     2                               NRTM, X,
+     2                               ITIED,NMN,INTER_STRUCT,SORT_COMM, GOT_PREVIEW)
 !$COMMENT
 !       SPMD_CELL_EXCHANGE description :
 !       exchange of secondary node data (x, v, temp...)
@@ -50,6 +54,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+        USE FILL_VOXEL_MOD
         USE TRI7BOX
         USE MESSAGE_MOD
         USE MULTI_FVM_MOD
@@ -75,14 +80,19 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER NIN, IFQ, INACTI, IGAP,INTTH,NSNR,
+        INTEGER NIN, IFQ, INACTI, IGAP,INTTH,NSN,NSNR,
      .        ITIED,
      .        NSNFIOLD(NSPMD),
      .        ISENDTO(NINTER+1,NSPMD+1), IRCVFROM(NINTER+1,NSPMD+1),
      .        ITYP
+        INTEGER :: GOT_PREVIEW !< flag to indicate if -preview is available
         INTEGER :: NMN
         TYPE(inter_struct_type), DIMENSION(NINTER), INTENT(inout) :: INTER_STRUCT   !   structure for interface
         TYPE(sorting_comm_type), DIMENSION(NINTER), INTENT(inout) :: SORT_COMM   ! structure for interface sorting comm
+        my_real :: stfns(nsn)
+        INTEGER :: NSV(NSN)
+        INTEGER :: NRTM
+        my_real :: X(3,NUMNOD)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -111,6 +121,8 @@ C-----------------------------------------------
       my_real, DIMENSION(:,:), ALLOCATABLE :: XTMP
       INTEGER :: ADRESS, LOCAL_RANK
       INTEGER :: SIZE_S
+      INTEGER :: OFFSET(NSPMD)
+      INTEGER :: DUMMY(1)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -129,8 +141,11 @@ C================================================================
          END DO
       END IF
       NSNR = SORT_COMM(NIN)%NSNR
+      OFFSET(1:NSPMD) = NSNR+1 
 
-      IF(IRCVFROM(NIN,LOC_PROC)==0.AND.ISENDTO(NIN,LOC_PROC)==0) RETURN
+
+      IF(.NOT. (IRCVFROM(NIN,LOC_PROC)==0.AND.ISENDTO(NIN,LOC_PROC)==0))  THEN
+
       IF (IMONM > 0) CALL STARTIME(25,1)
 
       ! ---------------------------------------
@@ -156,6 +171,7 @@ C================================================================
             P = SORT_COMM(NIN)%ISINDEXI(L)
             LEN = NSNFI(NIN)%P(P)*RSIZ
             MSGTYP = MSGOFF4 
+            OFFSET(L) = IDEB
             CALL MPI_IRECV(
      1        XREM(1,IDEB),LEN,REAL,IT_SPMD(P),
      2        MSGTYP,MPI_COMM_WORLD,REQ_RD(L),IERROR)
@@ -191,18 +207,50 @@ C================================================================
         ENDIF
       ENDDO
 
+
+        ! -----------------------------
+        if(GOT_PREVIEW == 1) THEN
+        ! finish the last groups of secondary nodes, if any
+            CALL FILL_VOXEL_LOCAL_PARTIAL(nsn,nsv,nsnr,nrtm,numnod,x,stfns,INTER_STRUCT(NIN),DUMMY,0) 
+        ENDIF
+ 
+
       ! ---------------------------------------
       ! wait the rcv comm
       IF(IRCVFROM(NIN,LOC_PROC)/=0) THEN  !   nmn > 0
        IF(NSNR>0) THEN   !   nsnr>0 only on proc with nmn>0
-          DO L = 1, SORT_COMM(NIN)%NBIRECV
-            CALL MPI_WAITANY(SORT_COMM(NIN)%NBIRECV,REQ_RD,INDEXI,STATUS,IERROR)
-            CALL MPI_WAITANY(SORT_COMM(NIN)%NBIRECV,REQ_RD2,INDEXI,STATUS,IERROR)
-          ENDDO
-          !set specifics IREM and XREM indexes for INT24 sorting
-          IGAPXREMP = IREM(4,1)
-          I24XREMP  = IREM(5,1)
-          I24IREMP  = IREM(6,1)
+         DO L = 1, SORT_COMM(NIN)%NBIRECV
+          CALL MPI_WAITANY(SORT_COMM(NIN)%NBIRECV,REQ_RD,INDEXI,STATUS,IERROR) !XREM
+
+         ! CALL MPI_WAITANY(SORT_COMM(NIN)%NBIRECV,REQ_RD2,INDEXI,STATUS,IERROR)
+
+          if(GOT_PREVIEW==1) then
+          call fill_voxel_remote(
+     .                    OFFSET(INDEXI), 
+     .                    OFFSET(INDEXI+1)-1, 
+     .                    nsn,
+     .                    nsnr,
+     .                    inter_struct(nin)%nbx,
+     .                    inter_struct(nin)%nby,
+     .                    inter_struct(nin)%nbz,
+     .                    size(XREM,1),
+     .                    inter_struct(nin)%voxel,
+     .                    inter_struct(nin)%next_nod,
+     .                    inter_struct(nin)%size_node,
+     .                    inter_struct(nin)%nb_voxel_on,
+     .                    inter_struct(nin)%list_nb_voxel_on,
+     .                    inter_struct(nin)%last_nod,
+     .                    xrem,
+     .                    inter_struct(nin)%box_limit_main)
+          endif
+          CALL MPI_WAIT(REQ_RD2(INDEXI),STATUS,IERROR) !IREM
+
+    
+         ENDDO
+         !set specifics IREM and XREM indexes for INT24 sorting
+         IGAPXREMP = IREM(4,1)
+         I24XREMP  = IREM(5,1)
+         I24IREMP  = IREM(6,1)
         ENDIF
       ENDIF
 
@@ -228,9 +276,17 @@ C================================================================
         ENDDO
       ENDIF
       ! ---------------------------------------
+      ELSE 
+
+        if(GOT_PREVIEW == 1) THEN
+        ! finish the last groups of secondary nodes, if any
+            CALL FILL_VOXEL_LOCAL_PARTIAL(nsn,nsv,nsnr,nrtm,numnod,x,stfns,INTER_STRUCT(NIN),DUMMY,0) 
+        ENDIF
+
+       ENDIF
 
       IF (IMONM > 0) CALL STOPTIME(25,1)
-C
 #endif
       RETURN
+
       END SUBROUTINE SPMD_CELL_EXCHANGE

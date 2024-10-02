@@ -38,7 +38,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       SUBROUTINE MULTIFLUID_INIT2(NEL, NSIGS, 
      .     IPARG, IXQ, IPM, ALE_CONNECTIVITY, IGEO, IPART, IPARTQ, NPF,
      .     PTQUAD, ILOADP, X, PM, 
-     .     GEO, SIGI, SKEW, TF, BUFMAT, FACLOAD, ELBUF_STR, ERROR_THROWN, DETONATORS)
+     .     GEO, SIGI, SKEW, TF, BUFMAT, FACLOAD, ELBUF_STR, ERROR_THROWN, DETONATORS,
+     .     MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -46,6 +47,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE DETONATORS_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,7 +62,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 ! NIXQ, NPROPMI, NPROPM, LFACLOAD
 #include      "param_c.inc"
-! JEUL, LFT, LLT, NFT
+! JEUL, NFT
 #include      "vect01_c.inc"
 ! LIPART1
 #include      "scr17_c.inc"
@@ -71,28 +73,28 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: NEL, NSIGS,IXQ(NIXQ, *), IPM(NPROPMI, *), 
+      INTEGER, INTENT(IN) :: NEL, NSIGS,IXQ(NIXQ, *), IPM(NPROPMI, NUMMAT),
      .     IGEO(*), IPART(LIPART1, *), IPARTQ(*), PTQUAD(*),
      .     NPF(*), ILOADP(SIZLOADP, *)
       INTEGER, INTENT(INOUT) :: IPARG(*)
       TYPE(ELBUF_STRUCT_), INTENT(IN), TARGET :: ELBUF_STR
       my_real, INTENT(IN) :: X(*),  FACLOAD(LFACLOAD, *)
-      my_real, INTENT(INOUT) :: PM(NPROPM, *)
+      my_real, INTENT(INOUT) :: PM(NPROPM, NUMMAT)
       my_real, INTENT(INOUT) :: GEO(*), SIGI(NSIGS, *), 
      .     SKEW(LSKEW, *), TF(*), BUFMAT(*)
       LOGICAL :: ERROR_THROWN
       TYPE(DETONATORS_STRUCT_) :: DETONATORS
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: ILAY, NLAY, II, IP, IBID, MATLAW
       INTEGER :: NGL(MVSIZ), MAT(MVSIZ), PID(MVSIZ)
       INTEGER :: IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ), IX4(MVSIZ)
-      my_real :: 
-     .     Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ),Y4(MVSIZ),  
-     .     Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ),Z4(MVSIZ),
-     .     SY(MVSIZ), SZ(MVSIZ), TY(MVSIZ),TZ(MVSIZ),PRES,VFRAC
+      my_real :: Y1(MVSIZ), Y2(MVSIZ), Y3(MVSIZ),Y4(MVSIZ),
+     .           Z1(MVSIZ), Z2(MVSIZ), Z3(MVSIZ),Z4(MVSIZ),
+     .           SY(MVSIZ), SZ(MVSIZ), TY(MVSIZ),TZ(MVSIZ),PRES,VFRAC
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(G_BUFEL_) ,POINTER :: GBUF  
       TYPE(BUF_MAT_) ,POINTER :: MBUF
@@ -128,11 +130,11 @@ C     Loop over the materials
 C     Layer buffer
          LBUF => ELBUF_STR%BUFLY(ILAY)%LBUF(1,1,1)
          MBUF => ELBUF_STR%BUFLY(ILAY)%MAT(1,1,1)
-         DO II = LFT, LLT
+         DO II = 1, NEL
 C     Material
-            MAT(II) = IPM(20 + ILAY, IXQ(1, II + NFT))
+            MAT(II) = MAT_PARAM( IXQ(1,II+NFT) )%MULTIMAT%MID(ILAY)
 C     Partial volumes
-            LBUF%VOL(II) = PM(20 + ILAY, IXQ(1, II + NFT)) * GBUF%VOL(II)
+            LBUF%VOL(II) =MAT_PARAM( IXQ(1,II+NFT) )%MULTIMAT%VFRAC(ILAY)  * GBUF%VOL(II)
          ENDDO
 C     Material initialization
          IP = 1
@@ -146,8 +148,8 @@ C     Material initialization
      .        GBUF, LBUF, MBUF, ELBUF_STR, ILOADP,
      .        FACLOAD, GBUF%DELTAX)
      
-         VFRAC = PM(20+ILAY,IXQ(1, 1 + NFT))
-         PRES  = PM(104, IPM(20+ILAY,IXQ(1, 1 + NFT)))
+         VFRAC = MAT_PARAM( IXQ(1,1+NFT) )%MULTIMAT%VFRAC(ILAY)
+         PRES  = PM(104, MAT_PARAM( IXQ(1,1+NFT) )%MULTIMAT%MID(ILAY) )
          PM(104,IXQ(1, 1 + NFT)) = PM(104,IXQ(1, 1 + NFT)) + VFRAC * PRES !global pressure
      
          MATLAW = IPM(2, MAT(1))
@@ -160,27 +162,28 @@ C     Material initialization
                ENDIF
                ERROR_THROWN = .TRUE.
             ENDIF
-            CALL M5IN2(PM, MAT, IPM(1, IXQ(1,LFT+NFT)), DETONATORS, LBUF%TB, NGL, X, IXQ, NIXQ)
+            CALL M5IN2(PM, MAT, IPM(1, IXQ(1,1+NFT)), DETONATORS, LBUF%TB, NGL, X, IXQ, NIXQ)
          ENDIF
       ENDDO
 
       IF (NLAY > 1) THEN
          
 C      Mass globalization
-         GBUF%RHO(LFT:LLT)=ZERO                 
+         GBUF%RHO(1:NEL)=ZERO
          DO ILAY = 1, NLAY
             LBUF  => ELBUF_STR%BUFLY(ILAY)%LBUF(1,1,1)
             DO II = LFT, LLT
-               GBUF%RHO(II) = GBUF%RHO(II) + LBUF%RHO(II) * PM(20 + ILAY, IXQ(1, II + NFT))
+               GBUF%RHO(II) = GBUF%RHO(II) + LBUF%RHO(II) * MAT_PARAM( IXQ(1,II+NFT) )%MULTIMAT%VFRAC(ILAY)
             ENDDO
          ENDDO
                   
 C      Temperature globalization. We must solve later T such as e+p/rho=integral(Cp_global(T),dT)
-         GBUF%TEMP(LFT:LLT)=ZERO
+         GBUF%TEMP(1:NEL)=ZERO
          DO ILAY = 1, NLAY
             LBUF  => ELBUF_STR%BUFLY(ILAY)%LBUF(1,1,1)
-            DO II = LFT, LLT
-               GBUF%TEMP(II) = GBUF%TEMP(II) + LBUF%TEMP(II) * PM(20 + ILAY, IXQ(1, II + NFT))*LBUF%RHO(II)/GBUF%RHO(II)   !volfrac*densfrac=massfrac
+            DO II = 1, NEL
+               GBUF%TEMP(II) = GBUF%TEMP(II) + LBUF%TEMP(II) * MAT_PARAM( IXQ(1,II+NFT) )%MULTIMAT%VFRAC(ILAY) *
+     .                         LBUF%RHO(II)/GBUF%RHO(II)   !volfrac*densfrac=massfrac
             ENDDO
          ENDDO    
      

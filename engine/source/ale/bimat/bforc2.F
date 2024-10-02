@@ -56,6 +56,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    qvolu2                 ../engine/source/elements/solid_2d/quad/qvolu2.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
@@ -64,21 +65,21 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    output_mod             ../common_source/modules/output/output_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
-      SUBROUTINE BFORC2(ELBUF_TAB,NG   ,
-     1                   PM     ,GEO    ,IC     ,X       ,
-     2                   A      ,V      ,MS     ,W      ,FLUX    ,
-     3                   FLU1   ,VEUL   ,ALE_CONNECT  ,IPARG   ,
-     4                   JPARG  ,FILL   ,DFILL  ,IMS    ,NLOC_DMG,
-     5                   TF     ,NPF    ,BUFMAT ,PARTSAV ,
-     6                   DT2T   ,NELTST ,ITYPTST,STIFN  ,OFFSET  ,
-     7                   EANI   ,IPARTQ ,NEL    ,IADQ   ,FSKY    ,
-     8                   IPM    ,BUFVOIS,
-     9                   GRESAV ,GRTH   ,IGRTH  ,TABLE  ,IGEO    ,
-     O                   VOLN   ,ITASK  ,MS_2D  ,FSKYM  ,MAT_ELEM,
-     B                   H3D_STRAIN,OUTPUT,SZ_BUFVOIS,SNPC,STF,SBUFMAT,SVIS,
-     C                   NSVOIS, IRESP,     IDEL7NOK, 
-     D                   IDTMIN, MAXFUNC, IMON_MAT,   
-     E                   USERL_AVAIL, heat_meca,   impl_s,      idyna)
+      SUBROUTINE BFORC2(ELBUF_TAB   ,NG        ,
+     1                   PM         ,GEO       ,IC         ,X       ,
+     2                   A          ,V         ,MS         ,W       ,FLUX    ,
+     3                   FLU1       ,VEUL      ,ALE_CONNECT,IPARG   ,
+     4                   JPARG      ,FILL      ,DFILL      ,IMS     ,NLOC_DMG,
+     5                   TF         ,NPF       ,BUFMAT     ,PARTSAV ,
+     6                   DT2T       ,NELTST    ,ITYPTST    ,STIFN   ,OFFSET  ,
+     7                   EANI       ,IPARTQ    ,NEL        ,IADQ    ,FSKY    ,
+     8                   IPM        ,BUFVOIS   ,
+     9                   GRESAV     ,GRTH      ,IGRTH      ,TABLE  ,IGEO     ,
+     A                   VOLN       ,ITASK     ,MS_2D      ,FSKYM  ,MAT_ELEM ,
+     B                   H3D_STRAIN ,OUTPUT    ,SZ_BUFVOIS ,SNPC   ,STF      ,SBUFMAT, SVIS,
+     C                   NSVOIS     , IRESP    ,IDEL7NOK   ,
+     D                   IDTMIN     , MAXFUNC  ,IMON_MAT   ,
+     E                   USERL_AVAIL, heat_meca,impl_s     ,idyna  ,DT       )
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -90,6 +91,7 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE OUTPUT_MOD
       USE MAT_ELEM_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -140,6 +142,7 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -280,7 +283,7 @@ C-----------
      .      MAT, NC1, NC2, NC3, NC4)
       ENDIF
 C-----------------------------------------------------
-C     SUBMATERIAL 1
+C     SUBMATERIAL 1 (MAT LAW20)
 C-----------------------------------------------------
       IMULT=JMULT
       JMULT=1
@@ -298,7 +301,7 @@ C-----------------------------------------------------
      .            EYY, EZZ, ETT, EYZ, EYT, EZT,
      .            EYYS, EZZS, ETTS, EYZS, EYTS, EZTS,
      .            VD2, DVOL,
-     .            MAT)
+     .            MAT,MAT_ELEM%MAT_PARAM, NUMMAT)
       CALL BLERO2(LBUF1%FRAC,LBUF2%FRAC,LBUF1%VOL,LBUF1%RHO,
      .            FLUX(1,NF1),FLU1(NF1),LBUF1%OFF,PM,NGL,VOLN, 
      .            AIRE, EYY, EZZ, ETT, EYZ, EYT, EZT, VD2, DVOL, 
@@ -366,7 +369,7 @@ C-----------------------------------------------------
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT         ,BID     )
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & ALE MASSES
 C----------------------------------
@@ -497,7 +500,7 @@ C--------------
       
       
 C-----------------------------------------------------
-C     SUBMATERIAL 2
+C     SUBMATERIAL 2 (MAT LAW20)
 C-----------------------------------------------------
       IF(IMULT > 1)THEN
         JMULT = 2
@@ -515,7 +518,7 @@ C-----------------------------------------------------
      .            EYY, EZZ, ETT, EYZ, EYT, EZT,
      .            EYYS, EZZS, ETTS, EYZS, EYTS, EZTS,
      .            VD2, DVOL,
-     .            MAT)
+     .            MAT, MAT_ELEM%MAT_PARAM, NUMMAT)
       CALL BLERO2(LBUF2%FRAC,LBUF1%FRAC,LBUF%VOL,LBUF%RHO,
      .            FLUX(1,NF2),FLU1(NF2),LBUF%OFF,PM,NGL,VOLN, 
      .            AIRE, EYY, EZZ, ETT, EYZ, EYT, EZT, VD2, DVOL, 
@@ -585,7 +588,7 @@ C-----------------------------------------------------
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna )
+     .   idyna,       DT         ,BID )
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & MASSES ALE
 C----------------------------------

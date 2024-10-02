@@ -34,18 +34,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .      X        ,NSV      ,AREA     ,NSN      ,ITAB     ,
      .      IXC      ,IXTG     ,IXS      ,KNOD2ELS ,NOD2ELS  ,
      .      KNOD2ELC ,NOD2ELC  ,KNOD2ELTG,NOD2ELTG ,ILEV     ,
-     .      ID,TITR  ,INTTH    )
+     .      ID,TITR      )
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NSN,ILEV,INTTH
+      INTEGER NSN,ILEV
       INTEGER NSV(*),IXC(NIXC,*),IXTG(NIXTG,*),IXS(NIXS,*),ITAB(*),
      .   KNOD2ELC(*),KNOD2ELTG(*),KNOD2ELS(*),NOD2ELC(*),
      .   NOD2ELTG(*),NOD2ELS(*)

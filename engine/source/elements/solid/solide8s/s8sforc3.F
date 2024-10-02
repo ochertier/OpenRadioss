@@ -64,6 +64,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    stoptime               ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
@@ -88,7 +90,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      F                    IGEO     ,XDP    ,VOLN    ,CONDN   ,CONDNSKY,
      G                    D        ,IOUTPRT,MAT_ELEM,H3D_STRAIN,SNPC,STF,
      H                    SBUFMAT  ,SVIS,NSVOIS,IDTMINS,IRESP,IDTMIN,MAXFUNC,
-     I                   USERL_AVAIL,heat_meca)
+     I                    USERL_AVAIL,heat_meca,DT  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -98,6 +100,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -165,6 +169,7 @@ C
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -440,7 +445,8 @@ C
       ALLOCATE(VAR_REG(NEL,NPTR*NPTS*NPTT))
       NBPRELD = GBUF%G_BPRELD
       BPRELD =>GBUF%BPRELD(1:NBPRELD*NEL)
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      BID(:)    = ZERO
       SZ_R1_FREE=MVSIZ
       SZ_IX=NUMELQ+NUMELS+NSVOIS
 c
@@ -855,7 +861,7 @@ c
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT,    BID )
 C
        IF (ISTRAIN == 1)THEN 
         CALL SSTRA3(

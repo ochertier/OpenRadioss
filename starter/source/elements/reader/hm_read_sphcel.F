@@ -38,6 +38,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_SPHCEL(ITAB    ,ITABM1  ,IPART ,
@@ -78,12 +79,15 @@ C-----------------------------------------------
 C     IXSP(1:KVOISPH,*)      :IVOIS  :   NOS DES VOISINS. 
 C-----------------------------------------------
 C   M o d u l e s
-C----------------------------------------------- 
+C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE HM_OPTION_READ_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE READER_OLD_MOD , ONLY : LINE, KCUR, KSPHOPT, IREC, KOPTAD
+      USE USER_ID_MOD , ONLY : ID_LIMIT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -105,9 +109,8 @@ C-----------------------------------------------
      .        ITAB(*),ITABM1(*),IPART(LIPART1,*),IPARTSP(*),
      .        RESERVEP(NBPARTINLET), IXS(NIXS,*), IPARTS(*), ISOLNOD(*),
      .        SPH2SOL(*), SOL2SPH(2,*), IRST(3,NSPHSOL),SOL2SPH_TYP(*)
-      my_real
-     .        X(3,*)
-      TYPE(SUBMODEL_DATA) LSUBMODEL(*)
+      my_real X(3,*)
+      TYPE(SUBMODEL_DATA) LSUBMODEL(NSUBMOD)
       my_real, INTENT(INOUT) :: SPBUF(NSPBUF,NUMSPH)
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER, INTENT(IN) :: IPRI
@@ -117,9 +120,8 @@ C-----------------------------------------------
       INTEGER I,N,J,ID,IDS,K,
      .        MID,PID,IPRT,IPIDS,NSPHDIR,
      .        NSPHCEL,NCELL,IDNOD,INOD,IDMAX,KSPHRES,
-     .        NBP,ITAG(NUMNOD),IT,NT,NP,NN,ITOPO,STAT,
+     .        NBP,IT,NT,NP,NN,ITOPO,STAT,
      .        INDEX_PART,UID,IFLAGUNIT
-C     REAL
       my_real BID,FAC_M
       CHARACTER MESS*40
       CHARACTER(LEN=NCHARKEY) :: KEY
@@ -140,6 +142,7 @@ C     REAL
       INTEGER, DIMENSION(:), ALLOCATABLE :: TYPE
       REAL*8, DIMENSION(:), ALLOCATABLE :: HM_MASS
       INTEGER, DIMENSION(:), ALLOCATABLE :: UID_SPH
+      INTEGER, DIMENSION(:), ALLOCATABLE :: ITAG
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -150,6 +153,7 @@ C--------------------------------------------------
 C      ALLOCS & INITS
 c      use NUMELQ IN PLACE OF NUMELC ( NBADMESH routine is modifying NUMELC )
 C--------------------------------------------------
+      CALL MY_ALLOC(ITAG,NUMNOD)
       ALLOCATE (SUB_SPH(NUMSPH),STAT=stat)
       IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                             MSGTYPE=MSGERROR,
@@ -246,7 +250,7 @@ C         meme identifiant que le noeud.
         KXSP(NISP,NCELL)=IDNOD
         IDMAX=MAX(IDMAX,IDNOD)
 C--------------------------------------------------
-        IF (KXSP(NISP,I)>ID_LIMIT)THEN
+        IF (KXSP(NISP,I)>ID_LIMIT%GLOBAL)THEN
             CALL ANCMSG(MSGID=509,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                  I1=KXSP(NISP,I),C1=LINE,C2='/SPHCEL')
         ENDIF
@@ -461,6 +465,8 @@ C
  200    CONTINUE
         WRITE (IOUT,'(A)') 'END OF CELL TRACEBACK'
       ENDIF
+
+       DEALLOCATE(ITAG)
 C
  300  FORMAT(/' SPH CELLS             '/
      +        ' ----------------------'/

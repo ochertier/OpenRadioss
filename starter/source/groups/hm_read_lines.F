@@ -46,6 +46,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
       !||    mapping_option_mod       ../starter/share/modules1/dichotomy_mod.F
       !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
       !||    surf_mod                 ../starter/share/modules1/surf_mod.F
       !||====================================================================
@@ -64,7 +65,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE UNITAB_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE OPTIONDEF_MOD
@@ -72,6 +73,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE MAPPING_OPTION_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE READER_OLD_MOD , ONLY : LINE, KLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

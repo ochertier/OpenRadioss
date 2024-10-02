@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mulawc          ../engine/source/materials/mat_share/mulawc.F
       !||    usermat_shell   ../engine/source/materials/mat_share/usermat_shell.F
       !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod    ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod    ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    stack_mod       ../engine/share/modules/stack_mod.F
@@ -35,7 +36,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                         THK_LY   ,THKLY    ,OFF      ,STACK    ,
      .                         ISUBSTACK,IGTYP    ,FAILWAVE ,FWAVE_EL ,
      .                         NLAY_MAX ,LAYNPT_MAX,NUMGEO  ,NUMSTACK ,
-     .                         IGEO     )
+     .                         IGEO     ,PRINT_FAIL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE STACK_MOD
       USE FAILWAVE_MOD
       USE STACK_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +71,8 @@ C-----------------------------------------------
       TYPE (STACK_PLY), INTENT(IN)                  :: STACK
       TYPE (FAILWAVE_STR_), INTENT(IN), TARGET      :: FAILWAVE 
       INTEGER, DIMENSION(NEL), INTENT(INOUT)        :: FWAVE_EL
-      TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (MAT_ELEM_) ,INTENT(INOUT)               :: MAT_ELEM
+      LOGICAL, DIMENSION(NEL), INTENT(INOUT)        :: PRINT_FAIL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -164,6 +167,7 @@ c
               IF (((THFACT(IEL) >= PTHKF(IL,IFL)).AND.(PTHKF(IL,IFL) > ZERO)).OR.
      .            ((NPFAIL(IEL) >= ABS(PTHKF(IL,IFL))).AND.(PTHKF(IL,IFL) < ZERO))) THEN
                 OFF(IEL) = FOUR_OVER_5
+                PRINT_FAIL(IEL) = .FALSE.
                 FAIL_NAME(IEL) = MAT_ELEM%MAT_PARAM(IMAT)%FAIL(IFL)%KEYWORD
 #include      "lockon.inc"                           
                 WRITE(IOUT, 1000) TRIM(FAIL_NAME(IEL)),NGL(IEL)

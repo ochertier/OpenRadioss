@@ -21,16 +21,17 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    inisoldist     ../starter/source/initial_conditions/inivol/inisoldist.F
+      !||    inisoldist       ../starter/source/initial_conditions/inivol/inisoldist.F
       !||--- called by ------------------------------------------------------
-      !||    init_inivol    ../starter/source/initial_conditions/inivol/init_inivol.F90
+      !||    init_inivol      ../starter/source/initial_conditions/inivol/init_inivol.F90
       !||--- calls      -----------------------------------------------------
-      !||    qcoor2         ../starter/source/elements/solid_2d/quad/qcoor2.F
-      !||    ratio_fill     ../starter/source/initial_conditions/inivol/ratio_fill.F
-      !||    s4coor3        ../starter/source/elements/solid/solide4/s4coor3.F
-      !||    scoor3         ../starter/source/elements/solid/solide/scoor3.F
-      !||    srcoor3        ../starter/source/elements/solid/solide/srcoor3.F
+      !||    qcoor2           ../starter/source/elements/solid_2d/quad/qcoor2.F
+      !||    ratio_fill       ../starter/source/initial_conditions/inivol/ratio_fill.F
+      !||    s4coor3          ../starter/source/elements/solid/solide4/s4coor3.F
+      !||    scoor3           ../starter/source/elements/solid/solide/scoor3.F
+      !||    srcoor3          ../starter/source/elements/solid/solide/srcoor3.F
       !||--- uses       -----------------------------------------------------
+      !||    inivol_def_mod   ../starter/share/modules1/inivol_mod.F
       !||====================================================================
        SUBROUTINE INISOLDIST(
      .          IFILL      ,IXS       ,X         ,GEO       ,NG        ,
@@ -41,11 +42,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .          IAD_BUFR   ,BUFSF     ,NOD_NORMAL,ISOLNOD   ,NBSUBMAT  ,
      .          FILL_RATIO ,ICUMU     ,IDC       ,NBCONTY   ,NSEG      ,
      .          IDSURF     ,SWIFTSURF ,SEGTOSURF ,IGRSURF   ,IVOLSURF  ,
-     .          NSURF_INVOL,IXQ       ,IXTG      ,ITYP      ,NEL       , NUMEL_TOT)
+     .          NSURF_INVOL,IXQ       ,IXTG      ,ITYP      ,NEL       , NUMEL_TOT,
+     .          NUM_INIVOL ,INIVOL    ,I_INIVOL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE GROUPDEF_MOD
+      USE INIVOL_DEF_MOD , ONLY : INIVOL_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -65,6 +68,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN) :: I_INIVOL !< inivol identifier
+      INTEGER,INTENT(IN) :: NUM_INIVOL !< number of inivol options
+      TYPE (INIVOL_STRUCT_), DIMENSION(NUM_INIVOL), INTENT(INOUT) :: INIVOL        !< inivol data structure
       INTEGER,INTENT(IN) :: NG
       INTEGER NTRACE,NTRACE0,IDC,NBCONTY,NSEG, IVOLSURF(NSURF),NUMEL_TOT,NEL
       INTEGER,TARGET :: IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),IXTG(NIXTG,NUMELTG)
@@ -213,7 +219,7 @@ C-----------
      . SURF_TYPE  ,IAD_BUFR   ,BUFSF     ,NOD_NORMAL ,ISOLNOD       ,NBSUBMAT      ,FILL_RATIO    ,ICUMU      ,
      . NSEG       ,SURF_ELTYP ,SURF_NODES,NBCONTY    ,IDC           ,NBIP(1,NF1)   ,IDSURF        ,SWIFTSURF  ,
      . SEGTOSURF  ,IGRSURF    ,IVOLSURF  ,NSURF_INVOL,pIXQ          ,pIXTG         ,ITYP          ,NEL        ,
-     . NUMEL_TOT  )
+     . NUMEL_TOT  ,NUM_INIVOL ,INIVOL    ,I_INIVOL)
 C-----------------------------------------------------------------
       RETURN
       END

@@ -39,6 +39,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
@@ -58,7 +60,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A    SBUFMAT   ,SVIS,NSVOIS,IDTMINS, IRESP,      
      .    IDEL7NG,   IDEL7NOK,    IDTMIN,     MAXFUNC,LIPART1,
      .    IMON_MAT,  USERL_AVAIL, heat_meca, impl_s,
-     V    idyna)
+     V    idyna,     DT         )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -68,6 +70,8 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
       USE OUTPUT_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -121,6 +125,7 @@ C-----------------------------------------------
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (DT_) ,INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -177,6 +182,7 @@ C-----------------------------------------------
       IBID = 0
       GBUF => ELBUF_TAB(NG)%GBUF
       LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
+      TEMPEL(:) = ZERO
 C-----------
       NF1=NFT+1
 C-----------
@@ -268,7 +274,7 @@ C     LAW 11 uses IELVS=IBIDON and IXS=IBIDON should not be used.
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT         , BID   )
 C-----------------------------
       IF(ISTRAIN==1)THEN 
         CALL SSTRA3(DXX,DYY      ,DZZ ,D4  ,D5  ,

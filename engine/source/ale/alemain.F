@@ -66,13 +66,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
       !||    bcs_mod                      ../common_source/modules/boundary_conditions/bcs_mod.F90
       !||    diffusion_mod                ../engine/share/modules/diffusion_mod.F
-      !||    dt_mod                       ../engine/share/modules/dt_mod.F
+      !||    dt_mod                       ../engine/source/modules/dt_mod.F
       !||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
       !||    nlocal_reg_mod               ../common_source/modules/nlocal_reg_mod.F
       !||    output_mod                   ../common_source/modules/output/output_mod.F90
       !||    python_funct_mod             ../common_source/modules/python_mod.F90
@@ -82,30 +85,30 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    th_surf_mod                  ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE ALEMAIN(
-     1         PM          ,GEO         ,X             ,A         ,AR        ,V               ,
-     2         MS          ,WA          ,ELBUF_TAB     ,BUFMAT    ,PARTSAV   ,TF              ,
-     3         VAL2        ,VEUL        ,FV            ,STIFN     ,FSKY      ,EANI            ,
-     4         PHI         ,FILL        ,DFILL         ,ALPH      ,SKEW      ,W               ,
-     5         D           ,DSAVE       ,ASAVE         ,DT2T      ,DT2SAVE   ,XCELL           ,
-     6         IPARG       ,NPC         ,IXS           ,IXQ       ,IXTG      ,IADS            ,IADQ    ,
-     7         IFILL       ,NODPOR      ,ICODT         ,ISKEW     ,IMS       ,
-     8         NELTST      ,ITYPTST     ,IPART         ,IPARTS    ,IPARTQ    ,ITASK           ,
-     A         NODFT       ,NODLT       ,NBRCVOIS      ,TEMP      ,FSAVSURF  ,
-     B         NBSDVOIS    ,LNRCVOIS    ,LNSDVOIS      ,NERCVOIS  ,NESDVOIS  ,LERCVOIS        ,
-     C         LESDVOIS    ,ISIZXV      ,IAD_ELEM      ,FR_ELEM   ,FSKYM     ,MSNF            ,
-     D         IPARI       ,SEGVAR      ,ITAB          ,ISKWN     ,
-     E         VOLMON      ,FSAV        ,IGRSURF       ,NELTSA    ,
-     F         ITYPTSA     ,WEIGHT      ,NPSEGCOM      ,LSEGCOM   ,IPM       ,IGEO            ,
-     G         ITABM1      ,LENQMV      ,NV46          ,AGLOB     ,GRESAV    ,
-     H         GRTH        ,IGRTH       ,LGAUGE        ,GAUGE     ,MSSA      ,
-     I         DMELS       ,IGAUP       ,NGAUP         ,TABLE     ,MS0       ,
-     J         XDP         ,IGRNOD      ,VARNOD                   ,FSKYI     ,ISKY            ,
-     K         INTBUF_TAB  ,IXT         ,IGRV          ,AGRAV     ,SENSORS   ,
-     L         LGRAV       ,CONDNSKY    ,CONDN         ,MS_2D     ,MULTI_FVM ,IGRTRUSS        ,
-     M         IGRBRIC     ,NLOC_DMG    ,ID_GLOBAL_VOIS,FACE_VOIS ,EBCS_TAB  ,ALE_CONNECTIVITY, 
-     N         DIFFUSION   ,MAT_ELEM    ,H3D_DATA      ,DT   ,OUTPUT,NEED_COMM_INTER18,IDTMINS,
-     O         IRESP       ,IDTMIN      ,MAXFUNC       ,IMON_MAT,    
-     P         USERL_AVAIL ,heat_meca   ,impl_s        ,idyna, PYTHON)
+     1         PM          ,GEO         ,X             ,A          ,AR                ,V               ,
+     2         MS          ,WA          ,ELBUF_TAB     ,BUFMAT     ,PARTSAV           ,TF              ,
+     3         VAL2        ,VEUL        ,FV            ,STIFN      ,FSKY              ,EANI            ,
+     4         PHI         ,FILL        ,DFILL         ,ALPH       ,SKEW              ,W               ,
+     5         D           ,DSAVE       ,ASAVE         ,DT2T       ,DT2SAVE           ,XCELL           ,
+     6         IPARG       ,NPC         ,IXS           ,IXQ        ,IXTG              ,IADS            ,
+     7         IFILL       ,NODPOR      ,ICODT         ,ISKEW      ,IMS               ,IADQ            ,
+     8         NELTST      ,ITYPTST     ,IPART         ,IPARTS     ,IPARTQ            ,ITASK           ,
+     A         NODFT       ,NODLT       ,NBRCVOIS      ,TEMP       ,FSAVSURF          ,
+     B         NBSDVOIS    ,LNRCVOIS    ,LNSDVOIS      ,NERCVOIS   ,NESDVOIS          ,LERCVOIS        ,
+     C         LESDVOIS    ,ISIZXV      ,IAD_ELEM      ,FR_ELEM    ,FSKYM             ,MSNF            ,
+     D         IPARI       ,SEGVAR      ,ITAB          ,ISKWN      ,DIFFUSION         ,IRESP           ,
+     E         VOLMON      ,FSAV        ,IGRSURF       ,NELTSA     ,
+     F         ITYPTSA     ,WEIGHT      ,NPSEGCOM      ,LSEGCOM    ,IPM               ,IGEO            ,
+     G         ITABM1      ,LENQMV      ,NV46          ,AGLOB      ,GRESAV            ,
+     H         GRTH        ,IGRTH       ,LGAUGE        ,GAUGE      ,MSSA              ,
+     I         DMELS       ,IGAUP       ,NGAUP         ,TABLE      ,MS0               ,
+     J         XDP         ,IGRNOD      ,VARNOD        ,FSKYI      ,ISKY              ,
+     K         INTBUF_TAB  ,IXT         ,IGRV          ,AGRAV      ,SENSORS           ,
+     L         LGRAV       ,CONDNSKY    ,CONDN         ,MS_2D      ,MULTI_FVM         ,IGRTRUSS        ,
+     M         IGRBRIC     ,NLOC_DMG    ,ID_GLOBAL_VOIS,FACE_VOIS  ,EBCS_TAB          ,ALE_CONNECTIVITY,
+     N         MAT_ELEM    ,H3D_DATA    ,DT            ,OUTPUT     ,NEED_COMM_INTER18 ,IDTMINS         ,
+     O         IDTMIN      ,MAXFUNC     ,IMON_MAT      ,USERL_AVAIL,heat_meca   ,
+     P         impl_s      ,idyna       ,PYTHON        ,MATPARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -129,6 +132,9 @@ C-----------------------------------------------
       USE DT_MOD
       USE OUTPUT_MOD
       USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
+      USE ELBUFDEF_MOD
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_IFLG6_SIZE
+      USE MATPARAM_DEF_MOD, ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -154,7 +160,6 @@ C-----------------------------------------------
 #include      "spmd_c.inc"
 #include      "inter18.inc"
 #include      "inter22.inc"
-#include      "mmale51_c.inc" 
 #include      "scr07_c.inc"
 #include      "stati_c.inc"
 #include      "macro.inc"
@@ -162,6 +167,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(MATPARAM_STRUCT_),DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM !< material buffer
       INTEGER, INTENT(IN):: IRESP
       integer,dimension(102) :: IDTMIN
       INTEGER ,INTENT(IN) :: MAXFUNC
@@ -496,7 +502,7 @@ C     -------------------------
 C     Multifluid pressure equilibration
 C     -------------------------
                CALL MULTI_PRESSURE_EQUILIBRIUM(DT1, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
-     .              PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF)
+     .              PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF,NUMMAT,MATPARAM)
 C     ------------------------
 C     Build FVM connectivities
 C     ------------------------
@@ -563,7 +569,7 @@ C     -------------------------
 C     Multifluid pressure equilibration
 C     -------------------------
                CALL MULTI_PRESSURE_EQUILIBRIUM(DT1, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
-     .              PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF)
+     .              PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF,NUMMAT,MATPARAM)
 C     ------------------------
 C     Build FVM connectivities
 C     ------------------------
@@ -617,14 +623,14 @@ C     --------------------------------------------------
      .                 NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, 
      .                 ITAB, ITABM1, TT - DT1, 
      .                 STIFN, FSKY, IADS, FSKYM, 
-     .                 CONDN, CONDNSKY, BUFMAT, FV, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPC,TF,FSAVSURF)
+     .                 CONDN, CONDNSKY, BUFMAT, FV, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPC,TF,FSAVSURF,MATPARAM)
 
                   CALL MY_BARRIER
 C     -------------------------
 C     Multifluid pressure computation
 C     -------------------------
                   CALL MULTI_PRESSURE_EQUILIBRIUM(DT1, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
-     .                 PM, IPM, MULTI_FVM, TT - DT1, BUFMAT,NPC,TF) 
+     .                 PM, IPM, MULTI_FVM, TT - DT1, BUFMAT,NPC,TF,NUMMAT,MATPARAM)
                   CALL MY_BARRIER  
 C     --------------------------------------------------
 C     Multifluid law time evolution --> Correction phase
@@ -638,14 +644,14 @@ C     --------------------------------------------------
      .                 NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, 
      .                 ITAB, ITABM1, TT - DT1, 
      .                 STIFN, FSKY, IADS, FSKYM, 
-     .                 CONDN, CONDNSKY, BUFMAT, FV, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPC,TF,FSAVSURF)
+     .                 CONDN, CONDNSKY, BUFMAT, FV, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPC,TF,FSAVSURF,MATPARAM)
 
                   CALL MY_BARRIER
 C     -------------------------
 C     Multifluid pressure equilibration
 C     -------------------------
                   CALL MULTI_PRESSURE_EQUILIBRIUM(DT1, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
-     .                 PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF) 
+     .                 PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF,NUMMAT,MATPARAM)
                   CALL MY_BARRIER                    
                ELSE
 C     -------------------------
@@ -657,7 +663,7 @@ C     -------------------------
      .                 NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, 
      .                 ITAB, ITABM1, TT - DT1, 
      .                 STIFN, FSKY, IADS, FSKYM, 
-     .                 CONDN, CONDNSKY, BUFMAT, FV, .FALSE.,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPC,TF,FSAVSURF)
+     .                 CONDN, CONDNSKY, BUFMAT, FV, .FALSE.,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPC,TF,FSAVSURF,MATPARAM)
                   CALL MY_BARRIER
 
                   IF (MULTI_FVM%NS_DIFF) THEN
@@ -671,7 +677,7 @@ C     -------------------------
 C     Multifluid pressure equilibration
 C     -------------------------
                   CALL MULTI_PRESSURE_EQUILIBRIUM(DT1, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
-     .                 PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF) 
+     .                 PM, IPM, MULTI_FVM, TT, BUFMAT,NPC,TF,NUMMAT,MATPARAM)
                   CALL MY_BARRIER   
                ENDIF
 
@@ -886,37 +892,39 @@ C
                     pQMV => BID
                   ENDIF   
                   CALL QFORC2(
-     .                  ELBUF_TAB,NG ,
-     1                  PM           ,GEO          ,IXQ         ,X         ,A        ,  
-     2                  V            ,MS           ,W           ,WA        ,VAL2     ,  
-     3                  VEUL         ,ALE_CONNECTIVITY       ,IPARG    ,NLOC_DMG,
-     4                  TF           ,NPC          ,BUFMAT      ,PARTSAV   ,
-     5                  DT2T         ,NELTST       ,ITYPTST     ,STIFN     ,OFFSET   ,  
-     6                  EANI         ,IPARTQ(1+NFT),NEL         ,IADQ      ,FSKY     ,  
-     9                  IPM          ,BUFVOIS      ,pQMV        ,
-     A                  GRESAV       ,GRTH         ,IGRTH       ,TABLE     ,IGEO     ,
-     B                  VOLN         ,ITASK        ,MS_2D       ,FSKYM     ,IOUTPRT  ,MAT_ELEM,
-     C              H3D_DATA%STRAIN  ,SZ_BUFVOIS   ,SNPC        ,STF       ,SBUFMAT  ,
-     D                  SVIS,NSVOIS,IRESP       ,TT        ,DT1,      
-     .                  IDEL7NOK     ,IDTMIN      ,MAXFUNC,  
-     .                  IMON_MAT,USERL_AVAIL, heat_meca, impl_s,     idyna) 
+     .                  ELBUF_TAB       ,NG               ,
+     1                  PM              ,GEO              ,IXQ         ,X         ,A        ,  
+     2                  V               ,MS               ,W           ,WA        ,VAL2     ,  
+     3                  VEUL            ,ALE_CONNECTIVITY ,IPARG       ,NLOC_DMG  ,
+     4                  TF              ,NPC              ,BUFMAT      ,PARTSAV   ,
+     5                  DT2T            ,NELTST           ,ITYPTST     ,STIFN     ,OFFSET   ,  
+     6                  EANI            ,IPARTQ(1+NFT)    ,NEL         ,IADQ      ,FSKY     ,  
+     9                  IPM             ,BUFVOIS          ,pQMV        ,
+     A                  GRESAV          ,GRTH             ,IGRTH       ,TABLE     ,IGEO     ,
+     B                  VOLN            ,ITASK            ,MS_2D       ,FSKYM     ,IOUTPRT  ,
+     C                  MAT_ELEM        ,H3D_DATA%STRAIN  ,SZ_BUFVOIS  ,SNPC      ,STF      ,SBUFMAT  ,
+     D                  SVIS            ,NSVOIS           ,IRESP       ,TT        ,DT1      ,      
+     .                  IDEL7NOK        ,IDTMIN           ,MAXFUNC     ,  
+     .                  IMON_MAT        ,USERL_AVAIL      ,heat_meca   ,impl_s    ,idyna    ,
+     .                  DT              ) 
 c
                  ELSEIF (ITY == 2 .AND. JMULT /= 0) THEN
-                  CALL BFORC2(ELBUF_TAB,NG      ,
-     1                  PM          , GEO           , IXQ       , X               ,
-     2                  A           , V             , MS        , W               , WA          ,
-     3                  VAL2        , VEUL          ,  ALE_CONNECTIVITY, IPARG       ,
-     4                  IPARG(1,NG) , FILL          , DFILL     , IMS             , NLOC_DMG    ,
-     5                  TF    ,NPC  , BUFMAT        , PARTSAV   ,
-     6                  DT2T        , NELTST,ITYPTST, STIFN     , OFFSET          ,
-     7                  EANI        , IPARTQ(1+NFT) , NEL,IADQ  , FSKY            ,
-     8                  IPM ,BUFVOIS,
-     9                  GRESAV,GRTH , IGRTH         , TABLE     , IGEO            ,
-     O                  VOLN  ,ITASK, MS_2D         , FSKYM     , MAT_ELEM        ,
-     B                  IBID,OUTPUT,SZ_BUFVOIS      ,SNPC,STF,SBUFMAT,SVIS,NSVOIS,IRESP,
-     C                  IDEL7NOK    ,IDTMIN         ,MAXFUNC,
-     E                  IMON_MAT    , USERL_AVAIL   ,heat_meca  ,impl_s,
-     F                  idyna)
+                  CALL BFORC2(
+     .                  ELBUF_TAB   , NG            ,
+     1                  PM          , GEO           ,IXQ             , X         ,
+     2                  A           , V             ,MS              , W         , WA        ,
+     3                  VAL2        , VEUL          ,ALE_CONNECTIVITY, IPARG     ,
+     4                  IPARG(1,NG) , FILL          ,DFILL           , IMS       , NLOC_DMG  ,
+     5                  TF          , NPC           ,BUFMAT          , PARTSAV   ,
+     6                  DT2T        , NELTST        ,ITYPTST         , STIFN     , OFFSET    ,
+     7                  EANI        , IPARTQ(1+NFT) ,NEL             , IADQ      , FSKY      ,
+     8                  IPM         , BUFVOIS       ,
+     9                  GRESAV      , GRTH          ,IGRTH           , TABLE     , IGEO      ,
+     O                  VOLN        , ITASK         ,MS_2D           , FSKYM     , MAT_ELEM  ,
+     B                  IBID        , OUTPUT        ,SZ_BUFVOIS      , SNPC      , STF       ,SBUFMAT, SVIS,
+     C                  NSVOIS      , IRESP         ,IDEL7NOK        , 
+     D                  IDTMIN      , MAXFUNC       ,IMON_MAT        , 
+     E                  USERL_AVAIL ,heat_meca      , impl_s         , idyna     ,DT         )
                  ENDIF
                 ENDIF
               ENDIF
@@ -1060,38 +1068,38 @@ C     ALE ON / OFF
                     pQMV => BID
                   ENDIF  
                   CALL QFORC2(
-     .              ELBUF_TAB,NG ,
-     1              PM           ,GEO          ,IXQ         ,X        ,A         ,  
-     2              V            ,MS           ,W           ,WA       ,VAL2      ,      
-     3              VEUL         ,ALE_CONNECTIVITY       ,IPARG    ,NLOC_DMG  ,              
-     4              TF           ,NPC          ,BUFMAT      ,PARTSAV  ,              
-     5              DT2T         ,NELTST       ,ITYPTST     ,STIFN    ,OFFSET    ,
-     6              EANI         ,IPARTQ(1+NFT),NEL         ,IADQ     ,FSKY      ,
-     9              IPM          ,BUFVOIS      ,pQMV        ,
-     A              GRESAV       ,GRTH         ,IGRTH       ,TABLE    ,IGEO      ,
-     B              VOLN         ,ITASK        ,MS_2D       ,FSKYM    ,IOUTPRT   ,MAT_ELEM ,
-     C              H3D_DATA%STRAIN,SZ_BUFVOIS   ,SNPC      ,STF,SBUFMAT,SVIS,NSVOIS,IDTMINS,
-     D              IRESP        ,TT           ,DT1,      
-     .              IDEL7NG,     IDEL7NOK,    IDTMIN,     MAXFUNC ,  
-     .              IMON_MAT,USERL_AVAIL, heat_meca, impl_s,     idyna)
+     .              ELBUF_TAB ,NG    ,
+     1              PM        ,GEO              ,IXQ         ,X        ,A         ,  
+     2              V         ,MS               ,W           ,WA       ,VAL2      ,      
+     3              VEUL      ,ALE_CONNECTIVITY ,IPARG       ,NLOC_DMG ,              
+     4              TF        ,NPC              ,BUFMAT      ,PARTSAV  ,              
+     5              DT2T      ,NELTST           ,ITYPTST     ,STIFN    ,OFFSET    ,
+     6              EANI      ,IPARTQ(1+NFT)    ,NEL         ,IADQ     ,FSKY      ,
+     9              IPM       ,BUFVOIS          ,pQMV        ,
+     A              GRESAV    ,GRTH             ,IGRTH       ,TABLE    ,IGEO      ,
+     B              VOLN      ,ITASK            ,MS_2D       ,FSKYM    ,IOUTPRT   ,
+     C              MAT_ELEM  ,H3D_DATA%STRAIN  ,SZ_BUFVOIS  ,SNPC     ,STF       ,SBUFMAT,
+     D              SVIS      ,NSVOIS           ,IRESP       ,TT       ,DT1       ,      
+     .              IDEL7NOK  ,IDTMIN           ,MAXFUNC     ,  
+     .              IMON_MAT  ,USERL_AVAIL      ,heat_meca   ,impl_s   ,idyna     ,
+     .              DT        )
 c
                       ELSEIF(ITY == 2 .AND. JMULT /= 0)THEN
                   CALL BFORC2(ELBUF_TAB  ,NG           ,
-     1                        PM         ,GEO          ,IXQ     ,X                ,    
-     2                        A          ,V            ,MS      ,W                ,WA        ,  
-     3                        VAL2       ,VEUL         ,ALE_CONNECTIVITY ,IPARG     ,
-     4                        IPARG(1,NG),FILL         ,DFILL   ,IMS              ,NLOC_DMG  ,    
-     5                        TF         ,NPC          ,BUFMAT  ,PARTSAV          ,       
-     5                        DT2T       ,NELTST       ,ITYPTST ,STIFN            ,OFFSET    ,  
-     6                        EANI       ,IPARTQ(1+NFT),NEL     ,IADQ             ,FSKY      ,  
+     1                        PM         ,GEO          ,IXQ              ,X          ,    
+     2                        A          ,V            ,MS               ,W          ,WA        ,  
+     3                        VAL2       ,VEUL         ,ALE_CONNECTIVITY ,IPARG      ,
+     4                        IPARG(1,NG),FILL         ,DFILL            ,IMS        ,NLOC_DMG  ,    
+     5                        TF         ,NPC          ,BUFMAT           ,PARTSAV    ,       
+     5                        DT2T       ,NELTST       ,ITYPTST          ,STIFN      ,OFFSET    ,  
+     6                        EANI       ,IPARTQ(1+NFT),NEL              ,IADQ       ,FSKY      ,  
      7                        IPM        ,BUFVOIS      ,
-     8                        GRESAV     ,GRTH         ,IGRTH   ,TABLE            ,IGEO      ,
-     9                        VOLN       ,ITASK        ,MS_2D   ,FSKYM            ,MAT_ELEM,
-     B                        IBID       ,OUTPUT       ,SZ_BUFVOIS      ,SNPC,STF,SBUFMAT,SVIS,
-     *                        NSVOIS     ,IDTMINS      ,IRESP,
-     C                       IDEL7NG     ,IDEL7NOK     ,IDTMIN     ,MAXFUNC,
-     E                       IMON_MAT    , USERL_AVAIL   ,heat_meca  ,impl_s,
-     F                       idyna)
+     8                        GRESAV     ,GRTH         ,IGRTH            ,TABLE      ,IGEO      ,
+     9                        VOLN       ,ITASK        ,MS_2D            ,FSKYM      ,MAT_ELEM,
+     A                        IBID       ,OUTPUT       ,SZ_BUFVOIS       ,SNPC       ,STF       ,SBUFMAT ,SVIS,
+     B                        NSVOIS     ,IRESP        ,IDEL7NOK         ,
+     C                        IDTMIN     ,MAXFUNC      ,IMON_MAT         ,
+     E                        USERL_AVAIL,heat_meca    ,impl_s           ,idyna      ,DT        )
 
                  ENDIF
                 ENDIF

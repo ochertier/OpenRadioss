@@ -35,6 +35,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i12tid3                          ../starter/source/interfaces/inter3d1/i12tid3.F
       !||    i17sti3                          ../starter/source/interfaces/inter3d1/i17sti3.F
       !||    i18pwr3                          ../starter/source/interfaces/inter3d1/i18pwr3.F
+      !||    i1bcs_check                      ../starter/source/interfaces/int01/i1bcs_check.F90
       !||    i1chk3                           ../starter/source/interfaces/inter3d1/i1chk3.F
       !||    i1tid3                           ../starter/source/interfaces/inter3d1/i1tid3.F
       !||    i20ini3                          ../starter/source/interfaces/inter3d1/i20ini3.F
@@ -96,6 +97,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i7pwr3                           ../starter/source/interfaces/inter3d1/i7pwr3.F
       !||    i7remnode                        ../starter/source/interfaces/inter3d1/i7remnode.F
       !||    i7sti3                           ../starter/source/interfaces/inter3d1/i7sti3.F
+      !||    i9bcs_check                      ../starter/source/interfaces/int09/i9bcs_check.F90
       !||    i9sti3                           ../starter/source/interfaces/int09/i9sti3.F
       !||    in12r                            ../starter/source/interfaces/inter3d1/in12r.F
       !||    inint0                           ../starter/source/interfaces/interf1/inint0.F
@@ -119,26 +121,30 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    inter_cand_mod                   ../starter/share/modules1/inter_cand_mod.F
       !||    message_mod                      ../starter/share/message_module/message_mod.F
       !||====================================================================
-      SUBROUTINE ININT3(INSCR     ,X            ,IXS        ,IXC       ,PM      ,
-     1                  GEO       ,IPARI        ,NIN        ,ITAB      ,MS      ,
-     2                  MWA       ,RWA          ,IXTG       ,IWRN      ,IKINE   ,
-     3                  IXT       ,IXP          ,IXR        ,NELEMINT  ,IDDLEVEL,
-     4                  IFIEND    ,ALE_CONNECTIVITY,NSNET      ,NMNET     ,IGRBRIC ,
-     5                  IWCONT    ,NSNT         ,NMNT       ,NSN2T     ,NMN2T   ,
-     6                  IWCIN2    ,KNOD2ELS     ,KNOD2ELC   ,KNOD2ELTG ,NOD2ELS ,
-     7                  NOD2ELC    ,NOD2ELTG    ,IGRSURF    ,IKINE1    ,IELEM21 ,
-     8                  SH4TREE    ,SH3TREE     ,IPART      ,IPARTC    ,IPARTTG ,
-     9                  THK        ,THK_PART    ,NOD2EL1D   ,KNOD2EL1D ,IXS10   ,
-     A                  I_MEM      ,RESORT      ,INTER_CAND ,IXS16     ,IXS20   ,   
-     B                  ID         ,TITR        ,IREMNODE   ,NREMNODE  ,IPARTS  ,
-     C                  KXX        ,IXX         ,IGEO       ,INTERCEP  ,LELX    ,
-     D                  INTBUF_TAB ,FILLSOL     ,PM_STACK   ,IWORKSH   ,KXIG3D  ,
-     E                  IXIG3D     ,TAGPRT_FRIC ,INTBUF_FRIC_TAB,IPARTT,IPARTP  ,
-     F                  IPARTX     ,IPARTR      ,NSN_MULTI_CONNEC,T2_ADD_CONNEC,T2_NB_CONNEC,
-     G                  T2_CONNEC  ,NOM_OPT     ,ICODE     ,ISKEW      ,IREMNODE_EDG,
-     H                  S_APPEND_ARRAY,X_APPEND,MASS_APPEND,N2D,FLAG_REMOVED_NODE,
-     I                  NSPMD,INTER_TYPE2_NUMBER,ELEM_LINKED_TO_SEGMENT)
-C============================================================================
+      SUBROUTINE ININT3(INSCR         ,X                   ,IXS                   ,IXC          ,PM      ,
+     1                  GEO           ,IPARI               ,NIN                   ,ITAB         ,MS      ,
+     2                  MWA           ,RWA                 ,IXTG                  ,IWRN         ,IKINE   ,
+     3                  IXT           ,IXP                 ,IXR                   ,NELEMINT     ,IDDLEVEL,
+     4                  IFIEND        ,ALE_CONNECTIVITY    ,NSNET                 ,NMNET        ,IGRBRIC ,
+     5                  IWCONT        ,NSNT                ,NMNT                  ,NSN2T        ,NMN2T   ,
+     6                  IWCIN2        ,KNOD2ELS            ,KNOD2ELC              ,KNOD2ELTG    ,NOD2ELS ,
+     7                  NOD2ELC       ,NOD2ELTG            ,IGRSURF               ,IKINE1       ,IELEM21 ,
+     8                  SH4TREE       ,SH3TREE             ,IPART                 ,IPARTC       ,IPARTTG ,
+     9                  THK           ,THK_PART            ,NOD2EL1D              ,KNOD2EL1D    ,IXS10   ,
+     A                  I_MEM         ,RESORT              ,INTER_CAND            ,IXS16        ,IXS20   ,
+     B                  ID            ,TITR                ,IREMNODE              ,NREMNODE     ,IPARTS  ,
+     C                  KXX           ,IXX                 ,IGEO                  ,INTERCEP     ,LELX    ,
+     D                  INTBUF_TAB    ,FILLSOL             ,PM_STACK              ,IWORKSH      ,KXIG3D  ,
+     E                  IXIG3D        ,TAGPRT_FRIC         ,INTBUF_FRIC_TAB       ,IPARTT       ,IPARTP  ,
+     F                  IPARTX        ,IPARTR              ,NSN_MULTI_CONNEC      ,T2_ADD_CONNEC,T2_NB_CONNEC,
+     G                  T2_CONNEC     ,NOM_OPT             ,ICODE                 ,ISKEW        ,IREMNODE_EDG,
+     H                  S_APPEND_ARRAY,X_APPEND            ,MASS_APPEND           ,N2D          ,FLAG_REMOVED_NODE,
+     I                  NSPMD         ,INTER_TYPE2_NUMBER  ,ELEM_LINKED_TO_SEGMENT,SINSCR       ,SICODE  ,
+     J                  SITAB)
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
+C Interfaces initialization for 3D analysis (N2D=0)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -171,13 +177,16 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NIN, IWRN, NSNT, NMNT, NSN2T, NMN2T,
-     .   NSNET  ,NMNET ,RESORT
+      INTEGER,INTENT(IN) :: SITAB !< array sizes
+      INTEGER,INTENT(IN) :: SICODE !< array size ICODE
+      INTEGER,INTENT(IN) :: ICODE(SICODE) !< boundary condition code for each node
+      INTEGER,INTENT(IN) :: SINSCR !< array size
+      INTEGER NIN, IWRN, NSNT, NMNT, NSN2T, NMN2T, NSNET  ,NMNET ,RESORT
       INTEGER, INTENT(in) :: N2D !< flag for 2D/3D, 0-->3D, 1-->2D
       INTEGER, DIMENSION(NPARI,NINTER), INTENT(inout) :: IPARI !< interface data
-      INTEGER INSCR(*), IXS(NIXS,NUMELS), IXC(NIXC,NUMELC),
+      INTEGER INSCR(SINSCR), IXS(NIXS,NUMELS), IXC(NIXC,NUMELC),
      .   IXT(NIXT,NUMELT) ,IXP(NIXP,NUMELP) ,IXR(NIXR,NUMELR),
-     .   ITAB(NUMNOD), MWA(*), IXTG(NIXTG,NUMELTG), IKINE(*),
+     .   ITAB(SITAB), MWA(*), IXTG(NIXTG,NUMELTG), IKINE(*),
      .   NELEMINT,  IDDLEVEL,IFIEND,
      .   IWCONT(*), IWCIN2(*),
      .   KNOD2ELS(*), KNOD2ELC(*), KNOD2ELTG(*), 
@@ -187,7 +196,7 @@ C-----------------------------------------------
      .   IXS10(6,*), IXS16(8,*), IXS20(12,*), IPARTS(*),
      .   KXIG3D(NIXIG3D,*),IXIG3D(*),TAGPRT_FRIC(*),
      .   IPARTT(*)  ,IPARTP(*)  ,IPARTX(*) ,IPARTR(*),
-     .   ICODE(*), ISKEW(*)
+     .   ISKEW(*)
       INTEGER IKINE1(*), IELEM21(*),I_MEM,ID,IREMNODE,IREMNODE_EDG,
      .   NREMNODE,KXX(*),IXX(*),IGEO(*),IWORKSH(*),NSN_MULTI_CONNEC,T2_ADD_CONNEC(*),
      .   T2_NB_CONNEC(*),T2_CONNEC(*)
@@ -346,12 +355,13 @@ C-----------------------------------------------------------------------
        L22=L20+1+NSN
 
       !must be flushed to 0 (in old code INBUF and BUFIN 
-      !flushed between 2 domain decomposition
+      !flushed between 2 domain decomposition (otherwise ININT0 subroutine does not store the expected segments)
       INTBUF_TAB(NIN)%NRT(1:NMT) = 0
 C
        CALL ININT0(
-     1    X                ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSEGM ,INTBUF_TAB(NIN)%NRT ,INTBUF_TAB(NIN)%MSR,
-     2    INTBUF_TAB(NIN)%NSV   ,INTBUF_TAB(NIN)%ILOCS   ,NSN              ,NMN            ,NRTM   )
+     1    X                ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSEGM ,INTBUF_TAB(NIN)%NRT  ,INTBUF_TAB(NIN)%MSR,
+     2    INTBUF_TAB(NIN)%NSV   ,INTBUF_TAB(NIN)%ILOCS   ,NSN              ,NMN            ,NRTM ,INTBUF_TAB(NIN)%S_IRECTM,
+     3    INTBUF_TAB(NIN)%S_NRT  )
        CALL I1CHK3(
      1    X                ,INTBUF_TAB(NIN)%IRECTS  ,IXS              ,NRTS           ,IXC           ,
      2    NIN           ,NSN                ,INTBUF_TAB(NIN)%NSV   ,NOINT          ,IXTG          ,
@@ -377,8 +387,9 @@ C
      2    INTBUF_TAB(NIN)%ILOCS ,INTBUF_TAB(NIN)%IRTLM   ,NSN              ,ITAB           ,IKINE         ,
      3    IKINE1           ,ID                 ,TITR             ,ILEV           ,NTY           ,
      4    INTBUF_TAB(NIN)%CSTS_BIS)
+       CALL I1BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB(NIN)%NSV, SITAB, ITAB, NOINT, TITR, NTY)
 C-----------------------------------------------------------------------
-      ELSEIF(NTY==2.AND.ISEARCH==1) THEN
+      ELSEIF(NTY == 2 .AND. ISEARCH == 1) THEN
 C-----------------------------------------------------------------------
        L16 = 1
        L17 = L16+NSN
@@ -387,28 +398,29 @@ C-----------------------------------------------------------------------
        L22 = L21+1+NMN
        L23 = L22+NST
        CALL ININT0(
-     1    X                ,INTBUF_TAB(NIN)%IRECTM  ,INSCR(L21)       ,INSCR(L23)     ,INTBUF_TAB(NIN)%MSR,
-     2    INTBUF_TAB(NIN)%NSV   ,INSCR(L16)         ,NSN              ,NMN            ,NRTM          )
+     1    X                    ,INTBUF_TAB(NIN)%IRECTM  ,INSCR(L21)  ,INSCR(L23)  ,INTBUF_TAB(NIN)%MSR,
+     2    INTBUF_TAB(NIN)%NSV  ,INSCR(L16)              ,NSN         ,NMN         ,NRTM               ,INTBUF_TAB(NIN)%S_IRECTM,
+     3    SINSCR-L23+1 )
 
        CALL I1CHK3(
-     1    X               ,INTBUF_TAB(NIN)%IRECTM   ,IXS              ,NRTM           ,IXC           ,
-     2    -NIN         ,NMN                 ,INTBUF_TAB(NIN)%MSR   ,NOINT          ,IXTG          ,
-     3    GEO             ,PM                  ,KNOD2ELS         ,KNOD2ELC       ,KNOD2ELTG     ,
-     4    NOD2ELS         ,NOD2ELC             ,NOD2ELTG         ,IGRSURF(ISU2)  ,
-     5    THK             ,NTY                 ,IXS10            ,IXS16          ,IXS20         ,
-     6    ID              ,TITR                ,IGEO             ,PM_STACK       , IWORKSH      )
+     1    X               ,INTBUF_TAB(NIN)%IRECTM   ,IXS                   ,NRTM                ,IXC           ,
+     2    -NIN            ,NMN                      ,INTBUF_TAB(NIN)%MSR   ,NOINT               ,IXTG          ,
+     3    GEO             ,PM                       ,KNOD2ELS              ,KNOD2ELC            ,KNOD2ELTG     ,
+     4    NOD2ELS         ,NOD2ELC                  ,NOD2ELTG              ,IGRSURF(ISU2)       ,
+     5    THK             ,NTY                      ,IXS10                 ,IXS16               ,IXS20         ,
+     6    ID              ,TITR                     ,IGEO                  ,PM_STACK            ,IWORKSH      )
        CALL INVOI3(
-     1    X               ,INTBUF_TAB(NIN)%IRECTM   ,INSCR(L23)       ,INTBUF_TAB(NIN)%MSR ,INTBUF_TAB(NIN)%NSV,
-     2    INSCR(L16)      ,INTBUF_TAB(NIN)%IRTLM    ,INSCR(L21)       ,NSN            ,NMN           ,
-     3    ITAB            ,ID                  ,TITR             ,NRTM)
+     1    X               ,INTBUF_TAB(NIN)%IRECTM   ,INSCR(L23)            ,INTBUF_TAB(NIN)%MSR ,INTBUF_TAB(NIN)%NSV,
+     2    INSCR(L16)      ,INTBUF_TAB(NIN)%IRTLM    ,INSCR(L21)            ,NSN                 ,NMN           ,
+     3    ITAB            ,ID                       ,TITR                  ,NRTM)
        WRITE(IOUT,2002)
        CALL I1TID3(
      1    X               ,INTBUF_TAB(NIN)%IRECTM   ,INTBUF_TAB(NIN)%CSTS  ,INTBUF_TAB(NIN)%MSR ,INTBUF_TAB(NIN)%NSV,
      2    INSCR(L16)      ,INTBUF_TAB(NIN)%IRTLM    ,NSN              ,ITAB           ,IKINE         ,
      3    IKINE1          ,ID                  ,TITR             ,ILEV           ,NTY           ,
      4    INTBUF_TAB(NIN)%CSTS_BIS)
-C selection main nodes utiles et recompactage buffer interface
-C      Attention NMN et K14 modifie par I2MAIN
+C      selecting relevant main nodes et recompating the interface buffer
+C      Warning : NMN et K14 updated by I2MAIN
        CALL I2MAIN(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%IRECTM,IPARI(1,NIN),
      .               MWA,MWA(NUMNOD+1),INTBUF_TAB(NIN))
 C
@@ -424,7 +436,7 @@ C
      .        X   ,INTBUF_TAB(NIN)%NSV  ,INTBUF_TAB(NIN)%AREAS2,NSN ,ITAB      ,
      .        IXC       ,IXTG      ,IXS       ,KNOD2ELS  ,NOD2ELS   ,
      .        KNOD2ELC  ,NOD2ELC   ,KNOD2ELTG ,NOD2ELTG  ,ILEV      ,
-     .        ID        ,TITR      ,INTTH    )
+     .        ID        ,TITR          )
           ENDIF
        IF ((ILEV >=10 .AND. ILEV < 23) ) THEN
          IF (ILEV==20 .OR. ILEV==21 .OR. ILEV==22) THEN
@@ -450,7 +462,7 @@ C
        ! -----------------
        IF((IDDLEVEL==0).AND.
      +    (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+C        nodal weights and interfaces
          CALL I2WCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN,NMN,IWCIN2,
      2                   NSN2T     ,NMN2T     )
        END IF
@@ -459,7 +471,7 @@ C-----------------------------------------------------------------------
       ELSEIF(NTY==2.AND.ISEARCH==2) THEN
 C-----------------------------------------------------------------------
        TZINF=INTBUF_TAB(NIN)%VARIABLES(4)
-C j21 utilise en tmp dans i2chk3, i2buc3 et i2tied3
+C j21 has a temporary usage in i2chk3, i2buc3 and i2tied3
 C
        CALL I2CHK3(
      1   X                 ,INTBUF_TAB(NIN)%IRECTM ,IXS                ,NRTM                   ,IXC             ,
@@ -470,7 +482,7 @@ C
      6   NTY               ,IXS10             ,IXS16              ,IXS20                  ,IGEO            ,
      7   PM_STACK          ,IWORKSH )
 C
-C      IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C      STILL ONE BUCKET SORT
 C
        IGNORE = IPARI(34,NIN)
        IPROJ  = IPARI(57,NIN)
@@ -497,7 +509,7 @@ C
      2   LC2    ,LC3    ,LC4,S   ,T         ,
      3   ILEV)
 C
-C      Attention NMN, NSN, K13, K14 et K15 modifie par I2TID3
+C      Warning : NMN, NSN, K13, K14 et K15 updated by I2TID3
        CALL I2TID3(
      1    X                ,INTBUF_TAB(NIN)%IRECTM ,INTBUF_TAB(NIN)%CSTS   ,INTBUF_TAB(NIN)%MSR          ,INTBUF_TAB(NIN)%NSV  ,
      2    INTBUF_TAB(NIN)%IRTLM ,ITAB              ,IKINE             ,IKINE1                  ,INTBUF_TAB(NIN)%DPARA,
@@ -510,13 +522,12 @@ C
        NMN = IPARI(6,NIN)
        INTTH = IPARI(47,NIN)
 C
-c       IF ((ILEV >=10 .AND. ILEV < 23) ) THEN
        IF ((ILEV >=10 .AND. ILEV < 23) .OR. INTTH > 0) THEN
          CALL I2SURFS(
      .    X                ,INTBUF_TAB(NIN)%NSV    ,INTBUF_TAB(NIN)%AREAS2 ,NSN                     ,ITAB,
      .    IXC              ,IXTG              ,IXS               ,KNOD2ELS                ,NOD2ELS   ,
      .    KNOD2ELC         ,NOD2ELC           ,KNOD2ELTG         ,NOD2ELTG                ,ILEV      ,
-     .    ID               ,TITR              ,INTTH    )
+     .    ID               ,TITR                  )
        ENDIF
 
        ! -----------------
@@ -528,9 +539,8 @@ c       IF ((ILEV >=10 .AND. ILEV < 23) ) THEN
        ENDIF
        ! -----------------
 C
-       IF(IDDLEVEL==0 .AND.
-     +   (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+       IF(IDDLEVEL == 0 .AND. (DECTYP >= 3 .AND. DECTYP <= 6))THEN
+C        nodal weights and interfaces
          CALL I2WCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN,NMN,IWCIN2,
      +                 NSN2T        ,NMN2T        )
        END IF
@@ -547,10 +557,10 @@ C-----------------------------------------------------------------------
 
        CALL ININT0(
      1    X,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%NSEGS,INTBUF_TAB(NIN)%LNSV,INTBUF_TAB(NIN)%NSV,
-     2    INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%ILOCM,NMN ,NSN   ,NRTS   )
+     2    INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%ILOCM,NMN ,NSN   ,NRTS ,INTBUF_TAB(NIN)%S_IRECTS ,INTBUF_TAB(NIN)%S_LNSV)
        CALL ININT0(
      1    X,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%NSEGM,INTBUF_TAB(NIN)%LMSR,INTBUF_TAB(NIN)%MSR,
-     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN,NMN   ,NRTM   )
+     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN,NMN   ,NRTM ,INTBUF_TAB(NIN)%S_IRECTM ,INTBUF_TAB(NIN)%S_LMSR )
        CALL I3STI3(
      1 X         ,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%STFS,IXS,PM   ,
      2 GEO       ,NRTS      ,IXC       ,INTBUF_TAB(NIN)%STFNS,INTBUF_TAB(NIN)%NSEGS,
@@ -607,7 +617,7 @@ C-----------------------------------------------------------------------
 
        CALL ININT0(
      1    X,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%NSEGM,INTBUF_TAB(NIN)%LMSR,INTBUF_TAB(NIN)%MSR,
-     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN ,NMN   ,NRTM   )
+     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN ,NMN   ,NRTM ,INTBUF_TAB(NIN)%S_IRECTM ,INTBUF_TAB(NIN)%S_LMSR)
        CALL I3STI3(
      1 X         ,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%STFM,IXS       ,PM          ,
      2 GEO       ,NRTM      ,IXC       ,INTBUF_TAB(NIN)%STFNM, INTBUF_TAB(NIN)%NSEGM  ,
@@ -637,7 +647,6 @@ C
 C-----------------------------------------------------------------------
       ELSEIF(NTY==7) THEN
 C-----------------------------------------------------------------------
-C       I_STOK = 0
        DRAD = INTBUF_TAB(NIN)%VARIABLES(32)
 
        IF(INTBUF_TAB(NIN)%S_NIGE/=0) THEN
@@ -667,7 +676,7 @@ C       I_STOK = 0
      7  XN2      ,YN2    ,ZN2    ,XN3     ,YN3   ,
      8  ZN3      ,XN4    ,YN4    ,ZN4      )
 C----------------
-C      CALCUL DES RIGIDITES ELEMENTTAIRES ET NODALES 
+C      NODAL AND ELEMENTARY STIFFNESS
 C----------------
        CALL I7STI3(
      1    PTR_X            ,INTBUF_TAB(NIN)%IRECTM       , INTBUF_TAB(NIN)%STFM ,    IXS          , PM              ,
@@ -706,7 +715,6 @@ C
 C----------------
 C      VOXEL SORT
 C----------------
-C     I_STOK=INTBUF_TAB(NIN)%I_STOK(1)
       CALL I7BUC_VOX1(
      1 PTR_X    ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%VARIABLES(4),NSEG  ,
      2 NMN      ,NRTM      ,MWA     ,NSN        ,INTBUF_TAB(NIN)%CAND_E  ,
@@ -729,7 +737,7 @@ C     I_STOK=INTBUF_TAB(NIN)%I_STOK(1)
      1 LC3   ,LC4     ,N11   ,N21   ,N31   ,
      2 STIF  ,PENE    ,IREMNODE  ,IPARI(63,NIN),
      3 INTBUF_TAB(NIN)%KREMNODE,INTBUF_TAB(NIN)%REMNODE,INTBUF_TAB(NIN)%VARIABLES(46))
-C I_STOK sauvegarde a sa place pour optimisation tri
+C I_STOK updated for searching optimization
          I_STOK=INTBUF_TAB(NIN)%I_STOK(1)
          
        IF (I_MEM == 2 ) RETURN
@@ -765,7 +773,6 @@ C Weighting interface nodes
           CALL IWCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN_FE,NMN_FE,IWCONT,NSNT,NMNT)
         ENDIF
       END IF
-cc     ENDIF
 C
 C     INITIAL PENETRATION I7PEN3
 C
@@ -822,10 +829,7 @@ C
          ENDIF
          IF(IWPENE/=0.AND.INACTI==3.OR.INACTI==4) IWRN = 1
         ENDDO
-        CALL ANCMSG(MSGID=1164,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,
-     .              I1=ID,
-     .              C1=TITR,
-     .              PRMOD=MSG_PRINT)
+        CALL ANCMSG(MSGID=1164,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,PRMOD=MSG_PRINT)
         DO I=1,NUMNOD+NUMFAKENODIGEO
          INPENE=INPENE+MIN(MWA(I),1)
         ENDDO
@@ -870,25 +874,27 @@ C-----------------------------------------------------------------------
 
        CALL ININT0(
      1    X,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%NSEGS,INTBUF_TAB(NIN)%LNSV,INTBUF_TAB(NIN)%NSV,
-     2    INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%ILOCM,NMN ,NSN            ,NRTS   )
+     2    INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%ILOCM,NMN ,NSN            ,NRTS  ,INTBUF_TAB(NIN)%S_IRECTS ,
+     3    INTBUF_TAB(NIN)%S_LNSV)
        CALL ININT0(
      1    X,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%NSEGM,INTBUF_TAB(NIN)%LMSR,INTBUF_TAB(NIN)%MSR,
-     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN ,NMN            ,NRTM   )
+     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN ,NMN            ,NRTM  ,INTBUF_TAB(NIN)%S_IRECTM ,
+     3    INTBUF_TAB(NIN)%S_LMSR )
 
        CALL I9STI3(
-     1   X         ,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%STFS,IXS ,PM ,
-     2   GEO       ,NRTS             ,IXC       ,INTBUF_TAB(NIN)%STFNS,INTBUF_TAB(NIN)%NSEGS,
-     3   INTBUF_TAB(NIN)%LNSV,NIN      ,NSN       ,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%STFAC(1),
-     4   NTY       ,INTBUF_TAB(NIN)%VARIABLES(2),NOINT   ,IXTG      ,INTBUF_TAB(NIN)%IELES,
-     5   KNOD2ELS  ,NOD2ELS   ,IGRSURF   ,ISU1      ,IXS10     ,
-     6   IXS16     ,IXS20     ,ID        ,TITR)
+     1   X         ,INTBUF_TAB(NIN)%IRECTS, INTBUF_TAB(NIN)%STFS ,IXS                     ,
+     2   NRTS      ,
+     3   NIN       ,NSN                   , INTBUF_TAB(NIN)%NSV  ,
+     4   NOINT     , INTBUF_TAB(NIN)%IELES,
+     5   KNOD2ELS  ,NOD2ELS               , IGRSURF              ,ISU1      ,
+     6   IXS10     ,IXS16                 ,IXS20                 , ID                      ,TITR)
        CALL I9STI3(
-     1   X         ,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%STFM,IXS       ,PM        ,
-     2   GEO       ,NRTM      ,IXC       ,INTBUF_TAB(NIN)%STFNM,INTBUF_TAB(NIN)%NSEGM,
-     3   INTBUF_TAB(NIN)%LMSR,-NIN   ,NMN    ,INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%STFAC(1),
-     4   NTY       ,INTBUF_TAB(NIN)%VARIABLES(2),NOINT   ,IXTG      ,INTBUF_TAB(NIN)%IELEM,
-     5   KNOD2ELS  ,NOD2ELS   ,IGRSURF     ,ISU2    ,IXS10     ,
-     6   IXS16     ,IXS20     ,ID       ,TITR)
+     1   X         ,INTBUF_TAB(NIN)%IRECTM, INTBUF_TAB(NIN)%STFM ,IXS                      ,
+     2   NRTM      ,
+     3   -NIN      ,NMN                   , INTBUF_TAB(NIN)%MSR  ,
+     4   NOINT     , INTBUF_TAB(NIN)%IELEM,
+     5   KNOD2ELS  ,NOD2ELS               , IGRSURF              ,ISU2    ,
+     6   IXS10     ,IXS16                 , IXS20                , ID                      ,TITR)
        CALL INVOI3(
      1    X,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%LMSR,INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%NSV,
      2    INTBUF_TAB(NIN)%ILOCS,INTBUF_TAB(NIN)%IRTLM,INTBUF_TAB(NIN)%NSEGM,NSN       ,NMN ,
@@ -908,16 +914,17 @@ C-----------------------------------------------------------------------
      1    X,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%ILOCM,
      2    INTBUF_TAB(NIN)%IRTLS,INTBUF_TAB(NIN)%CSTM,INTBUF_TAB(NIN)%IRTLOS,INTBUF_TAB(NIN)%VARIABLES(2),NMN,
      3    ITAB      ,IWPENE    ,ID,TITR)
-C
        ENDIF
+       CALL I9BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB(NIN)%NSV, SITAB, ITAB, NOINT, TITR, NTY,
+     .                  INTBUF_TAB(NIN)%S_ILOCS, INTBUF_TAB(NIN)%ILOCS )
 C-----------------------------------------------------------------------
       ELSEIF(NTY==10) THEN
 C-----------------------------------------------------------------------
-C      K14 = ELEMS CANDIDATS A L'IMPACT...
-C      K15 = NOEUDS CANDIDATS A L'IMPACT + ADRESSE ELEMS CORRES.
+C      K14 = CANDIDATE ELEMS...
+C      K15 = CANDIDATE NODES + INDEXES
        ITIED=NINT(INTBUF_TAB(NIN)%VARIABLES(1))
 C
-C      CALCUL DES RIGIDITES ELEMENTTAIRES ET NODALES 
+C      NODAL AND ELEMENTARY STIFFNESS
 C
         IBIDON = 0
         BIDON = ZERO
@@ -1013,7 +1020,7 @@ C
      7      Y2 ,Y3 ,Y4 ,Z1 ,Z2  ,
      8      Z3 ,Z4 ,XI ,YI ,ZI  ,
      9      N11,N21,N31,PENE)
-        IF(IWPENE/=0.AND.INACTI==3.OR.INACTI==4) IWRN = 1
+        IF(IWPENE /= 0 .AND. INACTI == 3 .OR. INACTI == 4) IWRN = 1
        ENDDO
        CALL ANCMSG(MSGID=1164,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,PRMOD=MSG_PRINT)
 
@@ -1021,8 +1028,8 @@ C
          INPENE=INPENE+MIN(MWA(I),1)
        ENDDO
        IF((IDDLEVEL==0).AND.
-     +    (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+     +    (DECTYP >= 3 .AND. DECTYP <= 6))THEN
+C        nodal weights and interface
          CALL IWCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN,NMN,IWCONT,
      .                   NSNT,NMNT)
        END IF
@@ -1033,15 +1040,13 @@ C      ELEMSTIFFNESS
 C
        GAP0 =INTBUF_TAB(NIN)%VARIABLES(2)
        GAPINF = EP30
-C        cette initialisation est necessaire seulement apres l appel de i11edge
-C        dans lecins
-C        qui compacte sur deux emplacements les segments 
-C        ils sont sur quatre emplacements a la lecture : 
-C           [2 cases remplies puis deux cases vides]
-C        cette initialisation specifique est donc faite dans inint3 
-C        en dehors de bufinti
-C        seul endroit ou BUFINTI est appele apres l appel de i11edge
-C        => pour l'engine tout est sur deux emplacement
+
+C this initialization is necessary only after calling i11edge in lecins
+C which compacts the segments on two locations
+C they are on four locations when reading:[2 filled boxes then two empty boxes]
+C this specific initialization is therefore done in inint3 outside bufinti
+C only place where BUFINTI is called after calling i11edge
+C => for the engine everything is on two locations
 
 C      INTBUF_TAB(NIN)%VARIABLES(1) EST MODIFIE PAR I11STI3; GAP0 NON
 
@@ -1078,7 +1083,7 @@ C
 C
        INTBUF_TAB(NIN)%VARIABLES(6)=MAX(GAPINF,INTBUF_TAB(NIN)%VARIABLES(13))
 C
-C      IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C      STILL ONE BUCKET SORT
 C
        MAXBOX = INTBUF_TAB(NIN)%VARIABLES(9)
        MINBOX = INTBUF_TAB(NIN)%VARIABLES(12)
@@ -1140,14 +1145,13 @@ C
        ENDIF
        ! -----------------
 
-       IF((IDDLEVEL==0).AND.
-     +    (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+       IF((IDDLEVEL == 0) .AND. (DECTYP >= 3 .AND. DECTYP <= 6))THEN
+C        node weights and interfaces
          CALL IWCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN,NMN,IWCONT,
      .                 NSNT,NMNT)
        END IF
 C
-C      PUIS CALCULER LES PENETRATIONS INITIALES AVEC ONE I11PEN3
+C      INITIAL PENETRATION CALCULATED WITH I11PEN3
 C
        NGROUS=1+(I_STOK-1)/NVSIZ
 C
@@ -1173,12 +1177,11 @@ C
      3    N1        ,N2        ,M1     ,M2        ,NX        ,
      4    NY        ,NZ        ,GAPV   ,INTBUF_TAB(NIN)%GAP_S,INTBUF_TAB(NIN)%GAP_M,
      5    INTBUF_TAB(NIN)%PENIS,INTBUF_TAB(NIN)%PENIM,IGAP,PRINT_WARNING)
-        IF(IWPENE/=0.AND.INACTI==3.OR.INACTI==4) IWRN = 1
+        IF(IWPENE/=0 .AND. INACTI==3 .OR. INACTI==4) IWRN = 1
 
        ENDDO
-       IF((IDDLEVEL==0).AND.
-     +    (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+       IF((IDDLEVEL == 0) .AND. (DECTYP >= 3 .AND. DECTYP <= 6))THEN
+C        node weights and interfaces
          CALL IWCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN,NMN,IWCONT,
      .                 NSNT,NMNT)
        END IF
@@ -1192,17 +1195,18 @@ C-----------------------------------------------------------------------
         !flushed between 2 domain decomposition
         INTBUF_TAB(NIN)%LMSR(1:NMT) = 0
         CALL ININT0(
-     1    X,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%NSEGM,INTBUF_TAB(NIN)%LMSR ,INTBUF_TAB(NIN)%MSR,
-     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN       ,NMN        ,NRTM   )
+     1    X,INTBUF_TAB(NIN)%IRECTM, INTBUF_TAB(NIN)%NSEGM,INTBUF_TAB(NIN)%LMSR ,INTBUF_TAB(NIN)%MSR,
+     2    INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%ILOCS,NSN       ,NMN        ,NRTM ,INTBUF_TAB(NIN)%S_IRECTM  ,
+     3    INTBUF_TAB(NIN)%S_LMSR)
        IPARI(30,NIN)=-1
       CALL I12CHK3(X,INTBUF_TAB(NIN)%IRECTM,IXS       ,NRTM     ,IXC        ,
      1          -NIN,NMN    ,INTBUF_TAB(NIN)%MSR,NOINT     ,MWA        ,
-     2          IXTG,GEO,PM,INTBUF_TAB(NIN)%IELEM, ALE_CONNECTIVITY,
+     2          IXTG,PM,INTBUF_TAB(NIN)%IELEM, ALE_CONNECTIVITY,
      3          IPARI(30,NIN),INTBUF_TAB(NIN)%FCOUNT,ITIED, ITAB,KNOD2ELS,
      4          NOD2ELS,NTY,ID,TITR)
        CALL I12CHK3(X,INTBUF_TAB(NIN)%IRECTS,IXS       ,NRTS     ,IXC,
      1          NIN,NSN      ,INTBUF_TAB(NIN)%NSV,NOINT     ,MWA,
-     2          IXTG,GEO,PM,INTBUF_TAB(NIN)%IELES, ALE_CONNECTIVITY,
+     2          IXTG,PM,INTBUF_TAB(NIN)%IELES, ALE_CONNECTIVITY,
      3          IPARI(30,NIN),INTBUF_TAB(NIN)%FCOUNT,ITIED, ITAB,KNOD2ELS,
      4          NOD2ELS,NTY,ID,TITR)
        IF(IPARI(30,NIN)==0)THEN
@@ -1224,14 +1228,14 @@ C-----------------------------------------------------------------------
      .  CALL IN12R(X,INTBUF_TAB(NIN)%VARIABLES(1),INTBUF_TAB(NIN)%NSV,NSN,2)
 C
 C-----------------------------------------------------------------------
-      ELSEIF(NTY==17.AND.IPARI(33,NIN)==0) THEN
+      ELSEIF(NTY == 17 .AND. IPARI(33,NIN) == 0) THEN
 C-----------------------------------------------------------------------
        IGN   = IPARI(36,NIN)
        IGE   = IPARI(34,NIN)
        NMES  = IGRBRIC(IGN)%NENTITY
        NME   = IGRBRIC(IGE)%NENTITY
 C
-C      CALCUL DES RIGIDITES ELEMENTTAIRES
+C      ELMENTARY STIFFNESS
 C
        CALL I17STI3(
      1 IXS     ,PM        ,NME    ,NMES  ,IGRBRIC(IGE)%ENTITY,IGRBRIC(IGN)%ENTITY,
@@ -1264,7 +1268,7 @@ C-----------------------------------------------------------------------
          INTBUF_TAB(NIN)%BS(1:NSN) = 0
        ENDIF
 
-C      detecte les segments de surface nulle.
+C      check segments with zero area
        CALL I7ERR3(
      1  X         ,NRTM     ,INTBUF_TAB(NIN)%IRECTM  ,NOINT     ,ITAB,ID,TITR,
      2  IX1      ,IX2    ,IX3    ,IX4    ,X1     ,
@@ -1275,8 +1279,8 @@ C      detecte les segments de surface nulle.
      7  XN2      ,YN2    ,ZN2    ,XN3     ,YN3   ,
      8  ZN3      ,XN4    ,YN4    ,ZN4      )
 C
-C      RECHERCHE DES ELTS SECND et CHECK DES ELTS main  
-C      + Preparation Thermique.
+C      SEARCHING FOR SECND ELEMS and CHECK MAIN ELEMS
+C      + Heat pre-treatment
 C
        CALL I21ELS3(
      1 X         ,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%IRECTM  ,NRTS      ,NRTM      ,
@@ -1290,18 +1294,15 @@ C
      9 SH3TREE   ,IPART        ,IPARTC       ,IPARTTG  , PM_STACK ,
      A IWORKSH )
 C
-C   ...CALCUL DU GAP et des PENETRATIONS INITIALES, apres INITIA (lecture des epaisseurs). 
+C   ...GAP CALCULATION AND INITIAL PENETRATIONS after INITIA subroutine (thickness must be read).
 C
 C-----------------------------------------------------------------------
       ELSEIF(NTY==22) THEN
 C-----------------------------------------------------------------------
-C     #########################################
-C     #     FAIRE UNE VERIFIACTION ICI        #
-C     #     Verifier si loi 51 ou 37 utilise.#
-C     #########################################
+C     checking cmaterial compatibility
       IF(ISU1>0)THEN
         CALL I22ERR3(
-     1    X         ,NRTM     ,INTBUF_TAB(NIN)%IRECTM  ,NOINT                   ,ITAB      ,
+     1    X         ,NRTM     ,INTBUF_TAB(NIN)%IRECTM   ,ITAB      ,
      2    PM        ,IXS      ,IGRBRIC(ISU1)%NENTITY ,IGRBRIC(ISU1)%ENTITY   ,ID        ,
      3    TITR,
      4    IX1      ,IX2    ,IX3    ,IX4    ,X1     ,
@@ -1314,22 +1315,9 @@ C     #########################################
       ENDIF
 
 C
-C      CALCUL DES RIGIDITES ELEMENTTAIRES ET NODALES 
+C      NODAL AND ELEMENTARY STIFFNESS
 C
-       CALL I22STI3(
-     1 X         ,INTBUF_TAB(NIN)%IRECTM,INTBUF_TAB(NIN)%STFM  ,IXS       ,PM        ,
-     2 GEO       ,NRTM      ,IXC         ,-NIN   ,INTBUF_TAB(NIN)%STFAC,
-     3            NTY       ,INTBUF_TAB(NIN)%VARIABLES(2),NOINT     ,
-     4 INTBUF_TAB(NIN)%STFNS,NSN       ,MS          ,INTBUF_TAB(NIN)%NSV,IXTG      ,
-     5 IGAP  ,RWA       ,INTBUF_TAB(NIN)%GAP_S,INTBUF_TAB(NIN)%GAP_M,INTBUF_TAB(NIN)%VARIABLES(13),
-     6 IXT   ,IXP       ,INTBUF_TAB(NIN)%VARIABLES(6),INTBUF_TAB(NIN)%VARIABLES(16),
-     8 INACTI    ,KNOD2ELS  ,KNOD2ELC   ,KNOD2ELTG ,NOD2ELS   ,
-     A NOD2ELC   ,NOD2ELTG  ,IPARI(47,NIN) ,
-     B INTBUF_TAB(NIN)%IELES,INTBUF_TAB(NIN)%IELEC, INTBUF_TAB(NIN)%AREAS  ,SH4TREE   ,SH3TREE,
-     C IPART     ,IPARTC    ,IPARTTG   ,THK ,THK_PART,
-     D INTBUF_TAB(NIN)%VARIABLES(28),INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML,NOD2EL1D,KNOD2EL1D,
-     E IXR       ,ITAB,INTBUF_TAB(NIN)%VARIABLES(7),IXS10       ,IXS16   ,IXS20    ,
-     F ID,TITR   ,IGEO ,PM_STACK, IWORKSH )
+       CALL I22STI3(INTBUF_TAB(NIN)%STFM, NRTM  )
        
        IPARI(21,NIN) = IGAP
        IAD       = IPARI(39,NIN)
@@ -1342,19 +1330,11 @@ C
        
        IAD=MAX(IAD,1) !in case of ISU1=0 (empty group => normal termination with error message)
        
-       CALL I22TZINF(
-     1   X               ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%VARIABLES(4),NSEG,
-     2   NMN             ,NRTM           ,MWA          ,NSN            ,INTBUF_TAB(NIN)%IRTLM   ,
-     3   INTBUF_TAB(NIN)%CAND_N   ,INTBUF_TAB(NIN)%VARIABLES(2),RWA          ,NOINT          ,I_STOK          ,
-     4   INTBUF_TAB(NIN)%VARIABLES(5) ,INTBUF_TAB(NIN)%VARIABLES(8),MAXBOX   ,MINBOX     ,INTBUF_TAB(NIN)%MSR ,
-     5   INTBUF_TAB(NIN)%STFM  ,INTBUF_TAB(NIN)%STFNS  ,MULTIMP      ,1              ,IDDLEVEL        ,
-     6   ITAB            ,INTBUF_TAB(NIN)%GAP_S  ,INTBUF_TAB(NIN)%GAP_M,IGAP           ,INTBUF_TAB(NIN)%VARIABLES(13),
-     7   INTBUF_TAB(NIN)%VARIABLES(16),INACTI         ,INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML  ,I_MEM     ,
-     8   ID              ,TITR           ,IGRBRIC(ISU1)%ENTITY ,NBRIC          ,IXS              ) 
+       CALL I22TZINF( X ,INTBUF_TAB(NIN)%VARIABLES(8) ,IGRBRIC(ISU1)%ENTITY ,NBRIC ,IXS  )
 C-----------------------------------------------------------------------
       ELSEIF(NTY==23) THEN
 C-----------------------------------------------------------
-C      detecte les segments de surface nulle.
+C      detects segments with null area
        CALL I7ERR3(
      1  X      ,NRTM     ,INTBUF_TAB(NIN)%IRECTM  ,NOINT     ,ITAB,ID,TITR,
      2  IX1      ,IX2    ,IX3    ,IX4    ,X1     ,
@@ -1365,7 +1345,7 @@ C      detecte les segments de surface nulle.
      7  XN2      ,YN2    ,ZN2    ,XN3     ,YN3   ,
      8  ZN3      ,XN4    ,YN4    ,ZN4      )
 C
-C      CALCUL DU GAP / RECHERCHE DES ELTS SECND et CHECK DES ELTS main  
+C      GAP CALCULATION / SEARCHING SECND ELEMS and CHECK MAIN ELEMS
 C
        CALL I23GAP3(
      1 X     ,INTBUF_TAB(NIN)%IRECTS,INTBUF_TAB(NIN)%IRECTM  ,NRTS      ,NRTM      ,
@@ -1380,7 +1360,7 @@ C
      9 INTBUF_TAB(NIN)%STFNS,INTBUF_TAB(NIN)%STFM,ID,TITR,INTBUF_TAB(NIN)%GAP_M, IGEO  ,
      A  PM_STACK , IWORKSH)
 C
-C      IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C      STILL ONE BUCKET SORT
 C
        MAXBOX = INTBUF_TAB(NIN)%VARIABLES(9)
        MINBOX = INTBUF_TAB(NIN)%VARIABLES(12)
@@ -1424,18 +1404,17 @@ C
        ENDIF
        ! -----------------
 
-       IF((IDDLEVEL==0).AND.
-     .  (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+       IF((IDDLEVEL==0).AND. (DECTYP>=3.AND.DECTYP<=6))THEN
+C node weights and interfaces
       CALL IWCONTDD(INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,NSN,NMN,IWCONT,
      .       NSNT,NMNT)
        END IF
-C
-C      PUIS CALCULER LES PENETRATIONS INITIALES AVEC ONE I23DST3
-C
+
+C      INITIAL PENETRATIONS CALCULATED WITH I23DST3
+
        NGROUS=1+(I_STOK-1)/NVSIZ
-C
-       DO 723 NG=1,NGROUS
+
+       DO NG=1,NGROUS
 
         IF(IPRI>=1) WRITE(IOUT,2007)
         NFT = (NG-1) * NVSIZ
@@ -1459,18 +1438,16 @@ C
      4   NSN    ,MWA   ,INTBUF_TAB(NIN)%CAND_E,INTBUF_TAB(NIN)%CAND_N,
      5   INTBUF_TAB(NIN)%CAND_P,INTBUF_TAB(NIN)%STFM,INTBUF_TAB(NIN)%IFPEN(1+NFT),INTBUF_TAB(NIN)%IFPEN,GAPV  )
 
- 723   CONTINUE
+       END DO !next NG
 
-C
        IF(IWPENE/=0) THEN
           CALL ANCMSG(MSGID=499,MSGTYPE=MSGWARNING,ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,I2=IWPENE)
        ENDIF
-C
-       IF(IWPENE==0.AND.(INACTI==5.OR.INACTI==6))
-     .   IPARI(22,NIN) = -INACTI     ! passage en negatif pour dimensionnenment
+
+       IF(IWPENE==0.AND.(INACTI==5.OR.INACTI==6)) IPARI(22,NIN) = -INACTI     ! negative transition for sizing
        INTBUF_TAB(NIN)%I_STOK(1)=IWPENE
 C
-C   ...CALCUL DU GAP et des PENETRATIONS INITIALES, apres INITIA (lecture des epaisseurs). 
+C   ...GAP CALCULATION AND INITIAL PENETRATIONS after INITIA subroutine (thickness must be read).
 C
 C-----------------------------------------------------------------------
       ELSEIF(NTY==24) THEN
@@ -1492,7 +1469,7 @@ C-----------------------------------------------------------------------
      7  XN2      ,YN2    ,ZN2    ,XN3     ,YN3   ,
      8  ZN3      ,XN4    ,YN4    ,ZN4      )
 C
-C      CALCUL DES RIGIDITES ELEMENTTAIRES ET NODALES 
+C      NODAL AND ELEMENTARY STIFFNESS
 C----  INTBUF_TAB(NIN)%CRIT V/A is used temporarily for sorting and Pen-max
        ALLOCATE(IPARTNS(NSN))
        IPARTNS(1:NSN)=0
@@ -1547,7 +1524,7 @@ C------------------
         CALL I24FICS_INI(INTBUF_TAB(NIN)%IRTSE   ,NSNE    ,INTBUF_TAB(NIN)%IS2SE   ,INTBUF_TAB(NIN)%NSV    ,
      1                  INTBUF_TAB(NIN)%IS2PT ,NSN     ,INTBUF_TAB(NIN)%NOD_2RY_LGTH   )
        END IF
-C      IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C      STILL ONE BUCKET SORT
 C
        MAXBOX = INTBUF_TAB(NIN)%VARIABLES(9)
        MINBOX = INTBUF_TAB(NIN)%VARIABLES(12)
@@ -1663,12 +1640,12 @@ C      CLOSE(67)
 
        IF((IDDLEVEL==0).AND.
      .  (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+C        nodal weights and interfaces
          CALL IWCONTDD_TYPE24(NUMNOD,NSN,NMN,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,
      .                        IWCONT,NSNT,NMNT,INTBUF_TAB(NIN))
        END IF
 C
-C-------PUIS CALCULER LES PENETRATIONS INITIALES as type5 for solid
+C-------COMPUTE INITIAL PENETRATION LIKE type5 does for solid
 C
        NGROUS=1+(I_STOK-1)/NVSIZ
        IF (NGROUS>0) THEN
@@ -1817,7 +1794,7 @@ C--------------------------------------------------------
      4 NMN   ,INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%GAPN_M,INTBUF_TAB(NIN)%GAP_N0,INTPLY,
      5 INTBUF_TAB(NIN)%VARIABLES(36),IGEO,INTBUF_TAB(NIN)%MSEGTYP24 )
      
-C int24 :candidats initiaux pour inacti=5 -> tri a TT=0 engine
+C int24 : initial candidates for inacti=5 treatment -> sort at TT=0 during engine
        IF (INACTI==5.OR.INACTI==-1)THEN 
          CALL I24CAND(INTBUF_TAB(NIN)%CAND_E,INTBUF_TAB(NIN)%CAND_N,NSN  ,
      +                INTBUF_TAB(NIN)%IRTLM ,INTBUF_TAB(NIN)%I_STOK(1),
@@ -1838,7 +1815,7 @@ C-----------------------------------------------------------------------
       ELSEIF(NTY==25) THEN
 C-----------------------------------------------------------------------
 C
-C      Sorting NSV (Retrier les structures vs NSN, cf sub-interfaces, etc !)
+C      Sorting NSV (Sorting again structural entities vs NSN, cf sub-interfaces, etc !)
        CALL I25SORS(NSN, NRTS, ITAB, ILEV, IPARI(1,NIN),
      .              INTBUF_TAB(NIN))
 C------
@@ -1858,7 +1835,7 @@ C      IPEN0 = IPARI(54,NIN)
      7  XN2      ,YN2    ,ZN2    ,XN3     ,YN3   ,
      8  ZN3      ,XN4    ,YN4    ,ZN4      )
 C-----------------------------------------------------------
-C        CALCUL DES RIGIDITES ELEMENTTAIRES ET NODALES 
+C        NODAL AND ELEMENTARY STIFFNESS
 C-----------------------------------------------------------
        GAPSCALE=INTBUF_TAB(NIN)%VARIABLES(13) 
        ! Warning : VARIABLES(13) is modified after, to store GAPMIN
@@ -1893,7 +1870,7 @@ C-----------------------------------------------------------
 C-----------------------------------------------------------
 C      ELEMENT NEIGHBROURS & FREE EDGES
 C--------------------------------------------------------
-C      MVOISIN & NVOISIN sont utilises temporairement pour construire ADMSR
+C      MVOISIN & NVOISIN are temporarily used to build ADMSR
 C          MVOISIN(1:4,1:NRTM) neighboring segments along each edge
 C          NVOISIN(1:8,1:NRTM) neighboring nodes on the 4 neighbors (on the cross)
 C      ADMSR(1:4,1:NRTM)   adresses of node normals
@@ -1958,7 +1935,7 @@ C
        ENDIF
 C-----------------------------------------------------------
 C
-C      IL FAUT ENCORE FAIRE ONE BUCKET SORT DANS LE STARTER
+C      STILL ONE BUCKET SORT
 C
        MAXBOX = INTBUF_TAB(NIN)%VARIABLES(9)
        MINBOX = INTBUF_TAB(NIN)%VARIABLES(12)
@@ -2040,7 +2017,7 @@ C
          MULNSNE   = MULTIMPE*NCONTE
          MULNSNS   = MULTIMPS*NCONTE
 
-         MARGE     = INTBUF_TAB(NIN)%VARIABLES(25) ! meme marge pour e2e que pour n2s
+         MARGE     = INTBUF_TAB(NIN)%VARIABLES(25) ! same margin : elem to elem AND node to surf
          GAP       = INTBUF_TAB(NIN)%VARIABLES(2)
          VMAXDT    = ZERO
          I_MEME(1:2)= 0
@@ -2054,7 +2031,7 @@ C
      6     NCONTE      ,INTBUF_TAB(NIN)%GAP_M       ,ITASK      ,INTBUF_TAB(NIN)%VARIABLES(40),
      7     I_MEME ,ITAB   ,INTBUF_TAB(NIN)%MBINFLG,INTBUF_TAB(NIN)%EBINFLG,INTBUF_TAB(NIN)%I_STOK_E(2) ,
      8     MULNSNS,ILEV   ,IBIDON        ,INTBUF_TAB(NIN)%CAND_P ,IGAP0    ,
-     9     IPARI(63,NIN),INTBUF_TAB(NIN)%KREMNODE_EDG(1+2*ESHIFT),INTBUF_TAB(NIN)%REMNODE_EDG,
+     9     IPARI(63,NIN),INTBUF_TAB(NIN)%KREMNODE_EDG(1+2*ESHIFT),INTBUF_TAB(NIN)%REMNODE_EDG, INTBUF_TAB(NIN)%S_REMNODE_EDG,
      A     IGAP   ,INTBUF_TAB(NIN)%GAP_ML,IEDGE ,NEDGE ,INTBUF_TAB(NIN)%MSEGTYP24,
      B     INTBUF_TAB(NIN)%LEDGE,INTBUF_TAB(NIN)%ADMSR,INTBUF_TAB(NIN)%EDGE_BISECTOR,INTBUF_TAB(NIN)%VTX_BISECTOR,
      C     INTBUF_TAB(NIN)%CANDM_E2S ,INTBUF_TAB(NIN)%CANDS_E2S,IBIDON,INTBUF_TAB(NIN)%CAND_PS,INTBUF_TAB(NIN)%GAPE,
@@ -2079,7 +2056,7 @@ C
            END IF
            I_MEME(1:2) = 0
            INTBUF_TAB(NIN)%I_STOK_E(1:2)=CAND_E_OLD(1:2)
-           GOTO 2510 ! on retrie tout
+           GOTO 2510 ! sorting/searching all again
          END IF
        ENDIF
 C
@@ -2101,9 +2078,8 @@ C
        ENDIF
        ! -----------------
 
-       IF((IDDLEVEL==0).AND.
-     .  (DECTYP>=3.AND.DECTYP<=6))THEN
-C Appel routine poids noeuds interfaces
+       IF((IDDLEVEL == 0) .AND. (DECTYP>=3.AND.DECTYP<=6))THEN
+C        nodal weights and interfaces
          CALL IWCONTDD_TYPE25(NLEDGE,NUMNOD,NSN,NMN,IEDGE,
      .                        NRTM,NEDGE,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%MSR,INTBUF_TAB(NIN)%IRECTM,
      .                        IWCONT,NSNT,NMNT,INTBUF_TAB(NIN))
@@ -2111,7 +2087,7 @@ C Appel routine poids noeuds interfaces
 
        IF(IDDLEVEL==1)THEN
 C-------------------------------------------------------------
-C        PUIS CALCULER LES PENETRATIONS INITIALES
+C        INITIAL PENETRATIONS
 C-------------------------------------------------------------
          NGROUS=1+(I_STOK-1)/NVSIZ
          IF (NGROUS>0) THEN
@@ -2185,7 +2161,7 @@ C
 C
            INTBUF_TAB(NIN)%VARIABLES(23) = ZERO
 C
-C          INT25 : candidats initiaux pour inacti=5 (garde symetriques) <=> tri a TT=0 engine
+C          INT25 : initial candidates for inacti=5 treatment (keep symmetrical) <=> sorting at TT=0 during engine
            CALL I25CAND(INTBUF_TAB(NIN)%CAND_E,INTBUF_TAB(NIN)%CAND_N,NSN  ,
      +                                    INTBUF_TAB(NIN)%IRTLM ,INTBUF_TAB(NIN)%I_STOK(1),
      *                  NRTM ,INTBUF_TAB(NIN)%MSEGTYP24)

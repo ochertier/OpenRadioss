@@ -45,7 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    bcsdtth                            ../engine/source/constraints/general/bcs/bcsdtth.F
       !||    bforc2                             ../engine/source/ale/bimat/bforc2.F
       !||    blero2                             ../engine/source/ale/bimat/blero2.F
-      !||    build_msg                          ../common_source/tools/memory/my_alloc.F
+      !||    build_msg                          ../common_source/tools/memory/my_alloc.F90
       !||    cfieldrest                         ../engine/source/output/restart/rdresb.F
       !||    check_fi                           ../engine/source/mpi/interfaces/spmd_i25slide.F
       !||    chkv0_cy                           ../engine/source/constraints/general/bcs/bcscyc.F
@@ -250,10 +250,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ini_kisc                           ../engine/source/implicit/lin_solv.F
       !||    ini_msg                            ../engine/source/output/message/ini_msg.F
       !||    iniresa                            ../engine/source/output/restart/rdresa.F
+      !||    inivel_start                       ../engine/source/loads/general/inivel/inivel_start.F90
       !||    int18_law151_init                  ../engine/source/interfaces/int18/int18_law151_init.F
       !||    int18_law151_omp_accumulation      ../engine/source/interfaces/int18/int18_law151_omp_accumulation.F
       !||    intbuf_ini                         ../common_source/interf/intbuf_ini.F
-      !||    inter7_collision_detection         ../engine/source/interfaces/inter7_collision_detection.F
+      !||    inter7_collision_detection         ../engine/source/interfaces/intsort/inter7_collision_detection.F90
       !||    inter_count_node_curv              ../engine/source/interfaces/generic/inter_count_node_curv.F
       !||    inter_minmax_node                  ../engine/source/interfaces/generic/inter_minmax_node.F
       !||    inter_sort_07                      ../engine/source/interfaces/int07/inter_sort_07.F
@@ -286,7 +287,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    loadprest                          ../engine/source/output/restart/rdresb.F
       !||    m13law                             ../engine/source/materials/mat/mat013/m13law.F
       !||    mat25_crasurv_c                    ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
+      !||    mat25_crasurv_s                    ../engine/source/materials/mat/mat025/mat25_crasurv_s.F90
       !||    mat25_tsaiwu_c                     ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
+      !||    mat25_tsaiwu_s                     ../engine/source/materials/mat/mat025/mat25_tsaiwu_s.F90
       !||    mmain                              ../engine/source/materials/mat_share/mmain.F90
       !||    mpi_min_real_begin                 ../engine/share/modules/mpi_tools_mod.F
       !||    mpi_min_real_end                   ../engine/share/modules/mpi_tools_mod.F

@@ -75,6 +75,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    read_elgroup_param     ../engine/source/output/restart/read_elgroup_param.F
       !||    read_failwave          ../engine/source/output/restart/read_failwave.F
       !||    read_i_c               ../common_source/tools/input_output/write_routtines.c
+      !||    read_inivel            ../engine/source/output/restart/read_inivel.F90
       !||    read_joint             ../engine/source/output/restart/read_joint.F
       !||    read_matparam          ../engine/source/output/restart/read_matparam.F
       !||    read_nloc_struct       ../engine/source/output/restart/read_nloc_struct.F
@@ -120,6 +121,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
       !||    pload_cyl_mod          ../common_source/modules/loads/pload_cyl_mod.F
       !||    python_funct_mod       ../common_source/modules/python_mod.F90
+      !||    read_inivel_mod        ../engine/source/output/restart/read_inivel.F90
       !||    restmod                ../engine/share/modules/restart_mod.F
       !||    seatbelt_mod           ../common_source/modules/seatbelt_mod.F
       !||    sensor_mod             ../engine/share/modules/sensor_mod.F
@@ -179,6 +181,7 @@ C-----------------------------------------------
       USE STACK_MOD
       USE DRAPE_MOD
       USE TIME_MOD
+      use read_inivel_mod, only : read_inivel
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1259,6 +1262,7 @@ C   ----------------------------------------------------------------------
       IF(IFCONTP2MAX >0)THEN
          CALL READ_DB(FNCONT2_MAX, 3*NUMNOD)
          CALL READ_DB(FTCONT2_MAX, 3*NUMNOD)
+         CALL READ_DB(NPCONT2_MAX, 3*NUMNOD)
       ENDIF
       IF(IFCONT2MIN >0)THEN
          CALL READ_DB(FCONT2_MIN, 3*NUMNOD)
@@ -1266,6 +1270,7 @@ C   ----------------------------------------------------------------------
       IF(IFCONTP2MIN >0)THEN
          CALL READ_DB(FNCONT2_MIN, 3*NUMNOD)
          CALL READ_DB(FTCONT2_MIN, 3*NUMNOD)
+         CALL READ_DB(NPCONT2_MIN, 3*NUMNOD)
       ENDIF
 C--------Frictional energy output-------
       IF(S_EFRICINT >0)THEN
@@ -1532,8 +1537,13 @@ C--------------------------------------
       ! Interface GAP Load
       IF (NINTLOADP>0) THEN
             CALL READ_DB(DGAPLOADINT, NINTER*NLOADP_HYD )
-         ENDIF
+      ENDIF
 
+! /INIVEL w/ T_start or senor_id
+      IF (LOADS%NINIVELT>0) THEN
+        ALLOCATE(LOADS%INIVELT(LOADS%NINIVELT))
+        CALL READ_INIVEL(LOADS%NINIVELT,LOADS%INIVELT)
+      ENDIF
       ! CrackXFEM
       IF(ICRACK3D > 0) CALL CRKXFEM_RREST(INOD_CRKXFEM,IEL_CRKXFEM,NODLEVXF)
       CALL CRKXFEM_RRESTANIM()

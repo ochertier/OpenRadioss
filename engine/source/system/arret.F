@@ -37,7 +37,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    c_fortran_dgssv                  ../engine/stub/superlu_stub.F
       !||    c_freemem                        ../engine/stub/superlu_stub.F
       !||    c_tricall                        ../engine/stub/fvmbags_stub.F
-      !||    check_error_and_write            ../common_source/tools/memory/my_alloc.F
+      !||    check_error_and_write            ../common_source/tools/memory/extend_array.F90
       !||    cp_ifront                        ../engine/source/implicit/produt_v.F
       !||    create_h3d_1d_scalar             ../engine/source/output/h3d/h3d_build_fortran/create_h3d_1d_scalar.F
       !||    create_h3d_1d_tensor             ../engine/source/output/h3d/h3d_build_fortran/create_h3d_1d_tensor.F
@@ -227,7 +227,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ini_kisc                         ../engine/source/implicit/lin_solv.F
       !||    inipar                           ../engine/source/mpi/init/inipar.F
       !||    intbuf_ini                       ../common_source/interf/intbuf_ini.F
-      !||    inter7_collision_detection       ../engine/source/interfaces/inter7_collision_detection.F
+      !||    inter7_collision_detection       ../engine/source/interfaces/intsort/inter7_collision_detection.F90
       !||    inter_count_node_curv            ../engine/source/interfaces/generic/inter_count_node_curv.F
       !||    joint_block_stiffness            ../engine/source/elements/joint/joint_block_stiffness.F
       !||    ktbuf_ini                        ../engine/source/implicit/imp_init.F

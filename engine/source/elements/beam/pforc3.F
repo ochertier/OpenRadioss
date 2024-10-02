@@ -45,6 +45,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    thermexppg          ../engine/source/elements/beam/thermexpp.F
       !||    thermexppi          ../engine/source/elements/beam/thermexpp.F
       !||--- uses       -----------------------------------------------------
+      !||    dt_mod              ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_mod             ../engine/share/modules/h3d_mod.F
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
@@ -68,13 +70,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G           SBUFMAT  ,SNPC     ,STF      ,NUMMAT   ,
      H           NUMGEO   ,IOUT     ,ISTDO    ,IDEL7NOK ,
      I           IDYNA    ,IMCONV   ,IMPL_S   ,MAT_PARAM,
-     J           PRELD1   ,STF_F    )
+     J           PRELD1   ,STF_F    ,DT       )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE H3D_MOD
       USE PRELOAD_AXIAL_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -123,6 +127,7 @@ C
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (H3D_DATABASE) :: H3D_DATA
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

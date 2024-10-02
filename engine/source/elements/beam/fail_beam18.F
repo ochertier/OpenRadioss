@@ -32,6 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fail_tensstrain_ib   ../engine/source/materials/fail/tensstrain/fail_tensstrain_ib.F
       !||    nvar                 ../engine/source/input/nvar.F
       !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod         ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||====================================================================
       SUBROUTINE FAIL_BEAM18(ELBUF_STR,FAIL     ,NUMMAT   ,NUMGEO   ,
@@ -46,6 +47,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MAT_ELEM_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

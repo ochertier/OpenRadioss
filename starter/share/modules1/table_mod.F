@@ -54,7 +54,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_visc              ../starter/source/materials/visc/hm_read_visc.F
       !||    hm_read_visc_prony        ../starter/source/materials/visc/hm_read_visc_prony.F
       !||    inter_dcod_function       ../starter/source/interfaces/reader/inter_dcod_function.F
-      !||    interface_table_mod       ../starter/share/modules1/table_mod.F
       !||    law100_upd_ab             ../starter/source/materials/mat/mat100/law100_upd.F
       !||    law100_upd_nht            ../starter/source/materials/mat/mat100/law100_upd.F
       !||    law108_upd                ../starter/source/materials/mat/mat108/law108_upd.F
@@ -119,52 +118,4 @@ C---------
       END TYPE TTABLE
 C-----------------------------------------------
       END MODULE TABLE_MOD
-      !||====================================================================
-      !||    interface_table_mod   ../starter/share/modules1/table_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    get_u_table           ../starter/source/user_interface/utable.F
-      !||    get_u_vtable          ../starter/source/user_interface/utable.F
-      !||    hm_read_table2        ../starter/source/tools/curve/hm_read_table.F
-      !||    hm_read_table2_0      ../starter/source/tools/curve/hm_read_table2_0.F
-      !||    hm_read_table2_1      ../starter/source/tools/curve/hm_read_table2_1.F
-      !||    law190_upd            ../starter/source/materials/mat/mat190/law190_upd.F
-      !||--- uses       -----------------------------------------------------
-      !||    table_mod             ../starter/share/modules1/table_mod.F
-      !||====================================================================
-      MODULE INTERFACE_TABLE_MOD
-C-----------------------------------------------
-      INTERFACE
-C
-        SUBROUTINE TABLE_INTERP(TABLE,XX,YY)
-        USE TABLE_MOD
-        TYPE(TTABLE) TABLE
-        my_real, 
-     .         DIMENSION(:) :: XX
-        my_real
-     .         YY
-        END SUBROUTINE TABLE_INTERP
-C
-        SUBROUTINE TABLE_VINTERP(TABLE,DIMX,NEL,IPOS,XX,YY,DYDX)
-        USE TABLE_MOD
-        TYPE(TTABLE) TABLE
-        INTEGER ,INTENT(IN)                  :: NEL
-        INTEGER ,VALUE ,INTENT(IN)           :: DIMX
-        INTEGER ,DIMENSION(DIMX,TABLE%NDIM)  :: IPOS
-        my_real ,DIMENSION(DIMX,TABLE%NDIM)  :: XX
-        my_real ,DIMENSION(NEL)              :: YY, DYDX
-        END SUBROUTINE TABLE_VINTERP
-C
-        SUBROUTINE TABLE_INTERP_LAW76(TABLE,IPOS2,XX,R2,DYDX,YY)
-        USE TABLE_MOD
-        TYPE(TTABLE) TABLE
-        my_real, 
-     .       DIMENSION(:) :: XX
-        my_real
-     .       YY, R2,DYDX
-        INTEGER IPOS2
-        END SUBROUTINE TABLE_INTERP_LAW76
-C
-      END INTERFACE
-      END MODULE INTERFACE_TABLE_MOD
-
 

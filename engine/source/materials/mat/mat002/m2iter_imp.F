@@ -68,33 +68,22 @@ C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
 #include      "mvsiz_p.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER  NEL
-C     REAL
-      my_real
-     .   SIG(NEL,6), EPXE(*),EPD(*),
-     .   G(*), AK(*),QH(*), AJ2(*), 
-     .   CA(*), CB(*), CN,FISOKIN,
-     .   SIGMX(*),DPLA1(*),EPMX  ,SIGY(*)
+      INTEGER :: NEL
+      my_real :: FISOKIN,EPMX,CB,CN
+      my_real ,DIMENSION(NEL)   :: EPXE,EPD,G,AK,QH,AJ2,CA,SIGMX,DPLA1,SIGY
+      my_real ,DIMENSION(NEL,6) :: SIG
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, ITER, NITER
-C
-C     REAL
-      MY_REAL
-     .   XSI,DXSI,LHS,RHS,ALPHA_RADIAL,BETA,G3(MVSIZ),HTOT
-C
+      INTEGER :: I, ITER, NITER
+      MY_REAL :: XSI,DXSI,LHS,RHS,ALPHA_RADIAL,BETA,G3(MVSIZ),HTOT
+C=======================================================================
 c ---- max number of iterations ----
        NITER = 10
 C       
        DO 100 I=1,NEL
-C
-C------------------------------------------
 C
        XSI = ZERO
 C
@@ -103,7 +92,7 @@ C      -- PREVIOUS TIME-STEP EQUIVALENT PLASTIC STRAIN
        G3(I) =MAX(THREE*G(I),EM15)
 C
 C      -- PREVIOUS TIME-STEP YIELD STRESS !!!!! if EPXE=0!!!!!
-C       AK(I)=CA(I)+CB(I)*EPXE(I)**CN(I) !..SIGMA0(EPS_P)
+C       AK(I)=CA(I)(I)+CB*EPXE(I)**CN !..SIGMA0(EPS_P)
 C
 C      -- COMPARE IT WITH ELASTIC PREDICTOR
        IF(AJ2(I)<AK(I)) GO TO 90 
@@ -112,17 +101,17 @@ C
        DO 80 ITER = 1,NITER ! .. NR ITERATIONS ..
 C
        IF(EPXE(I)>ZERO) THEN !..TESTING FOR ZERO EQUIV.PL.STRN
-         AK(I)=CA(I)+BETA*CB(I)*EPXE(I)**CN !..SIGMA0(EPS_P)
+         AK(I)=CA(I)+BETA*CB*EPXE(I)**CN !..SIGMA0(EPS_P)
 C
 C      --COMPUTE THE HARDENING PARAMETER H
 C      --(JUST THE DERIVATIVE OF THE SIG-EPS_PL FUNCTION)
 C
          IF(CN>ONE) THEN
-           QH(I) = (CB(I)*CN*EPXE(I)**(CN - ONE))*EPD(I)
+           QH(I) = (CB*CN*EPXE(I)**(CN - ONE))*EPD(I)
          ELSEIF(CN==ONE) THEN !.. LINEAR HARDENING
-           QH(I)= CB(I)*EPD(I)
+           QH(I)= CB*EPD(I)
          ELSE !.. POWER LESS THAN UNITY
-           QH(I) = (CB(I)*CN/EPXE(I)**(ONE -CN))*EPD(I)
+           QH(I) = (CB*CN/EPXE(I)**(ONE -CN))*EPD(I)
          ENDIF
 C
        ELSEIF(EPXE(I)==ZERO) THEN
@@ -132,7 +121,7 @@ C
          IF(CN>ONE )THEN
                QH(I) = ZERO
          ELSEIF(CN==ONE) THEN 
-               QH(I) = CB(I)*EPD(I)
+               QH(I) = CB*EPD(I)
          ELSE
                QH(I) = EP10 *EPD(I) !.. SHOULD BE +INFINITY
          ENDIF

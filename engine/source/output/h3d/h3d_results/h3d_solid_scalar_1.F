@@ -37,10 +37,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod           ../common_source/modules/ale/ale_connectivity_mod.F
       !||    aleanim_mod                    ../engine/share/modules/aleanim_mod.F
       !||    alefvm_mod                     ../common_source/modules/ale/alefvm_mod.F
+      !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_mod                        ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod                    ../engine/share/resol/initbuf.F
       !||    mat_elem_mod                   ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multimat_param_mod             ../common_source/modules/multimat_param_mod.F90
       !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
       !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
       !||====================================================================
@@ -60,6 +63,7 @@ C   M o d u l e s
 C-----------------------------------------------
         USE INITBUF_MOD
         USE MAT_ELEM_MOD
+        USE ELBUFDEF_MOD
         USE SCHLIEREN_MOD
         USE H3D_MOD
         USE MULTI_FVM_MOD
@@ -67,6 +71,8 @@ C-----------------------------------------------
         USE ALEFVM_MOD , only:ALEFVM_Param
         USE ALEANIM_MOD , ONLY : FANI_CELL_
         USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
+        USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
+        USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -85,8 +91,6 @@ C argument for initbuf
 #include      "param_c.inc"
 !ISPMD
 #include      "task_c.inc"
-!N0PHAS, NVPHAS,
-#include      "mmale51_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -371,16 +375,8 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'TEMP')THEN
 C--------------------------------------------------
-                IF (IPARG(1,NG)  ==  2 .AND. JTHE  ==  0) THEN
-                  DO I=1,NEL
-                    VALUE(I) = PM(54,IXS(1,NFT+I)) + GBUF%EINT(I)*
-     .                      GBUF%VOL(I) * PM(53,IXS(1,NFT+I))
-                    IS_WRITTEN_VALUE(I) = 1
-                  ENDDO
-                ELSEIF (GBUF%G_TEMP > 0) THEN
-                  DO I=LFT,LLT
-                    VALUE(I) = ZERO
-                  ENDDO
+                IF (GBUF%G_TEMP > 0) THEN
+                  VALUE(1:NEL) = ZERO
                   DO IL=1,NLAY
                     IF (ELBUF_TAB(NG)%BUFLY(IL)%L_TEMP > 0) THEN
                       DO IS=1,NPTS
@@ -848,7 +844,7 @@ C--------------------------------------------------
                   NUPARAM= IPM(9,IMAT)
                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
                   ISUBMAT=UPARAM(276+1)
-                  IUS=N0PHAS+(ISUBMAT-1)*NVPHAS
+                  IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
                 IF (MLW==51 .OR. MLW==37)THEN
                   DO IL=1,NLAY
@@ -876,7 +872,7 @@ C--------------------------------------------------
                   NUPARAM= IPM(9,IMAT)
                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
                   ISUBMAT=UPARAM(276+2)
-                  IUS=N0PHAS+(ISUBMAT-1)*NVPHAS
+                  IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
                 IF (MLW==51 .OR. MLW==37)THEN
                   DO IL=1,NLAY
@@ -904,7 +900,7 @@ C--------------------------------------------------
                   NUPARAM= IPM(9,IMAT)
                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
                   ISUBMAT=UPARAM(276+3)
-                  IUS=N0PHAS+(ISUBMAT-1)*NVPHAS
+                  IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
                 IF (MLW==51)THEN
                   DO IL=1,NLAY
@@ -932,7 +928,7 @@ C--------------------------------------------------
                   NUPARAM= IPM(9,IMAT)
                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
                   ISUBMAT=UPARAM(276+4)
-                  IUS=N0PHAS+(ISUBMAT-1)*NVPHAS
+                  IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                 ENDIF
                 IF (MLW==51)THEN
                   DO IL=1,NLAY
@@ -2013,7 +2009,7 @@ C--------------------------------------------------
                   IPOS      = 15
                   ITRIMAT   = 4
                   MBUF => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)
-                  K         = IPARG(2,NG) * ((N0PHAS + (ITRIMAT-1)*NVPHAS )+IPOS-1)
+                  K         = IPARG(2,NG) * ((M51_N0PHAS + (ITRIMAT-1)*M51_NVPHAS )+IPOS-1)
                   DO I=1,IPARG(2,NG)
                     VALUE(I) = -MBUF%VAR(K+I)
                     IS_WRITTEN_VALUE(I) = 1
@@ -2451,7 +2447,7 @@ C--------------------------------------------------
                     LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
                     IF(IS_ALE /= 0)THEN
                       !ale
-                      TMP_2(1:MVSIZ,1:3) = ZERO
+                      TMP_2(1:NEL,1:3) = ZERO
                       DO J=1,8
                         DO  I=1,NEL
                           TMP_2(I,1)=TMP_2(I,1) + V(1,IXS(J+1,I+NFT))-W(1,IXS(J+1,I+NFT))
@@ -2460,15 +2456,15 @@ C--------------------------------------------------
                         ENDDO
                       ENDDO
                       DO  I=1,NEL
-                        VEL(1) = TMP_2(I,1)*ONE_OVER_8!SUM(TMP_2(1,1:8))*ONE_OVER_8
-                        VEL(2) = TMP_2(I,2)*ONE_OVER_8!SUM(TMP_2(2,1:8))*ONE_OVER_8
-                        VEL(3) = TMP_2(I,3)*ONE_OVER_8!SUM(TMP_2(3,1:8))*ONE_OVER_8
+                        VEL(1) = TMP_2(I,1)*ONE_OVER_8
+                        VEL(2) = TMP_2(I,2)*ONE_OVER_8
+                        VEL(3) = TMP_2(I,3)*ONE_OVER_8
                         VALUE(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)
                         IS_WRITTEN_VALUE(I) = 1
                       ENDDO
                     ELSE
                       !euler and lagrange
-                      TMP_2(1:MVSIZ,1:3) = ZERO
+                      TMP_2(1:NEL,1:3) = ZERO
                       DO J=1,8
                         DO  I=1,NEL
                           TMP_2(I,1)=TMP_2(I,1)+V(1,IXS(J+1,I+NFT))
@@ -2477,9 +2473,9 @@ C--------------------------------------------------
                         ENDDO
                       ENDDO
                       DO  I=1,NEL
-                        VEL(1) = TMP_2(I,1)*ONE_OVER_8!SUM(TMP(1,1:8))*ONE_OVER_8
-                        VEL(2) = TMP_2(I,2)*ONE_OVER_8!SUM(TMP(2,1:8))*ONE_OVER_8
-                        VEL(3) = TMP_2(I,3)*ONE_OVER_8!SUM(TMP(3,1:8))*ONE_OVER_8
+                        VEL(1) = TMP_2(I,1)*ONE_OVER_8
+                        VEL(2) = TMP_2(I,2)*ONE_OVER_8
+                        VEL(3) = TMP_2(I,3)*ONE_OVER_8
                         VALUE(I) = SQRT(VEL(1)*VEL(1)+VEL(2)*VEL(2)+VEL(3)*VEL(3))/LBUF%SSP(I)
                         IS_WRITTEN_VALUE(I) = 1
                       ENDDO
@@ -2748,10 +2744,10 @@ C--------------------------------------------------
                   NUPARAM= IPM(9,IMAT)
                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
                   !bijective order           !indexes
-                  ISUBMAT=UPARAM(276+1);     IU(1)=N0PHAS+(ISUBMAT-1)*NVPHAS
-                  ISUBMAT=UPARAM(276+2);     IU(2)=N0PHAS+(ISUBMAT-1)*NVPHAS
-                  ISUBMAT=UPARAM(276+3);     IU(3)=N0PHAS+(ISUBMAT-1)*NVPHAS
-                  ISUBMAT=UPARAM(276+4);     IU(4)=N0PHAS+(ISUBMAT-1)*NVPHAS
+                  ISUBMAT=UPARAM(276+1);     IU(1)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                  ISUBMAT=UPARAM(276+2);     IU(2)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                  ISUBMAT=UPARAM(276+3);     IU(3)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                  ISUBMAT=UPARAM(276+4);     IU(4)=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
                   MBUF => ELBUF_TAB(NG)%BUFLY(1)%MAT(1,1,1)
                   NFRAC=4
                   DO  I=1,NEL
@@ -2811,7 +2807,7 @@ C--------------------------------------------------
                   !count number of submaterial based on /EOS/TILLOTSON (IEOS=3)
                   NTILLOTSON = 0
                   DO IMAT=1,NLAY
-                    IEOS =  IPM(4, IPM(20 + IMAT,MT) )
+                    IEOS =  IPM(4, MAT_PARAM(MT)%MULTIMAT%MID(IMAT) )
                     IF(IEOS == 3)THEN
                       NTILLOTSON = NTILLOTSON + 1
                       IMAT_TILLOTSON = IMAT
@@ -2821,7 +2817,7 @@ C--------------------------------------------------
                   IF(NTILLOTSON > 1)THEN
                     FAC=ONE
                     DO IMAT=1,NLAY
-                      IEOS =  IPM(4,    IPM(20 + IMAT,MT) )
+                      IEOS =  IPM(4, MAT_PARAM(MT)%MULTIMAT%MID(IMAT) )
                       IF(IEOS == 3)THEN
                         EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1,1,1)
                         NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
@@ -2867,10 +2863,19 @@ C--------------------------------------------------
                   ENDDO
                 ENDIF
 C--------------------------------------------------
+              ELSEIF (KEYWORD == 'ECONTROL')THEN
+C--------------------------------------------------
+                IF (GBUF%G_EINT_DISTOR>0) THEN
+                    DO I=1,NEL
+                      VALUE(I) = GBUF%EINT_DISTOR(I)
+                      IS_WRITTEN_VALUE(I) = 1
+                    ENDDO
+                ENDIF
+C--------------------------------------------------
               ENDIF
 C--------------------------------------------------
               IF(CALLED_FROM_PYTHON) THEN
-                 SOLID_SCALAR(1:MVSIZ) = VALUE(1:MVSIZ)
+                 SOLID_SCALAR(1:NEL) = VALUE(1:NEL)
               ELSE
                 CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SOLID,SOLID_SCALAR,NEL,OFFSET,NFT,
      .           VALUE,IS_WRITTEN_VALUE)

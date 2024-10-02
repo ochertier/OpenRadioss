@@ -104,7 +104,7 @@ C-----------------------------------------------
      .   ISUBSTACK,IPPID,IPIDL,NPT_LAY,LEN_PLAPT,LEN_SIGPT,
      .   IPMAT,IPMAT_IPLY,NPTTOT,NUVARN,NX,IBOLTP,CRKDIR,INLOC,LNLOC,
      .   NONL, DEBUG_PRINT,IPINCH,NUVAREOS,IEOS_TYPE,IDRAPE,LLOC_SLICE,
-     .   IPNPT_LAY,IDFAIL,LNLOCTS
+     .   IPNPT_LAY,IDFAIL,LNLOCTS,ICONTROL,ISHOFFSET
       INTEGER, ALLOCATABLE, DIMENSION(:,:) :: TFAIL,FAILID
       INTEGER, ALLOCATABLE, DIMENSION(:)   :: IMAT,ILAW
       TYPE(BUF_LAY_)     , POINTER :: BUFLY
@@ -460,13 +460,13 @@ c---
           ELSEIF (MLW == 20) THEN      ! Bimat  
             DO IL = 1,2
               ILAW(IL) = IPARG(24+IL,NG)
-              MX = NINT(PM(20+IL,IMID))
+              MX = MAT_PARAM(IMID)%MULTIMAT%MID(IL)
               NFAIL = MAT_PARAM(MX)%NFAIL
               NUVAREOS = 0
-              IEOS_TYPE = IPM(4, NINT(PM(20+IL,IMID)))
+              IEOS_TYPE = IPM(4, MX)
               IF(IEOS_TYPE>0)NUVAREOS = EOS_TAG(IEOS_TYPE)%NVAR                           
               ELBUF_TAB(NG)%BUFLY(IL)%ILAW = ILAW(IL)
-              ELBUF_TAB(NG)%BUFLY(IL)%IMAT = NINT(PM(20+IL,IMID))
+              ELBUF_TAB(NG)%BUFLY(IL)%IMAT = MX
               ELBUF_TAB(NG)%BUFLY(IL)%IEOS = IEOS        
               ELBUF_TAB(NG)%BUFLY(IL)%IVISC= 0
               ELBUF_TAB(NG)%BUFLY(IL)%IPORO= 0        
@@ -485,12 +485,12 @@ c---
 c---
           ELSEIF (MLW == 151) THEN   !  multiphase 151                                    
             DO IL = 1,NLAY
-              IMAT(IL) = IPM(20+IL,IMID)   ! submaterial MID                         
-              ILAW(IL) = IPM(2,IMAT(IL))  ! submaterial law type
+              IMAT(IL) = MAT_PARAM(IMID)%MULTIMAT%MID(IL)  ! submaterial MID                         
+              ILAW(IL) = IPM(2,IMAT(IL))                   ! submaterial law type
               NUVAR   = MLAW_TAG(IMID)%NUVAR                                
               NVARTMP = MLAW_TAG(IMID)%NVARTMP 
               NUVAREOS = 0  
-              IEOS_TYPE = IPM(4,IMAT(IL))                           
+              IEOS_TYPE = MAT_PARAM(IMAT(IL))%IEOS
               IF(IEOS_TYPE>0)NUVAREOS = EOS_TAG(IEOS_TYPE)%NVAR   
               NFAIL = MAT_PARAM(IMAT(IL))%NFAIL
               ELBUF_TAB(NG)%BUFLY(IL)%ILAW = ILAW(IL)
@@ -706,6 +706,12 @@ C------
             GBUF%G_AMU = 1
           ENDIF
 C------
+          ! Variable for Eint_distor
+          IF (ITY == 1 ) THEN
+            ICONTROL = IGEO(97,IPID)
+            IF (ICONTROL==1) GBUF%G_EINT_DISTOR = 1
+          ENDIF
+C------
           IF ((ISMSTR == 10.OR.ISMSTR == 12).AND.ITY == 1)THEN
            IF (ISNOD == 10.OR.(ISNOD==4 .AND. ISROT==1)) THEN 
             GBUF%G_JAC_I = 0    
@@ -824,6 +830,7 @@ c           LGLOB = LGLOB + GBUF%G_SMSTR
           LGLOB = LGLOB + GBUF%G_MAXFRAC
           LGLOB = LGLOB + GBUF%G_MAXEPS   
           LGLOB = LGLOB + GBUF%G_AMU 
+          LGLOB = LGLOB + GBUF%G_EINT_DISTOR
 
           IF (NPG > 1) THEN
             LGLOB = LGLOB + GBUF%G_FORPG
@@ -1028,7 +1035,7 @@ c          print*,'   nlay,nptr,npts,nptt=',nlay,nptr,npts,nptt
 c-------------------------------------------------
           CALL ALLOCBUF_AUTO(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,
      .                   NINTLAY,NEL,NPT,NG,NGROUP,ITY,
-     .                   IGTYP)
+     .                   IGTYP,NPROPM,NUMMAT,PM )
 c-------------------------------------------------
           DEALLOCATE(TFAIL)
           DEALLOCATE(FAILID)
@@ -1256,9 +1263,9 @@ c-----------------------------------------------
           IF (MLW == 151) THEN  ! Multifluid law
             DO IL = 1,NLAY
               ILAW(IL) = MLW
-              IMAT(IL) = IPM(20+IL,IMID)                                    
+              IMAT(IL) = MAT_PARAM(IMID)%MULTIMAT%MID(IL)                                    
               NUVAREOS = 0
-              IEOS_TYPE = IPM(4,IMAT(IL))
+              IEOS_TYPE = MAT_PARAM(IMAT(IL))%IEOS
               IF(IEOS_TYPE>0)NUVAREOS = EOS_TAG(IEOS_TYPE)%NVAR              
               ELBUF_TAB(NG)%BUFLY(IL)%ILAW = ILAW(IL)
               ELBUF_TAB(NG)%BUFLY(IL)%IMAT = IMAT(IL)
@@ -1460,7 +1467,6 @@ c----------------------------------------------------
           IF (JTHE      /= 0 .AND. NPG > 1) GBUF%G_TEMPG = NPG
           IF (ISMS_SELEC >= 1) GBUF%G_ISMS  = 1
           IF (JEUL+JALE /= 0 .AND. ISNOD >= 4) GBUF%G_MOM  = 3
-          IF (DEFAULTS%SHELL%IOFFSET == 1) GBUF%G_SH_IOFFSET  = 1
           IF (ITY == 3) THEN
             IF (JHBE <= 4) THEN
               GBUF%G_HOURG = 5
@@ -1486,6 +1492,9 @@ C------------- 3 is sufficient !!!!
               GBUF%G_SMSTR = 6
             ENDIF
             IF (JHBE < 30 .and. ISROT > 0) GBUF%G_HOURG = 5
+          ENDIF
+          IF (ITY == 3 .OR. ITY == 7) THEN
+            IF (DEFAULTS%SHELL%IOFFSET ==1) ELBUF_TAB(NG)%GBUF%G_SH_IOFFSET = 1
           ENDIF
 c---------for accumulate WXY
           IF (ISMSTR == 10 )THEN
@@ -1896,7 +1905,7 @@ c          print*,' elbuf_ini : NG, buflen=',NG,buflen,ITY,IGTYP
 c-------------------------------------------------
           CALL ALLOCBUF_AUTO(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,
      .                       NINTLAY,NEL,NPT,NG,NGROUP,ITY,
-     .                       IGTYP)
+     .                       IGTYP,NPROPM,NUMMAT,PM )
 c-------------------------------------------------
           DEALLOCATE(TFAIL)
           DEALLOCATE(FAILID)
@@ -2227,7 +2236,8 @@ c
           IF (IGTYP == 3 .and. IFAIL > 0) THEN
              ALLOCATE(ELBUF_TAB(NG)%GBUF%FAIL(1))
 c
-             ELBUF_TAB(NG)%GBUF%FAIL(1)%ILAWF = MAT_PARAM(IMID)%FAIL(1)%IRUPT                                           
+             IRUPT = MAT_PARAM(IMID)%FAIL(1)%IRUPT
+             ELBUF_TAB(NG)%GBUF%FAIL(1)%ILAWF = IRUPT                                           
              GFAIL = GFAIL + 1 
 c
              ELBUF_TAB(NG)%GBUF%FAIL(1)%IDFAIL = MAT_PARAM(IMID)%FAIL(1)%FAIL_ID
@@ -2375,7 +2385,7 @@ c
 c-------------------------------------------------
           CALL ALLOCBUF_AUTO(ELBUF_TAB,NLAY,NPTR,NPTS,NPTT,
      .                       NINTLAY,NEL,NPT,NG,NGROUP,ITY,
-     .                       IGTYP)
+     .                       IGTYP,NPROPM,NUMMAT,PM )
 C
           IF (ALLOCATED(IMAT)) DEALLOCATE(IMAT)
           IF (ALLOCATED(ILAW)) DEALLOCATE(ILAW)

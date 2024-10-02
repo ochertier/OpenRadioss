@@ -21,14 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    prelecig3d   ../starter/source/elements/ige3d/prelecig3d.F
+      !||    prelecig3d       ../starter/source/elements/ige3d/prelecig3d.F
       !||--- called by ------------------------------------------------------
-      !||    lectur       ../starter/source/starter/lectur.F
+      !||    lectur           ../starter/source/starter/lectur.F
       !||--- uses       -----------------------------------------------------
-      !||    format_mod   ../starter/share/modules1/format_mod.F90
+      !||    format_mod       ../starter/share/modules1/format_mod.F90
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE PRELECIG3D(NUM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
         USE FORMAT_MOD , ONLY : FMT_5I
+        USE READER_OLD_MOD , ONLY : KCUR, IREC, LINE, KIGE3D, KOPTAD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,15 +55,6 @@ C=======================================================================
         NUM  = 0
         KCUR = KIGE3D
         IREC = KOPTAD(KCUR)
-c        DO I=1,NUMELIG3D
-c          IREC=IREC+1
-c          READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
-c          READ(LINE,ERR=999,FMT=FMT_5I) ID,IDX,IDY,IDZ,NCTRL 
-c          NUM = NUM + NCTRL                              
-c          IREC= IREC+ ((NCTRL-1)/10)+1
-c          READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE 
-c          IF(LINE(1:6) == '/IGE3D') IREC = IREC + 1
-c        ENDDO
         IREC=IREC+1
         READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
         DO WHILE( LINE(1:1) /= '/' .OR. LINE(1:6) == '/IGE3D')
@@ -66,8 +62,7 @@ c        ENDDO
            IREC=IREC+1
            READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE
          ENDIF
-         READ(LINE,ERR=999,FMT=FMT_5I)
-     .   ID,IDX,IDY,IDZ,NCTRL
+         READ(LINE,ERR=999,FMT=FMT_5I)ID,IDX,IDY,IDZ,NCTRL
          NUM = NUM + NCTRL                              
          IREC = IREC + ((NCTRL-1)/10)+2
          READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE

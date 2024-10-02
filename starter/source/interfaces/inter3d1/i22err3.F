@@ -31,7 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||====================================================================
       SUBROUTINE I22ERR3(
-     1         X       ,NRTM    ,IRECT   ,NOINT   ,ITAB    ,
+     1         X       ,NRTM    ,IRECT   ,ITAB    ,
      2         PM      ,IXS     ,NBRIC   ,BRICS   ,
      3         ID,TITR,
      4         IX1      ,IX2    ,IX3    ,IX4    ,X1     ,
@@ -41,11 +41,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8         Y0       ,Z0     ,XN1    ,YN1    ,ZN1    ,
      9         XN2      ,YN2    ,ZN2    ,XN3    ,YN3    ,
      1         ZN3      ,XN4    ,YN4    ,ZN4      )
-      USE MESSAGE_MOD
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,15 +59,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
 #include      "inter22.inc"
-#include      "mmale51_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER              :: NRTM, IRECT(4,*), NOINT, ITAB(*), NBRIC, IXS(NIXS,*),  BRICS(*)
-      my_real              :: X(3,*), PM(NPROPM,*)    
-      INTEGER              :: ID, IMESG
+      INTEGER  :: NRTM, IRECT(4,*), NOINT, ITAB(*), NBRIC, IXS(NIXS,*),  BRICS(*)
+      my_real  :: X(3,*), PM(NPROPM,*)
+      INTEGER  :: ID, IMESG
       CHARACTER(LEN=NCHARTITLE) :: TITR
       INTEGER, DIMENSION(MVSIZ), INTENT(INOUT) :: IX1,IX2,IX3,IX4
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: X1,X2,X3,X4
@@ -229,7 +228,7 @@ C     #######################################################
         I22LAW37 = 0
         I22LAW51 = 0
         IF(ILAW == 37) I22LAW37 = 5               ! UVAR buffer size
-        IF(ILAW == 51) I22LAW51 = N0PHAS+4*NVPHAS ! UVAR buffer size
+        IF(ILAW == 51) I22LAW51 = M51_N0PHAS+4*M51_NVPHAS ! UVAR buffer size
 
           IF((ILAW/=0).AND.(ILAW/=11).AND.(ILAW/=51).AND.(ILAW/=6).AND.(ILAW/=37))THEN
           IMESG = 97

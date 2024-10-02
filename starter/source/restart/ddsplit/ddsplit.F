@@ -57,6 +57,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    c_iebcs                  ../starter/source/restart/ddsplit/c_iebcs.F
       !||    c_igrav                  ../starter/source/restart/ddsplit/c_igrav.F
       !||    c_iloadp                 ../starter/source/restart/ddsplit/c_iloadp.F
+      !||    c_inivell                ../starter/source/restart/ddsplit/c_inivell.F90
       !||    c_iradia                 ../starter/source/restart/ddsplit/c_iradia.F
       !||    c_irbe2                  ../starter/source/restart/ddsplit/c_irbe2.F
       !||    c_irbe3                  ../starter/source/restart/ddsplit/c_irbe3.F
@@ -151,6 +152,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    w_igrav                  ../starter/source/restart/ddsplit/w_igrav.F
       !||    w_iloadp                 ../starter/source/restart/ddsplit/w_iloadp.F
       !||    w_ing2loc                ../starter/source/restart/ddsplit/w_ing2loc.F
+      !||    w_inivel_str             ../starter/source/restart/ddsplit/w_inivel_str.F90
       !||    w_inloc                  ../starter/source/restart/ddsplit/w_inloc.F
       !||    w_iparg                  ../starter/source/restart/ddsplit/w_iparg.F
       !||    w_iradia                 ../starter/source/restart/ddsplit/w_iradia.F
@@ -214,6 +216,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_th_buffer          ../starter/source/restart/ddsplit/write_th_buffer.F
       !||    wrweight_rm              ../starter/source/restart/ddsplit/wrweight_rm.F
       !||--- uses       -----------------------------------------------------
+      !||    c_inivell_mod            ../starter/source/restart/ddsplit/c_inivell.F90
       !||    cluster_mod              ../starter/share/modules1/cluster_mod.F
       !||    constraint_mod           ../starter/source/modules/constaint_mod.F90
       !||    drape_mod                ../starter/share/modules1/drape_mod.F
@@ -231,6 +234,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    stack_var_mod            ../starter/share/modules1/stack_var_mod.F
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
       !||    table_mod                ../starter/share/modules1/table_mod.F
+      !||    w_inivel_str_mod         ../starter/source/restart/ddsplit/w_inivel_str.F90
       !||====================================================================
       SUBROUTINE DDSPLIT(
      1   P            ,CEP          ,CEL           ,IGEO          ,MAT_ELEM    ,
@@ -330,6 +334,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE UNITAB_MOD
       USE DSGRAPH_MOD
       USE FVBAG_MOD
@@ -377,6 +382,8 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD,only: NAMES_AND_TITLES_,LTITLE
       USE BCS_MOD , ONLY : BCS_STRUCT_
       use constraint_mod , only : constraint_
+      use c_inivell_mod ,  only : c_inivell
+      use w_inivel_str_mod , only : w_inivel_str
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -626,9 +633,12 @@ C-----------------------------------------------
         TYPE(BCS_STRUCT_),INTENT(INOUT) :: BCS_PER_PROC
         TYPE(NAMES_AND_TITLES_),INTENT(IN) :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
         type(constraint_), intent(inout) :: constraint_struct !< constraint structure for the splitting
+        TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
+      INTEGER,DIMENSION(:,:),ALLOCATABLE:: DD_RBYM2
+      INTEGER,DIMENSION(:,:),ALLOCATABLE:: DD_RBY2
       INTEGER I, IR_, IM,IFILNAM(2148),IFILNAM2(2148),
      .        NUMELS_L,NUMELS8_L,NUMELS10_L,NUMELS20_L,NUMELS16_L,
      .        NUMELQ_L ,NUMELC_L, NCONLD_L,NSKYLL_L,
@@ -651,13 +661,13 @@ C-----------------------------------------------
      .        NFASOLFR_L, NLAGF_L, PROC, INUM, IDDL, ISKW,
      .        LEN_IA, LEN_AM, I_EVAL,R_EVAL,LSKYI, NCMAX,
      .        NERVOIS, NESVOIS,NE_NERVOIS, NE_NESVOIS, NBCFD, NUMEL_L2,
-     .        DD_RBY2(3,NRBYKIN),  DD_RBM2(3,NIBVEL),
+     .         DD_RBM2(3,NIBVEL),
      .        EIGIPM_L(NEIPM,NEIG), LEIBUF_L, EIGIBUF_L(LEIBUF),
      .        IFLOW_L(LIFLOW), DD_LAGF(3,NSPMD+1),MY_ILEN,MY_RLEN,
      .        SKIPPON_L,LLRBE3_L,NSKYRBE3_L,
      .        NRBE3_L,NBDDRBE3M,NSLARBM_L,NSKYRBMK,
      .        NRBYMKIN_L ,NBDDNRBYM,NSKTRBMK_L,NRBYMK_L,
-     .        DD_RBYM2(3,NRBYM),NSKYRBMK_L, LAG_SEC,
+     .        NSKYRBMK_L, LAG_SEC,
      .        NRBE2_L,LLRBE2_L,NBDDRBE2,NUMELCPXFE_L,NUMNODPXFE_L,
      .        ITAG_PXFEM(NPLYXFE),INDEX_PXFEM(NPLYXFE),
      .        LCNEPXFEM_L,LLCFIELD_L,
@@ -675,10 +685,9 @@ C-----------------------------------------------
      .        LENIGRSH3N_L,LENISURF_L,LENISLIN_L,NBCSCYC_L,LLBCSCYC_L,NS_DIFF,
      .        N_SLIPRING_L,N_RETRACTOR_L,N_ANCHOR_REMOTE_L,N_ANCHOR_REMOTE_SEND_L,
      .        N_SEATBELT_L,N_SEATBELT_2D_L,NUMSH4N_L,NUMSH3N_L,NCLOAD_L,NPLOAD_L,
-     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP)
+     .        NDAMP_VREL_L,IDAMP_VREL_L(NDAMP),NINIVELT_L
       INTEGER LWAMP_L  !< Size of Working area in Engine. Need for SPH
       INTEGER LWANMP_L !< Size of Working area in Engine. Need for SPH
-      INTEGER IPARI_L(NPARI,MAX(1,NINTER))
       INTEGER NCONV_L,NFXTEMP_L,NRADIA_L,NFXFLUX_L
       INTEGER , DIMENSION(:), ALLOCATABLE:: NUMLOCGROUP,NUMLOCCLUSTER
       INTEGER, DIMENSION(:),ALLOCATABLE :: NODLOCAL,IEPXFEM_L,INPXFEM_L,
@@ -688,6 +697,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:),ALLOCATABLE :: NODGLOB, IDGLOB_L, UIDGLOB_L,
      .        IXSF, IXQF, IXTGF, ITABI2M, ITABRBE3M, ITABRBE2M
       ! for parith/on + FVM solver : ID_GLOBAL_VOIS = user id ; FACE_VOIS= id of the remote connected element
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: IPARI_L
       INTEGER, DIMENSION(:), ALLOCATABLE :: ID_GLOBAL_VOIS,FACE_VOIS
       INTEGER, DIMENSION(:),ALLOCATABLE :: ITABCNDM
       INTEGER LENNOD_L, LENMOD_L, LENELM_L, LENSIG_L,
@@ -702,8 +712,7 @@ C-----------------------------------------------
      .                                      FXBCPS_L, FXBLM_L,
      .                                      FXBFLS_L, FXBDLS_L,
      .                                      FXBGRVR_L
-      my_real
-     .      RDPARTSAV(NPSAV*NPART)
+      my_real,DIMENSION(:),ALLOCATABLE::RDPARTSAV
       my_real
      .       , DIMENSION(:), ALLOCATABLE :: FORNEQS
 
@@ -740,8 +749,7 @@ C-----------------------------------------------
      .   TABVREA(LMXVREA)
       DOUBLE PRECISION XDP(*)
 
-      TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
-      INTEGER, DIMENSION(:),ALLOCATABLE :: NODGLOBXFE
+       INTEGER, DIMENSION(:),ALLOCATABLE :: NODGLOBXFE
 
       TYPE(INTBUF_STRUCT_),DIMENSION(:),ALLOCATABLE :: INTBUF_TAB_L
       TYPE(MAT_ELEM_) ,INTENT(IN) :: MAT_ELEM
@@ -809,6 +817,11 @@ C ----------
       ALLOCATE(NUMLOCCLUSTER(NCLUSTER)) !NUMLOCCLUSTER(I) = NG_LOC or 0
       NUMLOCCLUSTER(1:NCLUSTER) = 0
       ALLOCATE(ISKWP_L(NUMSKW+1))
+
+      CALL MY_ALLOC(IPARI_L,NPARI,MAX(1,NINTER))
+      CALL MY_ALLOC(RDPARTSAV,NPSAV*NPART)
+      CALL MY_ALLOC(DD_RBYM2,3,NRBYM)
+      CALL MY_ALLOC(DD_RBY2,3,NRBYKIN)
 C--------------------------------------------
 C Allocate and init MONVOL local
 C--------------------------------------------
@@ -1659,6 +1672,17 @@ C--------------------------------------
        IF (LOADS%NLOAD_PLOAD>0)
      .   CALL C_NLOADS(CEP,P-1,LOADS%NLOAD_PLOAD,NPLOAD_L)
 C--------------------------------------
+C counts INIVEL
+C--------------------------------------
+       NINIVELT_L = 0
+      IF (LOADS%NINIVELT>0) THEN
+        CALL C_INIVELL(                                              
+     .                 NGRNOD,  NGRBRIC,    NGRQUAD,       NGRSH3N,           
+     .                 IGRNOD,  IGRBRIC,    IGRQUAD,       IGRSH3N,           
+     .                   P-1 ,      CEP,       SCEP,      NODLOCAL,           
+     .                 NUMNOD,LOADS%NINIVELT,LOADS%INIVELT,NINIVELT_L)
+      ENDIF
+C--------------------------------------
 C counts /DAMP/VREL
 C--------------------------------------    
       NDAMP_VREL_L = 0 
@@ -1754,7 +1778,7 @@ C--------------------------------------------
      4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
      5   NUMSH4N_L,NUMSH3N_L,INTERFACES%PARAMETERS,SENSORS,LOADS_PER_PROC%NLOAD_CYL,
      6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB,
-     7   LWAMP_L,LWANMP_L)
+     7   LWAMP_L,LWANMP_L,NINIVELT_L)
      
 
       CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P,INTERFACES%PARAMETERS,UNITAB)
@@ -1816,6 +1840,9 @@ C--------------------------------------
       CALL WRITE_I_C(TABVINT,LVARINT)
       LEN_IA = LEN_IA + LVARINT
 C--------------------------------------
+#ifdef DNC
+      CALL WRDUM_INFO()
+#endif
 C     NODGLOB Deplacee
 C--------------------------------------
       CALL WRITE_I_C(NODGLOB,NUMNOD_L)
@@ -1919,8 +1946,8 @@ C--------------------------------------------
         IF (NTGVOIS > 0)
      +       DEALLOCATE(IXTGF)
         IF (MULTI_FVM%NS_DIFF) THEN
-           CALL C_IDGLOB(NUMEL, NUMELS_L, NUMELQ_L, NUMELTG_L,
-     .          P - 1, CEL, CEP, IPARG, ALE_CONNECTIVITY, IXS, IDGLOB_L, UIDGLOB_L)
+           CALL C_IDGLOB(NUMEL, NUMELS_L, NUMELQ_L, NUMELTG_L, NUMELS, NUMELQ, NUMELTG,
+     .          P - 1, CEL, CEP, IPARG, ALE_CONNECTIVITY, IXS,IXQ,IXTG, IDGLOB_L, UIDGLOB_L, N2D, NGROUP, NPARG)
         ENDIF
       ENDIF
 C--------------------------------------------
@@ -2462,7 +2489,7 @@ C--------------------------------------
       NBCFD = MAX(NRCVVOIS,NSNDVOIS,NERVOIS,NESVOIS,NSEGFL_L)
       IF(NUMSKW>0) CALL SPLIT_SKEW(P,ISKWP_L,ISKWP,TAG_SKN,MULTIPLE_SKEW)
 
-      CALL W_FRONT(
+      CALL W_FRONT( 
      1   P       ,NBDDACC ,NBDDKIN ,NODLOCAL,
      2   NBDDPROC,NBDDBOUN,NODGLOB ,NUMNOD_L,NBDDNRB ,
      3   NPBY    ,LPBY    ,NPRW    ,LPRW    ,LEN_IA  ,
@@ -2562,7 +2589,6 @@ C--------------------------------------
 C Interfaces 
 C--------------------------------------
         CALL STARTIME(8,1)
-
         CALL W_FI(IPARI,P-1,LEN_IA,
      1            INTERCEP  ,INTBUF_TAB,ITAB,MULTI_FVM,TAG_SCRATCH,
      2            NINDX_SCRT,INDX_SCRT ,NODLOCAL,NUMNOD_L,LEN_CEP,CEP)
@@ -3380,6 +3406,17 @@ C--------------------------------------------
          LEN_AM = LEN_AM + S_LOADPINTER
       ENDIF
 C--------------------------------------------
+C /INIVEL w/ T_start or senor_id
+C--------------------------------------------
+      IF (LOADS%NINIVELT>0) THEN
+        CALL W_INIVEL_STR(                                              
+     .                 NGRNOD,  NGRBRIC,    NGRQUAD,       NGRSH3N,           
+     .                 IGRNOD,  IGRBRIC,    IGRQUAD,       IGRSH3N,           
+     .                   P-1 ,      CEP,       SCEP,      NODLOCAL,           
+     .                 NUMNOD,LOADS%NINIVELT,LOADS%INIVELT, LEN_IA,
+     .                 LEN_AM)
+      ENDIF
+C--------------------------------------------
 C  crack xfem
 C--------------------------------------------
        IF(ICRACK3D > 0)THEN
@@ -3634,6 +3671,10 @@ C
       DEALLOCATE(MULTI_FVM_VEL_L)
       DEALLOCATE(IEBCS_LISTELEM_L)
       DEALLOCATE(IEBCS_LISTFAC_L)
+      DEALLOCATE(IPARI_L)
+      DEALLOCATE(RDPARTSAV)
+      DEALLOCATE(DD_RBYM2)
+      DEALLOCATE(DD_RBY2)
 
 
       RETURN

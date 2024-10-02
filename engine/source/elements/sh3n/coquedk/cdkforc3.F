@@ -47,6 +47,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    set_failwave_sh3n   ../engine/source/materials/fail/failwave/upd_failwave_sh3n.F
       !||--- uses       -----------------------------------------------------
       !||    drape_mod           ../engine/share/modules/drape_mod.F
+      !||    dt_mod              ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod        ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
@@ -75,7 +77,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      I   TABLE,       IPARG,       SENSORS,     PTG,
      J   JTHE,        CONDN,       CONDNSKY,    ISUBSTACK,
      K   STACK,       ITASK,       DRAPE_SH3N,  IPRI,
-     L   NLOC_DMG,    INDX_DRAPE,  IGRE,        JTUR)
+     L   NLOC_DMG,    INDX_DRAPE,  IGRE,        JTUR,
+     M   DT    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -86,6 +89,8 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE DRAPE_MOD
       USE SENSOR_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -133,6 +138,7 @@ C     REAL
       TYPE (DRAPE_), DIMENSION (NUMELTG_DRAPE):: DRAPE_SH3N
       TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -177,6 +183,9 @@ c  indx utilise localement contrairement aux coques 4n
      :    ALLOCATABLE, DIMENSION(:), TARGET :: DIRA,DIRB
       my_real,
      .  DIMENSION(:) ,POINTER  :: DIR_A,DIR_B,CRKDIR,DADV
+!     variables for heat transfer
+      my_real, dimension(mvsiz) :: fheat
+!
 C--- Variables pour le non-local
       INTEGER :: NDDL, INOD(3),NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), L_NLOC, IPOS(3),INLOC
       my_real, DIMENSION(:,:), ALLOCATABLE :: VAR_REG
@@ -223,6 +232,9 @@ C---
       INLOC= IPARG(78)
       SEDRAPE = STDRAPE
       NUMEL_DRAPE = NUMELTG_DRAPE
+      ! thermal transfert for 3n shells type cdkforc is not available
+      TEMPEL(:) = ZERO
+      FHEAT(: ) = ZERO
 !
       DO J=1,5
         KK(J) = NEL*(J-1)
@@ -308,7 +320,6 @@ C     Initialize MAT and PID (because they are used in CMATBUF3
         PID(I) = IXTG(5,I)
         A11R(I) = ZERO
       ENDDO
-      TEMPEL(JLT:JFT) = ZERO  ! transfert thermique pour les coques 3 noeud n'est pas dispo
 C---
       CALL CDKCOOR3(ELBUF_STR,
      .              JFT,JLT,MAT,PID,NGL,X,V,R,IXTG,GBUF%OFF,
@@ -399,7 +410,7 @@ C----------------------------------------------------------------------------
      B     NGL       ,ZCFAC     ,SHF       ,GS        ,GBUF%EPSD ,
      C     KFTS      ,IHBE      ,ALPE      ,
      D     DIR_A     ,DIR_B     ,IGEO      ,
-     E     IPM       ,IFAILURE  ,NPG       ,
+     E     IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F     TEMPEL    ,DIE       ,IBID      ,IBID      ,BID       ,
      G     IBID      ,BID       ,
      H     BID       ,BID       ,BID       ,BID       ,BID       ,
@@ -411,7 +422,7 @@ C----------------------------------------------------------------------------
      N     ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O     IBID      ,IBID      ,ISUBSTACK ,STACK     ,
      P     BID       ,ITASK     ,DRAPE_SH3N  ,VAR_REG   ,NLOC_DMG  ,
-     R    INDX_DRAPE ,THKE        ,SEDRAPE     ,NUMEL_DRAPE)
+     R    INDX_DRAPE ,THKE        ,SEDRAPE     ,NUMEL_DRAPE,DT   )
 C----------------------------------------------------------------------------
 C     THICKNESS CORRECTION 
 C----------------------------
@@ -504,7 +515,7 @@ C--------------------------
 C--------------------------
 C     THERMAL TIME STEP
 C--------------------------
-        IF(JTHE > 0.AND.IDT_THERM == 1)THEN
+        IF (JTHE /= 0 .AND. IDT_THERM == 1) THEN
            CALL DTTHERM(
      1   JFT,     JLT,     PM,      TEMPEL,
      2   GBUF%RE, RHO,     GBUF%RK, VOL0,

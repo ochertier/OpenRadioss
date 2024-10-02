@@ -48,7 +48,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    tshgeodel3             ../engine/source/elements/thickshell/solidec/tshgeodel3.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
@@ -86,6 +87,7 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -161,7 +163,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,N,LCO, NF1, IFLAG, IL, IR, IS, IT, NF2,L_PLA,
+      INTEGER I,J,N,LCO, NF1, IFLAG, IL, IR, IS, IT, NF2,L_PLA,IMAT,
      .        IP,NLAY,NPTT,NPTS,NPTR,ICO,IBID,IBIDON(1),MX,II(6),PID,CURRENT_LAYER
 
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),IPERM1(NPE),IPERM2(NPE)
@@ -187,6 +189,7 @@ C-----------------------------------------------
      . SIGY(MVSIZ),ET(MVSIZ),GAMA(MVSIZ,6),
      . R1_FREE(MVSIZ),R3_FREE(MVSIZ),R4_FREE(MVSIZ),
      . TEMPEL(MVSIZ),DIE(MVSIZ),THEM(MVSIZ,NPE),AREA(MVSIZ),LLSH(MVSIZ)
+      my_real, dimension(mvsiz) :: fheat
      
       ! Variables utilisees dans les routines solides uniquement (en arguments).
       INTEGER NC(MVSIZ,NPE),NN_DEL,IPRES,SZ_IX
@@ -391,7 +394,8 @@ C=======================================================================
       NLAY     = ELBUF_TAB(NG)%NLAY
       IS       = 1
       ISORTH   = 0
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
       NF1      = NFT+1
       NF2      = NF1-(NUMELS8+NUMELS10+NUMELS20)
       IF (NPTR*NPTS*NPTT*NLAY > NIPMAX) STOP 933
@@ -588,7 +592,7 @@ C
 C
 C    for heat transfert
 C
-          IF(JTHE < 0 ) THEN
+          IF (JTHE < 0 ) THEN
              CALL S20TEMPCG(1,NEL,NPE, NC,NI(1,IP), TEMP,TEMPEL)
           ENDIF
 
@@ -631,9 +635,8 @@ C
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna,       OPT_MTN=MTN, OPT_JCVT=JCVT,OPT_ISORTH=ISORTH,
-     .   OPT_ISORTHG=ISORTHG)
-
+     .   idyna,       DT,         fheat   , OPT_MTN=MTN, OPT_JCVT=JCVT,
+     .   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 c
       IF (ISTRAIN == 1)THEN 
         CALL SSTRA3(
@@ -675,12 +678,22 @@ C
       !--------------------------
 
          IF (JTHE < 0) THEN
-           CALL S20THERM(
-     1   NPE,       PM,        MXT,       NC,
-     2   VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
-     3   NI(1,IP),  DT1,       TEMP,      TEMPEL,
-     4   DIE,       THEM,      GBUF%OFF,  LBUF%OFF,
-     5   NEL)
+           IMAT = MXT(1)
+           IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+             CALL S20THERM(
+     1            NPE,       PM,       IMAT,       NC,
+     2            VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
+     3            NI(1,IP),  DT1,       TEMP,      TEMPEL,
+     4            FHEAT,     THEM,      GBUF%OFF,  LBUF%OFF,
+     5            NEL)
+           ELSE
+             CALL S20THERM(
+     1            NPE,       PM,       IMAT,       NC,
+     2            VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
+     3            NI(1,IP),  DT1,       TEMP,      TEMPEL,
+     4            DIE,      THEM,      GBUF%OFF,  LBUF%OFF,
+     5            NEL)
+           END IF
           ENDIF
         ENDDO   ! IL=1,NLAY
        ENDDO    ! IR=1,NPTR

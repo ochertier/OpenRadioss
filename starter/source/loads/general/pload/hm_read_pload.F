@@ -62,7 +62,6 @@ C-----------------------------------------------
 #include      "param_c.inc"
 #include      "units_c.inc"
 #include      "scr03_c.inc"
-#include      "scr17_c.inc"
 #include      "com04_c.inc"
 #include      "r2r_c.inc"
 C-----------------------------------------------
@@ -243,7 +242,11 @@ C-----------Multidomaines -> on decompte les seg communs, on ne les compte qu'un
             IF (IDDOM>0) NN = NN-ISURF_R2R(1,IS)                                                  
           NPRELD=NPRELD+NN                                       
         ELSE                                                     
-          GOTO 999                                               
+          CALL ANCMSG(MSGID=3066,
+     .                MSGTYPE=MSGERROR,
+     .                ANMODE=ANINFO,
+     .                I1=ID,
+     .                C1=TITR)                                              
         ENDIF             
       ENDDO
 C
@@ -292,7 +295,6 @@ C---
      .'     ----------------  '/
      .'       SEGM      NODE1      NODE2      NODE3      NODE4    CURVE',
      .'     SENSOR         SCALE-X                 SCALE-Y ')
- 999  CALL FREERR(3)
 C-----------
       RETURN
       END

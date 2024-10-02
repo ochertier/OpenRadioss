@@ -78,6 +78,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    strs_txt50                ../engine/source/output/sta/sta_txt.F
       !||--- uses       -----------------------------------------------------
       !||    drape_mod                 ../engine/share/modules/drape_mod.F
+      !||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    inoutfile_mod             ../common_source/modules/inoutfile_mod.F
       !||    mat_elem_mod              ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod               ../engine/share/message_module/message_mod.F
@@ -107,6 +108,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MAT_ELEM_MOD
+      USE ELBUFDEF_MOD
       USE MESSAGE_MOD    
       USE INOUTFILE_MOD 
       USE MULTI_FVM_MOD
@@ -352,30 +354,30 @@ c
       IF(IS_STAT_INIMAP1D)THEN
         IF(IS_STAT_INIMAP_FILE)THEN
           CALL STAT_INIMAP1D_FILE_SPMD(
-     .                          X        , V        , ITAB  , IPART_STATE, NODTAG,
-     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    ,
-     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG  , 
+     .                          X        , V        , ITAB  , IPART_STATE, NODTAG   ,
+     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    , MAT_PARAM,
+     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG     ,
      .                          ELBUF_TAB, MULTI_FVM, BUFMAT, IPM) 
         ELSE
           CALL STAT_INIMAP1D_SPMD(
-     .                          X        , V        , ITAB  , IPART_STATE, NODTAG,
-     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    ,
-     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG  , 
+     .                          X        , V        , ITAB  , IPART_STATE, NODTAG   ,
+     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    , MAT_PARAM,
+     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG     ,
      .                          ELBUF_TAB, MULTI_FVM, BUFMAT, IPM) 
         ENDIF 
       !  - inimap2d -  (generic subroutine : SMP or SPMD)
       ELSEIF(IS_STAT_INIMAP2D)THEN
         IF(IS_STAT_INIMAP_FILE)THEN
           CALL STAT_INIMAP2D_FILE_SPMD(
-     .                          X        , V        , ITAB  , IPART_STATE, NODTAG,
-     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    ,
-     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG  , 
+     .                          X        , V        , ITAB  , IPART_STATE, NODTAG   ,
+     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    , MAT_PARAM,
+     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG     ,
      .                          ELBUF_TAB, MULTI_FVM, BUFMAT, IPM) 
         ELSE
           CALL STAT_INIMAP2D_SPMD(
-     .                          X        , V        , ITAB  , IPART_STATE, NODTAG,
-     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    ,
-     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG  , 
+     .                          X        , V        , ITAB  , IPART_STATE, NODTAG   ,
+     .                          IPART    , IPARTS   , IPARTQ, IPARTTG    , MAT_PARAM,
+     .                          IGEO     , IPARG    , IXS   , IXQ        , IXTG     ,
      .                          ELBUF_TAB, MULTI_FVM, BUFMAT, IPM)        
         ENDIF 
       ENDIF                     

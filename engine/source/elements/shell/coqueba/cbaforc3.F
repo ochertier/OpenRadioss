@@ -82,6 +82,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    stoptime            ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    drape_mod           ../engine/share/modules/drape_mod.F
+      !||    dt_mod              ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod        ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
@@ -119,7 +121,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Q   CONDN,       CONDNSKY,    ISUBSTACK,   STACK,
      R   DRAPE_SH4N,  NEL,         NLOC_DMG,    VPINCH,
      S   FPINCH,      STIFPINCH,   INDX_DRAPE,  IGRE,
-     T   JTUR)
+     T   JTUR,        DT)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -131,6 +133,8 @@ C-----------------------------------------------
       USE PINCH_LOCAL_MOD
       USE DRAPE_MOD
       USE SENSOR_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -187,6 +191,7 @@ C     REAL OU REAL*8
       TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE)
       TYPE (MAT_ELEM_),INTENT(INOUT) :: MAT_ELEM
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DT_) ,INTENT(IN) :: DT
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -266,6 +271,9 @@ C-----------------------------------------------
      .  VRL1(MVSIZ,3),VRL2(MVSIZ,3),VRL3(MVSIZ,3),VRL4(MVSIZ,3),
      .   UXYZ(MVSIZ,12),AXYZ(MVSIZ,4),WXY(MVSIZ),XLCORE(MVSIZ,2*(NNOD-1))
        my_real , DIMENSION(NEL) ::  ZOFFSET
+!     variables for heat transfer
+      my_real, dimension(mvsiz) :: fheat
+!
 C-----------------------------------------------
       INTEGER, DIMENSION(NEL) :: OFFLY
       my_real, DIMENSION(:) ,POINTER     :: DIR_A, DIR_B,CRKDIR,DADV
@@ -299,6 +307,8 @@ C--------------------------
       NPINCH= IPARG(90)
       SEDRAPE = SCDRAPE
       NUMEL_DRAPE = NUMELC_DRAPE
+      TEMPEL(:) = ZERO
+      FHEAT(: ) = ZERO
 C
       NLAY = ELBUF_STR%NLAY
       NPTR = ELBUF_STR%NPTR
@@ -420,7 +430,6 @@ C initiallisation pour la thermique ---
          THEM(I,2) = ZERO
          THEM(I,3) = ZERO
          THEM(I,4) = ZERO
-         TEMPEL(I) = ZERO
        ENDDO
 C
        IF(NPINCH > 0) THEN
@@ -701,8 +710,7 @@ C
 C
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
         IF (JTHE > 0 ) THEN
-           CALL CBATEMPEL(JFT ,JLT   ,NG  ,IXC   ,TEMP ,
-     .                  TEMPEL)
+           CALL CBATEMPEL(JFT ,JLT   ,NG  ,IXC   ,TEMP ,TEMPEL)
         ENDIF
 C-----------------------------------------------------------------------
         IF (INLOC>0) THEN
@@ -759,7 +767,7 @@ C-----------------
      B    NGL       ,ZCFAC     ,SHF       ,GS        ,GBUF%EPSD ,
      C    KFTS      ,IHBE      ,ALPE      ,
      D    DIR_A     ,DIR_B     ,IGEO      ,
-     E    IPM       ,IFAILURE  ,NPG       ,
+     E    IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F    TEMPEL    ,DIE       ,JTHE      ,IEXPAN    ,GBUF%TEMPG(PTT) ,
      G    ISHPLYXFEM,PLY_EXX   ,
      H    PLY_EYY   ,PLY_EXY   ,PLY_EZX   ,PLY_EYZ   ,PLY_F     ,
@@ -771,7 +779,7 @@ C-----------------
      N    ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O    IBID      ,IBID      ,ISUBSTACK ,STACK     ,
      P    F_DEF(1,1,NG),ITASK  ,DRAPE_SH4N     ,VAR_REG(1,1),NLOC_DMG ,
-     R    INDX_DRAPE ,THKE        ,SEDRAPE     ,NUMEL_DRAPE)        
+     R    INDX_DRAPE ,THKE        ,SEDRAPE     ,NUMEL_DRAPE,DT   )        
         ENDIF
 C-----------------
         IF ((ITASK==0).AND.(IMON_MAT == 1)) CALL STOPTIME(35,1)
@@ -836,11 +844,17 @@ C-------------------------
 c     Thermal Analysis
 C--------------------------
 C
-         IF (JTHE > 0) THEN
+      IF (JTHE /= 0) THEN
+        IF (MAT_ELEM%MAT_PARAM(MAT(1))%HEAT_FLAG == 1) THEN
           CALL CBATHERM(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
-     .                  BM    ,AREA  ,DT1C   ,TEMP    ,TEMPEL,DIE   , 
-     .                  NPLAT  ,IPLAT,THEM    ) 
-         ENDIF
+     .                  BM    ,AREA  ,DT1C   ,TEMP    ,TEMPEL,FHEAT   , 
+     .                  NPLAT ,IPLAT,THEM    ) 
+        ELSE
+          CALL CBATHERM(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
+     .                  BM    ,AREA  ,DT1C   ,TEMP    ,TEMPEL,DIE     , 
+     .                  NPLAT ,IPLAT,THEM    ) 
+        END IF
+      ENDIF
 c-------------------------
 c     Virtual internal forces of regularized non local ddl 
 c--------------------------

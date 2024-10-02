@@ -177,10 +177,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    imp_restarcp                                 ../engine/source/implicit/imp_sol_init.F
       !||    imp_sol_init                                 ../engine/source/implicit/imp_sol_init.F
       !||    imp_solv                                     ../engine/source/implicit/imp_solv.F
+      !||    init_global_frontier_monvol                  ../engine/source/airbag/init_global_monvol_frontier.F90
       !||    init_i25_edge                                ../engine/source/interfaces/int25/init_i25_edge.F
       !||    init_interf_sorting_strategy                 ../engine/source/interfaces/init_interf_sorting_strategy.F
+      !||    init_monvol_omp_structure                    ../engine/source/airbag/init_monvol_omp_structure.F90
       !||    init_nodal_state                             ../engine/source/interfaces/interf/init_nodal_state.F
       !||    init_trim                                    ../engine/source/interfaces/intsort/init_trim.F
+      !||    inivel_dt2                                   ../engine/source/loads/general/inivel/inivel_dt2.F90
+      !||    inivel_start                                 ../engine/source/loads/general/inivel/inivel_start.F90
       !||    inixfem                                      ../engine/source/elements/xfem/inixfem.F
       !||    int18_alloc                                  ../engine/source/interfaces/int18/int18_alloc.F
       !||    int18_law151_init                            ../engine/source/interfaces/int18/int18_law151_init.F
@@ -424,11 +428,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    diffusion_mod                                ../engine/share/modules/diffusion_mod.F
       !||    drape_mod                                    ../engine/share/modules/drape_mod.F
       !||    dsgraph_mod                                  ../engine/share/modules/dsgraph_mod.F
-      !||    dt_mod                                       ../engine/share/modules/dt_mod.F
+      !||    dt_mod                                       ../engine/source/modules/dt_mod.F
       !||    dtdc_mod                                     ../engine/share/modules/dtdc_mod.F
       !||    dynlib_mod                                   ../engine/share/modules/dynlib_mod.F
       !||    ebcs_mod                                     ../common_source/modules/boundary_conditions/ebcs_mod.F
       !||    ecnd_mod                                     ../engine/share/modules/ecdn_mod.F
+      !||    elbufdef_mod                                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    error_mod                                    ../engine/share/modules/error_mod.F
       !||    failwave_mod                                 ../common_source/modules/failwave_mod.F
       !||    force_mod                                    ../engine/source/loads/general/force.F90
@@ -444,6 +449,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i22tri_mod                                   ../common_source/modules/interfaces/cut-cell-search_mod.F
       !||    icontact_mod                                 ../engine/share/modules/icontact_mod.F
       !||    impbufdef_mod                                ../engine/share/modules/impbufdef_mod.F
+      !||    init_global_frontier_monvol_mod              ../engine/source/airbag/init_global_monvol_frontier.F90
+      !||    init_monvol_omp_structure_mod                ../engine/source/airbag/init_monvol_omp_structure.F90
+      !||    inivel_dt2_mod                               ../engine/source/loads/general/inivel/inivel_dt2.F90
+      !||    inivel_start_mod                             ../engine/source/loads/general/inivel/inivel_start.F90
       !||    inter_sh_offset_mod                          ../engine/source/modules/interfaces/sh_offset_mod.F90
       !||    inter_sorting_mod                            ../engine/share/modules/inter_sorting_mod.F
       !||    inter_struct_mod                             ../engine/share/modules/inter_struct_mod.F
@@ -456,6 +465,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    monvol_struct_mod                            ../engine/share/modules/monvol_struct_mod.F
       !||    mpi_tools_mod                                ../engine/share/modules/mpi_tools_mod.F
       !||    multi_fvm_mod                                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multimat_param_mod                           ../common_source/modules/multimat_param_mod.F90
       !||    names_and_titles_mod                         ../common_source/modules/names_and_titles_mod.F
       !||    nlocal_reg_mod                               ../common_source/modules/nlocal_reg_mod.F
       !||    offset_nproj_mod                             ../engine/source/interfaces/shell_offset/offset_nproj.F90
@@ -661,6 +671,12 @@ C-----------------------------------------------
       USE get_neighbour_surface_mod , only : get_neighbour_surface
       USE spmd_mod , only : SPMD_MAX,spmd_allreduce
       USE SKEW_MOD
+      USE ELBUFDEF_MOD
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
+      use init_global_frontier_monvol_mod , only : init_global_frontier_monvol
+      use init_monvol_omp_structure_mod , only : init_monvol_omp_structure
+      USE inivel_dt2_mod ,   only : inivel_dt2
+      USE inivel_start_mod , only : inivel_start
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -869,7 +885,7 @@ c
       TYPE(PINCH) :: PINCH_DATA
       TYPE(t_ale_connectivity), INTENT(INOUT) :: ALE_CONNECTIVITY
       INTEGER, INTENT(IN) :: NE_NERCVOIS(*), NE_NESDVOIS(*), NE_LERCVOIS(*), NE_LESDVOIS(*)
-      TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(IN) :: T_MONVOL
+      TYPE(MONVOL_STRUCT_), DIMENSION(NVOLU), INTENT(INOUT) :: T_MONVOL
       TYPE (DRAPE_)                                      :: DRAPE_SH4N(NUMELC_DRAPE)  , DRAPE_SH3N(NUMELTG_DRAPE) 
       TYPE(DRAPEG_)                                      :: DRAPEG
       TYPE (SENSORS_)   ,INTENT(INOUT)                   :: SENSORS
@@ -1140,7 +1156,7 @@ C---Nitsche Method----
       REAL(kind=8) :: SECS
       REAL(kind=8) :: TT_DOUBLE
       my_real
-     .         DTNOD_NLOCAL
+     .         DTNOD_NLOCAL,T_KIN
       INTEGER, DIMENSION(:),ALLOCATABLE ::IBUFPDEL, NINDEXPDEL
       
       DOUBLE PRECISION :: argin,argout
@@ -1151,7 +1167,12 @@ C IMPVEL/FGEO
 C----------------------------------------------------------------------------------
 C /DAMP/VREL
       INTEGER SIZE_RBY6_C     
-!  contact w/ offset  
+C----------------------------------------------------------------------------------
+C Type2 output - PCONT2
+      INTEGER :: SZ_NPCONT2
+      my_real, DIMENSION(:,:),ALLOCATABLE :: NPCONT2
+C----------------------------------------------------------------------------------
+!  contact w/ offset
       my_real, DIMENSION(:),ALLOCATABLE, TARGET :: XYZ    
       my_real, DIMENSION(:)  , POINTER :: X_C 
       TYPE(sh_offset_)                   :: SH_OFFSET_TAB   
@@ -1219,6 +1240,8 @@ C-------------------------------------------------------------------------------
 
         INTEGER :: CHECK_NEIGH_FLAG,CHECK_NEIGH_FLAG_RES
 
+        integer, dimension(nspmd+2) :: frontier_global_mv !< frontier fo monitored volume
+        integer :: sporo
         ! Restart File Writing
         INTEGER STOP_OR_ADD_CYCLE  !< Check if additional cycle must be done after restart at termination
       DATA IUN/1/
@@ -2033,7 +2056,7 @@ C save the Python functions into the Python interpreter dictionarry
      .          IPM         ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,  
      .          X           ,V         ,W           ,ALE_CONNECTIVITY,  
      .          NERCVOIS    ,NESDVOIS  ,LERCVOIS    ,LESDVOIS,  
-     .          n0phas, nvphas, STACK       ,           
+     .          M51_N0PHAS, M51_NVPHAS, STACK       ,
      .          IPART(K3:K4-1),IPART(K1:K2-1),IPART(K8:K9-1), IPART(K2:K3-1), 
      .          D           , MULTI_FVM ,  
      .          MAT_ELEM%MAT_PARAM , FANI_CELL)
@@ -2124,7 +2147,8 @@ C
      5   FXVEL_FGEO,FAILWAVE,NLOC_DMG,PINCH_DATA ,SLLOADP,
      6   TAGSLV_RBY,NFNCA2  ,NFTCA2  ,IN0 ,SORT_COMM,STACK,OUTPUT,
      7   THKE   ,SFR_ELEM  ,SH_OFFSET_TAB,
-     8   NEED_COMM_INT25_SOLID_EROSION,COMM_INT25_SOLID_EROSION )
+     8   NEED_COMM_INT25_SOLID_EROSION,COMM_INT25_SOLID_EROSION ,
+     9   ISKWN  ,IFRAME  ,LOADS )
 
 !$OMP END PARALLEL
 C========================================================================================
@@ -2152,7 +2176,21 @@ c      we constraint all DDLs
        IF(IDT_THERM == 1) THEN
           CALL BCSDTTH_COPY(ICODT, ICODR, ICODT0, ICODR0 ,1 )
        ENDIF
-       
+
+      ! -----------------
+      ! Monitored volume : initialization of global frontier array for mpi comm
+      if(nvolu/=0) then
+        call init_global_frontier_monvol(ispmd,nspmd,nvolu,nsurf,monvol,
+     .                       nimv,
+     .                  fr_mv,frontier_global_mv, t_monvol,igrsurf )
+      else
+        frontier_global_mv(1:nspmd+2) = 0
+      endif
+      ! Monitored volume : initialization of omp array
+      call init_monvol_omp_structure(ispmd,nspmd,nvolu,nsurf,monvol,
+     .                       nimv,numnod,
+     .                  fr_mv,t_monvol,igrsurf )
+      ! -----------------
        I24MAXNSNE=0
        IF (INT24USE == 1)THEN
          ALLOCATE(IAD_I24(NBINTC+1,NSPMD))
@@ -2200,7 +2238,17 @@ C     THERMAL EXPANSION and IMPTEMP : Initialisation of nodal temperatures
         CALL FIXTEMP(IBFTEMP  ,FBFTEMP    ,TEMP    ,NPC    ,TF  ,
      .       NSENSOR  ,SENSORS%SENSOR_TAB )
       ENDIF
-
+C ---------------------
+C Allocating Array for PCONT2 - average normal
+C ---------------------
+      IF (ANIM_V(27)+H3D_DATA%N_VECT_PCONT2 > 0) THEN
+        SZ_NPCONT2 = NUMNOD
+        ALLOCATE(NPCONT2(3,NUMNOD))
+        NPCONT2 = ZERO
+      ELSE
+        SZ_NPCONT2 = 0
+        ALLOCATE(NPCONT2(3,0))
+      ENDIF
 C ---------------------
 C Allocating FEXT Array
 C ---------------------
@@ -3175,7 +3223,7 @@ C===============================================================================
              FANI(2,I) = ZERO
              FANI(3,I) = ZERO
           ENDDO
-          IF(ANIM_V(13)+H3D_DATA%N_VECT_CONT2==1)THEN
+          IF(ANIM_V(13)+H3D_DATA%N_VECT_CONT2 > 0)THEN
               DO I=1+NFT2,NFT2 + NUMNOD*MIN(1,ANIM_V(13)+H3D_DATA%N_VECT_CONT2)
                  FANI(1,I) = ZERO
                  FANI(2,I) = ZERO
@@ -3469,18 +3517,19 @@ C-------------------------------------------------
           ELSE
             N1 = N0
           ENDIF
+          SPORO = NUMELC+NUMELTG+IBAGSURF
 C
           N=1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG
            CALL MONVOL0(
      1      MONVOL     ,VOLMON     ,X_A            ,A         ,
      2      NPC        ,TF         ,V              ,WA        ,
      3      FSAV(1,N)  ,NSENSOR    ,SENSORS%SENSOR_TAB ,IGRSURF   ,
-     4      FR_MV      ,IADS(I87I) ,
+     4      FR_MV      ,IADS(I87I) ,SICONTACT,SPORO           ,
      5      FSKY       ,ICONTACT   ,WA(N0)         ,IPARG     ,
      6      ELBUF_TAB  ,GEO        ,IGEO           ,
      7      PM         ,IPM        ,IPART          ,IPART(K3) ,
      8      IPART(K8)  ,IGROUPC    ,IGROUPTG       ,FEXT      ,
-     9      1          ,H3D_DATA   ,T_MONVOL)
+     9      1          ,H3D_DATA   ,T_MONVOL,frontier_global_mv)
           CALL TRACE_OUT(11)
         IF (IMONM > 0) CALL STOPTIME(50,1)
         ENDIF
@@ -3833,30 +3882,30 @@ C     Init var parallel SMP
            ITYPTSTT = ITYPTST
 C     
            CALL ALEMAIN(
-     1          PM         ,GEO      ,X             ,A(1,NDTSK)   ,AR(1,NDTSK)      ,V               ,
-     2          MS         ,WA       ,ELBUF_TAB     ,BUFMAT       ,PARTSAV(IPMTSK)  ,TF              ,
-     3          VAL2       ,VEUL     ,FV            ,STIFN(NDTSK) ,FSKY             ,EANI            ,
-     4          PHI        ,FILL     ,DFILL         ,ALPH         ,SKEWS%SKEW        ,W               ,
-     5          D          ,DSAVE    ,ASAVE         ,DT2TT        ,DT2SAVE          ,XCELL           ,
-     6          IPARG      ,NPC      ,IXS           ,IXQ          ,IXTG             ,IADS            ,IADS(I87B),
-     7          IFILL      ,NODPOR   ,ICODT         ,ISKEW        ,IMS              ,
-     8          NELTSTT    ,ITYPTSTT ,IPART         ,IPART(K1)    ,IPART(K2)        ,ITSK            ,
-     A          NODFTSK    ,NODLTSK  ,NBRCVOIS      ,TEMP         ,OUTPUT%TH%TH_SURF%CHANNELS,
-     B          NBSDVOIS   ,LNRCVOIS ,LNSDVOIS      ,NERCVOIS     ,NESDVOIS         ,LERCVOIS        ,
-     C          LESDVOIS   ,ISIZXV   ,IAD_ELEM      ,FR_ELEM      ,FSKYM            ,MSNF            ,
-     D          IPARI      ,SEGVAR   ,ITAB          ,ISKWN        ,
-     E          VOLMON     ,FSAV     ,IGRSURF       ,NELTSA       ,
-     F          ITYPTSA    ,WEIGHT   ,NPSEGCOM      ,LSEGCOM      ,IPM              ,IGEO            ,
-     G          ITABM1     ,LENQMV   ,NV46          ,A            ,GRESAV           ,
-     H          GRTH       ,IGRTH    ,LGAUGE        ,GAUGE        ,MSSA             ,
-     I          DMELS      ,IGAUP    ,NGAUP         ,TABLE        ,MS0              ,
-     J          XDP        ,IGRNOD   ,VARNOD                      ,FSKYI            ,ISKY            ,
-     K          INTERFACES%INTBUF_TAB ,IXT      ,IGRV          ,AGRV         ,SENSORS          ,
-     L          LGRAV      ,CONDNSKY ,CONDN         ,MS_2D        ,MULTI_FVM        ,IGRTRUSS        ,
-     M          IGRBRIC    ,NLOC_DMG ,ID_GLOBAL_VOIS,FACE_VOIS    ,EBCS_TAB         ,ALE_CONNECTIVITY, DIFFUSION,
-     N          MAT_ELEM   ,H3D_DATA,DT , OUTPUT , NEED_COMM_INTER18,IDTMINS,IRESP,
-     O          IDTMIN     ,MAXFUNC ,IMON_MAT        ,USERL_AVAIL      ,heat_meca       ,
-     P          impl_s     , idyna , PYTHON)
+     1          PM                    ,GEO      ,X             ,A(1,NDTSK)        ,AR(1,NDTSK)               ,V               ,
+     2          MS                    ,WA       ,ELBUF_TAB     ,BUFMAT            ,PARTSAV(IPMTSK)           ,TF              ,
+     3          VAL2                  ,VEUL     ,FV            ,STIFN(NDTSK)      ,FSKY                      ,EANI            ,
+     4          PHI                   ,FILL     ,DFILL         ,ALPH              ,SKEWS%SKEW                ,W               ,
+     5          D                     ,DSAVE    ,ASAVE         ,DT2TT             ,DT2SAVE                   ,XCELL           ,
+     6          IPARG                 ,NPC      ,IXS           ,IXQ               ,IXTG                      ,IADS            ,
+     7          IFILL                 ,NODPOR   ,ICODT         ,ISKEW             ,IMS                       ,IADS(I87B)      ,
+     8          NELTSTT               ,ITYPTSTT ,IPART         ,IPART(K1)         ,IPART(K2)                 ,ITSK            ,
+     A          NODFTSK               ,NODLTSK  ,NBRCVOIS      ,TEMP              ,OUTPUT%TH%TH_SURF%CHANNELS,
+     B          NBSDVOIS              ,LNRCVOIS ,LNSDVOIS      ,NERCVOIS          ,NESDVOIS                  ,LERCVOIS        ,
+     C          LESDVOIS              ,ISIZXV   ,IAD_ELEM      ,FR_ELEM           ,FSKYM                     ,MSNF            ,
+     D          IPARI                 ,SEGVAR   ,ITAB          ,ISKWN             ,DIFFUSION                 ,IRESP           ,
+     E          VOLMON                ,FSAV     ,IGRSURF       ,NELTSA            ,
+     F          ITYPTSA               ,WEIGHT   ,NPSEGCOM      ,LSEGCOM           ,IPM                       ,IGEO            ,
+     G          ITABM1                ,LENQMV   ,NV46          ,A                 ,GRESAV                    ,
+     H          GRTH                  ,IGRTH    ,LGAUGE        ,GAUGE             ,MSSA                      ,
+     I          DMELS                 ,IGAUP    ,NGAUP         ,TABLE             ,MS0                       ,
+     J          XDP                   ,IGRNOD   ,VARNOD        ,FSKYI             ,ISKY                      ,
+     K          INTERFACES%INTBUF_TAB ,IXT      ,IGRV          ,AGRV              ,SENSORS                   ,
+     L          LGRAV                 ,CONDNSKY ,CONDN         ,MS_2D             ,MULTI_FVM                 ,IGRTRUSS        ,
+     M          IGRBRIC               ,NLOC_DMG ,ID_GLOBAL_VOIS,FACE_VOIS         ,EBCS_TAB                  ,ALE_CONNECTIVITY,
+     N          MAT_ELEM              ,H3D_DATA ,DT            ,OUTPUT            ,NEED_COMM_INTER18         ,IDTMINS         ,
+     O          IDTMIN                ,MAXFUNC  ,IMON_MAT      ,USERL_AVAIL       ,heat_meca                 ,
+     P          impl_s                ,idyna    ,PYTHON        ,MAT_ELEM%MAT_PARAM)
 
            IF(INT22 /=0)  call my_barrier !INTER22in input files  - get also IDT_INT22
 #include "lockon.inc"
@@ -4445,7 +4494,8 @@ C Init var parallel SMP
      N   XFEM_TAB     ,CONDN(IDX_CONDN),CONDNSKY        ,CRKEDGE       ,
      O   STACK        ,ITAB            ,
      Q   DRAPE_SH4N   ,DRAPE_SH3N      ,SUBSETS, XDP    ,PINCH_DATA%VPINCH   ,
-     R   PINCH_DATA%APINCH(1,IDX_PINCH)    ,PINCH_DATA%STIFPINCH(IDX_PINCH)  ,DRAPEG  ,OUTPUT)     
+     R   PINCH_DATA%APINCH(1,IDX_PINCH)    ,PINCH_DATA%STIFPINCH(IDX_PINCH)  ,DRAPEG  ,
+     S   OUTPUT       ,DT              )     
 #include "lockon.inc"
       IF(DT2TT<DT2T)THEN
          DT2T = DT2TT
@@ -4624,7 +4674,8 @@ C----------------------------------
      E    FTHE          ,FTHESKYI       ,SPHG_F6    ,WSMCOMP%BUF     ,SOL2SPH_TYP   ,
      F    MAt_ELEM      ,OUTPUT         ,SPH_IORD1  ,SNPC            ,STF           ,
      G    SBUFMAT       ,NSVOIS         ,IDTMINS    ,IRESP           ,MAXFUNC       ,
-     .    IMON_MAT      ,USERL_AVAIL    ,heat_meca  ,impl_s          ,idyna)
+     .    IMON_MAT      ,USERL_AVAIL    ,heat_meca  ,impl_s          ,idyna         ,
+     .    DT            )
 #include "lockon.inc"
         IF(DT2TT<DT2T)THEN
           DT2T = DT2TT
@@ -4672,6 +4723,7 @@ C----------------------------------------------
           ELSE
             N1 = N0
           ENDIF
+          SPORO = NUMELC+NUMELTG+IBAGSURF
 C
           N=1+NINTER+NRWALL+NRBODY+NSECT+NJOINT+NRBAG
           CALL FVBAG0(MONVOL,    VOLMON,  X,           SENSORS%SENSOR_TAB,  V,
@@ -4684,12 +4736,12 @@ C
      1      MONVOL     ,VOLMON     ,X_A            ,A         ,
      2      NPC        ,TF         ,V              ,WA        ,
      3      FSAV(1,N)  ,NSENSOR    ,SENSORS%SENSOR_TAB ,IGRSURF   ,
-     4      FR_MV      ,IADS(I87I) ,
+     4      FR_MV      ,IADS(I87I) ,SICONTACT,SPORO           ,
      5      FSKY       ,ICONTACT   ,WA(N0)         ,IPARG     ,
      6      ELBUF_TAB  ,GEO        ,IGEO           ,
      7      PM         ,IPM        ,IPART          ,IPART(K3) ,
      8      IPART(K8)  ,IGROUPC    ,IGROUPTG       ,FEXT      ,
-     9      2          ,H3D_DATA   ,T_MONVOL)
+     9      2          ,H3D_DATA   ,T_MONVOL,frontier_global_mv)
 
 
           CALL TRACE_OUT(11)
@@ -5628,7 +5680,7 @@ C===============================================================================
      7         NATIV_SMS,DMINT2,ANIN(NDAMA2+1),NB_FRI2M ,FR_LOCI2M,
      8         DT2T  ,NELTST ,ITYPTST   ,INTERFACES%INTBUF_TAB ,TEMP     ,MCP   ,
      9         FTHE  ,CONDN  ,
-     A         H3D_DATA,T2FAC_SMS,FANI(1,NFNCA2+1),FANI(1,NFTCA2+1)) 
+     A         H3D_DATA,T2FAC_SMS,FANI(1,NFNCA2+1),NPCONT2)
           ENDDO
           IF (IMONM > 0) CALL STOPTIME(28,1)
           IF (IMON>0) THEN
@@ -6470,6 +6522,8 @@ C Exchange Time Step
         IF (IMONM > 0) CALL STOPTIME(55,1)
       ENDIF
 #endif
+! reducing dt2 due to /INIVEL
+      IF(LOADS%NINIVELT_G>0) CALL INIVEL_DT2(LOADS%NINIVELT,LOADS%INIVELT,SENSORS,TT , DT2 ,NSPMD)
 C-----------------------------
       IF (IMONM > 0) CALL STARTIME(53,1)
         DT2OLD=DT2
@@ -6879,7 +6933,7 @@ C-----------------------------------------------
         ENDIF
         
         CALL ACCELE(A       ,AR      ,V    ,MS     ,IN     ,
-     2              NODFTSK ,NODLTSK ,ALE%GLOBAL%SNALE ,ALE_CONNECTIVITY%NALE   ,MS_2D  ,
+     2              ALE%GLOBAL%SNALE ,ALE_CONNECTIVITY%NALE   ,MS_2D  ,
      3              SIZE_NPBY,NPBY   )
 C
         IF(IPLYXFEM > 0 )
@@ -8181,7 +8235,7 @@ C===============================================================================
      .          IPM         ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,  
      .          X           ,V         ,W           ,ALE_CONNECTIVITY,  
      .          NERCVOIS    ,NESDVOIS  ,LERCVOIS    ,LESDVOIS,  
-     .          N0PHAS, NVPHAS, STACK       ,           
+     .          M51_N0PHAS, M51_NVPHAS, STACK       ,
      .          IPART(K3:K4-1),IPART(K1:K2-1) ,IPART(K8:K9-1),IPART(K1:K2-1), 
      .          D           , MULTI_FVM ,  
      .          MAT_ELEM%MAT_PARAM, FANI_CELL)
@@ -8378,7 +8432,6 @@ C Regular animation
         
         IF(DEBUG(MACRO_DEBUG_CHKSM) >0) THEN
           IF(MOD(NCYCLE,DEBUG(MACRO_DEBUG_CHKSM)) == 0  ) THEN
-        ! Print checksum
           CALL SPMD_FLUSH_ACCEL(NCYCLE,  ISPMD,   NSPMD, NUMNOD,
      .                          NUMNODG, NUMNODM, A,     ITAB,
      .                          WEIGHT,  NODGLOB)
@@ -8433,7 +8486,8 @@ C Regular animation
      r   FANI(1,NFNCA2+1),FANI(1,NFTCA2+1),IBCL        ,ILOADP         ,LLOADP        ,
      s   LOADP         ,TAGNCONT       ,LOADP_HYD_INTER,FORC           ,DRAPEG        ,
      t   USER_WINDOWS  ,OUTPUT         ,DT             ,OUTPUT%TH%TH_SURF%CHANNELS    ,
-     u   TABLE         ,LOADS          ,SFANI          ,IPARIT         ,X_C           )
+     u   TABLE         ,LOADS          ,SFANI          ,IPARIT         ,X_C           ,
+     v   SZ_NPCONT2    ,NPCONT2)
 C
         IF((MSTOP == 1 .AND. ICTLSTOP == 0) .OR. MSTOP == 2 .OR. DT2<=ZERO)THEN
           CALL SORTIE_ERROR(
@@ -8780,7 +8834,7 @@ C         VITESSES
 C-----------------
           CALL VITESSE(
      1                 A      , AR     , V   , VR   , FZERO,
-     2                 NODFTSK, NODLTSK, ITAB,ALE_CONNECTIVITY%NALE             )
+     2                  ITAB,ALE_CONNECTIVITY%NALE             )
 c        
         IF (NLOC_DMG%IMOD > 0) THEN
 c
@@ -8803,6 +8857,27 @@ C
 CC
 !$OMP END PARALLEL
 
+! inivel w/ Tstart or sensor
+        IF (LOADS%NINIVELT > 0) THEN
+           IF (N2D == 0) THEN
+              SIZE = NUMELS + NSVOIS
+           ELSE
+              SIZE = NUMELQ + NUMELTG             
+           ENDIF
+          CALL INIVEL_START(                                               
+     .                    NGRNOD,  NGRBRIC,    NGRQUAD,       NGRSH3N,           
+     .                    IGRNOD,  IGRBRIC,    IGRQUAD,       IGRSH3N,          
+     .                    NUMSKW,    LSKEW,    NUMFRAM,       SENSORS,
+     .                    XFRAME,SKEWS%SKEW,         X,             V,
+     .                        VR,   NUMNOD,      VFLOW,         WFLOW,
+     .                         W,MULTI_FVM,      IALE ,       IALELAG,
+     .                        TT,   IRODDL, LOADS%NINIVELT,LOADS%INIVELT,
+     .                     NPARG,   NGROUP,       SIZE,         IPARG, 
+     .                 ELBUF_TAB,       MS,         IN,        WEIGHT,
+     .                   NXFRAME,   T_KIN ) 
+          TFEXT = TFEXT + T_KIN
+        END IF 
+!        
 C----------------------------------
 C       ITET2 of S10 Kinematic
 C----------------------------------
@@ -8847,7 +8922,7 @@ C===============================================================================
           NODLTSK   = (ITSK+1)*NUMNOD/NTHREAD
 
           CALL DEPLA(V      ,D      ,X  ,VR   ,DR    ,
-     2               NODFTSK,NODLTSK,XDP,DDP)
+     2               XDP,DDP,NUMNOD)
 C
           CALL DEPLAFAKEIGE(X ,V ,INTERFACES%INTBUF_TAB, KXIG3D,
      2                      IXIG3D,IGEO, KNOT, WIGE,
@@ -9085,8 +9160,14 @@ C===============================================================================
             END IF
             IF ( NCYCLE>=DEBSTART .AND.
      .           MOD(NCYCLE-DEBSTART,RSTFREQ)==0 ) THEN
-                CALL SPMD_COLLECT_MULTI_FVM(IXS,MULTI_FVM)
+                CALL SPMD_COLLECT_MULTI_FVM(IXS,MULTI_FVM,1)
             ENDIF
+        ENDIF
+        IF(DEBUG(MACRO_DEBUG_CHKSM) >0) THEN
+          IF(MOD(NCYCLE,DEBUG(MACRO_DEBUG_CHKSM)) == 0  ) THEN
+                CALL SPMD_COLLECT_MULTI_FVM(IXS,MULTI_FVM,2)
+
+          ENDIF
         ENDIF
       ENDIF
 C========================================================================================
@@ -9648,6 +9729,7 @@ C
         IF(INTPLYXFEM > 0)DEALLOCATE(PLYSKYI%FSKYI)
         DEALLOCATE(PLY, PLYSKY)
         DEALLOCATE(FEXT)
+        DEALLOCATE(NPCONT2)
 C
 C Deallocte AMS / POFF
         IF(ALLOCATED(FR_LOC))DEALLOCATE (FR_LOC)

@@ -33,14 +33,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_option_read_mod        ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod               ../starter/share/message_module/message_mod.F
       !||    r2r_mod                   ../starter/share/modules1/r2r_mod.F
+      !||    reader_old_mod            ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod              ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_FRICTION_MODELS(
-     1        NOM_OPT   ,UNITAB     ,IGRPART     ,IPART     ,TAGPRT_FRIC,
+     1        NOM_OPT                ,UNITAB          ,IGRPART          ,IPART         ,TAGPRT_FRIC,
      2        TABCOUPLEPARTS_FRIC_TMP,TABCOEF_FRIC_TMP,INTBUF_FRIC_TAB  ,
-     .                                          NSETFRICTOT  ,
-     3        IFLAG   ,COEFSLEN, IORTHFRICMAX  ,IFRICORTH_TMP,NGRPF        ,
-     4        LENGRPF ,LENG    ,NSETMAX        ,LSUBMODEL )
+     .        NSETFRICTOT            ,
+     3        IFLAG                  ,COEFSLEN        ,IORTHFRICMAX     ,IFRICORTH_TMP ,NGRPF      ,
+     4        LENGRPF                ,LENG            ,NSETMAX          ,LSUBMODEL )
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -52,6 +53,7 @@ C-----------------------------------------------
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE READER_OLD_MOD , ONLY : IREC
 C-----------------------------------------------      
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

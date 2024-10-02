@@ -45,7 +45,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    eig1                             ../engine/stub/eig1.F
       !||    eigcond                          ../engine/stub/eigcond.F
       !||    eigp                             ../engine/stub/eigp.F
-      !||    freform                          ../engine/source/input/freform.F
       !||    funct_python_update_elements     ../engine/source/tools/curve/funct_python_update_elements.F90
       !||    genani                           ../engine/source/output/anim/generate/genani.F
       !||    genh3d                           ../engine/source/output/h3d/h3d_results/genh3d.F
@@ -121,6 +120,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    init_inivol_2d_polygons          ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
       !||    initia                           ../starter/source/elements/initia/initia.F
       !||    inivel                           ../starter/source/initial_conditions/general/inivel/inivel.F
+      !||    inivel_start                     ../engine/source/loads/general/inivel/inivel_start.F90
       !||    inivol_interf_mod                ../starter/share/modules1/inivol_mod.F
       !||    inivol_set                       ../starter/source/initial_conditions/inivol/inivol_set.F
       !||    int18_alloc                      ../engine/source/interfaces/int18/int18_alloc.F
@@ -218,7 +218,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod                     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||====================================================================
       MODULE MULTI_FVM_MOD
-      USE ELBUFDEF_MOD
+      USE ELBUFDEF_MOD ,ONLY: L_BUFEL_,BUF_EOS_
 #include "my_real.inc"
 
       ! --------------------------------------------------

@@ -47,7 +47,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sxfillopt              ../engine/source/elements/solid/solide10/sxfillopt.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
@@ -88,6 +89,7 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
       USE DT_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -163,7 +165,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,N,NF1,NF2,ILAY,IP,IR,IS,IT,NPTT,NPTS,NPTR,IFLAG,IBID
-      INTEGER IBIDON(1),ITET,NN_DEL,PID
+      INTEGER IBIDON(1),ITET,NN_DEL,PID,IMAT
 
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ), IPERM1(NPE),
      .IPERM2(NPE)
@@ -191,6 +193,7 @@ C-----------------------------------------------
      . SIGY(MVSIZ),ET(MVSIZ),GAMA(MVSIZ,6),
      . R1_FREE(MVSIZ),R3_FREE(MVSIZ),R4_FREE(MVSIZ),
      . TEMPEL(MVSIZ),DIE(MVSIZ),THEM(MVSIZ,NPE)
+      my_real, dimension(mvsiz) :: fheat
      
       ! Variables utilisees dans les routines solides uniquement (en arguments).
       INTEGER NC(MVSIZ,NPE)
@@ -282,7 +285,8 @@ c
       SZ_IX=NUMELQ+NUMELS+NSVOIS
       IBID   = 0
       IBIDON = 0
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
       NF1  = NFT+1
       NF2  = NF1-(NUMELS8+NUMELS10)
 C     
@@ -406,7 +410,7 @@ C-----------------------------
 C
 C         for heat transfert
 C
-          IF(JTHE < 0 ) THEN
+          IF (JTHE < 0 ) THEN
              CALL S20TEMPCG(1,NEL,NPE, NC,NI(1,IP),TEMP,TEMPEL)
           ENDIF             
 C------------------------------------------------------
@@ -447,7 +451,7 @@ C------------------------------------------------------
      .   numgeo,      numnod,      numels,  
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT,    fheat      )
 c     
           IF (ISTRAIN == 1) THEN 
             CALL SSTRA3(
@@ -480,13 +484,23 @@ C
 C-------------------------
 c    finite element heat transfert  
 C--------------------------
-          IF(JTHE < 0) THEN
-            CALL S20THERM(
-     1   NPE,       PM,        MXT,       NC,
-     2   VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
-     3   NI(1,IP),  DT1,       TEMP,      TEMPEL,
-     4   DIE,       THEM,      GBUF%OFF,  LBUF%OFF,
-     5   NEL)
+          IF (JTHE < 0) THEN
+            IMAT = MXT(1)
+            IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+              CALL S20THERM(
+     1             NPE,       PM,       IMAT,       NC,
+     2             VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
+     3             NI(1,IP),  DT1,       TEMP,      TEMPEL,
+     4             FHEAT,     THEM,      GBUF%OFF,  LBUF%OFF,
+     5             NEL)
+            ELSE
+              CALL S20THERM(
+     1             NPE,       PM,       IMAT,       NC,
+     2             VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
+     3             NI(1,IP),  DT1,       TEMP,      TEMPEL,
+     4             DIE ,      THEM,      GBUF%OFF,  LBUF%OFF,
+     5             NEL)
+            END IF
           ENDIF  
         ENDDO
        ENDDO

@@ -36,6 +36,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE NBADMESH(LSUBMODEL,NUMNUSR,UNITAB)
@@ -43,10 +44,12 @@ C----------------------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD   
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE READER_OLD_MOD , ONLY : LINE, IREC
+      USE USER_ID_MOD , ONLY : ID_LIMIT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -149,7 +152,7 @@ C
 C------
       IF(NADMESHSTAT > 0) IADMSTAT = 1
 
-      IF(IADMSTAT /= 0) ID_LIMIT_ADMESH=ID_LIMIT
+      IF(IADMSTAT /= 0) ID_LIMIT%ADMESH=ID_LIMIT%GLOBAL
 C------
 
 C--------------------------------------------------
@@ -330,12 +333,10 @@ C--------------------------------------------------
 C      CHECKS NODES & CNODES IDs
 C--------------------------------------------------  
       DO I=1,NUMNUSR
-          IF (ITAB(I) > ID_LIMIT_ADMESH
-     .        .AND. (ITAB(I) <  IDFT_NODE_AUTO.OR.
-     .               ITAB(I) >= IDLT_NODE_AUTO)) THEN
-              CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
-     .                    I1=ITAB(I),C1=LINE,C2='/NODE') 
-          ENDIF        
+        IF (ITAB(I) > ID_LIMIT%ADMESH
+     .   .AND. (ITAB(I) < ID_LIMIT%ADMESH_FT_NODE_AUTO .OR. ITAB(I) >= ID_LIMIT%ADMESH_LT_NODE_AUTO))THEN
+          CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,I1=ITAB(I),C1=LINE,C2='/NODE')
+        ENDIF
       ENDDO
       IF(ALLOCATED(SUBID_NODES)) DEALLOCATE(SUBID_NODES)
 C------
@@ -347,7 +348,7 @@ C------
 C     4-node shells
 C------        
       DO I=1,NUMELC
-            IF (IXC(NIXC,I)>ID_LIMIT_ADMESH) THEN       
+            IF (IXC(NIXC,I)>ID_LIMIT%ADMESH) THEN
             CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .            I1=IXC(NIXC,I),C1=LINE,C2='/SHELL') 
             ENDIF
@@ -360,7 +361,7 @@ C------
       IF(ALLOCATED(SH_THK)) DEALLOCATE (SH_THK)
 C------        
       DO I=1,NUMELTG
-            IF (IXTG(NIXTG,I)>ID_LIMIT_ADMESH) THEN       
+            IF (IXTG(NIXTG,I)>ID_LIMIT%ADMESH) THEN
             CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .            I1=IXTG(NIXTG,I),C1=LINE,C2='/SH3N')
             ENDIF

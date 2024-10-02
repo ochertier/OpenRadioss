@@ -65,7 +65,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod            ../engine/share/resol/initbuf.F
@@ -129,6 +130,7 @@ C-----------------------------------------------
       USE DT_MOD
       USE OUTPUT_MOD
       USE PRELOAD_AXIAL_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -767,7 +769,7 @@ C------------------------- Isolid=19 for Salim
      F         IGEO       ,XDP      ,VOLN      ,CONDN    ,CONDNSKY   ,
      G         D          ,IPRI     ,MAT_ELEM ,IBID,SNPC,STF,SBUFMAT,
      H         SVIS       ,NSVOIS   ,IDTMINS  ,IRESP,IDTMIN,MAXFUNC ,
-     I          USERL_AVAIL,heat_meca  )
+     I         USERL_AVAIL,heat_meca,DT       )
             ELSE
 C-------------------------
 C             SOLID HE8<->HE8
@@ -1153,7 +1155,8 @@ C----6---------------------------------------------------------------7---------8
      A        MS_2D      ,FSKYM   ,IPRI      ,MAT_ELEM  ,IBID,SBID,SNPC,
      B        STF,SBUFMAT,SVIS,NSVOIS,IDTMINS,IRESP,TT,DT1,      
      .        IDEL7NG,     IDEL7NOK,    IDTMIN,      MAXFUNC,IMON_MAT,
-     V        USERL_AVAIL, heat_meca,  impl_s,     idyna)
+     V        USERL_AVAIL, heat_meca,  impl_s,     idyna,
+     .        DT         )
           ELSE
 
             CALL QFORC2(ELBUF_TAB,NG   ,
@@ -1169,7 +1172,8 @@ C----6---------------------------------------------------------------7---------8
      C        MAT_ELEM,H3D_DATA%STRAIN,SBID,SNPC,STF,SBUFMAT,
      D        SVIS,NSVOIS,IRESP,TT,DT1,      
      .        IDEL7NOK,    IDTMIN,     MAXFUNC,  
-     .        IMON_MAT,USERL_AVAIL, heat_meca, impl_s,     idyna)
+     .        IMON_MAT,USERL_AVAIL, heat_meca, impl_s,     idyna,
+     .        DT      )
 
           ENDIF
 C----6---------------------------------------------------------------7---------8
@@ -1202,7 +1206,8 @@ c
      8   GRTH,                IGRTH(OFF_IGRTH+NF1),MSTR(NF1),           DMELTR(NF1),
      9   IPRI,                IPM,                 NPC,                 TF,
      A   ITASK,               H3D_DATA,            NFT,                 MTN,
-     B   JSMS,                IGRE,                PRELOAD1,            STF_F )
+     B   JSMS,                IGRE,                PRELOAD1,            STF_F,
+     C   DT)
 C
              IF (NSECT > 0) THEN
               K0=NSTRF(25)
@@ -1269,7 +1274,7 @@ c
      G         SBUFMAT      ,SNPC                ,STF           ,NUMMAT     ,
      H         NUMGEO       ,IOUT                ,ISTDO         ,IDEL7NOK   ,
      I         IDYNA        ,IMCONV              ,IMPL_S        ,MAT_ELEM%MAT_PARAM,
-     J         PRELOAD1     ,STF_F  )
+     J         PRELOAD1     ,STF_F               ,DT            )
 C 
              IF (NSECT > 0) THEN
               K0=NSTRF(25)
@@ -1421,7 +1426,7 @@ c              K = 1+2*(NSECT+NRBODY+NRWALL)
      K   JSPH,                SNPC,                STF,                 SBUFMAT,
      L   SVIS,                NSVOIS,              IDTMINS,             IRESP,      
      M   IDEL7NG,             IDEL7NOK,            USERL_AVAIL,         heat_meca,
-     .   impl_s,      idyna)
+     .   impl_s,              idyna,               DT)
 
         ENDIF
             IF (IDDW>0) CALL STOPTIMEG(NG)

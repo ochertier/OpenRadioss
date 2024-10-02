@@ -94,6 +94,7 @@
       !||    sigeps121              ../engine/source/materials/mat/mat121/sigeps121.F
       !||    sigeps122              ../engine/source/materials/mat/mat122/sigeps122.F
       !||    sigeps124              ../engine/source/materials/mat/mat124/sigeps124.F
+      !||    sigeps125              ../engine/source/materials/mat/mat125/sigeps125.F90
       !||    sigeps126              ../engine/source/materials/mat/mat126/sigeps126.F90
       !||    sigeps187              ../engine/source/materials/mat/mat187/sigeps187.F
       !||    sigeps190              ../engine/source/materials/mat/mat190/sigeps190.F
@@ -150,11 +151,13 @@
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    constant_mod           ../common_source/modules/constant_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    prop_param_mod         ../common_source/modules/mat_elem/prop_param_mod.F90
       !||    sigeps100_mod          ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps125_mod          ../engine/source/materials/mat/mat125/sigeps125.F90
       !||    sigeps126_mod          ../engine/source/materials/mat/mat126/sigeps126.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
@@ -203,19 +206,22 @@
         &numgeo,      nummat,      numelq,      idtmin,&
         &dt1,         tt,          &
         &impl_s,&
-        &idyna,       userl_avail, nixs,        nixq)
+        &idyna,       userl_avail, nixs,        nixq,&
+        &dt)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-          use constant_mod
-          use table_mod
-          use mat_elem_mod
-          use ale_connectivity_mod
-          use message_mod
-          use nlocal_reg_mod
-          use sigeps100_mod
-          use sigeps126_mod
-          use prop_param_mod
+      use constant_mod
+      use table_mod
+      use mat_elem_mod
+      use ale_connectivity_mod
+      use message_mod
+      use nlocal_reg_mod
+      use sigeps100_mod
+      use sigeps125_mod
+      use sigeps126_mod
+      use prop_param_mod
+      use dt_mod
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -232,6 +238,7 @@
           type(t_ale_connectivity), intent(in)                          :: ale_connect
           type (mat_elem_) ,intent(inout) ,target                       :: mat_elem
           type (nlocal_str_),intent(inout)                              :: nloc_dmg
+          type (dt_), intent(in)                                        :: dt
 
           integer,intent(in) :: nixs
           integer,intent(in) :: nixq
@@ -467,7 +474,7 @@
 !
           character option*256
           integer size,nvareos,nvarvis
-          integer :: nrate
+          integer :: nrate,nodadt
           my_real :: fisokin
           my_real, dimension(nel), target :: vecnul
           my_real, dimension(:), pointer  :: sigbxx,sigbyy,sigbzz,sigbxy,sigbyz,sigbzx
@@ -493,14 +500,11 @@
           l_dmg    = elbuf_tab(ng)%bufly(ilay)%l_dmg
           l_planl  = elbuf_tab(ng)%bufly(ilay)%l_planl
           l_epsdnl = elbuf_tab(ng)%bufly(ilay)%l_epsdnl
+          nodadt = dt%nodadt
           ! make sure that the non-local variable increment is positive
           if (inloc > 0) then
             do i = 1,nel
-              if (off(i) == one) then
-                varnl(i) = max(varnl(i),zero)
-              else
-                varnl(i) = zero
-              endif
+              varnl(i)       = max(varnl(i),zero)
               lbuf%planl(i)  = lbuf%planl(i) + varnl(i)
               lbuf%epsdnl(i) = varnl(i)/max(dt1,em20)
             enddo
@@ -1968,6 +1972,14 @@
             &s1     ,s2     ,s3     ,s4     ,s5     ,s6     ,&
             &sigy   ,et     ,lbuf%dmg,deltax)
 !
+          elseif (mtn == 125) then 
+            call sigeps125(&
+            &nel      ,nuvar    ,uvar     ,matparam                     ,&
+            &rho0                                                       ,&
+            &es1      ,es2      ,es3      ,es4      ,es5      ,es6      ,&
+            &s1       ,s2       ,s3       ,s4       ,s5       ,s6       ,&
+            &ssp )
+!
           elseif (mtn == 126) then
             idev = 1
             call mstrain_rate(nel    ,israte ,asrate ,epsd   ,idev   ,&
@@ -1994,15 +2006,14 @@
             &ssp   ,vis   ,uvar  ,off   ,sigy  ,defp  ,&
             &dpla  ,et    ,ipm   ,mat   ,israte,&
             &yldfac,epsp  )
+! 
           elseif (mtn == 190) then !path dependent foam (dubois)
-
-            call sigeps190(nel ,nuvar,tt   ,rho ,&
-            &ep1 ,ep2 ,ep3 ,ep4  ,ep5  ,ep6 ,&
-            &s1  ,s2  ,s3  ,s4   ,s5   ,s6  ,&
-            &mfxx,mfxy,mfxz,mfyx ,mfyy ,mfyz,&
-            &mfzx ,mfzy,mfzz,&
-            &ssp ,vis ,uvar,&
-            &matparam%ntable,matparam,nvartmp, vartmp)
+            call sigeps190(nel   ,nuvar ,rho0  ,et    ,&
+            &ep1   ,ep2   ,ep3   ,ep4   ,ep5   ,ep6   ,&
+            &s1    ,s2    ,s3    ,s4    ,s5    ,s6    ,&
+            &mfxx  ,mfxy  ,mfxz  ,mfyx  ,mfyy  ,mfyz  ,&
+            &mfzx  ,mfzy  ,mfzz  ,ssp   ,vis   ,uvar  ,&
+            &matparam%ntable,matparam   ,nvartmp,vartmp)
 !
 !----------------------------------------
           endif  ! mtn

@@ -157,6 +157,7 @@
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
       !||    anim_mod               ../common_source/modules/output/anim_mod.F
       !||    constant_mod           ../common_source/modules/constant_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    mulaw_mod              ../engine/source/materials/mat_share/mulaw.F90
@@ -196,10 +197,10 @@
         &n2d,         th_strain,   ngroup,      tt,&
         &dt1,         ntable,      numelq,      nummat,&
         &numgeo,      numnod,      numels,            &
-        &idel7nok,    idtmin,      maxfunc,&
+        &idel7nok,    idtmin,      maxfunc    ,        &
         &imon_mat,    userl_avail, heat_meca,   impl_s,&
-        &idyna,       opt_mtn,      opt_jcvt,   opt_isorth,&
-        &opt_isorthg   )
+        &idyna,       dt,          fheat    ,   opt_mtn,     opt_jcvt,&
+        &opt_isorth,  opt_isorthg)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -212,6 +213,7 @@
           use ale_mod
           use mulaw_mod
           use constant_mod
+          use dt_mod
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -356,13 +358,15 @@
           my_real, dimension(mvsiz), intent(inout) :: die
           my_real, dimension(mvsiz), intent(inout) :: r3_dam
           my_real, dimension(mvsiz), intent(inout) :: r4_amu
-          target :: varnl,defp
+          my_real, dimension(mvsiz), intent(inout) :: fheat
+          target :: varnl,defp,tempel
 
           type(ttable) table(*)
           type (elbuf_struct_), target, dimension(ngroup) :: elbuf_tab
           type (nlocal_str_) :: nloc_dmg
           type (t_ale_connectivity), intent(in) :: ale_connect
-          type (mat_elem_) ,target ,intent(inout) :: mat_elem
+          type (dt_), intent(in) :: dt
+          type (mat_elem_) ,intent(inout) :: mat_elem
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -373,7 +377,7 @@
           integer ifunc(maxfunc)
 
           ! Float/Double
-          my_real facq0,e1,e2,e3,e4,e5,e6,alpha,t0,tm
+          my_real facq0,e1,e2,e3,e4,e5,e6,alpha,tref,tmelt
           my_real pnew(mvsiz)
           my_real psh(mvsiz)
           my_real p0(mvsiz)
@@ -381,7 +385,7 @@
           &       c3(mvsiz), c4(mvsiz), c5(mvsiz),c6(mvsiz),                    &
           &       einc(mvsiz), rho0(mvsiz),vol_avg(mvsiz),                      &
           &       df(mvsiz), pc(mvsiz),espe(mvsiz),tmu(mvsiz),                  &
-          &       tx(mvsiz)    ,ty(mvsiz)    ,tz(mvsiz)
+          &       tx(mvsiz)    ,ty(mvsiz)    ,tz(mvsiz) 
 
           my_real ss1(mvsiz),ss2(mvsiz), ss3(mvsiz),ss4(mvsiz),ss5(mvsiz),ss6(mvsiz)
           my_real r11(mvsiz),r12(mvsiz),r13(mvsiz),r21(mvsiz),r22(mvsiz),r23(mvsiz),r31(mvsiz),r32(mvsiz),r33(mvsiz)
@@ -424,6 +428,7 @@
           type(buf_eos_)  ,pointer :: ebuf
           my_real,&
           &dimension(:), pointer  :: uvarf,uparamf,dfmax,tdel,damini
+          my_real ,dimension(:), pointer  :: el_temp
 !     bolt preloading
           integer iboltp, nbpreld
           my_real,&
@@ -494,8 +499,8 @@
           ifailure = iparg(43,ng)
           jsms = iparg(52,ng)
           ipartsph = iparg(69,ng)
-
-
+          
+          fheat(:) = zero
 
 ! compatibility with deprecated law 20
           if(ilay < 0) then
@@ -578,14 +583,13 @@
 
 ! flag idel
           off_old(1:nel) = off(1:nel)
+
+          dpla(1:nel) = zero
 !
           if (jthe < 0) then
             die(1:nel) = lbuf%eint(1:nel)
-            dpla(1:nel) = zero
-          else
-            tstar(1:nel) = zero
-            dpla(1:nel) = zero
           endif
+!
 ! tangent module ratio (often w.r.t. g )
           et(1:nel) = one
 !----   iselect>0 : modified left cauchy-green  strain  saved in etotsh
@@ -616,7 +620,7 @@
           svis(1:nel,5)= zero
           svis(1:nel,6)= zero
 !
-          if(iparg(64,ng)/=0)then
+          if (iparg(64,ng) /= 0) then
             df(1:nel)      = one
             vol_avg(1:nel) = voln(1:nel)
           else
@@ -686,12 +690,19 @@
           end if
           rhosp(1:nel) =lbuf%rho(1:nel)
 ! --------------------------------------------------------
+!    storage used for element temperature (in Gauss points)
+! --------------------------------------------------------
+          if (jthe == 0 .and. elbuf_tab(ng)%bufly(ilay)%l_temp > 0) then
+            el_temp => lbuf%temp(1:nel) ! adiabatic conditions => element buffer 
+          else
+            el_temp => tempel(1:nel)    ! /heat/mat => local, from actualized nodal temperature
+          end if
+! --------------------------------------------------------
 !    thermal material istrope expansion
 ! --------------------------------------------------------
-
-          if((iexpan > 0).and.(jthe < 0).and.(tt/=zero)) then
-            if(ismstr==4) then
-              amu(1:nel)  = amu(1:nel) /(amu(1:nel) + one) ! to get amu = 1- rho0/rho
+          if (iexpan > 0 .and. jthe < 0 .and. tt/=zero ) then
+            if (ismstr==4) then
+              amu(1:nel)  = amu(1:nel) /(amu(1:nel) + one) ! to get amu = 1-rho0/rho
             endif
             if(ismstr==2) then
               do i=1,nel
@@ -721,14 +732,13 @@
           else
             epsth(1:nel)= zero
           endif
-!-----tstar computation for jonhson cook failure : t* = (t-t0)/(tm-t0)----
-          if (jthe < 0) then
-            t0 = pm(79, imat)
-            tm = pm(80, imat)
-            do i=1,nel
-              tstar(i)=max(zero,(tempel(i)-t0)/(tm-t0))
-            enddo
-          endif
+!
+!-----tstar computation for jonhson cook failure : t* = (t-tref)/(tmelt-tref) => move to JC routine
+          tref  = pm(79, imat)
+          tmelt = pm(80, imat)
+          do i=1,nel
+            tstar(i) = max(zero,(el_temp(i)-tref) / max((tmelt-tref),em20) )
+          enddo
 !-----------------------------------
 !     eos part1
 !-----------------------------------
@@ -840,14 +850,14 @@
             &d5,       d6,       pnew,     psh,&
             &qvis,     ssp_eq,   s1,       s2,&
             &s3,       s4,       s5,       s6,&
-            &jplasol,  sigy,     defp,     dpla,&
+            &sigy,     defp,     dpla,&
             &epsp,     tstar,    et,       mssa,&
-            &dmels,    tempel,   lbuf%sigb,al_imp,&
+            &dmels,    el_temp,  lbuf%sigb,al_imp,&
             &signor,   conde,    gbuf%dt,  gbuf%g_dt,&
             &nel,      ipm,      rhoref,   rhosp,&
             &ipg,      lbuf%dmg, ity,      jtur,&
             &jthe,     jsph,     ismstr,   jsms,&
-            &lbuf%epsq,npg )
+            &lbuf%epsq,npg ,mat_elem%mat_param(imat)%ieos ,dpdm  ,fheat )
 !----------------
             if (istrain > 0 .and.&
             &(h3d_strain == 1 .or. th_strain == 1 )) then
@@ -953,6 +963,7 @@
                 lbuf%stra(nel*(6-1) + i) = lbuf%stra(nel*(6-1) + i) + es6(i)
               enddo
             endif ! if (istrain > 0
+!
 !----------------
           elseif (mtn == 3) then
             call m3law(&
@@ -1629,7 +1640,7 @@
             &lbuf%off,   ngl,        nel,        nft,&
             &ilay,       npt,        ipg,&
             &jcvt,       jsph,       isorth,     lbuf%dmg,&
-            &elbuf_tab(ng)%bufly(ilay)%l_dmg)
+            &elbuf_tab(ng)%bufly(ilay)%l_dmg,gbuf%ierr)
 !
             if (jsph == 0) then
               call mqviscb(&
@@ -1805,7 +1816,8 @@
             &lbuf%forth, lbuf%visc,  nel,        gbuf%etotsh,&
             &iselect,    tstar,      lbuf%mu,    amu2,&
             &dpdm,       rhoref,     rhosp,      nloc_dmg,&
-            &ity,        jtur,       mat_elem,   idel7nok,svis)
+            &ity,        jtur,       mat_elem,   idel7nok,svis,&
+            &dt)
 !
           else   ! 'user type' radioss material laws
 !---
@@ -1858,13 +1870,13 @@
             &numgeo,      nummat,      numelq,      idtmin,&
             &dt1,         tt,&
             &impl_s,&
-            &idyna,       userl_avail, nixs,        nixq)
+            &idyna,       userl_avail, nixs,        nixq,&
+            &dt)
 
           endif
 !-----------------------------------
 !     eos part2
 !-----------------------------------
-!     if (mtn == 3.or.mtn == 4.or.mtn == 6.or.mtn==10.or.mtn==17.or.mtn == 49.or.mtn == 102.or.mtn == 103) then
           eostyp = mat_elem%mat_param(imat)%ieos
           if (eostyp > 0 .and. mtn /=12 ) then
             if (mtn /= 6 .and. mtn /= 17) then
@@ -1896,10 +1908,19 @@
 !
           if (jthe < 0) then
             heat_meca_l = zero
-            do i=1,nel
-              die(i) = (lbuf%eint(i)*lbuf%vol(i) - die(i)) * pm(90,imat)
-              heat_meca_l = heat_meca_l + die(i)
-            enddo
+            if (mat_elem%mat_param(imat)%heat_flag == 0) then  
+              ! internal energy is used as heat source by default
+              do i=1,nel
+                die(i) = lbuf%eint(i)*lbuf%vol(i) - die(i)
+                die(i) = die(i) * pm(90,imat)  ! mat_elem%mat_param(imat)%therm%efrac
+                heat_meca_l = heat_meca_l + die(i)
+              enddo
+            else   
+              ! exact dissipated energy is calculated by the material law as heat source 
+              do i=1,nel
+                heat_meca_l = heat_meca_l + fheat(i)*pm(90,imat)  ! mat_elem%mat_param(imat)%therm%efrac
+              enddo
+            end if
 !$omp critical
             heat_meca = heat_meca_l + heat_meca
 !$omp end critical
@@ -2068,11 +2089,7 @@
               ! -> copying the non-local plastic strain increment
               if (elbuf_tab(ng)%bufly(ilay)%l_pla > 0) then
                 do i = 1,nel
-                  if (off(i) == one) then
-                    varnl(i) = max(varnl(i),zero)
-                  else
-                    varnl(i) = zero
-                  endif
+                  varnl(i)       = max(varnl(i),zero)
                   lbuf%planl(i)  = lbuf%planl(i) + varnl(i)
                   lbuf%epsdnl(i) = varnl(i)/max(dt1,em20)
                   dpla(i) = max(varnl(i),zero)
@@ -2584,7 +2601,7 @@
                 e6=d6(i) *(-stor6+ss6(i))
                 eint(i)=lbuf%eint(i)*lbuf%vol(i)&
                 &+(e1+e2+e3+e4+e5+e6)*(voln(i)- half*dvol(i))*dt1*half
-                lbuf%eint(i)=eint(i)/max(lbuf%vol(i),em30)
+                lbuf%eint(i) = eint(i)/max(lbuf%vol(i),em20)
               end do
 !
               do i=1,nel
@@ -2655,7 +2672,7 @@
             end do
           end if
 !-----------------------------------------------------------------
-          if(iexpan > 0 .or. jthe <0) then
+          if (iexpan > 0 .or. jthe <0) then
             do i=1,nel
               if(off(i) == zero) cycle
               lbuf%temp(i) = tempel(i)

@@ -28,7 +28,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ancmsg                       ../engine/source/output/message/message.F
       !||    arret                        ../engine/source/system/arret.F
       !||    bcs0                         ../engine/source/constraints/general/bcs/bcs0.F
-      !||    build_msg                    ../common_source/tools/memory/my_alloc.F
+      !||    build_msg                    ../common_source/tools/memory/my_alloc.F90
       !||    cdk6bc3                      ../engine/source/elements/sh3n/coquedk6/cdk6bc3.F
       !||    check_message_definition     ../common_source/modules/check_mod.F
       !||    close_c                      ../common_source/tools/input_output/write_routtines.c
@@ -64,8 +64,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    read_c_c                     ../common_source/tools/input_output/write_routtines.c
       !||    resol_head                   ../engine/source/engine/resol_head.F
       !||    restalloc                    ../engine/source/output/restart/arralloc.F
-      !||    set_stack_values             ../engine/source/system/machine.F
       !||    setignorecore                ../engine/source/system/traceback_handler.c
+      !||    solver_stacksize             ../common_source/comm/stacksize.cpp
       !||    spmd_allreduce_db            ../engine/source/mpi/generic/spmd_allreduce_db.F
       !||    spmd_allreduce_int           ../engine/source/mpi/generic/spmd_allreduce_db.F
       !||    spmd_reduce_db               ../engine/source/mpi/generic/spmd_reduce_db.F
@@ -93,7 +93,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    diffusion_mod                ../engine/share/modules/diffusion_mod.F
       !||    drape_mod                    ../engine/share/modules/drape_mod.F
       !||    dsgraph_mod                  ../engine/share/modules/dsgraph_mod.F
-      !||    dt_mod                       ../engine/share/modules/dt_mod.F
+      !||    dt_mod                       ../engine/source/modules/dt_mod.F
       !||    dynlib_mod                   ../engine/share/modules/dynlib_mod.F
       !||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F
       !||    group_mod                    ../engine/share/modules/group_mod.F
@@ -458,7 +458,7 @@ C------------------------------------------------------------------
       NDSOLV=0
       NBUCK=0
       NRBE3L = 10
-      NRBE2L = 11
+      NRBE2L = 12
       NSMSPCG=0
       IUDYNAIN = 19833333
       ALEMUSCL_Param%I_MUSCL_OFF = 0
@@ -584,8 +584,8 @@ C Get Hardware characteristics before init // (system incompatible with infiniba
       CALL PRINTCPU(1)
 C Init NTHREAD(=NPROC) tasks
       CALL INIPAR(ITID,1,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
-C Hardcode KMP_STACKSIZE Environment variable
-      CALL SET_STACK_VALUES()
+C KMP_STACKSIZE/OMP_STACKSIZE Environment variable check
+      CALL SOLVER_STACKSIZE()
 C--------------------------------------------------
       HELAS=HALF
       HVISC=HALF
@@ -900,10 +900,6 @@ C Specific case with different number of threads per MPI domain
        CALL QAOPEN('engine')
       ENDIF
 C
-      IF (STACKSIZ>0 .AND. STACKSIZ<=512)THEN
-          CALL ANCMSG(MSGID=240,
-     .        ANMODE=ANINFO)
-      ENDIF
 
       CALL PRINTCPU(2)
 

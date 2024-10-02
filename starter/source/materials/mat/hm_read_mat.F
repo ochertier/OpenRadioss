@@ -73,6 +73,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat124            ../starter/source/materials/mat/mat124/hm_read_mat124.F
       !||    hm_read_mat125            ../starter/source/materials/mat/mat125/hm_read_mat125.F90
       !||    hm_read_mat126            ../starter/source/materials/mat/mat126/hm_read_mat126.F90
+      !||    hm_read_mat127            ../starter/source/materials/mat/mat127/hm_read_mat127.F90
       !||    hm_read_mat13             ../starter/source/materials/mat/mat013/hm_read_mat13.F
       !||    hm_read_mat14             ../starter/source/materials/mat/mat014/hm_read_mat14.F
       !||    hm_read_mat15             ../starter/source/materials/mat/mat015/hm_read_mat15.F
@@ -156,9 +157,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_option_read_mod        ../starter/share/modules1/hm_option_read_mod.F
       !||    hm_read_mat125_mod        ../starter/source/materials/mat/mat125/hm_read_mat125.F90
       !||    hm_read_mat126_mod        ../starter/source/materials/mat/mat126/hm_read_mat126.F90
+      !||    hm_read_mat127_mod        ../starter/source/materials/mat/mat127/hm_read_mat127.F90
       !||    hm_read_mat169_arup_mod   ../starter/source/materials/mat/mat169/hm_read_mat169.F90
       !||    law_user                  ../starter/source/user_interface/law_user.F
       !||    message_mod               ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod            ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod              ../starter/share/modules1/submodel_mod.F
       !||    table_mod                 ../starter/share/modules1/table_mod.F
       !||====================================================================
@@ -185,7 +188,10 @@ C-----------------------------------------------
       USE HM_READ_MAT169_ARUP_MOD
       USE HM_READ_MAT125_MOD
       USE HM_READ_MAT126_MOD
+      USE HM_READ_MAT127_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : nchartitle, ncharline
+      USE READER_OLD_MOD , ONLY : KCUR, KLINE, LINE, KEY0, KCUR
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_SSP0MAX, M51_LC0MAX, M51_TCP_REF, M51_lSET_IFLG6, M20_DISCRETE_FILL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -200,8 +206,6 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "scr17_c.inc"
-#include      "mmale20_c.inc"
-#include      "mmale51_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -225,7 +229,7 @@ C-----------------------------------------------
      .        MAXUPARAM,MAXFUNC,MAXTABL,IUNIT,IFLAGUNIT,K,NSUBMAT
       PARAMETER (MAXUPARAM = 1048576) 
       PARAMETER (MAXFUNC  = 128, MAXTABL = 9)
-      my_real :: RHO,RHO0,RHOR,YOUNG,NU,C1,G,SSP,ASRATE,RBID,RHO_MAX
+      my_real :: RHO,RHO0,RHOR,YOUNG,NU,BULK,G,SSP,ASRATE,RBID,RHO_MAX
       INTEGER ,DIMENSION(MAXFUNC) :: IFUNC
       INTEGER ,DIMENSION(MAXTABL) :: ITABLE
       my_real ,DIMENSION(:), ALLOCATABLE :: UPARAM
@@ -254,15 +258,14 @@ C-----------------------------------------------
       IUSER_LAW     = 0
       IMATVIS       = 0
       TRIMAT        = 0
-      lSET_51_IFLG6 = 0
-      lSET_51_IFLG6 = 0
+      M51_lSET_IFLG6 = 0
             
-      SSP0MAX       = ZERO
-      LC0MAX        = ZERO
-      TCP_REF       = ZERO
+      M51_SSP0MAX = ZERO
+      M51_LC0MAX  = ZERO
+      M51_TCP_REF = ZERO
 
       MULTI_FVM%IS_USED = .FALSE.
-      DISCRETE_FILL     = .FALSE.  ! BIMAT : PARTIAL FILL ENABLED BY DEFAULT
+      M20_DISCRETE_FILL = .FALSE.  ! BIMAT : PARTIAL FILL ENABLED BY DEFAULT
 c     
 C--------------------------------------------------
 C START BROWSING MODEL MATERIALS
@@ -357,24 +360,24 @@ c-------
           CASE ('LAW2','LAW02','PLAS_JOHNS','JOHNS')
             ILAW  = 2  
             CALL HM_READ_MAT02(
-     .                       UPARAM ,MAXUPARAM ,NUPARAM  ,NUVAR     ,IFUNC   ,
-     .                       MAXFUNC,NFUNC     ,PARMAT   ,IMATVIS   ,0       ,
+     .                       UPARAM ,MAXUPARAM ,NUPARAM  ,NUVAR     ,
+     .                       PARMAT   ,0         ,
      .                       UNITAB ,MAT_ID    ,TITR     ,LSUBMODEL ,MTAG    ,
      .                       PM(1,I),IPM(1,I)  ,ISRATE   ,MATPARAM  )
 c-------
           CASE ('ZERIL','PLAS_ZERIL')
             ILAW  = 2 
             CALL HM_READ_MAT02(
-     .                       UPARAM ,MAXUPARAM ,NUPARAM  ,NUVAR     ,IFUNC   ,
-     .                       MAXFUNC,NFUNC     ,PARMAT   ,IMATVIS   ,1       ,
+     .                       UPARAM ,MAXUPARAM ,NUPARAM  ,NUVAR     ,
+     .                       PARMAT   ,1         ,
      .                       UNITAB ,MAT_ID    ,TITR     ,LSUBMODEL ,MTAG    ,
      .                       PM(1,I),IPM(1,I)  ,ISRATE   ,MATPARAM  )
 c-------
           CASE ('PLAS_PREDEF')
             ILAW  = 2 
             CALL HM_READ_MAT02(
-     .                       UPARAM ,MAXUPARAM ,NUPARAM  ,NUVAR     ,IFUNC   ,
-     .                       MAXFUNC,NFUNC     ,PARMAT   ,IMATVIS   ,2       ,
+     .                       UPARAM ,MAXUPARAM ,NUPARAM  ,NUVAR     ,
+     .                       PARMAT   ,2       ,
      .                       UNITAB ,MAT_ID    ,TITR     ,LSUBMODEL ,MTAG    ,
      .                       PM(1,I),IPM(1,I)  ,ISRATE   ,MATPARAM  )
 c-------
@@ -1151,6 +1154,14 @@ c-------
      .           NUVAR    ,MTAG     ,MATPARAM ,NPROPM   ,IOUT     ,
      .           PARMAT   ,UNITAB   ,PM(1,I)  ,LSUBMODEL,ISRATE   ,
      .           MAT_ID   ,TITR     )
+C-------     
+          CASE ('LAW127','ENHANCED_COMPOSITE')
+            ILAW = 127
+            CALL HM_READ_MAT127(
+     .           NUVAR    ,MAXFUNC  ,NPROPM  , IOUT     , 
+     .           NFUNC    ,IFUNC    ,MTAG     ,PARMAT   ,UNITAB   ,
+     .           PM(1,I)  ,LSUBMODEL,ISRATE   ,MAT_ID   ,TITR     ,
+     .           MATPARAM ,NVARTMP  )     
 c-------
           CASE ('LAW151','MULTIFLUID')
             ILAW  = 151
@@ -1312,7 +1323,7 @@ c-----------------------------------------------------------------------
         ENDIF
 c--------------------------------------------      
         ISRATE = MAX(ISRATE, NINT(PARMAT(4)))  ! just in case ...
-        IF(ILAW/=2)ASRATE = PARMAT(5)*TWO*PI             ! ASRATE = 2*PI*FCUT
+        ASRATE = PARMAT(5)*TWO*PI              ! ASRATE = 2*PI*FCUT
 !!        IF (ASRATE == ZERO) ASRATE = EP20
 c--------------------------------------------      
         MATPARAM%ILAW   = ILAW
@@ -1324,11 +1335,11 @@ c--------------------------------------------
 c       for user type laws (lecmuser)
 c---------------------------------------------------------
         
-        IF (ILAW > 27 .and. ILAW /= 32 .and. ILAW /= 49 .and. ILAW /= 125 
+        IF (ILAW > 27 .and. ILAW /= 32 .and. ILAW /= 49 
      .     .and. ILAW /= 151 .AND. ILAW /= 999) THEN
           MTAG%L_STRA = 6        ! all user type laws calculate total strain
 c
-          C1    = PARMAT(1)
+          BULK  = PARMAT(1)
           YOUNG = PARMAT(2)
           NU    = PARMAT(3)
           G     = HALF*YOUNG/(ONE + NU)
@@ -1341,7 +1352,7 @@ c
           PM(21,I) = NU
           PM(22,I) = G
           PM(24,I) = YOUNG/(ONE - NU**2)
-          PM(32,I) = C1  
+          PM(32,I) = BULK  
           IF (ILAW==71 ) PM(27,I)=SQRT(YOUNG/MAX(PM(1,I),EM20))  ! Sound speed
 C---------
 C         For solid elements time step computation :
@@ -1392,9 +1403,9 @@ c
         IPM(1,I)   = MAT_ID
         IPM(2,I)   = ILAW
         IPM(3,I)   = ISRATE
-c
+!        
         PM(8,I)    = ISRATE          ! double stockage - a nettoyer
-        IF (PM(9,I) == ZERO.AND.ILAW /=2 ) PM(9,I) = ASRATE    ! old mat laws fill it directly
+        IF (PM(9,I) == ZERO) PM(9,I) = ASRATE  ! old mat laws fill it directly
         PM(19,I)   = ILAW + EM01     ! double stockage - a nettoyer
         PM(70,I)   = JTUR + EM01
         PM(71,I)   = JTHE + EM01
@@ -1402,26 +1413,42 @@ c
         IPM(217,I) = IUSER_LAW
 c---------------------------------------------------------
 c
-        IF (MATPARAM%RHO  > ZERO) PM(1 ,I) = MATPARAM%RHO
-        IF (MATPARAM%RHO0 > ZERO) PM(89,I) = MATPARAM%RHO0
-          
+        IF (MATPARAM%RHO   > ZERO) PM(1 ,I) = MATPARAM%RHO
+        IF (MATPARAM%RHO0  > ZERO) PM(89,I) = MATPARAM%RHO0
+!
+        IF (MATPARAM%YOUNG == ZERO) MATPARAM%YOUNG = PM(20,I)
+        IF (MATPARAM%NU    == ZERO) MATPARAM%NU    = PM(21,I)
+        IF (MATPARAM%SHEAR == ZERO) MATPARAM%SHEAR = PM(22,I)
+        IF (MATPARAM%BULK  == ZERO) MATPARAM%BULK  = PM(32,I)
+!
+        ! to be defined
+        ! IF (MATPARAM%STIFF_CONTACT == ZERO) MATPARAM%STIFF_CONTACT = PM(?,I)
+        ! IF (MATPARAM%STIFF_HGLASS  == ZERO) MATPARAM%STIFF_HGLASS  = PM(?,I)
+        ! IF (MATPARAM%STIFF_TSTEP   == ZERO) MATPARAM%STIFF_TSTEP   = PM(?,I)
+!---------------------------------------------------------
+        !  PM(100)=Bulk
+        !  pour interface type 7  K=PM(32) ...
+        !  pour interface type 20 K=PM(100)...  
+
+        IF (PM(100,I) == ZERO) PM(100,I) = PM(32,I) ! bulk used for interf 20 stiffness
+c---------------------------------------------------------
         RHOR = PM(1 ,I)
         RHO0 = PM(89,I)
         IF (RHOR == ZERO .AND. ILAW /= 37) THEN
           RHOR = RHO0
           PM(1,I) = RHOR
         ENDIF
-        IF(ILAW/=0 .AND. ILAW/=20 .AND. ILAW/=51 .AND. ILAW/=151 .AND. ILAW/=108 .AND. 
-     .     ILAW /= 999)THEN
-          IF(RHO0<=ZERO)THEN
-            CALL ANCMSG(MSGID=683,
-     .                  MSGTYPE=MSGERROR,
-     .                  ANMODE=ANINFO,
+!
+        IF (ILAW/=0 .AND. ILAW/=20 .AND. ILAW/=51 .AND. ILAW/=151 .AND. 
+     .      ILAW/=108 .AND. ILAW /= 999) THEN
+          IF (RHO0 <= ZERO) THEN
+            CALL ANCMSG(MSGID=683, MSGTYPE=MSGERROR, ANMODE=ANINFO,
      .                  I1=MAT_ID,
      .                  C1=TITR,
      .                  C2='DENSITY')
           ENDIF
         ENDIF
+!---------------------------------------------------------
 c
         IF (ISRATE >= 0) THEN
           IF (MTAG%G_EPSD == 0) MTAG%G_EPSD = 1
@@ -1431,19 +1458,15 @@ c
         !Sound Speed
         IF(MTAG%L_SSP == 0)MTAG%L_SSP = 1
 
+!---------------------------------------------------------
 C for QEPH (shell formulation)       
-        IF(IPM(2,I) /= 999)THEN ! IF ipm(2,) == 999 possible negative square root with PM(25)=CPE(gas)
+        IF (IPM(2,I) /= 999) THEN ! IF ipm(2,) == 999 possible negative square root with PM(25)=CPE(gas)
           PM(12,I) = SQRT(MAX(ZERO, PM(22,I)))    ! GSR
           PM(13,I) = SQRT(MAX(ZERO, PM(24,I)))    ! A11SR
           PM(14,I) = SQRT(MAX(ZERO, PM(25,I)))    ! A12SR
           PM(190,I)= SQRT(MAX(ZERO, PM(21,I)))    ! NUSR
         ENDIF  
-!PM(100)=Bulk
-!pour interface type 7  Ki=PM(32)*...
-!pour interface type 20 Ki=PM(100)*...        
-c
-        IF (PM(100,I) == ZERO) PM(100,I) = PM(32,I) ! bulk used for interf 20 stiffness
-C                       
+!                       
 C---------------  fin boucle sur les lois
       ENDDO   ! HM_NUMMAT
 C---------------   
@@ -1483,7 +1506,7 @@ C------------------------------
           !already done
           !law37  : see hm_read_mat37.F          
           !law51  : see hm_read_mat51.F & fill_buffer_51.F
-          !law151 : see m20dcod.F (user material ids are first converted into internal material ids in IPM(20+1:20+NSBUMAT)
+          !law151 : see m20dcod.F (user material ids are first converted into internal material ids in MAT_PARAM()%MULTIMAT%MID(1:NBMAT)
         ENDIF
       END DO
 

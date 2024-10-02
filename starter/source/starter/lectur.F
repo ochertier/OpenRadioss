@@ -96,6 +96,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fillcni2                            ../starter/source/spmd/domdec2.F
       !||    fixmodif_nd                         ../starter/source/elements/solid/solide10/dim_s10edg.F
       !||    flowdec                             ../starter/source/fluid/flowdec.F
+      !||    fractal_elem_renum                  ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
       !||    fsdcod                              ../starter/source/system/fsdcod.F
       !||    fvdim                               ../starter/source/airbag/fvmesh.F
       !||    fvmesh0                             ../starter/source/airbag/fvmesh0.F
@@ -129,6 +130,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_preread_imptemp                  ../starter/source/constraints/thermic/hm_preread_imptemp.F
       !||    hm_preread_impvel                   ../starter/source/constraints/general/impvel/hm_preread_impvel.F
       !||    hm_preread_impvel0                  ../starter/source/constraints/general/impvel/hm_preread_impvel0.F
+      !||    hm_preread_inivel                   ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
       !||    hm_preread_load_centri              ../starter/source/loads/general/load_centri/hm_preread_load_centri.F
       !||    hm_preread_load_pressure            ../starter/source/loads/general/load_pressure/hm_preread_load_pressure.F
       !||    hm_preread_merge                    ../starter/source/constraints/general/merge/hm_preread_merge.F
@@ -471,11 +473,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    drape_mod                           ../starter/share/modules1/drape_mod.F
       !||    dsgraph_mod                         ../starter/share/modules1/dsgraph_mod.F
       !||    elbuftag_mod                        ../starter/share/modules1/elbuftag_mod.F
+      !||    fractal_elem_renum_mod              ../starter/source/materials/fail/fractal/fractal_elem_spmd_renum.F90
       !||    front_mod                           ../starter/share/modules1/front_mod.F
       !||    func2d_mod                          ../starter/share/modules1/func2d_mod.F
       !||    fvbag_mod                           ../starter/share/modules1/fvbag_mod.F
       !||    group_mod                           ../starter/share/modules1/group_mod.F
       !||    hm_option_read_mod                  ../starter/share/modules1/hm_option_read_mod.F
+      !||    hm_preread_inivel_mod               ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
       !||    hm_read_preload_axial_mod           ../starter/source/loads/general/preload/hm_read_preload_axial.F90
       !||    inigrav                             ../starter/share/modules1/inigrav_mod.F
       !||    inimap1d_mod                        ../starter/share/modules1/inimap1d_mod.F
@@ -613,6 +617,8 @@ C-----------------------------------------------
       use constraint_mod , only : constraint_,alloc_constraint_struct,dealloc_constraint_struct
       use split_rwall_mod , only : split_rwall
       use stifint_icontrol_mod, only : stifint_icontrol
+      use fractal_elem_renum_mod
+      use hm_preread_inivel_mod, only : hm_preread_inivel
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -681,7 +687,6 @@ C-----------------------------------------------
 #include      "elbuf_c.inc"
 #include      "userlib.inc"
 #include      "drape_c.inc"
-#include      "mmale51_c.inc"
 #include      "thermal_c.inc"
 #include      "boltpr_c.inc"
 #include      "inigrav_c.inc"
@@ -1147,6 +1152,7 @@ c For /RANDOM --------------------------------------------------
       ! BCS wall structure
       TYPE (bcs_struct_), DIMENSION(NSPMD) :: BCS_PER_PROC
       ! -------------
+      INTEGER NINIVELT
 
 C MERGE NODES
       INTEGER NMERGE_NODE_CAND,NMERGE_NODE_DEST,NMERGE_TOT,ALE_EULER
@@ -1202,8 +1208,6 @@ c=======================================================================
       NXLAYMAX = 0   ! max layer nb in parts xfem
 C     /DAMP/VREL + RBY      
       NDAMP_VREL_RBY = 0
-C lic. Init
-      LIDFS = 0
 C bc heat
       NUMCONV = 0
       NFXTEMP = 0
@@ -4739,48 +4743,6 @@ C--------------------------------------------
       ALLOCATE(FSAV(SFSAV)  ,STAT=stat)
       FSAV = ZERO
       CALL TRACE_OUT1()
-C--------------------------------------------
-C     LECTURE DES VITESSES INITIALES
-C--------------------------------------------
-      ERR_MSG='INITIAL VELOCITIES'
-      ERR_CATEGORY='INITIAL VELOCITIES'
-      CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-C
-      IF(NRBODY > 0) THEN
-        ALLOCATE(RBY_INIAXIS(7,NRBODY))
-        RBY_INIAXIS = ZERO
-      ELSE
-        ALLOCATE(RBY_INIAXIS(0,0))
-      ENDIF
-C
-      IF(NINVEL/=0.OR.ISIGI>=3)THEN
-        SIWORK = NINVEL
-        ALLOCATE(IWORK(SIWORK)  ,STAT=stat)
-        IWORK = 0
-       WRITE(ISTDO,'(A)')TITRE(35)
-       ALLOCATE(FVM_INIVEL(NINVEL))
-       DO I = 1, NINVEL
-          FVM_INIVEL(I)%FLAG = .FALSE.
-       ENDDO
-C
-        CALL HM_READ_INIVEL(V         , W      , ITAB     , ITABM1 , VR         ,
-     .                      IGRNOD    , IGRBRIC, ISKWN    , SKEW   , IWORK      ,
-     .                      X         , UNITAB , LSUBMODEL, RTRANS , XFRAME     ,
-     .                      IFRAME    , VFLOW  , WFLOW    , KXSP   , MULTI_FVM  ,
-     .                      FVM_INIVEL, IGRQUAD, IGRSH3N  , RBY_MSN, RBY_INIAXIS)
-        CALL INIVEL(V, VR, SVR_1, ITABM1)
-C
-        IF(ALLOCATED(IWORK)) DEALLOCATE(IWORK)
-        NINVEL  = SIWORK
-C
-      ELSE
-        ALLOCATE(FVM_INIVEL(0:0))
-      ENDIF
-C
-      IF(ALLOCATED(RBY_MSN)) DEALLOCATE(RBY_MSN)
-C
-      CALL TRACE_OUT1()
-
 C     *****************************************************************    C
 C     Check if ALE or EULER materials are used with lagrangian thermics
 C     *****************************************************************    C
@@ -4974,6 +4936,53 @@ c
           ENDIF
       ENDIF
         ! -----------------
+      CALL TRACE_OUT1()
+
+C--------------------------------------------
+C     LECTURE DES VITESSES INITIALES
+C--------------------------------------------
+      ERR_MSG='INITIAL VELOCITIES'
+      ERR_CATEGORY='INITIAL VELOCITIES'
+      CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
+C
+      IF(NRBODY > 0) THEN
+        ALLOCATE(RBY_INIAXIS(7,NRBODY))
+        RBY_INIAXIS = ZERO
+      ELSE
+        ALLOCATE(RBY_INIAXIS(0,0))
+      ENDIF
+C
+      NINIVELT = 0  ! /INIVEL w/ T_start
+      IF(NINVEL > 0 ) CALL HM_PREREAD_INIVEL(LSUBMODEL,UNITAB,HM_NINVEL,NINIVELT)
+      LOADS%NINIVELT = NINIVELT
+      IF(NINVEL/=0.OR.ISIGI>=3)THEN
+        SIWORK = NINVEL
+        ALLOCATE(IWORK(SIWORK)  ,STAT=stat)
+        IWORK = 0
+       WRITE(ISTDO,'(A)')TITRE(35)
+       ALLOCATE(FVM_INIVEL(NINVEL))
+       DO I = 1, NINVEL
+          FVM_INIVEL(I)%FLAG = .FALSE.
+       ENDDO
+       ALLOCATE(LOADS%INIVELT(NINIVELT)  ,STAT=stat)
+C
+        CALL HM_READ_INIVEL(V         , W      , ITAB     , ITABM1 , VR         ,
+     .                      IGRNOD    , IGRBRIC, ISKWN    , SKEW   , IWORK      ,
+     .                      X         , UNITAB , LSUBMODEL, RTRANS , XFRAME     ,
+     .                      IFRAME    , VFLOW  , WFLOW    , KXSP   , MULTI_FVM  ,
+     .                      FVM_INIVEL, IGRQUAD, IGRSH3N  , RBY_MSN, RBY_INIAXIS,
+     .                      SENSORS   ,NINIVELT,LOADS%INIVELT)
+        CALL INIVEL(V, VR, SVR_1, ITABM1)
+C
+        IF(ALLOCATED(IWORK)) DEALLOCATE(IWORK)
+        NINVEL  = SIWORK
+C
+      ELSE
+        ALLOCATE(FVM_INIVEL(0:0))
+      ENDIF
+C
+      IF(ALLOCATED(RBY_MSN)) DEALLOCATE(RBY_MSN)
+C
       CALL TRACE_OUT1()
 
 C--------------------------------------------
@@ -5424,12 +5433,12 @@ C------------------------------------------------------------------------
       ERR_MSG='USER TO SYSTEM RENUMBERING'
       ERR_CATEGORY='INTERNAL'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-      CALL FSDCOD(BUFMAT   ,PM       ,GEO      ,IBCL      ,IPRES    ,
-     .            IBFV     ,ISKEW    ,ISKWN    ,SENSORS   ,
-     .            ITABM1   ,SKEW     ,LACCELM  ,BID13     ,BUFGEO   ,
+      CALL FSDCOD(BUFMAT   ,PM       ,GEO      ,IBCL      ,IPRES              ,
+     .            IBFV     ,ISKEW    ,ISKWN    ,SENSORS   ,MAT_ELEM%MAT_PARAM ,
+     .            ITABM1   ,SKEW     ,LACCELM  ,BID13     ,BUFGEO             ,
      .            IBCSLAG  ,IGEO     ,IPM      ,
      .            IBFTEMP  ,IBCV     ,IBFV      ,
-     .            IBCR     ,TABLE    ,NPC1     ,NPC       ,TF       ,
+     .            IBCR     ,TABLE    ,NPC1     ,NPC       ,TF                 ,
      .            NOM_OPT(LNOPT1*INOM_OPT(3)+1),IBFFLUX   )
 C
 c------------------------------------------------------------------------
@@ -5849,7 +5858,7 @@ C---------------------------
      .              C1='IPARG')
       ENDIF
 C     REMPLACEMENT DES NOS EXTERNES DES SS-MATERIAUX PAR LES NOS SYSTEMES
-      IF(IDDLEVEL == 0) CALL M20DCOD(MLAW_TAG,IPM, PM)
+      IF(IDDLEVEL == 0) CALL M20DCOD(MLAW_TAG,IPM, PM, MAT_ELEM%MAT_PARAM)
 C
 C adresse temporaire de DD_IAD
 C nombre de super groupes
@@ -6599,7 +6608,10 @@ C provisoire
       END IF
       NBR_GPMP = NGROUP
 
-
+c-----------------------------------------------------------------------
+c     element renumbering failure  by /fail/fractal 
+c-----------------------------------------------------------------------
+      call fractal_elem_renum(FAIL_FRACTAL  ,NUMELC  ,NUMELTG)
 c-----------------------------------------------------------------------
 c     set default material/property parameters by element group
 c-----------------------------------------------------------------------
@@ -7308,48 +7320,32 @@ C     INTERFACE READING
 C--------------------------------------------------------------
        NINTER25 = 0
        CALL HM_READ_INTERFACES(
-     1           IPARI    ,FRIGAP   ,NINTER   ,ITAB       ,ITABM1                      ,
-     2           IGRNOD   ,IGRSURF  ,IGRSLIN  ,IGRBRIC    ,IGRSH3N                     ,
-     3           IGRTRUSS ,NPC      ,ISKWN    ,XFILTR     ,STFAC                       ,
-     4           FRIC_P   ,I2RUPT   ,AREASL   ,UNITAB     ,NOM_OPT(LNOPT1*INOM_OPT(3)+1),
-     5           DEF_INTER,NPC1     ,SENSORS  ,MULTI_FVM ,NOM_OPT(LNOPT1*INOM_OPT(29)+1),
-     6           INTBUF_FRIC_TAB    ,IDDLEVEL ,LSUBMODEL  ,TF                          ,
-     7           KLOADPINTER        ,DGAPINT  ,INTERFACES)
+     1           IPARI           ,FRIGAP   ,ITAB       ,ITABM1     ,
+     2           IGRNOD          ,IGRSURF  ,IGRSLIN    ,IGRBRIC    ,IGRSH3N                       ,
+     3           IGRTRUSS        ,NPC      ,ISKWN      ,XFILTR     ,STFAC                         ,
+     4           FRIC_P          ,I2RUPT   ,AREASL     ,UNITAB     ,NOM_OPT(LNOPT1*INOM_OPT(3)+1) ,
+     5           DEF_INTER       ,NPC1     ,SENSORS    ,MULTI_FVM  ,NOM_OPT(LNOPT1*INOM_OPT(29)+1),
+     6           INTBUF_FRIC_TAB ,LSUBMODEL,TF         ,NPTS       ,NPARI                         ,
+     7           KLOADPINTER     ,DGAPINT  ,INTERFACES ,SITAB      ,NPARIR                        ,
+     8           SITABM1         ,SISKWN   ,LISKN      ,SNPC       ,SNPC1      )
 C
-
        IF(.NOT. ALLOCATED(ALE_CONNECTIVITY%NALE)) ALLOCATE(ALE_CONNECTIVITY%NALE(0))
 
-c       IF(NINTER25 /= 0)THEN
-c        DO N=1,NGROUP
-c          IF(IPARG(NPARG*(N-1)+43) >0.AND.IPARG(NPARG*(N-1)+5)==1)THEN
-c             INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 1
-c          ENDIF
-c        END DO
-c       END IF
-c       INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 1
-
-
-       CALL LECINT (IPARI       ,NINTER    ,IPM       ,BUFMAT   ,                                                 
-     .              NMNT        ,ITAB      ,ITABM1    ,GEO      ,                                                 
-     .              PM          ,X         ,IGRNOD    ,IGRSURF  ,IGRSLIN  ,                                       
-     .              NPC         ,PROBINT   ,LAG_NCF   ,                                                           
-     .              LAG_NKF     ,LAG_NCL   ,LAG_NKL   ,LAG_NHF  ,MAXRTM   ,                                       
-     .              ISKWN       ,MAXRTMS   ,IGEO      ,                                                           
-     .              XFILTR      ,STFAC     ,FRIC_P    ,FRIGAP   ,                                                 
-     .              I2RUPT      ,AREASL    ,UNITAB    ,IXS      ,NOM_OPT(LNOPT1*INOM_OPT(3)+1),                   
-     .              ITAG        ,IXC       ,IXTG      ,KNOD2ELC ,KNOD2ELTG,                                       
-     .              NOD2ELC     ,NOD2ELTG  ,KNOD2ELS  ,NOD2ELS  ,IXS10   ,                                        
-     .              IXS16       ,IXS20     ,DEF_INTER ,MAXNSNE  ,                                                 
+       CALL LECINT (IPARI       ,NINTER    ,IPM                           ,BUFMAT         ,
+     .              NMNT        ,ITAB      ,ITABM1                        ,GEO            ,
+     .              PM          ,X         ,IGRNOD                        ,IGRSURF        ,IGRSLIN  ,
+     .              NPC         ,PROBINT   ,LAG_NCF                       ,
+     .              LAG_NKF     ,LAG_NCL   ,LAG_NKL                       ,LAG_NHF        ,MAXRTM   ,
+     .              ISKWN       ,MAXRTMS   ,IGEO                          ,
+     .              XFILTR      ,STFAC     ,FRIC_P                        ,FRIGAP         ,
+     .              I2RUPT      ,AREASL    ,UNITAB                        ,IXS            ,NOM_OPT(LNOPT1*INOM_OPT(3)+1),
+     .              ITAG        ,IXC       ,IXTG                          ,KNOD2ELC       ,KNOD2ELTG,
+     .              NOD2ELC     ,NOD2ELTG  ,KNOD2ELS                      ,NOD2ELS        ,IXS10   ,
+     .              IXS16       ,IXS20     ,DEF_INTER                     ,MAXNSNE        ,
      .              NPC1        ,MULTI_FVM ,NOM_OPT(LNOPT1*INOM_OPT(29)+1),INTBUF_FRIC_TAB,            
-     .              IGRBRIC     ,IGRSH3N   ,IGRTRUSS  ,MAXRTM_T2,NSN_MULTI_CONNEC,           
-     .              T2_NB_CONNEC,IDDLEVEL ,ALE_CONNECTIVITY%NALE,INTERFACES)
+     .              IGRBRIC     ,IGRSH3N   ,IGRTRUSS                      ,MAXRTM_T2      ,NSN_MULTI_CONNEC,
+     .              T2_NB_CONNEC,IDDLEVEL  ,ALE_CONNECTIVITY%NALE         ,INTERFACES     ,SNPC1)
 
-c       IF(INTERFACES%PARAMETERS%INT25_EROSION_SOLID == 2) THEN
-c         INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 1
-c       ELSE
-c         INTERFACES%PARAMETERS%INT25_EROSION_SOLID = 0
-c       ENDIF
-C
        !need to allocate only once at first passage in lectur
        FLAG_ALLOCATE = 1
        !PROC argument is used only for call in ddsplit
@@ -7522,22 +7518,23 @@ c set INTERCEP for INT7 only to avoid bug with INT20 dur to renumerotation
 c in I20NLG (other interface types still done in SET_INTERCEP)
         CALL FILL_INTERCEP(IPARI,INTBUF_TAB,INTERCEP)
 C
-        CALL ININTR(IPARI     ,INSCR    ,X_C,V   ,IXS      ,IXQ      ,
-     2               IXC      ,PM       ,GEO     ,ITAB     ,MS       ,
-     3               IWORK    ,RWORK    ,IXTG    ,D        ,IXT      ,
-     4               IXP      ,IXR      ,ALE_CONNECTIVITY  ,NELEMINT ,IDDLEVEL ,
-     5               LIXINT   ,IGRBRIC  ,IWCONT  ,IWCIN2   ,KNOD2ELS ,
-     7               KNOD2ELC ,KNOD2ELTG,NOD2ELS ,NOD2ELC  ,NOD2ELTG ,
-     8               IGRSURF  ,IELEM21  ,SH4TREE ,SH3TREE  ,IPART    ,
-     9               IPARTC   ,IPARTG   ,THKE    ,THK_PART ,NOD2EL1D ,
-     A               KNOD2EL1D,IXS10    ,INTER_CAND,FRIGAP   ,IXS16    ,
-     B               IXS20    ,IPM      ,NOM_OPT(LNOPT1*INOM_OPT(3)+1),IPARTS,
-     C               KXX      ,IXX      ,IGEO    ,INTERCEP ,LELX     ,
-     D               INTBUF_TAB,FILLSOL ,STACK%PM,IWORKSH  ,NSNT     ,
-     E               NMNT_2   ,KXIG3D   ,IXIG3D  ,KNOD2ELQ ,NOD2ELQ  ,
-     F               SEGQUADFR,TAGPRT_FRIC,INTBUF_FRIC_TAB ,IPARTT   ,
-     G               IPARTP   ,IPARTX   ,IPARTR  ,NSN_MULTI_CONNEC ,T2_NB_CONNEC,
-     H               ICODE    ,ISKEW    ,MULTI_FVM,S_NOD2ELS)
+        CALL ININTR(IPARI      ,INSCR      ,X_C                          ,V                ,IXS         ,IXQ      ,
+     2               IXC       ,PM         ,GEO                          ,ITAB             ,MS          ,
+     3               IWORK     ,RWORK      ,IXTG                         ,D                ,IXT         ,
+     4               IXP       ,IXR        ,ALE_CONNECTIVITY             ,NELEMINT         ,IDDLEVEL    ,
+     5               LIXINT    ,IGRBRIC    ,IWCONT                       ,IWCIN2           ,KNOD2ELS    ,
+     7               KNOD2ELC  ,KNOD2ELTG  ,NOD2ELS                      ,NOD2ELC          ,NOD2ELTG    ,
+     8               IGRSURF   ,IELEM21    ,SH4TREE                      ,SH3TREE          ,IPART       ,
+     9               IPARTC    ,IPARTG     ,THKE                         ,THK_PART         ,NOD2EL1D    ,
+     A               KNOD2EL1D ,IXS10      ,INTER_CAND                   ,FRIGAP           ,IXS16       ,
+     B               IXS20     ,IPM        ,NOM_OPT(LNOPT1*INOM_OPT(3)+1),IPARTS           ,SISKWN      ,
+     C               KXX       ,IXX        ,IGEO                         ,INTERCEP         ,LELX        ,
+     D               INTBUF_TAB,FILLSOL    ,STACK%PM                     ,IWORKSH          ,NSNT        ,
+     E               NMNT_2    ,KXIG3D     ,IXIG3D                       ,KNOD2ELQ         ,NOD2ELQ     ,
+     F               SEGQUADFR ,TAGPRT_FRIC,INTBUF_FRIC_TAB              ,IPARTT           ,
+     G               IPARTP    ,IPARTX     ,IPARTR                       ,NSN_MULTI_CONNEC ,T2_NB_CONNEC,
+     H               SICODE    ,ICODE      ,ISKEW                        ,MULTI_FVM        ,S_NOD2ELS   ,
+     I               SITAB     ,SITABM1)
       IF(IDDLEVEL == 0) CALL STOPTIME(12,1)
       IF(IDDLEVEL == 1) CALL STOPTIME(13,1)
 
@@ -8210,10 +8207,10 @@ c
 C
       CALL ELBUF_INI(ELBUF_TAB,MAT_ELEM%MAT_PARAM,
      .               MLAW_TAG ,PROP_TAG ,FAIL_TAG ,
-     .               IGEO     ,IPM      ,PM       ,IPARG    ,IPART     ,
-     .               IPARTSP  ,IXS      ,IXQ      ,IXC      ,IXTG      ,
-     .               FLAG_XFEM,IPARTIG3D,STACK    ,IGEO_STACK,
-     .               IXT      ,IXP      ,IXR      ,KXX      ,GEO       ,
+     .               IGEO     ,IPM      ,PM       ,IPARG      ,IPART     ,
+     .               IPARTSP  ,IXS      ,IXQ      ,IXC        ,IXTG      ,
+     .               FLAG_XFEM,IPARTIG3D,STACK    ,IGEO_STACK ,
+     .               IXT      ,IXP      ,IXR      ,KXX        ,GEO       ,
      .               EOS_TAG  ,ISTR_24  ,IPRI     ,DEFAULTS)
 C---
 C  if xfem
@@ -9383,7 +9380,7 @@ c
          CALL INIEBCS(ALE_CONNECTIVITY, 1,IGRSURF, IXS, IXQ, IXTG,
      .        PM, IGEO, X, SENSORS, MONVOl, MULTI_FVM%IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
          !initialization
-        CALL INIEBCSP0(X, IPARG, ELBUF_TAB, EBCS_TAB, IXS, IXQ, IXTG, IPARTS, IPARTQ, IPARTG, PM, IPM)
+        CALL INIEBCSP0(X, IPARG, ELBUF_TAB, EBCS_TAB, IXS, IXQ, IXTG, IPARTS, IPARTQ, IPARTG, PM, IPM, MAT_ELEM%MAT_PARAM)
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
@@ -11236,7 +11233,6 @@ C-----------------------------------------------
 #include      "units_c.inc"
 #include      "warn_c.inc"
 #include      "param_c.inc"
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

@@ -71,6 +71,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    stoptime                    ../engine/source/system/timer.F
       !||    viscmain                    ../engine/source/materials/visc/viscmain.F
       !||--- uses       -----------------------------------------------------
+      !||    dt_mod                      ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod                ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    law_userso                  ../engine/source/user_interface/law_userso.F
       !||    mat_elem_mod                ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod                 ../engine/share/message_module/message_mod.F
@@ -116,7 +118,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Z   EPSTH,    SVISC,    NEL,      ETOTSH,
      1   ISELECT,  TSTAR,    MUOLD,    AMU2,
      2   DPDM,     RHOREF,   RHOSP,    NLOC_DMG,
-     3   ITY,      JTUR  ,   MAT_ELEM, IDEL7NOK,SVIS)
+     3   ITY,      JTUR  ,   MAT_ELEM, IDEL7NOK,SVIS,
+     4   DT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -126,6 +129,8 @@ C-----------------------------------------------
       USE MAT_ELEM_MOD            
       USE MESSAGE_MOD
       USE NLOCAL_REG_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -189,6 +194,7 @@ C
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (MAT_ELEM_)  ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -262,11 +268,7 @@ C=======================================================================
       ! Make sure that the non-local variable increment is positive
       IF (INLOC > 0) THEN 
         DO I = LFT,LLT
-          IF (OFF(I) == ONE) THEN
-            VARNL(I) = MAX(VARNL(I),ZERO)
-          ELSE
-            VARNL(I) = ZERO
-          ENDIF
+          VARNL(I)       = MAX(VARNL(I),ZERO)
           LBUF%PLANL(I)  = LBUF%PLANL(I) + VARNL(I)
           LBUF%EPSDNL(I) = VARNL(I)/MAX(DT1,EM20)
         ENDDO
@@ -896,7 +898,7 @@ C Fill Structure in dynamical library
      *         FPSZZ  ,MVSIZ ,FPSXY  ,MVSIZ ,FPSYZ  ,MVSIZ ,FPSZX  ,MVSIZ,
      *         FPSYX  ,MVSIZ ,FPSZY  ,MVSIZ ,FPSXZ  ,MVSIZ ,UPSXX  ,MVSIZ, 
      *         UPSYY  ,MVSIZ ,UPSZZ  ,MVSIZ ,UPSXY  ,MVSIZ ,UPSYZ  ,MVSIZ,
-     *         UPSXZ  ,MVSIZ ,EL_TEMP,MVSIZ ,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *         UPSXZ  ,MVSIZ ,EL_TEMP,MVSIZ ,DVOL   ,MVSIZ ,BID_ARR,SIZNUL,    
      *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
      *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
      *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
@@ -936,7 +938,7 @@ C Get back results from structure in user library
      
            IF(DLIBTKVERS >= 1301501260)THEN
              SIZNUL=0           
-             CALL ENG_USERLIB_SET_LAW_VAR_2(BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+             CALL ENG_USERLIB_SET_LAW_VAR_2(EL_TEMP,MVSIZ,BID_ARR,SIZNUL,
      *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
      *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
      *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,

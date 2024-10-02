@@ -21,18 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    hm_read_tria    ../starter/source/elements/reader/hm_read_tria.F
+      !||    hm_read_tria     ../starter/source/elements/reader/hm_read_tria.F
       !||--- called by ------------------------------------------------------
-      !||    lectur          ../starter/source/starter/lectur.F
+      !||    lectur           ../starter/source/starter/lectur.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    anodset         ../starter/source/output/analyse/analyse_node.c
-      !||    nintrn          ../starter/source/system/nintrn.F
-      !||    usr2sys         ../starter/source/system/sysfus.F
-      !||    vdouble         ../starter/source/system/sysfus.F
+      !||    ancmsg           ../starter/source/output/message/message.F
+      !||    anodset          ../starter/source/output/analyse/analyse_node.c
+      !||    nintrn           ../starter/source/system/nintrn.F
+      !||    usr2sys          ../starter/source/system/sysfus.F
+      !||    vdouble          ../starter/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
-      !||    submodel_mod    ../starter/share/modules1/submodel_mod.F
+      !||    message_mod      ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+      !||    submodel_mod     ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_TRIA(IXTG  ,ITAB   ,ITABM1 ,IPART  ,IPARTTG ,
      .                  PM    ,GEO    ,ICNOD  ,IGEO   ,IPM     ,
@@ -64,7 +65,9 @@ C   M o d u l e s
 C-----------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
+      USE READER_OLD_MOD , ONLY : LINE
+      USE USER_ID_MOD , ONLY : ID_LIMIT
 C--------------------------------------------------------
 C     LECTURE DES ELEMENTS 2D TRIANGULAIRES
 C--------------------------------------------------------
@@ -222,10 +225,10 @@ C--------------------------------------------------
             IPID=IPART(2,INDEX_PART)                                
             IXTG(1,I)=MT                                
             IXTG(5,I)=IPID
-            IF (IXTG(NIXTG,I)>ID_LIMIT)THEN
+            IF (IXTG(NIXTG,I)>ID_LIMIT%GLOBAL)THEN
                 CALL ANCMSG(MSGID=509,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                      I1=IXTG(NIXTG,I),C1=LINE,C2='/TRIA')
-            ELSEIF (NADMESH/=0.AND.IXTG(NIXTG,I)>ID_LIMIT_ADMESH)THEN
+            ELSEIF (NADMESH/=0.AND.IXTG(NIXTG,I)>ID_LIMIT%ADMESH)THEN
                 CALL ANCMSG(MSGID=1069,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                      I1=IXTG(NIXTG,I),C1=LINE,C2='/TRIA')
             ENDIF       

@@ -21,12 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    inimul   ../starter/source/ale/bimat/inimul.F
+      !||    inimul               ../starter/source/ale/bimat/inimul.F
       !||--- called by ------------------------------------------------------
-      !||    lectur   ../starter/source/starter/lectur.F
+      !||    lectur               ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
       !||====================================================================
       SUBROUTINE INIMUL(PM,F,DF)
-C
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MULTIMAT_PARAM_MOD , ONLY : M20_DISCRETE_FILL
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -37,13 +41,10 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "mmale20_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-C     REAL
-      my_real
-     .   PM(NPROPM,*), F(NUMNOD,*), DF(NUMNOD,*)
+      my_real PM(NPROPM,*), F(NUMNOD,*), DF(NUMNOD,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -54,7 +55,7 @@ C-----------------------------------------------
         DO N=1,NUMNOD
           IF(DF(N,M)==ZERO)CYCLE !N
           F(N,M)=TWO*F(N,M)/DF(N,M)-ONE
-          IF(DISCRETE_FILL)THEN
+          IF(M20_DISCRETE_FILL)THEN
             IF(F(N,M)<ZEP99.AND.F(N,M)>-ZEP99)F(N,M)=ZERO        
           ENDIF
           !remplissage partiel autorise mais check dans l'engine de alpd=zero

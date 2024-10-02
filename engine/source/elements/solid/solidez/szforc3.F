@@ -43,11 +43,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    s8sav3                 ../engine/source/elements/solid/solide/s8sav3.F
       !||    s8upd11t12             ../engine/source/elements/solid/solide/s8upd11t12.F
       !||    scoor_cp2sp            ../engine/source/elements/solid/solidez/scoor_cp2sp.F
-      !||    scre_sig3              ../engine/source/elements/solid/solide/scre_sig3.F
       !||    scumu3                 ../engine/source/elements/solid/solide/scumu3.F
       !||    scumu3p                ../engine/source/elements/solid/solide/scumu3p.F
       !||    sdefo3                 ../engine/source/elements/solid/solide/sdefo3.F
       !||    sdefot3                ../engine/source/elements/solid/solide/sdefot3.F
+      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
       !||    sdlen8                 ../engine/source/elements/solid/solidez/sdlen8.F
       !||    sdlen_sms              ../engine/source/elements/solid/solidez/sdlen_sms.F
@@ -85,11 +85,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    output_mod             ../common_source/modules/output/output_mod.F90
+      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sensor_mod             ../engine/share/modules/sensor_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
@@ -127,6 +129,8 @@ C-----------------------------------------------
       USE ALE_MOD
       USE DT_MOD
       USE OUTPUT_MOD
+      USE ELBUFDEF_MOD
+      USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -168,7 +172,7 @@ C-----------------------------------------------
       INTEGER IXS(NIXS,*),IPARG(NPARG,NGROUP), NPF(*),IADS(8,*),
      .        IPARTS(*),IPM(NPROPMI,NUMMAT),ITASK,IMATVIS,GRTH(*),IGRTH(*),
      .        IGEO(NPROPGI,*), TAGPRT_SMS(*)        
-      INTEGER NELTST,ITYPTST,OFFSET,NEL ,ICP, NDDIM,
+      INTEGER NELTST,ITYPTST,OFFSET,NEL ,ICP,
      .        NVC,ISTRAIN,IEXPAN,NG,NPTS,IOUTPRT,NALE(*),H3D_STRAIN
 
       DOUBLE PRECISION 
@@ -204,8 +208,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,LCO,NF1,IFLAG,ILAY,IPTR,IPTS,IPTT,II(6)
-      INTEGER IBID,IBIDV(1),ITET,IADBUF,IVISC,IP,NNOD
+      INTEGER I,J,NF1,IFLAG,ILAY,IPTR,IPTS,IPTT,II(6)
+      INTEGER IBID,IBIDV(1),ITET,IADBUF,IVISC,IP
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),INOD(8),
      .        IPOS(8), L_NLOC, INLOC,ICP0
       my_real
@@ -291,14 +295,14 @@ C 8-nodes solid connectivities
      .  MFZZ(MVSIZ),MFZX(MVSIZ),MFXZ(MVSIZ),
      .  TEMPEL(MVSIZ),THEM(MVSIZ,8),DIE(MVSIZ),
      .  SIGY(MVSIZ), SIGO(NEL,6),ET(MVSIZ), SIGN(NEL,6),
-     .  R1_FREE(MVSIZ),R3_DAM(MVSIZ),R4_FREE(MVSIZ),OFFG0(MVSIZ),AMU(MVSIZ),
+     .  R1_FREE(MVSIZ),R3_DAM(MVSIZ),OFFG0(MVSIZ),AMU(MVSIZ),
      .  XGXA(MVSIZ),XGYA(MVSIZ),XGZA(MVSIZ),
      .  XGXYA(MVSIZ),XGYZA(MVSIZ),XGZXA(MVSIZ),
      .  XGXA2(MVSIZ),XGYA2(MVSIZ),XGZA2(MVSIZ),
      .  STI_C(MVSIZ),LL(MVSIZ),L_MAX(MVSIZ),FLD(MVSIZ),
      .  CNS2,RHO0_1,NU,C1,CAQ,FQMAX
-      my_real, 
-     .  DIMENSION(:), POINTER :: EINT
+      my_real, dimension(mvsiz) :: fheat
+      my_real ,DIMENSION(:), POINTER :: EINT
 C-----
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -320,7 +324,8 @@ C=======================================================================
       NPTS = IPARG(6,NG) 
       INLOC = IPARG(78,NG)
       ALLOCATE(VAR_REG(NEL))   
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
       IBID = 0
       IBIDV = 0
       SZ_IX=NUMELQ+NUMELS+NSVOIS
@@ -508,7 +513,7 @@ C------
      .        GBUF%SMSTR,GBUF%OFF,NEL,VOLDP,JLAG)
         END IF
 C        
-        IF (IDT1SOL == 1) THEN
+        IF (IDT1SOL == 1.OR.(ISCTL>0.AND.NU0>0.48999)) THEN
           CALL SDLEN8(
      1   DELTAX,    VOLN,      IXS(1,NF1),X1,
      2   X2,        X3,        X4,        X5,
@@ -643,7 +648,7 @@ C  Total strain option doesn't change the reference configuration
       END IF !(ISMSTR == 2) THEN
 C
 C Element temperature
-      IF(JTHE < 0) THEN       
+      IF (JTHE < 0) THEN       
         DO I=1,NEL
           TEMPEL(I) = ONE_OVER_8 *(  TEMP(NC1(I)) + TEMP(NC2(I))  
      .                             + TEMP(NC3(I)) + TEMP(NC4(I)) 
@@ -723,7 +728,8 @@ C Compute stresses according to the material law
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,      
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,idyna   )
+     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   idyna,       DT         ,fheat     )
 
       IF (ISTRAIN == 1)THEN 
         CALL SSTRA3(
@@ -1080,17 +1086,31 @@ c===========================================================================
 c===========================================================================  
 C
 C Finite element heat transfert
-      IF(JTHE < 0) THEN
-        CALL STHERM(
-     1   PM,      MXT,     VOLN,    NC1,
-     2   NC2,     NC3,     NC4,     NC5,
-     3   NC6,     NC7,     NC8,     PX1,
-     4   PX2,     PX3,     PX4,     PY1,
-     5   PY2,     PY3,     PY4,     PZ1,
-     6   PZ2,     PZ3,     PZ4,     DT1,
-     7   TEMP,    TEMPEL,  DIE,     THEM,
-     8   GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
-     9   GBUF%VOL,NEL)
+      IF (JTHE < 0) THEN
+        IMAT = MXT(1)
+        IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+          CALL STHERM(
+     1         PM,      IMAT,    VOLN,    NC1,
+     2         NC2,     NC3,     NC4,     NC5,
+     3         NC6,     NC7,     NC8,     PX1,
+     4         PX2,     PX3,     PX4,     PY1,
+     5         PY2,     PY3,     PY4,     PZ1,
+     6         PZ2,     PZ3,     PZ4,     DT1,
+     7         TEMP,    TEMPEL,  FHEAT,   THEM,
+     8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
+     9         GBUF%VOL,NEL     ,NUMNOD )
+         ELSE
+          CALL STHERM(
+     1         PM,      IMAT,    VOLN,    NC1,
+     2         NC2,     NC3,     NC4,     NC5,
+     3         NC6,     NC7,     NC8,     PX1,
+     4         PX2,     PX3,     PX4,     PY1,
+     5         PY2,     PY3,     PY4,     PZ1,
+     6         PZ2,     PZ3,     PZ4,     DT1,
+     7         TEMP,    TEMPEL,  DIE,     THEM,
+     8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
+     9         GBUF%VOL,NEL     ,NUMNOD )
+         END IF
       ENDIF 
 C
 C Transform forces from convected frame to global frame
@@ -1108,17 +1128,12 @@ C----------------------------
 C     distorsion control  
 C----------------------------
       IF (ISCTL > 0) THEN  ! think about degenerated element
-         CNS2=ZEP05
-         C1 =PM(32,IMAT)+ONEP333*PM(22,IMAT)
-         FQMAX = EP03
-         IF (MTN==42.OR.MTN==69) FQMAX = EP02
-         DO I=LFT,LLT
-          LL(I) = VOLN(I)**THIRD
-          CAQ=CNS2*GBUF%RHO(I)*LL(I)
-          FLD(I)=FOURTH*CAQ*CXX(I)*OFF(I)
-          STI_C(I) = C1 * LL(I) *OFF(I)
-         ENDDO
-         CALL SCRE_SIG3(GBUF%SIG, C1, ISTAB,GBUF%OFF,ISMSTR ,NEL)
+         CALL SDISTOR_INI(                                      
+     1                NEL      ,STI_C    ,NPROPM     ,NUMMAT  ,       
+     2                ISMSTR   ,MXT      ,ISTAB      ,PM      ,       
+     3                GBUF%SIG ,GBUF%RHO ,CXX        ,OFF     ,       
+     4                GBUF%OFF ,LL       ,VOLN       ,FLD     ,       
+     5                CNS2     ,FQMAX    )
 C        get actual configuration from x(3,*) for small strain option
 !      xj now is the current config in global sys, xx0 is in global sys excepting ismstr=11 
          IF (ISMSTR == 1.OR.ISMSTR >= 11) 
@@ -1178,7 +1193,8 @@ C        get actual configuration from x(3,*) for small strain option
      .   F31,     F32,     F33,     F34,
      .   F35,     F36,     F37,     F38,
      .   STI,   STI_C,   FLD  ,    CNS2,
-     .   LL ,   ISTAB,   FQMAX,    NEL )
+     .   LL ,   ISTAB,   FQMAX,     NEL,
+     .   GBUF%EINT_DISTOR, DT1)
       ENDIF
 C----------------------------
 C

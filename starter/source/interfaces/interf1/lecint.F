@@ -21,29 +21,30 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    lecint                 ../starter/source/interfaces/interf1/lecint.F
+      !||    lecint                       ../starter/source/interfaces/interf1/lecint.F
       !||--- called by ------------------------------------------------------
-      !||    lectur                 ../starter/source/starter/lectur.F
+      !||    lectur                       ../starter/source/starter/lectur.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    i20surfi               ../starter/source/interfaces/inter3d1/i20surfi.F
-      !||    i24surfi               ../starter/source/interfaces/inter3d1/i24surfi.F
-      !||    i25surfi               ../starter/source/interfaces/inter3d1/i25surfi.F
-      !||    ingrbric               ../starter/source/interfaces/interf1/ingrbric.F
-      !||    ingrbric_dx            ../starter/source/interfaces/interf1/ingrbric_dx.F
-      !||    ingrbric_nodes         ../starter/source/interfaces/interf1/ingrbric_nodes.F
-      !||    inpoint                ../starter/source/interfaces/interf1/inpoint.F
-      !||    inslin                 ../starter/source/interfaces/interf1/inslin.F
-      !||    insurf                 ../starter/source/interfaces/interf1/insurf.F
-      !||    insurf23               ../starter/source/interfaces/interf1/insurf23.F
-      !||    insurf_dx              ../starter/source/interfaces/interf1/insurf_dx.F
-      !||    insurfigeo             ../starter/source/interfaces/interf1/insurfigeo.F
-      !||    nintri                 ../starter/source/system/nintrr.F
-      !||    presegmt               ../starter/source/interfaces/interf1/presegmt.F
+      !||    ancmsg                       ../starter/source/output/message/message.F
+      !||    fretitl2                     ../starter/source/starter/freform.F
+      !||    i20surfi                     ../starter/source/interfaces/inter3d1/i20surfi.F
+      !||    i24surfi                     ../starter/source/interfaces/inter3d1/i24surfi.F
+      !||    i25surfi                     ../starter/source/interfaces/inter3d1/i25surfi.F
+      !||    ingrbric                     ../starter/source/interfaces/interf1/ingrbric.F
+      !||    ingrbric_dx                  ../starter/source/interfaces/interf1/ingrbric_dx.F
+      !||    ingrbric_nodes               ../starter/source/interfaces/interf1/ingrbric_nodes.F
+      !||    inpoint                      ../starter/source/interfaces/interf1/inpoint.F
+      !||    inslin                       ../starter/source/interfaces/interf1/inslin.F
+      !||    insurf                       ../starter/source/interfaces/interf1/insurf.F
+      !||    insurf23                     ../starter/source/interfaces/interf1/insurf23.F
+      !||    insurf_dx                    ../starter/source/interfaces/interf1/insurf_dx.F
+      !||    insurfigeo                   ../starter/source/interfaces/interf1/insurfigeo.F
+      !||    inter1_check_ale_lag_sides   ../starter/source/interfaces/int01/inter1_check_ale_lag_sides.F90
+      !||    nintri                       ../starter/source/system/nintrr.F
+      !||    presegmt                     ../starter/source/interfaces/interf1/presegmt.F
       !||--- uses       -----------------------------------------------------
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    message_mod                  ../starter/share/message_module/message_mod.F
+      !||    r2r_mod                      ../starter/share/modules1/r2r_mod.F
       !||====================================================================
       SUBROUTINE LECINT(IPARI   ,LINTER  ,IPM     ,BUFMAT  ,
      .                  NMNT    ,ITAB    ,ITABM1  ,GEO     ,
@@ -58,7 +59,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  IXS16   ,IXS20   ,DEF_INTER,MAXNSNE,
      .                  NPC1    ,MULTI_FVM,NOM_OPTFRIC,INTBUF_FRIC_TAB,
      .                  IGRBRIC,IGRSH3N ,IGRTRUSS ,MAXRTM_T2,NSN_MULTI_CONNEC,T2_NB_CONNEC,
-     .                  IDDLEVEL,NALE   ,INTERFACES)
+     .                  IDDLEVEL,NALE   ,INTERFACES,SNPC1)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -87,27 +88,26 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
+      INTEGER,INTENT(IN) :: SNPC1 !< array size NPC1
+      TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB
       INTEGER,INTENT(IN)::IDDLEVEL
       INTEGER NOM_OPT(LNOPT1,*),MAXNSNE
       INTEGER LINTER,NMNT, LAG_NCF,LAG_NKF,
      .        LAG_NCL,LAG_NKL,LAG_NHF,MAXRTM,MAXRTMS, NBRIC
-      INTEGER IPARI(NPARI,NINTER), ITAB(NUMNOD), ITABM1(*),
-     .        NPC(*),ISKN(*),
+      INTEGER IPARI(NPARI,NINTER), ITAB(SITAB), ITABM1(SITABM1),
+     .        NPC(SNPC),ISKN(SISKWN),
      .        IGEO(NPROPGI,NUMGEO),IXS(NIXS,NUMELS),ITAG(*),
      .        IXC(*),IXTG(*),KNOD2ELC(*),KNOD2ELTG(*),
      .        NOD2ELC(*),NOD2ELTG(*),KNOD2ELS(*),NOD2ELS(*),
-     .        IXS10(6,*), IXS16(8,*), IXS20(12,*),DEF_INTER(*),
-     .        NPC1(*),NOM_OPTFRIC(LNOPT1,*),MAXRTM_T2,
+     .        IXS10(6,*), IXS16(8,*), IXS20(12,*),DEF_INTER(100),
+     .        NPC1(SNPC1),NOM_OPTFRIC(LNOPT1,*),MAXRTM_T2,
      .        T2_NB_CONNEC(*),NSN_MULTI_CONNEC
       INTEGER, INTENT(IN) :: NALE(NUMNOD)
       my_real
      .   GEO(NPROPG,NUMGEO), PM(*), XFILTR(*),STFAC(*),
-     .   FRIC_P(10,*),I2RUPT(6,*),FRIGAP(NPARIR,*),AREASL(*)
-      my_real
-     .   PROBINT
-      my_real
-     .   X(3,NUMNOD)
+     .   FRIC_P(10,NINTER),I2RUPT(6,NINTER),FRIGAP(NPARIR,NINTER),AREASL(*)
+      my_real PROBINT
+      my_real X(3,NUMNOD)
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(INTBUF_FRIC_STRUCT_) INTBUF_FRIC_TAB(*)
       INTEGER,INTENT(IN) :: IPM(NPROPMI,NUMMAT)
@@ -711,14 +711,18 @@ C--------------------------------------------
 C--------------------------------------------
           IF(IS1  /= 0) THEN
             IF(NRTS_FE == 0.AND.NRTS_IGE == 0.AND.IS1  /= 2.AND.IS1  /= 5) THEN
-              CALL ANCMSG(MSGID=118,  MSGTYPE=MSGERROR,  ANMODE=ANINFO, I1=ID, C1=TITR)
+              CALL ANCMSG(MSGID=118, MSGTYPE=MSGERROR, ANMODE=ANINFO, I1=ID, C1=TITR)
             ENDIF
             IF(IS1 == 1)THEN
               IF (NTYP == 3 .OR. NTYP == 6) IRS = IPARI(25,NI)
               SURF_NODES => IGRSURF(ISU1)%NODES(1:NRTS_FE,1:4)
-              CALL INSURF(NRTS_FE,NSN_FE,IRS,IRECTS,NOINT,
+              CALL INSURF(NRTS_FE,NSN_FE,IRS,IRECTS,
      .                    SURF_NODES,ITAB,NSV,ID,TITR,
-     .                    NTAG,S_NSV,S_IRECTS,X,TYPE18)
+     .                    NTAG,S_NSV,S_IRECTS,TYPE18)
+              IF (NTYP == 1)THEN
+                CALL INTER1_CHECK_ALE_LAG_SIDES(N2D, IGRSURF(ISU1)%ID, ID, TITR,
+     .                                          NUMNOD, ITAB, NRTS_FE, IRECTS, NALE, 'ALE', IDDLEVEL)
+              ENDIF
               IF (IGRSURF(ISU1)%NSEG_IGE >= 1) THEN
                 SURF_NODES_IGE => IGRSURF(ISU1)%NODES_IGE(1:NRTS_IGE,1:4)
                 IAD_IGE = IGRSURF(ISU1)%IAD_IGE               
@@ -795,9 +799,9 @@ C         SURFACE SECONDARY
             CALL ANCMSG(MSGID=118, MSGTYPE=MSGERROR, ANMODE=ANINFO, I1=ID, C1=TITR)
           ENDIF
           SURF_NODES => IGRSURF(ISU1)%NODES(1:NRTS,1:4)
-          CALL INSURF(NRTS,NSN,IRS,IRECTS,NOINT,
+          CALL INSURF(NRTS,NSN,IRS,IRECTS,
      .                SURF_NODES,ITAB,NSV,ID,TITR,
-     .                NTAG,S_NSV,S_IRECTS,X,TYPE18)
+     .                NTAG,S_NSV,S_IRECTS,TYPE18)
           IPARI(5,NI) = NSN
 C         SURFACE MAIN :
           IF(NRTM == 0) THEN
@@ -811,9 +815,9 @@ C--------------------------------------------
         ELSEIF ( NTYP == 22) THEN
 C--------------------------------------------
               SURF_NODES => IGRSURF(ISU2)%NODES(1:NRTM,1:4)
-              CALL INSURF(NRTM,NMN,IRM,IRECTM,NOINT,
+              CALL INSURF(NRTM,NMN,IRM,IRECTM,
      .                    SURF_NODES,ITAB,MSR,ID,TITR,
-     .                    NTAG,S_MSR,S_IRECTM,X,TYPE18)
+     .                    NTAG,S_MSR,S_IRECTM,TYPE18)
               IPARI(6,NI)  = NMN           !nombre de main node.
               IPARI(33,NI) = IGRSURF(ISU2)%NSEG ! nombre de facette main
               IPARI(4,NI)  = IGRSURF(ISU2)%NSEG
@@ -848,9 +852,13 @@ C--------------------------------------------
             ENDIF
             IF(IS2 == 1)THEN
               SURF_NODES => IGRSURF(ISU2)%NODES(1:NRTM_FE,1:4)
-              CALL INSURF(NRTM_FE,NMN_FE,IRM,IRECTM,NOINT,
+              CALL INSURF(NRTM_FE,NMN_FE,IRM,IRECTM,
      .                    SURF_NODES,ITAB,MSR,ID,TITR,
-     .                    NTAG,S_MSR,S_IRECTM,X,TYPE18)
+     .                    NTAG,S_MSR,S_IRECTM,TYPE18)
+              IF (NTYP == 1)THEN
+                CALL INTER1_CHECK_ALE_LAG_SIDES(N2D, IGRSURF(ISU2)%ID, ID, TITR,
+     .                                          NUMNOD, ITAB, NRTM_FE, IRECTM, NALE, 'LAG', IDDLEVEL)
+              ENDIF
               IF (IGRSURF(ISU2)%NSEG_IGE >= 1) THEN
               SURF_NODES_IGE => IGRSURF(ISU2)%NODES_IGE(1:NRTM_IGE,1:4)
               IAD_IGE = IGRSURF(ISU2)%IAD_IGE              
@@ -865,9 +873,9 @@ C--------------------------------------------
      .                    NTAG)
             ELSEIF(IS2 == 4) THEN
               SURF_NODES => IGRSURF(ISU2)%NODES(1:NRTM_FE,1:4)
-              CALL INSURF(NRTM_FE,NMN_FE,IRM,IRECTM,NOINT,
+              CALL INSURF(NRTM_FE,NMN_FE,IRM,IRECTM,
      .                    SURF_NODES,ITAB,MSR,ID,TITR,
-     .                    NTAG,S_MSR,S_IRECTM,X,TYPE18)
+     .                    NTAG,S_MSR,S_IRECTM,TYPE18)
               IF (IGRSURF(ISU2)%NSEG_IGE >= 1) THEN
               SURF_NODES_IGE => IGRSURF(ISU2)%NODES_IGE(1:NRTM_IGE,1:4)
               IAD_IGE = IGRSURF(ISU2)%IAD_IGE              

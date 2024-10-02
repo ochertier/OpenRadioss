@@ -32,6 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    vdouble           ../starter/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod       ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod    ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod      ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_SPRING(IXR   ,ITAB ,ITABM1,IPART,IPARTR,
@@ -58,7 +59,9 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
+      USE READER_OLD_MOD , ONLY : LINE
+      USE USER_ID_MOD , ONLY : ID_LIMIT
 C----------------------------------------------------------
 C     LECTURE ELEMENT RESSORT
 C     VERSION NUMEROTATION DES NOEUDS LIBRE/MARS 90/DIM
@@ -89,7 +92,7 @@ C INPUT ARGUMENTS
       INTEGER,INTENT(IN)::IGEO(NPROPGI,*)
       INTEGER,INTENT(IN)::ISKN(LISKN,*)
       INTEGER,INTENT(IN)::IPM(NPROPMI,*)
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
 C OUTPUT ARGUMENTS
       INTEGER,INTENT(OUT)::IXR(NIXR,*)
       INTEGER,INTENT(OUT)::IXR_KJ(5,*)
@@ -171,7 +174,7 @@ c
             IF (IXR_KJ(J,I)/=0) FLAG_KJ(I) = FLAG_KJ(I) + 1
           END DO   
 c      
-          IF (IXR(NIXR,I)>ID_LIMIT) THEN
+          IF (IXR(NIXR,I)>ID_LIMIT%GLOBAL) THEN
             CALL ANCMSG(MSGID=509,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                  I1=IXR(NIXR,I),C1=LINE,C2='/SPRING')
           ENDIF

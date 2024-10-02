@@ -209,6 +209,8 @@ C-----------------------------------------------
       USE RANDOM_WALK_DEF_MOD
       USE DEFAULTS_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE ELBUFDEF_MOD
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_LC0MAX, M51_SSP0MAX, M51_TCP_REF, M51_lSET_IFLG6, M51_IFLG6, M51_ILOOP_NRF
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -239,7 +241,6 @@ C-----------------------------------------------
 #include      "userlib.inc"
 #include      "sms_c.inc"
 #include      "boltpr_c.inc"
-#include      "mmale51_c.inc"
 #include      "titr_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
@@ -427,7 +428,7 @@ C                   1 2 3 4 5 6 7 8 9 10
      4              0,0,0,0,0,0,0,0,0,0/
 C=======================================================================
 
-      ILOOP_NRF51 = 0
+      M51_ILOOP_NRF = 0
       NVC = 0
       STAT = 0
 
@@ -589,6 +590,8 @@ C     solids
       SOLMAT(121)= 1
       SOLMAT(122)= 1
       SOLMAT(124)= 1
+      SOLMAT(125)= 1
+      SOLMAT(127)= 1
       SOLMAT(151)= 1
       SOLMAT(187)= 1
       SOLMAT(190)= 1
@@ -956,7 +959,7 @@ C Element types
      .              NPC, IPART, ILOADP,
      .              XREFS, GEO, PM, FACLOAD, PLD, SKEW, SIGI, BUFMAT, X, 
      .              WMA, PARTSAV, MS, V, MSS, MSSF, MSSA, MSNF, MCPS, ERROR_THROWN, DETONATORS,
-     .              DEFAULTS)
+     .              DEFAULTS, MAT_PARAM)
             ELSE
                IF (ISTOT == 1) THEN
                   CALL SGSAVINI(ISOLNOD,X,IXS(1,NFT+1),GBUF%SMSTR,NEL)
@@ -1192,7 +1195,7 @@ C Case total strain
      B              XREFS        ,NPC          ,PLD    ,MSSA       ,STRSGLOB(NF1),
      C              STRAGLOB(NF1),FAIL_INI     ,SPBUF  ,KXSP       ,IPART(I15J),
      D              NOD2SP       ,SOL2SPH      ,IRST   ,ILOADP     ,FACLOAD    , 
-     E              MULTI_FVM, ERROR_THROWN,DETONATORS)    
+     E              MULTI_FVM, ERROR_THROWN,DETONATORS, MAT_PARAM)
             ENDIF
            
             CALL SREFSTA3(
@@ -1256,19 +1259,20 @@ C Case total strain: conf_ref <- XREF
            ELSE  ! JMULT > 0
               IF (MTN == 20) THEN
                  CALL BINIT2(
-     .                ELBUF_TAB(NG),MS        ,IXQ        ,PM          ,X  ,   
-     .                DETONATORS   ,VEUL      ,ALE_CONNECTIVITY      ,IPARG(1,NG)  ,FILL,
-     .                SIGI         ,BUFMAT    ,NEL        ,
-     .                SKEW         ,MSQ       ,IPART      ,IPART(I15B),             
-     .                GEO          ,IGEO      ,IPM        ,                         
-     .                NSIGS        ,WMA       ,PTQUAD     ,NPC         ,PLD ,
-     .                IPARG        ,ILOADP    ,FACLOAD    ,PARTSAV     ,V   )
+     .                ELBUF_TAB(NG),MS        ,IXQ              ,PM           ,X    ,
+     .                DETONATORS   ,VEUL      ,ALE_CONNECTIVITY ,IPARG(1,NG)  ,FILL ,
+     .                SIGI         ,BUFMAT    ,NEL              ,MAT_PARAM    ,
+     .                SKEW         ,MSQ       ,IPART            ,IPART(I15B)  ,
+     .                GEO          ,IGEO      ,IPM              ,
+     .                NSIGS        ,WMA       ,PTQUAD           ,NPC          ,PLD  ,
+     .                IPARG        ,ILOADP    ,FACLOAD          ,PARTSAV      ,V   )
               ELSE IF (MTN == 151) THEN
 C 2D multifluid law
                  CALL MULTIFLUID_INIT2(NEL, NSIGS, 
      .                IPARG, IXQ, IPM, ALE_CONNECTIVITY, IGEO, IPART, IPART(I15B), NPC, 
      .                PTQUAD, ILOADP, X, PM, 
-     .                GEO, SIGI, SKEW, PLD, BUFMAT, FACLOAD, ELBUF_TAB(NG), ERROR_THROWN,DETONATORS) 
+     .                GEO, SIGI, SKEW, PLD, BUFMAT, FACLOAD, ELBUF_TAB(NG), ERROR_THROWN,DETONATORS,
+     .                MAT_PARAM)
               ELSE
                  CALL ARRET(2)
               ENDIF    
@@ -1342,7 +1346,7 @@ C 2D multifluid law
      2                DTELEM ,NFT        ,NEL      ,STIFN  ,PARTSAV,
      3                V      ,IPART(I15D),MST      ,STIFINT,STT    ,
      4                IGEO   ,NSIGTRUSS  ,SIGTRUSS ,PTTRUSS,
-     5                PRELOAD_A(IBOLTP),IBOLTP    )
+     5                PRELOAD_A,IBOLTP   ,NPRELOAD_A )
         !----------------------------------------!
         !   ITY == 5                        BEAM !
         !----------------------------------------!
@@ -1353,7 +1357,7 @@ C 2D multifluid law
      3                STIFN      ,STIFR    ,PARTSAV ,V       ,IPART(I15E),
      4                MSP        ,INP      ,IGEO    ,STIFINT ,STRP       ,
      5                NSIGBEAM   ,SIGBEAM  ,PTBEAM  ,IUSER   ,MCP        ,
-     6                MCPP       ,TEMP     ,PRELOAD_A(IBOLTP),IBOLTP    )
+     6                MCPP       ,TEMP     ,PRELOAD_A,IBOLTP ,NPRELOAD_A )
         !----------------------------------------!
         !   ITY == 6                      SPRING !
         !----------------------------------------!
@@ -1367,7 +1371,7 @@ C 2D multifluid law
      5                INR       ,STIFINT     ,STR(NFT+1),IGEO     ,SIGRS      ,
      6                NSIGRS    ,IMERGE2     ,IADMERGE2 ,MSRT(NFT+1),IXR_KJ   ,
      7                NOM_OPT(1,IOPT),STRR   ,PTSPRI    ,IPM       , PM     ,
-     8                BUFMAT    ,R_SKEW      ,PRELOAD_A(IBOLTP),IBOLTP    )          
+     8                BUFMAT    ,R_SKEW      ,PRELOAD_A ,IBOLTP    ,NPRELOAD_A)          
         !----------------------------------------!
         !   ITY == 7                SH3N or TRIA !
         !----------------------------------------!
@@ -1396,7 +1400,8 @@ C 2D multifluid law
           ELSEIF (MTN == 151 .OR. N2D > 0) THEN
              CALL MULTIFLUID_INIT2T(ELBUF_TAB(NG), NEL, NSIGS, NVC, IPARG, IXTG, ALE_CONNECTIVITY,
      .            IGEO, IPART, IPART(I15H), IPM, PTSH3N, NPC, ILOADP, 
-     .            X, PM, GEO, SIGI, SKEW, PLD, BUFMAT, FACLOAD, MULTI_FVM, ERROR_THROWN, DETONATORS)
+     .            X, PM, GEO, SIGI, SKEW, PLD, BUFMAT, FACLOAD, MULTI_FVM, ERROR_THROWN, DETONATORS,
+     .            MAT_PARAM)
           ELSE
            NULLIFY(ptr_ITAGE)
            IF (SITAGE > 0) ptr_ITAGE => ITAGE(NUMELC+1)  
@@ -1499,9 +1504,9 @@ C
 C-----------
       !loop over material initialisation done.
       !IF NRF outlet, print its automatic characteristic
-       IF(M51_IFLG6==1 .AND. lSET_51_IFLG6==1)THEN
+       IF(M51_IFLG6==1 .AND. M51_lSET_IFLG6==1)THEN
          !first initialization of group whose MAT=51 + iform=6
-         WRITE (IOUT,1001)LC0MAX,SSP0MAX,TCP_REF
+         WRITE (IOUT,1001)M51_LC0MAX,M51_SSP0MAX,M51_TCP_REF
        ENDIF
 
  1001 FORMAT(
@@ -1636,17 +1641,18 @@ C-----------------------------------------------------
 C-----------------------------------------------------
 C Option /INIVOL
 C-----------------------------------------------------
-      CALL INIT_INIVOL(  NUM_INIVOL,   inivol,   nsurf, igrsurf,
+      CALL INIT_INIVOL(  NUM_INIVOL,  inivol,   nsurf, igrsurf,
      .                   nparg    ,   ngroup,   iparg,  numnod, npart,
      .                   numels   ,     nixs,     ixs,
      .                   numeltg  ,    nixtg,    ixtg,
      .                   numelq   ,     nixq,     ixq,
      .                   x        , nbsubmat,    kvol,
      .                   elbuf_tab,  numels8,   xrefs,
-     .                   n2d      ,multi_fvm,  sipart, ipart,
+     .                   n2d      ,multi_fvm,  sipart, ipart  ,
      .                   i15a     ,i15b     ,    i15h, sbufmat,  bufmat,
-     .                   npropmi  ,nummat   ,     ipm , sbufsf,   bufsf,
-     .                   npropg   ,numgeo   ,     geo , mvsiz ,   skvol, itab)
+     .                   npropmi  ,nummat   ,     ipm,  sbufsf,   bufsf,
+     .                   npropg   ,numgeo   ,     geo, mvsiz  ,   skvol,    itab,
+     .                   mat_param)
 C---------------------------------
 C  Gravity (after INIVOL)
 C---------------------------------
@@ -2970,7 +2976,7 @@ C-----------------------------------------------
      .        IHBE,ISMSTR,ICPRE,JCVT,IINT,IHKT,ITET4,ITET10,IMATVIS,NPT,NLY,
      .        ICSTR,IDRIL,ITHK,IPLAS,I2GEO(NUMGEO),NG2,NG1,NG0,JG,ETYE,
      .        IH4,IH3,IGMAT,I2GEO1(NUMGEO),I2GEO2(NUMGEO),IHBE0,
-     .        IP,NFT,IP2NG1(NPART),IP2NG2(NPART),LST,ICONTROL
+     .        IP,NFT,IP2NG1(NPART),IP2NG2(NPART),LST,ICONTROL,IPOS
       my_real
      .   MAS,SM,XX,YY,ZZ,XY,YZ,ZX,XG,YG,ZG,
      .   IXX,IXY,IYY,IYZ,IZZ,IZX,EK,VX,VY,VZ,HM,HR,HF,DN,QA,QB,QH,
@@ -3110,6 +3116,7 @@ C-------We suppose the orders of IPART/IPARG are the same
         NPT =IGEO(4,IPID)
         IHBE0 =IGEO(10,IPID)
         ICONTROL = IGEO(97,IPID)
+        IPOS = IGEO(99,IPID)
 c        MID = IPM(2,IMID)
         NG0 = I2GEO(IPID)
         NG2=0
@@ -3350,7 +3357,7 @@ C-------- shell
           ITHK =IPARG(28,NG) 
           IPLAS =IPARG(29,NG) 
           IGMAT =IGEO(98,IPID)
-          NPT = IPARG(6,NG)
+          IF (NPT>1 .AND.(MID==1 .OR. MID==91)) NPT =0
           QF = ZERO
           QM = ZERO
           QR = ZERO
@@ -3375,18 +3382,18 @@ C           IF (IH4==0) IH4 =2
 C           MIXED CASE take directly defining in pid
             IH3 = IGEO(18,IPID) 
             IH4 = IGEO(10,IPID) 
-           WRITE(IOUT,'(A)') '  Ishell   Ish3n  Ismstr   Idril     NPT    ITHK   IPLAS'
-           WRITE(IOUT,'(7I8)')IH4,IH3,ISMSTR,IDRIL,NPT,ITHK,IPLAS
+           WRITE(IOUT,'(A)') '  Ishell   Ish3n  Ismstr   Idril     NPT    ITHK   IPLAS    IPOS'
+           WRITE(IOUT,'(8I8)')IH4,IH3,ISMSTR,IDRIL,NPT,ITHK,IPLAS,IPOS
           ELSEIF(ITY==3)THEN
             IH4 = IPARG(23,NG) 
            IF (IH4>4.OR.IH4==2) IH4 =IH4 +1
            IF (IH4==0) IH4 =2
-           WRITE(IOUT,'(A)') '  Ishell  Ismstr   Idril     NPT    ITHK   IPLAS'
-           WRITE(IOUT,'(6I8)')IH4,ISMSTR,IDRIL,NPT,ITHK,IPLAS           
+           WRITE(IOUT,'(A)') '  Ishell  Ismstr   Idril     NPT    ITHK   IPLAS    IPOS'
+           WRITE(IOUT,'(7I8)')IH4,ISMSTR,IDRIL,NPT,ITHK,IPLAS,IPOS           
           ELSE
             IH3 = IPARG(23,NG) 
-           WRITE(IOUT,'(A)') '   Ish3n  Ismstr   Idril     NPT    ITHK   IPLAS'
-           WRITE(IOUT,'(6I8)')IH3,ISMSTR,IDRIL,NPT,ITHK,IPLAS
+           WRITE(IOUT,'(A)') '   Ish3n  Ismstr   Idril     NPT    ITHK   IPLAS    IPOS'
+           WRITE(IOUT,'(7I8)')IH3,ISMSTR,IDRIL,NPT,ITHK,IPLAS,IPOS
           END IF
           IF (IH4>0.AND.IH4<=4) THEN
            QF = GEO(13,IPID)

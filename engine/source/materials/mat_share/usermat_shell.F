@@ -78,6 +78,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    urotov                       ../engine/source/airbag/uroto.F
       !||    xfem_crk_dir                 ../engine/source/elements/xfem/xfem_crk_dir.F
       !||--- uses       -----------------------------------------------------
+      !||    dt_mod                       ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod                 ../common_source/modules/failwave_mod.F
       !||    law_usersh                   ../engine/source/user_interface/law_usersh.F
       !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
@@ -105,7 +107,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      F       IXEL     ,ITHK     ,F_DEF    ,ISHPLYXFEM,                        
      G       ITASK    ,PM_STACK , ISUBSTACK,STACK    ,TSTAR    ,ALPE     ,
      H       PLY_EXX  ,PLY_EYY  ,PLY_EXY  ,PLY_EXZ   ,PLY_EYZ  ,PLY_F    ,
-     I       VARNL    ,NLOC_DMG ,NLAY_MAX ,LAYNPT_MAX)
+     I       VARNL    ,NLOC_DMG ,NLAY_MAX ,LAYNPT_MAX,DT       )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -117,6 +119,8 @@ C-----------------------------------------------
       USE FAILWAVE_MOD
       USE MESSAGE_MOD
       USE NLOCAL_REG_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -169,6 +173,7 @@ C-----------------------------------------------
       TYPE (FAILWAVE_STR_) ,TARGET :: FAILWAVE 
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (MAT_ELEM_) ,INTENT(INOUT) ,TARGET :: MAT_ELEM
+      TYPE (DT_) ,INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -239,6 +244,7 @@ c----
 c----
       LOGICAL :: LOGICAL_USERL_AVAIL
       LOGICAL :: FLAG_EPS,FLAG_EPSP,FLAG_ZCFAC
+      LOGICAL, DIMENSION(NEL) :: PRINT_FAIL
       CHARACTER*256 MDS_LIBNAME
       INTEGER LENGTH
 !
@@ -497,11 +503,7 @@ c
           ! -> Make sure the non-local increment is positive
           IF (INLOC > 0) THEN 
             DO I = JFT,JLT
-              IF (OFF(I) == ONE) THEN 
-                VARNL(I,IT)  = MAX(VARNL(I,IT),ZERO)
-              ELSE 
-                VARNL(I,IT)  = ZERO
-              ENDIF
+              VARNL(I,IT)    = MAX(VARNL(I,IT),ZERO)
               LBUF%PLANL(I)  = LBUF%PLANL(I) + VARNL(I,IT)
               LBUF%EPSDNL(I) = VARNL(I,IT)/MAX(DT1,EM20)
             ENDDO 
@@ -1453,23 +1455,26 @@ c
                 ENDDO
                 IF (IXFEM == 0) THEN
                   CALL FAIL_FLD_C(
-     1            NEL       ,NUPAR     ,NFUNC_FAIL   ,IFUNC_FAIL     ,
+     1            NEL       ,NUPAR     ,NFUNC_FAIL,IFUNC_FAIL ,
      2            NPF       ,TF        ,TT        ,UPARAMF    ,   
      3            NGL       ,IPG       ,ILAYER    ,IT         ,
      4            EPSXX     ,EPSYY     ,EPSXY     ,
-     5            ZT        ,OFF       ,FOFF      ,TDEL ,
-     6            FLD_IDX   ,DAM       ,DFMAX     )
+     5            DEPSXX    ,DEPSYY    ,DEPSXY    ,EL_PLA     ,
+     6            ZT        ,OFF       ,FOFF      ,TDEL       ,
+     7            FLD_IDX   ,DAM       ,DFMAX     ,DT1        ,
+     8            NIPAR     ,IPARAMF   ,NVARF     ,UVARF      )
                 ELSE
                   CALL FAIL_FLD_XFEM(                                      
-     1            NEL       ,NUPAR    ,NVARF    ,NFUNC_FAIL   ,IFUNC_FAIL    ,
-     2            NPF       ,TF       ,TT       ,UPARAMF  ,
-     3            NGL       ,IPT      ,MPT      ,SSP      ,TENSX     ,
-     4            SIGNXX    ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX    ,  
-     5            EPSXX     ,EPSYY    ,EPSXY    ,EPSYZ    ,EPSZX     ,  
-     6            UVARF     ,GBUF%NOFF,OFF      ,
-     7            ELCRKINI  ,IXFEM    ,IXEL     ,ILAYER   ,IT        ,  
-     8            OFFL      ,NPTT     ,UELR1    ,DFMAX    ,TDEL      ,
-     9            DAM       ,FLD_IDX  )
+     1            NEL       ,NUPAR     ,NVARF     ,NFUNC_FAIL,IFUNC_FAIL,
+     2            NPF       ,TF        ,TT        ,UPARAMF   ,
+     3            NGL       ,IPT       ,MPT       ,SSP       ,TENSX     ,
+     4            SIGNXX    ,SIGNYY    ,SIGNXY    ,SIGNYZ    ,SIGNZX    ,  
+     5            EPSXX     ,EPSYY     ,EPSXY     ,EPSYZ     ,EPSZX     ,  
+     6            UVARF     ,GBUF%NOFF ,OFF       ,
+     7            ELCRKINI  ,IXFEM     ,IXEL      ,ILAYER    ,IT        ,  
+     8            OFFL      ,NPTT      ,UELR1     ,DFMAX     ,TDEL      ,
+     9            DAM       ,FLD_IDX   ,NIPAR     ,IPARAMF   ,EL_PLA    ,
+     A            DEPSXX    ,DEPSYY    ,DEPSXY    ,DT1       )
                 ENDIF
 c
               CASE (9)     !    Xue_wierzbicki
@@ -1971,6 +1976,9 @@ c     FIN DE BOUCLE SUR POINTS INTEGRATION (LAYERS)
 c--------------------------------------------------
 c     TEST OF ELEMENT FAILURE 
 c--------------------------------------------------
+      ! Flag for printing element deletion message
+      PRINT_FAIL(1:NEL) = .TRUE.
+      ! Check element deletion from failure criterion
       IF (IFAILURE == 1 .and. IXFEM == 0) THEN
         IF (ORTH_DAMAGE == 1) THEN   ! /fail/alter + front_wave only
           TFAIL => GBUF%DMG(1+NEL:NEL*2)  ! only for /FAIL/ALTER          
@@ -1987,7 +1995,7 @@ c--------------------------------------------------
      .                       THK_LY   ,THKLY    ,OFF      ,STACK    ,
      .                       ISUBSTACK,IGTYP    ,FAILWAVE ,FWAVE_EL ,
      .                       NLAY_MAX ,LAYNPT_MAX,NUMGEO  ,NUMSTACK ,
-     .                       IGEO     )
+     .                       IGEO     ,PRINT_FAIL)
         ELSE
           CALL FAIL_SETOFF_NPG_C(
      .                       ELBUF_STR,MAT_ELEM ,GEO      ,PID(1)   ,
@@ -1996,10 +2004,11 @@ c--------------------------------------------------
      .                       OFF      ,NPG      ,STACK    ,ISUBSTACK, 
      .                       IGTYP    ,FAILWAVE ,FWAVE_EL ,NLAY_MAX ,
      .                       LAYNPT_MAX,NUMGEO  ,IPG      ,NUMSTACK ,
-     .                       IGEO     )
+     .                       IGEO     ,PRINT_FAIL)
         ENDIF
       ENDIF  
 c---
+      ! Checking element deletion and printing element deletion messages (if needed)
       NINDX = 0
       IF (IXFEM == 0) THEN
         DO I=JFT,JLT
@@ -2008,7 +2017,8 @@ c---
      .        OFF(I) > ZERO   .and. OFF(I) < ONE .and. DMG_FLAG == 1 .and. 
      .        DMG_GLOB_SCALE(I) < EM02) THEN  
             OFF(I) = ZERO
-            IF (NLAY > 1) THEN 
+            ! Printing message not always mandatory
+            IF (PRINT_FAIL(I)) THEN 
               NINDX  = NINDX + 1
               INDX(NINDX) = I
             ENDIF

@@ -296,6 +296,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat122                      ../starter/source/materials/mat/mat122/hm_read_mat122.F
       !||    hm_read_mat124                      ../starter/source/materials/mat/mat124/hm_read_mat124.F
       !||    hm_read_mat125                      ../starter/source/materials/mat/mat125/hm_read_mat125.F90
+      !||    hm_read_mat127                      ../starter/source/materials/mat/mat127/hm_read_mat127.F90
       !||    hm_read_mat13                       ../starter/source/materials/mat/mat013/hm_read_mat13.F
       !||    hm_read_mat14                       ../starter/source/materials/mat/mat014/hm_read_mat14.F
       !||    hm_read_mat15                       ../starter/source/materials/mat/mat015/hm_read_mat15.F
@@ -501,6 +502,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i12chk3                             ../starter/source/interfaces/inter3d1/i12chk3.F
       !||    i12sol3                             ../starter/source/interfaces/inter3d1/insol3.F
       !||    i12tid3                             ../starter/source/interfaces/inter3d1/i12tid3.F
+      !||    i1bcs_check                         ../starter/source/interfaces/int01/i1bcs_check.F90
       !||    i1chk3                              ../starter/source/interfaces/inter3d1/i1chk3.F
       !||    i1tid2                              ../starter/source/interfaces/inter2d1/i1tid2.F
       !||    i1tid3                              ../starter/source/interfaces/inter3d1/i1tid3.F
@@ -598,6 +600,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    insurf                              ../starter/source/interfaces/interf1/insurf.F
       !||    int2cy_chk                          ../starter/source/constraints/general/bcs/lecbcscyc.F
       !||    int2modif_nd                        ../starter/source/elements/solid/solide10/dim_s10edg.F
+      !||    inter1_check_ale_lag_sides          ../starter/source/interfaces/int01/inter1_check_ale_lag_sides.F90
       !||    inter_dcod_friction                 ../starter/source/interfaces/reader/inter_dcod_friction.F
       !||    inter_dcod_function                 ../starter/source/interfaces/reader/inter_dcod_function.F
       !||    inter_dcod_sensor                   ../starter/source/interfaces/reader/inter_dcod_sensor.F
@@ -905,7 +908,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
-#include      "scr17_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

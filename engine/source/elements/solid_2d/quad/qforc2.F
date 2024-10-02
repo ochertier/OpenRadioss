@@ -55,25 +55,28 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
-      SUBROUTINE QFORC2(ELBUF_TAB,NG      ,
-     1                  PM       ,GEO     ,IC          ,X        ,A       ,
-     2                  V        ,MS      ,W           ,FLUX     ,FLU1    ,
-     3                  VEUL     ,ALE_CONNECT ,IPARG    ,NLOC_DMG,
-     4                  TF       ,NPF     ,BUFMAT      ,PARTSAV  ,
-     5                  DT2T     ,NELTST  ,ITYPTST     ,STIFN    ,OFFSET  ,
-     6                  EANI     ,IPARTQ  ,NEL         ,IADQ     ,FSKY    ,
-     9                  IPM      ,BUFVOIS ,QMV         ,
-     A                  GRESAV   ,GRTH    ,IGRTH       ,TABLE    ,IGEO    ,
-     B                  VOLN     ,ITASK   ,MS_2D       ,FSKYM    ,IOUTPRT ,
-     C                  MAT_ELEM ,H3D_STRAIN,SZ_BUFVOIS,SNPC,STF,SBUFMAT  ,
-     D                  SVIS,NSVOIS,IRESP,TT,DT1,      
-     .                  IDEL7NOK,    IDTMIN,     MAXFUNC,  
-     .                  IMON_MAT,USERL_AVAIL, heat_meca, impl_s,     idyna)
+      SUBROUTINE QFORC2(ELBUF_TAB  ,NG          ,
+     1                  PM         ,GEO         ,IC          ,X        ,A           ,
+     2                  V          ,MS          ,W           ,FLUX     ,FLU1        ,
+     3                  VEUL       ,ALE_CONNECT ,IPARG       ,NLOC_DMG ,
+     4                  TF         ,NPF         ,BUFMAT      ,PARTSAV  ,
+     5                  DT2T       ,NELTST      ,ITYPTST     ,STIFN    ,OFFSET      ,
+     6                  EANI       ,IPARTQ      ,NEL         ,IADQ     ,FSKY        ,
+     9                  IPM        ,BUFVOIS     ,QMV         ,
+     A                  GRESAV     ,GRTH        ,IGRTH       ,TABLE    ,IGEO        ,
+     B                  VOLN       ,ITASK       ,MS_2D       ,FSKYM    ,IOUTPRT     ,
+     C                  MAT_ELEM   ,H3D_STRAIN  ,SZ_BUFVOIS  ,SNPC     ,STF         ,SBUFMAT ,
+     D                  SVIS       ,NSVOIS      ,IRESP       ,TT       ,DT1         ,
+     .                  IDEL7NOK   ,IDTMIN      ,MAXFUNC     ,
+     .                  IMON_MAT   ,USERL_AVAIL ,heat_meca   ,impl_s   ,idyna       ,
+     .                  DT         )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -119,6 +122,8 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE ALE_CONNECTIVITY_MOD
       USE ALE_MOD , ONLY : ALE
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -163,6 +168,7 @@ C-----------------------------------------------
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -219,6 +225,8 @@ c
       IBID = 0
       SZ_IX=NUMELQ+NUMELS+NSVOIS    ! Size of IX array (either IXS+NSVOIS or IXQ)
       BIDM(1:MVSIZ) = ZERO
+      MBID(1:MVSIZ) = ZERO
+      BID(:) = ZERO
       DO I=1,NEL
         WYY(I)=ZERO
         WZZ(I)=ZERO
@@ -430,7 +438,7 @@ c
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
      .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna)
+     .   idyna,       DT         , BID      )
 C--------------------------
 C       SYNTHESIS PER MATERIAL (thermics)
 C--------------------------

@@ -29,6 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    format_mod             ../starter/share/modules1/format_mod.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE BIGBOX(X   ,FLAG,NNOD ,
      .                  SKEW,IGS    ,ISKN ,ITABM1,IBOX   ,
@@ -42,6 +43,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
       USE FORMAT_MOD , ONLY : FMT_I
+      USE READER_OLD_MOD , ONLY : LINE, IREC
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -186,6 +188,7 @@ C--------------
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE OPTIONDEF_MOD
 C-----------------------------------------------
@@ -207,11 +210,13 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,OK,ISK,IDBX,BOXNOD,TAGN(NUMNOD),
+      INTEGER, DIMENSION(:),ALLOCATABLE :: TAGN
+      INTEGER I,J,K,OK,ISK,IDBX,BOXNOD,
      .        IADB0,JAD,ITYPE
       my_real
      .    XP1,YP1,ZP1,XP2,YP2,ZP2,DIAM,NODINB(3)
 C-----------------------------------------------
+      CALL MY_ALLOC(TAGN,NUMNOD)
       OK  = 0
       BOXNOD = 0
       IADB0 = IADB
@@ -272,6 +277,7 @@ C---------------
           END IF
         END DO
       ENDIF
+      DEALLOCATE(TAGN)
 C---------------
       RETURN
       END
@@ -1209,14 +1215,15 @@ C----------------
       RETURN
       END
       !||====================================================================
-      !||    bigbox2         ../starter/source/model/box/bigbox.F
+      !||    bigbox2          ../starter/source/model/box/bigbox.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    boxbox2         ../starter/source/model/box/boxbox.F
-      !||    boxtage         ../starter/source/model/box/bigbox.F
+      !||    ancmsg           ../starter/source/output/message/message.F
+      !||    boxbox2          ../starter/source/model/box/boxbox.F
+      !||    boxtage          ../starter/source/model/box/bigbox.F
       !||--- uses       -----------------------------------------------------
-      !||    format_mod      ../starter/share/modules1/format_mod.F90
-      !||    message_mod     ../starter/share/message_module/message_mod.F
+      !||    format_mod       ../starter/share/modules1/format_mod.F90
+      !||    message_mod      ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE BIGBOX2(X      ,FLAG   ,NEL     ,
      .                   SKEW   ,IGS    ,ISKN    ,ITABM1,IBOX   ,
@@ -1231,6 +1238,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE OPTIONDEF_MOD
       USE FORMAT_MOD , ONLY : FMT_I
+      USE READER_OLD_MOD , ONLY : LINE, IREC
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1576,14 +1584,15 @@ C---------------
       RETURN
       END
       !||====================================================================
-      !||    bigsbox         ../starter/source/model/box/bigbox.F
+      !||    bigsbox          ../starter/source/model/box/bigbox.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg          ../starter/source/output/message/message.F
-      !||    box_surf_sh     ../starter/source/model/box/bigbox.F
-      !||    boxboxs         ../starter/source/model/box/boxbox.F
+      !||    ancmsg           ../starter/source/output/message/message.F
+      !||    box_surf_sh      ../starter/source/model/box/bigbox.F
+      !||    boxboxs          ../starter/source/model/box/boxbox.F
       !||--- uses       -----------------------------------------------------
-      !||    format_mod      ../starter/share/modules1/format_mod.F90
-      !||    message_mod     ../starter/share/message_module/message_mod.F
+      !||    format_mod       ../starter/share/modules1/format_mod.F90
+      !||    message_mod      ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE BIGSBOX(NUMEL ,IX     ,NIX    ,NIX1 ,NIX2,IELTYP,
      .                   X     ,        NSEG ,FLAG,SKEW  ,
@@ -1598,6 +1607,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE OPTIONDEF_MOD
       USE FORMAT_MOD , ONLY : FMT_I
+      USE READER_OLD_MOD , ONLY : LINE, IREC
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

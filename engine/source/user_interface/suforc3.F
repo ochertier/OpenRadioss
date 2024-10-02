@@ -33,6 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sucumu3p            ../engine/source/user_interface/suforc3.F
       !||    suser43             ../engine/source/elements/solid/sconnect/suser43.F
       !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod         ../engine/share/message_module/message_mod.F
       !||    table_mod           ../engine/share/modules/table_mod.F
@@ -54,6 +55,7 @@ C-----------------------------------------------
       USE TABLE_MOD
       USE MAT_ELEM_MOD
       USE MESSAGE_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -120,7 +122,7 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C=======================================================================
       GBUF  => ELBUF_STR%GBUF
-      UVAR  => ELBUF_STR%BUFLY(1)%MAT(1,1,1)%VAR
+      UVAR  => ELBUF_STR%GBUF%VAR
       NF1=NFT+1
 !
       DO I=1,6
@@ -133,7 +135,7 @@ C GATHER NODAL VARIABLES
      .             XX ,YY ,ZZ, UX  ,UY  ,UZ , 
      .             VX ,VY ,VZ, VRX ,VRY ,VRZ, 
      .             GBUF%OFF,OFF, NC,SID,IMAT,IPROP)
-      NUVAR   = IPM(8,IMAT(1))
+      NUVAR   = ELBUF_STR%GBUF%G_NUVAR
       NUPARAM = IPM(9,IMAT(1))
 C-----------
       IG =IPROP(1)

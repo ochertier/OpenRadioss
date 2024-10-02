@@ -58,7 +58,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alemuscl_mod           ../common_source/modules/ale/alemuscl_mod.F
       !||    anim_mod               ../common_source/modules/output/anim_mod.F
       !||    check_mod              ../common_source/modules/check_mod.F
-      !||    dt_mod                 ../engine/share/modules/dt_mod.F
+      !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    fvbag_mod              ../engine/share/modules/fvbag_mod.F
       !||    fxb_mod                ../engine/share/modules/fxb_mod.F
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
@@ -68,7 +69,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
-      !||    my_alloc_mod           ../common_source/tools/memory/my_alloc.F
+      !||    my_alloc_mod           ../common_source/tools/memory/my_alloc.F90
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
       !||    output_mod             ../common_source/modules/output/output_mod.F90
       !||    outputs_mod            ../common_source/modules/outputs_mod.F
@@ -122,6 +123,7 @@ C-----------------------------------------------
       USE FXB_MOD
       USE MY_ALLOC_MOD
       USE NAMES_AND_TITLES_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

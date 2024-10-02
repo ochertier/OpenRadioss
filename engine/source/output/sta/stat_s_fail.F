@@ -32,6 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    strs_txt50          ../engine/source/output/sta/sta_txt.F
       !||    tab_strs_txt50      ../engine/source/output/sta/sta_txt.F
       !||--- uses       -----------------------------------------------------
+      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod         ../engine/share/resol/initbuf.F
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||====================================================================
@@ -42,7 +43,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
-      USE MAT_ELEM_MOD         
+      USE MAT_ELEM_MOD
+      USE ELBUFDEF_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

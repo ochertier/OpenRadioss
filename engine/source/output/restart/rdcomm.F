@@ -1026,11 +1026,6 @@ C heat transfer
 C Static condensation
       NEXT=NEXT+1
       ISTATCND=TABVINT(NEXT)
-C Defense Lic Flag
-      NEXT   = NEXT + 1
-      LIDFS  = TABVINT(NEXT)
-      NEXT   = NEXT + 1
-      LIRNUR = TABVINT(NEXT)
 C Unit info
       NEXT   = NEXT + 1
       LUNIT  = TABVINT(NEXT)
@@ -1793,6 +1788,9 @@ C-----/DAMP/VREL
 !
       NEXT       = NEXT + 1
       INTER_PARAMETERS%INT25_EROSION_SOLID   = TABVINT(NEXT)
+C /INIVEL
+      NEXT       = NEXT + 1
+      LOADS%NINIVELT = TABVINT(NEXT)
 C
       ! Initialize variables from Restart 
       ! ----------------------------------
@@ -1804,16 +1802,17 @@ C--------------------------------------
       RETURN
       END
       !||====================================================================
-      !||    rdcomr           ../engine/source/output/restart/rdcomm.F
+      !||    rdcomr               ../engine/source/output/restart/rdcomm.F
       !||--- called by ------------------------------------------------------
-      !||    rdresb           ../engine/source/output/restart/rdresb.F
+      !||    rdresb               ../engine/source/output/restart/rdresb.F
       !||--- uses       -----------------------------------------------------
-      !||    ale_mod          ../common_source/modules/ale/ale_mod.F
-      !||    anim_mod         ../common_source/modules/output/anim_mod.F
-      !||    output_mod       ../common_source/modules/output/output_mod.F90
-      !||    outputs_mod      ../common_source/modules/outputs_mod.F
-      !||    parameters_mod   ../common_source/modules/interfaces/parameters_mod.F
-      !||    state_mod        ../common_source/modules/state_mod.F
+      !||    ale_mod              ../common_source/modules/ale/ale_mod.F
+      !||    anim_mod             ../common_source/modules/output/anim_mod.F
+      !||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
+      !||    output_mod           ../common_source/modules/output/output_mod.F90
+      !||    outputs_mod          ../common_source/modules/outputs_mod.F
+      !||    parameters_mod       ../common_source/modules/interfaces/parameters_mod.F
+      !||    state_mod            ../common_source/modules/state_mod.F
       !||====================================================================
       SUBROUTINE RDCOMR(LMXVREA,TABVREA,DYNAIN_DATA,INTER_PARAMETERS,
      .                  OUTPUT)
@@ -1826,6 +1825,7 @@ C-----------------------------------------------
        USE ALE_MOD
        USE PARAMETERS_MOD
        USE OUTPUT_MOD
+       USE MULTIMAT_PARAM_MOD , ONLY : M51_IFLG6
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1858,7 +1858,6 @@ C-----------------------------------------------
 #include      "sysunit.inc"
 #include      "statr_c.inc"
 #include      "inter22.inc"
-#include      "mmale51_c.inc"
 #include      "thermal_c.inc"
 #include      "itet2_c.inc"
 C-----------------------------------------------

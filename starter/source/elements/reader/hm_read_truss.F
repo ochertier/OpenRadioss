@@ -32,6 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    vdouble          ../starter/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod      ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod     ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_TRUSS(IXT ,ITAB,ITABM1,IPART,IPARTT,
@@ -58,7 +59,9 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
+      USE READER_OLD_MOD , ONLY : LINE
+      USE USER_ID_MOD , ONLY : ID_LIMIT
 C---------------------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,7 +86,7 @@ C INPUT ARGUMENTS
       INTEGER,INTENT(IN)::IPART(LIPART1,*)
       INTEGER,INTENT(IN)::IGEO(NPROPGI,*)
       INTEGER,INTENT(IN)::IPM(NPROPMI,*)
-      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN)::LSUBMODEL(NSUBMOD)
 C OUTPUT ARGUMENTS
       INTEGER,INTENT(OUT)::IXT(NIXT,*)
       INTEGER,INTENT(OUT)::IPARTT(*)
@@ -149,7 +152,7 @@ C--------------------------------------------------
           IXT(1,I)=MT
           IXT(4,I)=IPID 
 
-          IF (IXT(5,I)>ID_LIMIT) THEN
+          IF (IXT(5,I)>ID_LIMIT%GLOBAL) THEN
             CALL ANCMSG(MSGID=509,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                  I1=IXT(5,I),C1=LINE,C2='/TRUSS')
           ENDIF

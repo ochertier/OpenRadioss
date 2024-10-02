@@ -21,11 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    printcpu   ../starter/source/system/printcpu.F
+      !||    printcpu               ../starter/source/system/printcpu.F
       !||--- called by ------------------------------------------------------
-      !||    starter0   ../starter/source/starter/starter0.F
+      !||    starter0               ../starter/source/starter/starter0.F
       !||--- calls      -----------------------------------------------------
-      !||    cpuinfo    ../starter/source/system/mon_c.c
+      !||    cpuinfo                ../starter/source/system/mon_c.c
+      !||    my_flush               ../starter/source/system/machine.F
       !||====================================================================
       SUBROUTINE PRINTCPU()
 C-----------------------------------------------
@@ -45,6 +46,12 @@ C-----------------------------------------------
 
       CHARACTER*256 HOSTNAME, CPUNAM
       INTEGER FREQUENCE,LENH,LENC,I,NPROC,MEM,SWAP
+      !
+      CHARACTER(len=129) :: STACKSIZE_INFO
+      INTEGER            :: STACKSIZE_INFO_LEN
+
+      CHARACTER(len=129) :: OMP_STACKSIZE_INFO
+      INTEGER            :: OMP_STACKSIZE_INFO_LEN
 
         CALL CPUINFO(HOSTNAME,LENH,CPUNAM, LENC, FREQUENCE,MEM,SWAP)
 
@@ -74,6 +81,15 @@ C-----------------------------------------------
 
           WRITE(IOUT,*)' ' 
         ENDIF
+
+        OMP_STACKSIZE_INFO_LEN=128
+        STACKSIZE_INFO_LEN=128
+        call GET_SOLVER_STACKSIZE(STACKSIZE_INFO,STACKSIZE_INFO_LEN,OMP_STACKSIZE_INFO,OMP_STACKSIZE_INFO_LEN)
+        WRITE(IOUT,'(A,A)') ' STACKSIZE  . . . . . . . . . . . . . . . . . . . . ',STACKSIZE_INFO(1:STACKSIZE_INFO_LEN)
+        WRITE(IOUT,'(A,A)') ' THREAD STACKSIZE . . . . . . . . . . . . . . . . . ',OMP_STACKSIZE_INFO(1:OMP_STACKSIZE_INFO_LEN)
+        WRITE(IOUT,'(A)') ' '
+        ! Force write to output file
+        CALL MY_FLUSH(IOUT)   
 
  7000 FORMAT (' COMPUTATION HARDWARE DESCRIPTION')
  7400 FORMAT (' HOSTNAME     CPU TYPE, FREQUENCY AND MEMORY')

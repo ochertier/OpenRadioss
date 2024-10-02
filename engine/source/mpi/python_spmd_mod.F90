@@ -42,15 +42,13 @@
       !||    spmd_comm_size        ../engine/source/mpi/spmd_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    python_element_mod    ../common_source/modules/python_element_mod.F90
-      !||    python_funct_mod      ../common_source/modules/python_mod.F90
       !||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
         subroutine python_element_init(element, n, group_id, local_id, user_ids)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
 ! ----------------------------------------------------------------------------------------------------------------------
-          use python_funct_mod, only : NAME_LEN
-          use python_element_mod, only: python_element
+          use python_element_mod, only: python_element, NAME_LEN
           use spmd_mod, only : spmd_comm_size, spmd_comm_rank, spmd_allreduce, SPMD_MAX
           implicit none
 ! ----------------------------------------------------------------------------------------------------------------------

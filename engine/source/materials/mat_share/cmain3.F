@@ -45,6 +45,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
       !||--- uses       -----------------------------------------------------
       !||    drape_mod        ../engine/share/modules/drape_mod.F
+      !||    dt_mod           ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod     ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mulawc_mod       ../engine/source/materials/mat_share/mulawc.F
@@ -67,7 +69,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B           NGL       ,ZCFAC     ,SHF       ,GS        ,EPSP       ,
      C           KFTS      ,JHBE      ,ALPE      ,
      D           DIR_A     ,DIR_B     ,IGEO      ,
-     E           IPM       ,IFAILURE  ,NPG       ,
+     E           IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F           TEMPEL    ,DIE       ,JTHE      ,IEXPAN    ,TEMPEL0    ,
      G           ISHPLYXFEM,PLY_EXX   ,
      H           PLY_EYY   ,PLY_EXY   ,PLY_EXZ   ,PLY_EYZ   ,PLY_F      ,
@@ -79,7 +81,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      N           ISMSTR    ,IR        ,IS        ,NLAY      ,NPT        ,
      O           IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P           F_DEF     ,ITASK     ,DRAPE     ,VARNL     ,NLOC_DMG   ,
-     R           INDX_DRAPE,THKE      ,SEDRAPE   ,NUMEL_DRAPE)
+     R           INDX_DRAPE,THKE      ,SEDRAPE   ,NUMEL_DRAPE,DT        )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -91,6 +93,8 @@ C-----------------------------------------------
       USE DRAPE_MOD 
       USE NLOCAL_REG_MOD
       USE SENSOR_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -137,6 +141,7 @@ C-----------------------------------------------
      .   DIR1_CRK(*),DIR2_CRK(*),DMG_SCALE(MVSIZ),
      .   F_DEF(MVSIZ,*),ALDT(MVSIZ),VARNL(NEL,*)
       my_real, DIMENSION(NEL), INTENT(IN) :: THKE
+      my_real, dimension(mvsiz), intent(inout) :: fheat
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE (STACK_PLY) :: STACK
@@ -146,6 +151,7 @@ C-----------------------------------------------
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -273,7 +279,7 @@ c
      F       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
      G       ITASK   ,STACK%PM ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
      H       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
-     I       VARNL   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX)
+     I       VARNL   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX,DT    )
 cc----------------------------
       ELSE   ! User-type Radioss laws , NPT > 0
 c----------------------------
@@ -296,7 +302,7 @@ c
      7       INDXDEL ,NGL     ,THKLY   ,MATLY   ,ZCFAC   ,MAT_ELEM,
      8       SHF     ,GS      ,SIGY    ,THK0    ,EPSP    ,
      9       POSLY   ,IGEO    ,IPM     ,FAILWAVE,FWAVE_EL,
-     A       IFAILURE,ALDT    ,TEMPEL  ,DIE     ,
+     A       IFAILURE,ALDT    ,TEMPEL  ,DIE     ,FHEAT   ,
      B       E1X     ,E1Y     ,E1Z     ,E2X     ,E2Y     ,E2Z     ,
      C       E3X     ,E3Y     ,E3Z     ,TABLE   ,IXFEM   ,ELCRKINI,
      D       SENSORS ,NG      ,
@@ -305,10 +311,10 @@ c
      G       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
      H       ITASK   ,STACK%PM ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
      I       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
-     J       VARNL   ,ETIMP   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX)
+     J       VARNL   ,ETIMP   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX,DT    )
       ENDIF ! IF (NPT == 0) 
 C----------------------------------------------------------------------
-      IF (IEXPAN > 0 .AND. JTHE > 0. AND.IDT_THERM==0) THEN
+      IF (IEXPAN > 0 .AND. JTHE > 0. AND. IDT_THERM==0) THEN
          CALL THERMEXPC(ELBUF_STR,
      1                  JFT  ,JLT   ,GBUF%FORTH  ,FOR   ,EINT  , 
      2                  OFF  ,ETH   ,THK0        ,EXX   ,EYY   ,    

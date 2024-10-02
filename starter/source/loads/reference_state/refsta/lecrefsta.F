@@ -21,21 +21,29 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    lecrefsta     ../starter/source/loads/reference_state/refsta/lecrefsta.F
+      !||    lecrefsta        ../starter/source/loads/reference_state/refsta/lecrefsta.F
       !||--- called by ------------------------------------------------------
-      !||    lectur        ../starter/source/starter/lectur.F
+      !||    lectur           ../starter/source/starter/lectur.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../starter/source/output/message/message.F
-      !||    r2r_sys       ../starter/source/coupling/rad2rad/routines_r2r.F
-      !||    usr2sys       ../starter/source/system/sysfus.F
+      !||    ancmsg           ../starter/source/output/message/message.F
+      !||    r2r_sys          ../starter/source/coupling/rad2rad/routines_r2r.F
+      !||    usr2sys          ../starter/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../starter/share/message_module/message_mod.F
+      !||    message_mod      ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
+      !||    refsta_mod       ../starter/share/modules1/refsta_mod.F
       !||====================================================================
       SUBROUTINE LECREFSTA(ITABM1  ,UNITAB,IXC   ,IXTG  ,IXS   ,
      .                     XYZREF  ,XREFC ,XREFTG,XREFS ,TAGNOD,
      .                     IDDLEVEL,TAGREF )
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE READER_OLD_MOD , ONLY : IREC, NSLASH
       USE UNITAB_MOD
       USE MESSAGE_MOD
+      USE REFSTA_MOD , ONLY : RS0_FMT
+      USE READER_OLD_MOD , ONLY : LINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,16 +65,12 @@ C-----------------------------------------------
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER ITABM1(*),IXC(NIXC,*),IXTG(NIXTG,*),IXS(NIXS,*),TAGNOD(*)
       INTEGER IDDLEVEL,TAGREF(*)
-      my_real
-     .  XREFC(4,3,*),XREFTG(3,3,*),XREFS(8,3,*),
-     .  XYZREF(3,*)
+      my_real XREFC(4,3,*),XREFTG(3,3,*),XREFS(8,3,*),XYZREF(3,*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER  I,J,IE,IN,ID,NN,IFLAGUNIT,NNOD
-C     REAL
-      my_real
-     .  XX,YY,ZZ,FAC_L
+      my_real XX,YY,ZZ,FAC_L
       CHARACTER MESS*40
       DATA MESS/'REFSTA'/      
 C-----------------------------------------------

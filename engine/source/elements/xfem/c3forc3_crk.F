@@ -53,6 +53,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    crackxfem_mod    ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod        ../engine/share/modules/drape_mod.F
+      !||    dt_mod           ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod     ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
@@ -85,7 +87,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      M   IXEL,        STACK,       ISUBSTACK,   UXINT_MEAN,
      N   UYINT_MEAN,  UZINT_MEAN,  NLEVXF,      NODEDGE,
      O   CRKEDGE,     DRAPE_SH3N,  IPRI,        NLOC_DMG,
-     P   INDX_DRAPE,  IGRE)
+     P   INDX_DRAPE,  IGRE,        DT  )
 C-----------------------------------------------
       USE TABLE_MOD
       USE CRACKXFEM_MOD
@@ -95,6 +97,8 @@ C-----------------------------------------------
       USE DRAPE_MOD 
       USE NLOCAL_REG_MOD          
       USE SENSOR_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -150,6 +154,7 @@ C-----------------------------------------------
       TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -206,6 +211,9 @@ C---
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF
 C
+!     variables for heat transfer
+      my_real, dimension(mvsiz) :: fheat
+!
       my_real,
      .  DIMENSION(:) ,POINTER  ::  OFFG,THKG,STRAG,FORG,MOMG,
      .  EINTG,EPSDG,TEMPG,EINTTH,HOURGG
@@ -433,7 +441,7 @@ C--------------------------
      B   NGL       ,ZCFAC     ,SHF       ,GS        ,EPSDG     ,
      C   KFTS      ,ISH3N     ,ALPE      ,
      D   DIR_A     ,DIR_B     ,IGEO      ,
-     E   IPM       ,IFAILURE  ,NPG       ,
+     E   IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F   TEMPEL    ,DIE       ,JTHE     ,IEXPAN     ,TEMPG     ,
      G   IBID      ,BID       ,
      H   BID       ,BID       ,BID       ,BID       ,BID       ,
@@ -445,7 +453,7 @@ C--------------------------
      P   ISMSTR    ,IR        ,IS        ,NLAYER    ,NPTT      ,
      Q   IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P   BID    ,ITASK        ,DRAPE_SH3N  ,VARNL     ,NLOC_DMG ,
-     R   INDX_DRAPE , THKE    ,SEDRAPE ,NUMEL_DRAPE)
+     R   INDX_DRAPE , THKE    ,SEDRAPE ,NUMEL_DRAPE, DT  )
 
 C--------------------------
         IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
@@ -497,9 +505,15 @@ C-------------------------
 c     Thermique des coques 
 C--------------------------
         IF (JTHE > 0) THEN
-          CALL THERM3C(JFT   ,JLT   ,PM   ,MAT  ,THK0 ,IXTG,
-     .                 PX1   ,PY1   ,PY2  ,AREA ,DT1C ,
-     .                 TEMP  ,TEMPEL,DIE  ,THEM )
+          IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+            CALL THERM3C(JFT   ,JLT   ,PM   ,MAT  ,THK0 ,IXTG,
+     .                   PX1   ,PY1   ,PY2  ,AREA ,DT1C ,
+     .                   TEMP  ,TEMPEL,FHEAT ,THEM )
+          ELSE
+            CALL THERM3C(JFT   ,JLT   ,PM   ,MAT  ,THK0 ,IXTG,
+     .                   PX1   ,PY1   ,PY2  ,AREA ,DT1C ,
+     .                   TEMP  ,TEMPEL,DIE ,THEM )
+          END IF
         ENDIF
 C--------------------------
 C     THERMAL TIME STEP       --- to be added --- (see c3forc3.F)

@@ -36,6 +36,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    cluster_mod            ../starter/share/modules1/cluster_mod.F
       !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_CLUSTER(CLUSTERS,UNITAB ,ISKN    ,IGRBRIC,IGRSPRING,
@@ -47,9 +48,10 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE CLUSTER_MOD
       USE GROUPDEF_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE HM_OPTION_READ_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
+      USE READER_OLD_MOD , ONLY : LINE, KLINE, KEY0, KCUR
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,8 +77,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,II,JJ,KK,N,CLID,UID,ICLUS,IAD,IG,IGR,ISK,IFAIL,
-     .   IEL,NEL,NNOD,IFLAGUNIT,VAL,NNOD0,ITY,NELMAX
+      INTEGER I,J,K,II,JJ,KK,N,CLID,UID,ICLUS,IAD,IG,IGR,ISK,IFAIL,IEL,NEL,NNOD,IFLAGUNIT,VAL,NNOD0,ITY,NELMAX
       INTEGER NOD1(2000),NOD2(2000),SUB_INDEX,ISK_L
       my_real BID(1),AX(4),NX(4),FMAX(2),MMAX(2)
       CHARACTER(LEN=NCHARTITLE)::TITR
@@ -117,10 +118,7 @@ c
           ENDDO                                   
         ENDIF
         IF (UID / = 0 .and. IFLAGUNIT == 0) THEN                        
-          CALL ANCMSG(MSGID=659,ANMODE=ANINFO,MSGTYPE=MSGERROR,      
-     .                I1=CLID,I2=UID,C1='CLUSTER',                  
-     .                C2='CLUSTER',                               
-     .                C3=TITR)                                       
+          CALL ANCMSG(MSGID=659,ANMODE=ANINFO,MSGTYPE=MSGERROR,I1=CLID,I2=UID,C1='CLUSTER',C2='CLUSTER',C3=TITR)
         ENDIF                                                        
 c----------------------------
 Card1
@@ -164,12 +162,7 @@ c----------------------------
             ENDIF
           ENDDO
           IF (.NOT.FOUND) THEN
-            CALL ANCMSG(MSGID=137,ANMODE=ANINFO,MSGTYPE=MSGERROR,     
-     .              C1='CLUSTER',
-     .              C2='CLUSTER',
-     .              I2=ISK,
-     .              I1=CLID,
-     .              C3=TITR)       
+            CALL ANCMSG(MSGID=137,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1='CLUSTER',C2='CLUSTER',I2=ISK,I1=CLID,C3=TITR)
           ENDIF
         ENDIF
         NOD1 = 0
@@ -186,11 +179,7 @@ c----------------------------
             IF (IGR == IGRBRIC(IG)%ID .and. IGRBRIC(IG)%GRTYPE == 1) THEN
               NEL = IGRBRIC(IG)%NENTITY
               IF (NEL > NELMAX) THEN
-                CALL ANCMSG(MSGID=1055,       
-     .                      ANMODE=ANINFO,    
-     .                      MSGTYPE=MSGERROR, 
-     .                      I1=CLID,          
-     .                      I2=NEL)  
+                CALL ANCMSG(MSGID=1055, ANMODE=ANINFO, MSGTYPE=MSGERROR, I1=CLID, I2=NEL)
                 EXIT
               ENDIF
               CLUSTERS(I)%ID = CLID                                          
@@ -374,12 +363,7 @@ C-------------------------------------
  9000 FORMAT(10X/)
 C-----------
       RETURN
-  998 CALL ANCMSG(MSGID=55,
-     .            ANMODE=ANINFO,
-     .            MSGTYPE=MSGERROR,
-     .            C1=KEY0(KCUR),
-     .            C2=KLINE,
-     .            C3=LINE)
+  998 CALL ANCMSG(MSGID=55,ANMODE=ANINFO,MSGTYPE=MSGERROR,C1=KEY0(KCUR),C2=KLINE,C3=LINE)
 C-----------
       RETURN
       END

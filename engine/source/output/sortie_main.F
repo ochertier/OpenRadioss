@@ -37,6 +37,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fcont_max_output         ../engine/source/output/h3d/h3d_results/fcont_max_output.F
       !||    file_size                ../common_source/tools/input_output/write_routtines.c
       !||    fluxsw                   ../engine/source/fluid/fluxsw.F
+      !||    fpcont2_max_output       ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
+      !||    fpcont2_min_output       ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
       !||    genani                   ../engine/source/output/anim/generate/genani.F
       !||    gendynain                ../engine/source/output/dynain/gendynain.F
       !||    genh3d                   ../engine/source/output/h3d/h3d_results/genh3d.F
@@ -55,9 +57,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    cluster_mod              ../engine/share/modules/cluster_mod.F
       !||    crackxfem_mod            ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod                ../engine/share/modules/drape_mod.F
-      !||    dt_mod                   ../engine/share/modules/dt_mod.F
+      !||    dt_mod                   ../engine/source/modules/dt_mod.F
       !||    ebcs_mod                 ../common_source/modules/boundary_conditions/ebcs_mod.F
       !||    ecnd_mod                 ../engine/share/modules/ecdn_mod.F
+      !||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    fpcont2_max_output_mod   ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
+      !||    fpcont2_min_output_mod   ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
       !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
       !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
       !||    genani_mod               ../engine/source/output/anim/generate/genani.F
@@ -127,7 +132,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      r            FNCONTP2  ,FTCONTP2    ,IBCL        ,ILOADP   ,LLOADP   ,
      s            LOADP     ,TAGNCONT    ,LOADP_HYD_INTER,FORC  ,DRAPEG,USER_WINDOWS,
      t            OUTPUT    ,DT          ,FSAVSURF    ,TABLE   ,
-     u            LOADS     ,SFANI       ,IPARIT      ,X_C    )
+     u            LOADS     ,SFANI       ,IPARIT      ,X_C      ,
+     v            SZ_NPCONT2,NPCONT2)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -162,6 +168,9 @@ C-----------------------------------------------
       USE LOADS_MOD
       USE EBCS_MOD , only : t_ebcs_tab
       USE TH_SURF_MOD , only : TH_SURF_, TH_SURF_NUM_CHANNEL
+      USE ELBUFDEF_MOD
+      use FPCONT2_MAX_OUTPUT_MOD
+      use FPCONT2_MIN_OUTPUT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -257,8 +266,10 @@ C-----------------------------------------------
      .       LOADP(LFACCLD,*),FORC(*)
 
       INTEGER, DIMENSION(*), INTENT(IN) :: ISKWP
+      INTEGER, INTENT(IN) :: SZ_NPCONT2
       my_real, INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
       my_real, DIMENSION(3,NUMNOD), INTENT(IN) :: X_C
+      my_real, DIMENSION(3,SZ_NPCONT2), INTENT(INOUT) :: NPCONT2
 C-----------------------------------------------      
       TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 C-----------------------------------------------      
@@ -450,13 +461,13 @@ C----------------------
           CALL ANI_PCONT(IXS ,IXC    ,IXTG    ,FASOLFR  ,X      ,
      .               FNCONT  ,FTCONT,IAD_ELEM ,FR_ELEM  ,WEIGHT ,
      .               IXQ     ,SEGQUADFR,IXS10 ,FNCONTP2,FTCONTP2,
-     .               H3D_DATA,CSEFRIC,CSEFRICG)
+     .               H3D_DATA,CSEFRIC,CSEFRICG,SZ_NPCONT2,NPCONT2)
         ELSE
           IFLAG_ANIPCONT = 1
           CALL ANI_PCONT21(IXS ,IXC    ,IXTG    ,FASOLFR  ,X      ,
      .               FNCONT    ,FTCONT ,IAD_ELEM,FR_ELEM  ,WEIGHT ,
      .               NODGLOB   ,FNCONTG,FTCONTG,FNCONTP2,FTCONTP2,
-     .               H3D_DATA  ,CSEFRIC_STAMP,CSEFRICG_STAMP)
+     .               H3D_DATA  ,CSEFRIC_STAMP,CSEFRICG_STAMP,SZ_NPCONT2,NPCONT2)
         END IF
       END IF
 C------------------------------------------------------
@@ -472,16 +483,20 @@ C----------------------------------------------------
       IF(H3D_DATA%N_VECT_CONT2_MAX /=0) THEN
          CALL FCONT2_MAX_OUTPUT(FNCONT2,FCONT2_MAX,WEIGHT)
       ENDIF 
-      IF(H3D_DATA%N_VECT_PCONT2_MAX /=0) THEN
-         CALL FCONT2_MAX_OUTPUT(FNCONTP2,FNCONT2_MAX,WEIGHT)
-         CALL FCONT2_MAX_OUTPUT(FTCONTP2,FTCONT2_MAX,WEIGHT)
-      ENDIF 
       IF(H3D_DATA%N_VECT_CONT2_MIN /=0) THEN
          CALL FCONT2_MIN_OUTPUT(FNCONT2,FCONT2_MIN,WEIGHT)
       ENDIF 
       IF(H3D_DATA%N_VECT_PCONT2_MAX /=0) THEN
-         CALL FCONT2_MIN_OUTPUT(FNCONTP2,FNCONT2_MIN,WEIGHT)
-         CALL FCONT2_MIN_OUTPUT(FTCONTP2,FTCONT2_MIN,WEIGHT)
+         CALL FPCONT2_MAX_OUTPUT(FNCONTP2,FNCONT2_MAX,SZ_NPCONT2,NPCONT2,WEIGHT,
+     .                           NPCONT2_MAX,NUMNOD)
+         CALL FPCONT2_MAX_OUTPUT(FTCONTP2,FTCONT2_MAX,SZ_NPCONT2,NPCONT2,WEIGHT,
+     .                           NPCONT2_MAX,NUMNOD)
+      ENDIF
+      IF(H3D_DATA%N_VECT_PCONT2_MIN /=0) THEN
+         CALL FPCONT2_MIN_OUTPUT(FNCONTP2,FNCONT2_MIN,SZ_NPCONT2,NPCONT2,WEIGHT,
+     .                           NPCONT2_MIN,NUMNOD)
+         CALL FPCONT2_MIN_OUTPUT(FTCONTP2,FTCONT2_MIN,SZ_NPCONT2,NPCONT2,WEIGHT,
+     .                           NPCONT2_MIN,NUMNOD)
       ENDIF 
   
       IF ((TT>=TANIM .AND. TT<=TANIM_STOP).OR. ! NUMELCRK > NUMELCRK2 .or.   !  => ANIM par fissure avance
@@ -977,6 +992,7 @@ C----------------------
         IF(NINTER/=0.AND.ANIM_V(27)+H3D_DATA%N_VECT_PCONT2>0)THEN
             CALL ANICON0(FNCONTP2,NUMNOD)
             CALL ANICON0(FTCONTP2,NUMNOD)
+            CALL ANICON0(NPCONT2,NUMNOD)
         ENDIF
 
         N1 = 1

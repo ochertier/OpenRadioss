@@ -33,6 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod              ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod           ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_SURFSURF(IGRSURF ,INSEG  ,FLAG  ,ICOUNT  ,ITER ,NSETS, LSUBMODEL)
@@ -42,9 +43,10 @@ C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE HM_OPTION_READ_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE READER_OLD_MOD , ONLY : LINE, KLINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

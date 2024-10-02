@@ -152,7 +152,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    matparam_def_mod                     ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    message_mod                          ../engine/share/message_module/message_mod.F
       !||    multi_fvm_mod                        ../common_source/modules/ale/multi_fvm_mod.F
-      !||    my_alloc_mod                         ../common_source/tools/memory/my_alloc.F
+      !||    my_alloc_mod                         ../common_source/tools/memory/my_alloc.F90
       !||    names_and_titles_mod                 ../common_source/modules/names_and_titles_mod.F
       !||    outmax_mod                           ../common_source/modules/outmax_mod.F
       !||    outputs_mod                          ../common_source/modules/outputs_mod.F
@@ -2958,17 +2958,17 @@ c         IF(ISPMD == 0)  print *,'QUAD scalar',N_OUTP_DATA,'IFUNC',IFUNC,'INFO1
 c         IF(ISPMD == 0)  print *,'H3D_DATA%OUTPUT_LIST(I)%PART',H3D_DATA%OUTPUT_LIST(I)%PART(1:NPART)
 
             CALL H3D_QUAD_SCALAR(
-     .                       ELBUF_TAB ,QUAD_SCALAR ,IPARG,
-     .                       IXQ       ,PM       ,
-     .                       EANI      ,
-     .                       IPM       ,
-     .                       X         ,V             ,W            ,ALE_CONNECT,
-     .                       NERCVOIS  ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
-     .                       QUAD_ID  ,
+     .                       ELBUF_TAB     ,QUAD_SCALAR ,IPARG,
+     .                       IXQ           ,PM       ,
+     .                       EANI          ,
+     .                       IPM           ,
+     .                       X             ,V             ,W            ,ALE_CONNECT,
+     .                       NERCVOIS      ,NESDVOIS      ,LERCVOIS     ,LESDVOIS   ,
+     .                       QUAD_ID       ,
      .                       IS_WRITEN_QUAD,IPARTQ ,LAYER        , NPART, 
-     .                       IUVAR ,H3D_DATA%OUTPUT_LIST(I)%PART,KEYWORD,
-     .                       BUFMAT     ,MULTI_FVM ,IR           ,IS           ,IT         ,
-     .                       OBJECT_ID  )
+     .                       IUVAR         ,H3D_DATA%OUTPUT_LIST(I)%PART,KEYWORD,
+     .                       BUFMAT        ,MULTI_FVM ,IR           ,IS           ,IT         ,
+     .                       OBJECT_ID     ,MAT_PARAM)
 c
             IF (NSPMD > 1 ) THEN
               CALL STARTIME(MACRO_TIMER_SPMDH3D,1)

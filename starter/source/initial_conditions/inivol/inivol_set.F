@@ -21,22 +21,26 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    inivol_set      ../starter/source/initial_conditions/inivol/inivol_set.F
+      !||    inivol_set           ../starter/source/initial_conditions/inivol/inivol_set.F
       !||--- called by ------------------------------------------------------
-      !||    init_inivol     ../starter/source/initial_conditions/inivol/init_inivol.F90
+      !||    init_inivol          ../starter/source/initial_conditions/inivol/init_inivol.F90
       !||--- uses       -----------------------------------------------------
-      !||    message_mod     ../starter/share/message_module/message_mod.F
+      !||    message_mod          ../starter/share/message_module/message_mod.F
       !||====================================================================
       SUBROUTINE INIVOL_SET(UVAR     , NUVAR , NEL     , KVOL         , MLW                         ,
      .                      ELBUF_TAB, NG    , NBSUBMAT, MULTI_FVM    , REQUIRED_2D_POLYGON_CLIPPING,
-     .                      IDP      , IPART , NFT     , KVOL_2D_POLYG   )
+     .                      IDP      , IPART , NFT     , KVOL_2D_POLYG, IMID,
+     .                      MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD 
+      USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
-      USE ELBUFDEF_MOD 
+      USE ELBUFDEF_MOD
       USE MESSAGE_MOD
+      USE CONSTANT_MOD, ONLY : NINE_OVER_10
+      USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
+      USE MATPARAM_DEF_MOD  , ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -46,10 +50,10 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "mmale51_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER,INTENT(IN)                 :: IMID
       INTEGER,INTENT(IN)                 :: NEL, NUVAR, MLW, NG, NBSUBMAT,IDP,IPART(*),NFT
       my_real,INTENT(INOUT)              :: KVOL(NBSUBMAT,NEL)
       my_real,INTENT(INOUT)              :: KVOL_2D_POLYG(NBSUBMAT,NEL)
@@ -57,16 +61,23 @@ C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT),INTENT(IN)  :: MULTI_FVM
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP),INTENT(INOUT) :: ELBUF_TAB
       LOGICAL,INTENT(IN) :: REQUIRED_2D_POLYGON_CLIPPING
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER                 :: I, IMAT, KK
-      TYPE(G_BUFEL_) ,POINTER :: GBUF   
-      TYPE(L_BUFEL_) ,POINTER :: LBUF   
+      TYPE(G_BUFEL_) ,POINTER :: GBUF
+      TYPE(L_BUFEL_) ,POINTER :: LBUF
       my_real                 :: P, P1,P2,P3,P4,SUMVF,RATIO
+      my_real                 :: vfrac0(nbsubmat)
+      INTEGER                 :: default_SUBMAT_id(NEL)
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
+
+      ! DETERMINE DEFAULT SUBMAT ID
+      vfrac0(1:nbsubmat) = MAT_PARAM(IMID)%MULTIMAT%VFRAC(1:NBSUBMAT)
+      default_SUBMAT_id(1:NEL) = MAX(1, MAXLOC(vfrac0,1))
 
       !---ADD CONTRIBUTION FROM 2D POLYGONAL CLIPPING
       IF(REQUIRED_2D_POLYGON_CLIPPING) THEN
@@ -77,15 +88,17 @@ C-----------------------------------------------
         ENDDO
       ENDIF
 
-      !---CHECK UNOCCUPIPED SUBVOLUME AND FILL WITH PHASE 1. IF SUM(vfrac>1) display an error message.
+      !---CHECK UNOCCUPIPED SUBVOLUME AND FILL WITH DEFAULT PHASE IF SUM(vfrac>1) display an error message.
       DO I=1,NEL
        IF(IPART(I+NFT) /= IDP)CYCLE
         SUMVF = SUM(KVOL(1:NBSUBMAT,I))
+        IMAT = default_SUBMAT_id(I)
         IF(SUMVF > ONE+EM06)THEN
           !not expected, user input must be checked : error message
-          SUMVF = SUM(KVOL(2:NBSUBMAT,I))
+          SUMVF = SUM(KVOL(1:NBSUBMAT,I))
+          SUMVF = SUMVF - KVOL(IMAT,I)
           IF(SUMVF <= ONE .AND. SUMVF > ZERO)THEN  ! sumvf is here calculated in range 2:nbsumat
-            KVOL(1,I)=ONE-SUMVF
+            KVOL(IMAT,I)=ONE-SUMVF
           ELSE
             SUMVF = SUM(KVOL(1:NBSUBMAT,I))
             RATIO=ONE/SUMVF
@@ -93,7 +106,7 @@ C-----------------------------------------------
           ENDIF
         ELSEIF(SUMVF < ONE-EM06)THEN
           !fill unoccupied subvolume with phase-1
-          KVOL(1,I) = KVOL(1,I) + ONE-SUMVF
+          KVOL(IMAT,I) = KVOL(IMAT,I) + ONE-SUMVF
         ELSEIF(SUMVF >= ONE-EM06 .AND. SUMVF <= ONE+EM06)THEN
           !get rid of precision issue so that sumvf is exactly 1.000000
           RATIO=ONE/SUMVF
@@ -101,10 +114,10 @@ C-----------------------------------------------
         ENDIF
       ENDDO
 
-      !---set initial volumetric fraction using KVOL array
+      !---set initial volumetric fraction result (KVOL) in material buffer (+ posteriori checks)
       IF(MLW == 51)THEN
         DO IMAT=1,4
-          KK = N0PHAS + (IMAT-1)*NVPHAS
+          KK = M51_N0PHAS + (IMAT-1)*M51_NVPHAS
           DO I=1,NEL
             IF(IPART(I+NFT) /= IDP)CYCLE
             UVAR(I,1+KK)   = KVOL(IMAT,I)
@@ -113,13 +126,13 @@ C-----------------------------------------------
         ENDDO
         DO I=1,NEL
           IF(IPART(I+NFT) /= IDP)CYCLE
-          KK  = N0PHAS + (1-1)*NVPHAS
+          KK  = M51_N0PHAS + (1-1)*M51_NVPHAS
           P1  = UVAR(I,18+KK)
-          KK  = N0PHAS + (2-1)*NVPHAS
+          KK  = M51_N0PHAS + (2-1)*M51_NVPHAS
           P2  = UVAR(I,18+KK)
-          KK  = N0PHAS + (3-1)*NVPHAS
+          KK  = M51_N0PHAS + (3-1)*M51_NVPHAS
           P3  = UVAR(I,18+KK)
-          KK  = N0PHAS + (4-1)*NVPHAS
+          KK  = M51_N0PHAS + (4-1)*M51_NVPHAS
           P4  = UVAR(I,18+KK)
           SUMVF=SUM(KVOL(1:NBSUBMAT,I))
           P   = KVOL(1,I)*P1 + KVOL(2,I)*P2 + KVOL(3,I)*P3 + KVOL(4,I)*P4

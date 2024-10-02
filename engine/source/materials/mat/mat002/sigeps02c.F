@@ -29,25 +29,22 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       SUBROUTINE SIGEPS02C(
      1                  JFT      ,JLT      ,PM       ,EINT     ,THK      ,
-     2                  OFF      ,SIGY     ,DT1C     ,IPLA     ,NEL      ,
-     3                  VOL0     ,GS       ,ISRATE   ,THKLYL   ,ETSE     ,
-     4                  NGL      ,EPSPDT   ,G_IMP    ,SIGKSI   ,IOFF_DUCT,
+     2                  OFF      ,SIGY     ,DT1      ,IPLA     ,NEL      ,
+     3                  VOL      ,GS       ,ISRATE   ,THKLYL   ,ETSE     ,
+     4                  NGL      ,EPSP     ,G_IMP    ,SIGKSI   ,IOFF_DUCT,
      5                  DPLA     ,TSTAR    ,JTHE     ,HARDM    ,EPCHK    ,
      6                  IMAT     ,IPT      ,NPTT     ,PLA      ,OFF_OLD  ,
      7                  SIGOXX   ,SIGOYY   ,SIGOXY   ,SIGOYZ   ,SIGOZX   ,
      8                  SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      9                  DEPSXX   ,DEPSYY   ,DEPSXY   ,DEPSYZ   ,DEPSZX   ,
-     A                  EPSPXX   ,EPSPYY  ,EPSPXY   ,EPSPYZ    ,EPSPZX   ,
+     A                  EPSPXX   ,EPSPYY   ,EPSPXY   ,EPSPYZ   ,EPSPZX   ,
      B                  SIGBAKXX ,SIGBAKYY ,SIGBAKXY ,INLOC    ,DPLANL   ,
-     C                  VP       ,NUVAR    ,UVAR     ,ASRATE   ,LOFF     )
+     C                  VP       ,ASRATE   ,LOFF     ,EPSD     ,
+     D                  TEMPEL   ,FHEAT    )
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-C-----------------------------------------------
-C   G l o b a l   P a r a m e t e r s
-C-----------------------------------------------
-#include      "mvsiz_p.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -55,48 +52,36 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER JFT,JLT,IPLA,NEL,IOFC,JTHE,IPT,NPTT,IMAT,ISRATE
-      INTEGER NGL(MVSIZ),IOFF_DUCT(*),INLOC
-      INTEGER, INTENT(IN) :: NUVAR ,VP
-      my_real ,DIMENSION(NEL,NUVAR)   ,INTENT(INOUT) :: UVAR
-      my_real ,DIMENSION(NEL),INTENT(IN) :: EPSPXX   ,EPSPYY  ,EPSPXY   ,EPSPYZ    ,EPSPZX
-      my_real ,INTENT(IN) :: ASRATE
-      my_real, DIMENSION(NEL), INTENT(IN) :: LOFF
-!---
-C     REAL
-      my_real
-     .   PM(NPROPM,*),EINT(NEL,2),
-     .   OFF(*),SIGY(*),DT1C(*),VOL0(*),GS(*),THK(*),
-     .   TSTAR(*),DPLA(*),SIGKSI(MVSIZ,5),ETSE(MVSIZ),
-     .   DEPSXX(MVSIZ),DEPSYY(MVSIZ),DEPSXY(MVSIZ),DEPSYZ(MVSIZ),
-     .   DEPSZX(MVSIZ),PLA(NEL),
-     .   SIGBAKXX(NEL),SIGBAKYY(NEL),SIGBAKXY(NEL),
-     .   SIGOXX(NEL),SIGOYY(NEL),SIGOXY(NEL),SIGOYZ(NEL),SIGOZX(NEL),
-     .   OFF_OLD(MVSIZ),THKLYL(NEL),DPLANL(NEL)
-!
-      my_real
-     .   SIGNXX(NEL),SIGNYY(NEL),SIGNXY(NEL),
-     .   SIGNYZ(NEL),SIGNZX(NEL),EPCHK(MVSIZ),G_IMP(MVSIZ)
-!
-      my_real
-     .   HARDM(MVSIZ),EPSPDT(MVSIZ),EZZ(MVSIZ)
+      INTEGER, INTENT(IN) :: JFT,JLT,IPLA,NEL,JTHE,IPT,NPTT,IMAT,ISRATE,
+     .   INLOC,VP
+      INTEGER, DIMENSION(NEL), INTENT(IN) :: NGL
+      INTEGER, DIMENSION(NEL), INTENT(INOUT) :: IOFF_DUCT
+      my_real, DIMENSION(NEL), INTENT(IN) :: EPSPXX,EPSPYY,EPSPXY,EPSPYZ,
+     .   EPSPZX,EPSP,DEPSXX,DEPSYY,DEPSXY,DEPSYZ,DEPSZX,SIGOXX,
+     .   SIGOYY,SIGOXY,SIGOYZ,SIGOZX,OFF_OLD,DPLANL,GS,THKLYL
+      my_real, INTENT(IN) :: ASRATE,DT1
+      my_real, DIMENSION(NEL), INTENT(INOUT) :: SIGNXX,SIGNYY,SIGNXY,SIGNYZ,
+     .   SIGNZX,SIGBAKXX,SIGBAKYY,SIGBAKXY,PLA,DPLA,TSTAR,ETSE,THK, 
+     .   SIGY,OFF,VOL,HARDM,EPCHK,G_IMP,EPSD
+      my_real, DIMENSION(NPROPM,*), INTENT(IN) :: PM
+      my_real, DIMENSION(NEL,5), INTENT(INOUT) :: SIGKSI
+      my_real, DIMENSION(NEL,2), INTENT(IN)    :: EINT
+      my_real, DIMENSION(NEL)  , INTENT(IN)    :: LOFF
+      my_real, DIMENSION(NEL)  , INTENT(INOUT) :: TEMPEL
+      my_real, DIMENSION(NEL)  , INTENT(INOUT) :: FHEAT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER ICC,IRTY,I,J,NPIF
-C     REAL
-      my_real
-     .   EPMX,CA,CB,CN,CP,CC,
+      INTEGER :: I,ICC,IRTY
+      my_real :: EPMX,CA,CB,CN,RHOCP,CC,
      .   DAV,DEVE1,DEVE2,DEVE3,DEVE4,Z3,Z4,FISOKIN,
-     .   EPIF,YOUNG,TI,TM,G,A11,A12,NU,
-     .   YMAX(MVSIZ),PLAP(MVSIZ),
-     .   EPDR(MVSIZ),YLD(MVSIZ),EPSDOT(MVSIZ),
-     .   T(MVSIZ)
-C-----------------------------------------------
-      EPIF = ZERO
-      NPIF = 0
-      EZZ(1:MVSIZ) = ZERO
+     .   YOUNG,TREF,TMELT,G,A11,A12,NU,YMAX
+      my_real, DIMENSION(NEL) :: EPDR,YLD,EPSDOT,T,EZZ
+!=======================================================================
+      ! Variable initialization
+      EZZ(1:NEL) = ZERO
 !---
+      ! Recover material law parameters
       YOUNG  = PM(20,IMAT)
       NU     = PM(21,IMAT)
       G      = PM(22,IMAT)
@@ -111,75 +96,67 @@ C-----------------------------------------------
       ICC    = NINT(PM(49,IMAT))
       IRTY   = NINT(PM(50,IMAT))
       Z3     = PM(51,IMAT)
-      Z4     = PM(52,IMAT)
-      CP     = PM(53,IMAT)
-      TI     = PM(54,IMAT)
       FISOKIN= PM(55,IMAT)
-
-       
-      EPIF   = MAX( EPIF, CC )
 !
-
+      ! Recover internal variables
       DO I=JFT,JLT              
-        EPDR(I) = MAX( EM20, PM(44,IMAT)*DT1C(I) )        
-        NPIF      = NPIF + IRTY
-        T(I)      = TI
-        PLAP(I)   = ZERO
+        EPDR(I) = MAX(EM20, PM(44,IMAT))      
       ENDDO
-      IF(VP == 1) THEN
-        DO I=JFT,JLT          
-          EPDR(I) = MAX( EM20, PM(44,IMAT))
-          PLAP(I) = UVAR(I,1)
-        ENDDO
-      ELSEIF (VP == 3) THEN
-        DO I=JFT,JLT          
-          EPDR(I) = MAX( EM20, PM(44,IMAT))
-        ENDDO        
-      ENDIF
 !
-      IF ( JTHE <= 0 ) THEN      
-        TM=Z4  
-        DO I=JFT,JLT
-          T(I) = T(I)+CP*(EINT(I,1)+EINT(I,2))/VOL0(I)
-          TSTAR(I) = MAX( ZERO, (T(I)-TI)/(TM-TI) )
-        ENDDO
-      ENDIF
-      IF (VP == 3) THEN
-        IF (ISRATE > 0) THEN 
+      IF (IRTY == 1) THEN       ! Zerilli
+        RHOCP = PM(53,IMAT)     ! = 1 /rhocp             
+        Z4    = PM(52,IMAT)                    
+        TREF  = PM(54,IMAT)                    
+        IF (JTHE /= 0) THEN      
           DO I=JFT,JLT
-            DAV    = (EPSPXX(I)+EPSPYY(I))*THIRD
-            DEVE1  = EPSPXX(I) - DAV
-            DEVE2  = EPSPYY(I) - DAV
-            DEVE3  = - DAV
-            DEVE4  = HALF*EPSPXY(I)
-            EPSDOT(I)   = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
-            EPSDOT(I)   = SQRT(THREE*EPSDOT(I))/THREE_HALF             
-            EPSDOT(I)   = ASRATE*EPSDOT(I) + (ONE - ASRATE)*UVAR(I,1)
-            UVAR(I,1)   = EPSDOT(I)
+            TEMPEL(I) = TREF + RHOCP*(EINT(I,1)+EINT(I,2))/VOL(I)
           ENDDO
-        ELSEIF (ISRATE == 0) THEN
-          DO I=JFT,JLT
-             DAV = (EPSPXX(I)+EPSPYY(I))*THIRD
-             DEVE1  = EPSPXX(I) - DAV
-             DEVE2  = EPSPYY(I) - DAV
-             DEVE3  = - DAV
-             DEVE4  = HALF*EPSPXY(I)
-             EPSDOT(I)   = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
-             EPSDOT(I)   = SQRT(THREE*EPSDOT(I))/THREE_HALF             
-             UVAR(I,1)   = EPSDOT(I)
-           ENDDO
-         ENDIF
-      ELSE
+        ENDIF
+      ELSE                       ! Johnson-Cook
+        RHOCP = PM(69,IMAT)                  
+        TREF  = PM(79,IMAT)                    
+        TMELT = PM(80,IMAT)                    
+        DO I=JFT,JLT
+          TSTAR(I) = MAX( ZERO, (TEMPEL(I)-TREF)/(TMELT-TREF) )
+        ENDDO
+      END IF             
+!
+      ! Specific strain rate computation
+      ! -> Plastic strain rate
+      ! Old filtered value already stored in EPSD
+!
+      IF (VP == 1) THEN 
+        DO I=JFT,JLT
+          EPSDOT(I) = EPSD(I) 
+        ENDDO
+      ! -> Total strain rate
+      ELSEIF (VP == 2) THEN
         DO I=JFT,JLT  
-         EPSDOT(I)  = EPSPDT(I)    
-        ENDDO     
+          EPSDOT(I) = EPSP(I)  
+          EPSD(I)   = EPSP(I)    
+        ENDDO   
+      ! -> Deviatoric strain rate    
+      ELSEIF (VP == 3) THEN
+        DO I=JFT,JLT
+          DAV   = (EPSPXX(I)+EPSPYY(I))*THIRD
+          DEVE1 = EPSPXX(I) - DAV
+          DEVE2 = EPSPYY(I) - DAV
+          DEVE3 = - DAV
+          DEVE4 = HALF*EPSPXY(I)
+          EPSDOT(I) = HALF*(DEVE1**2 + DEVE2**2 + DEVE3**2) + DEVE4**2
+          EPSDOT(I) = SQRT(THREE*EPSDOT(I))/THREE_HALF             
+          IF (ISRATE > 0) THEN 
+            EPSDOT(I) = ASRATE*EPSDOT(I) + (ONE - ASRATE)*EPSD(I)
+          ENDIF
+          EPSD(I) = EPSDOT(I)
+        ENDDO 
       ENDIF
 !----------------------------
 !         CONTRAINTES PLASTIQUEMENT ADMISSIBLES
 !----------------------------
       CALL M2CPLR(JFT     ,JLT     ,EZZ      ,OFF_OLD  ,PLA     ,
-     2            IPLA    ,T       ,Z3       ,Z4       ,EPIF    ,
-     3            NPIF    ,IRTY    ,ETSE     ,GS       ,EPSDOT  ,
+     2            IPLA    ,TEMPEL  ,Z3       ,Z4       ,
+     3            IRTY    ,ETSE    ,GS       ,EPSDOT   ,
      4            ISRATE  ,YLD     ,G        ,A11      ,A12     ,
      5            NU      ,CA      ,CB       ,CN       ,YMAX    ,
      6            EPCHK   ,YOUNG   ,CC       ,EPDR     ,ICC     ,
@@ -188,14 +165,18 @@ C-----------------------------------------------
      9            DEPSYZ  ,DEPSZX  ,SIGNXX   ,SIGNYY   ,SIGNXY  ,
      A            SIGNYZ  ,SIGNZX  ,SIGBAKXX ,SIGBAKYY ,SIGBAKXY,
      B            SIGOXX  ,SIGOYY  ,SIGOXY   ,SIGOYZ   ,SIGOZX  ,
-     C            VP      ,PLAP    ,DT1C     ,ASRATE)
+     C            VP      ,EPSPXX  ,EPSPYY   ,EPSPXY  )
 !
-      IF(VP == 1) THEN
+!--------------------------------------------
+!     UPDATE AND FILTER PLASTIC STRAIN RATE
+!--------------------------------------------
+      IF (VP == 1) THEN
         DO I=JFT,JLT
-          UVAR(I,1) = PLAP(I) 
+          EPSDOT(I) = DPLA(I)/MAX(EM20,DT1)
+          EPSD(I)   = ASRATE*EPSDOT(I) + (ONE - ASRATE)*EPSD(I)
         ENDDO
       ENDIF
-
+!--------------------------------------------
       DO I=JFT,JLT
         SIGY(I) = SIGY(I) + YLD(I)/NPTT
       ENDDO
@@ -227,6 +208,20 @@ c------------------------------------
         ENDIF
         THK(I) = THK(I) + EZZ(I) * THKLYL(I)*OFF(I)
       ENDDO
+!---------------------------------------------------------
+!     calculate temperature or thermal load due to plastic work
+!---------------------------------------------------------
+      IF (JTHE == 0 .and. RHOCP > ZERO) THEN  ! update temperature in adiabatic conditions
+        IF (IRTY /= 1) THEN                   ! Johnson-Cook only
+          DO I=1,NEL       
+            TEMPEL(I) = TEMPEL(I) + SIGY(I)*DPLA(I) / RHOCP
+          ENDDO
+        END IF
+      ELSE                                    ! cumulate thermal load due to plastic work for /heat/mat
+        DO I=1,NEL       
+          FHEAT(I) = FHEAT(I) + SIGY(I)*DPLA(I)*VOL(I)
+        ENDDO
+      END IF
 c-----------
       RETURN
       END

@@ -31,6 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||    table_mod              ../starter/share/modules1/table_mod.F
       !||====================================================================
@@ -40,10 +41,11 @@ C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
       USE MESSAGE_MOD
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : NSUBMOD, SUBMODEL_DATA
       USE HM_OPTION_READ_MOD
       USE UNITAB_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
+      USE READER_OLD_MOD , ONLY : KFUNCT, NSLASH
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -62,6 +64,7 @@ C-----------------------------------------------
       INTEGER NOM_OPT(LNOPT1,*)
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD), INTENT(IN) :: LSUBMODEL
       TYPE(UNIT_TYPE_), INTENT(IN) :: UNITAB
+
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -69,14 +72,12 @@ C-----------------------------------------------
       INTEGER I, J, K, II, N, L, NDIM, NX(4), NY,
      .        JREC, NPTS, STAT, LL
       INTEGER IERROR, NF, IDFUNC, NP
-C     REAL
-      my_real
-     .   BID, F5(5), TIME, FUNCT
+      my_real BID, F5(5), TIME, FUNCT
       CHARACTER(LEN=NCHARTITLE) :: TITR,TITR1
       CHARACTER :: MESS*40
       CHARACTER(LEN=NCHARFIELD)::KEY
       DATA MESS/' FUNCTION & TABLE DEFINITION            '/
-      LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE
+      LOGICAL :: IS_ENCRYPTED, IS_AVAILABLE     
 C======================================================================|
       IF(NTABLE  == 0) RETURN 
 !     Initialization
@@ -132,7 +133,6 @@ C-----------------------------------------------------------------
       !||    udouble                ../starter/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
-      !||    interface_table_mod    ../starter/share/modules1/table_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||    table_mod              ../starter/share/modules1/table_mod.F
@@ -142,7 +142,6 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
-      USE INTERFACE_TABLE_MOD
       USE MESSAGE_MOD
       USE SUBMODEL_MOD
       USE HM_OPTION_READ_MOD

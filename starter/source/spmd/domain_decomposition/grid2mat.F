@@ -3179,11 +3179,17 @@ c        END IF
       END
 
       !||====================================================================
-      !||    prelec_ddw   ../starter/source/spmd/domain_decomposition/grid2mat.F
+      !||    prelec_ddw       ../starter/source/spmd/domain_decomposition/grid2mat.F
       !||--- called by ------------------------------------------------------
-      !||    lectur       ../starter/source/starter/lectur.F
+      !||    lectur           ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE PRELEC_DDW(FILNAM,LEN_FILNAM,MARQUEUR3)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE READER_OLD_MOD , ONLY : LINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -3245,11 +3251,17 @@ C        Prelecture des poids couple Mat/Prop
        RETURN
        END
       !||====================================================================
-      !||    lec_ddw   ../starter/source/spmd/domain_decomposition/grid2mat.F
+      !||    lec_ddw          ../starter/source/spmd/domain_decomposition/grid2mat.F
       !||--- called by ------------------------------------------------------
-      !||    lectur    ../starter/source/starter/lectur.F
+      !||    lectur           ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE LEC_DDW(FILNAM,LEN_FILNAM,TAB_UMP_OLD,CPUTIME_MP_OLD)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE READER_OLD_MOD , ONLY : LINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -3294,8 +3306,14 @@ C     Lecture des poids couple Mat/Prop
       !||    prelec_ddw_poin   ../starter/source/spmd/domain_decomposition/grid2mat.F
       !||--- called by ------------------------------------------------------
       !||    lectur            ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||    reader_old_mod    ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE PRELEC_DDW_POIN(FILNAM,LEN_FILNAM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE READER_OLD_MOD , ONLY : LINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -3326,11 +3344,17 @@ C     Lecture du pointer
       RETURN
       END 
       !||====================================================================
-      !||    lec_ddw_poin   ../starter/source/spmd/domain_decomposition/grid2mat.F
+      !||    lec_ddw_poin     ../starter/source/spmd/domain_decomposition/grid2mat.F
       !||--- called by ------------------------------------------------------
-      !||    lectur         ../starter/source/starter/lectur.F
+      !||    lectur           ../starter/source/starter/lectur.F
+      !||--- uses       -----------------------------------------------------
+      !||    reader_old_mod   ../starter/share/modules1/reader_old_mod.F90
       !||====================================================================
       SUBROUTINE LEC_DDW_POIN(FILNAM,LEN_FILNAM,POIN_UMP_OLD)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+        USE READER_OLD_MOD , ONLY : LINE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

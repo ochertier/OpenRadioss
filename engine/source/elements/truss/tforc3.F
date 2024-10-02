@@ -37,6 +37,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    tfcum3              ../engine/source/elements/truss/tfcum3.F
       !||    tfcum3p             ../engine/source/elements/truss/tfcum3p.F
       !||--- uses       -----------------------------------------------------
+      !||    dt_mod              ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_mod             ../engine/share/modules/h3d_mod.F
       !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
@@ -52,13 +53,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8   GRTH,     IGRTH,    MSTR,     DMELTR,
      9   IOUTPRT,  IPM,      NPF,      TF,
      A   ITASK,    H3D_DATA, NFT,      MTN,
-     B   JSMS,     IGRE,     PRELD1,   STF_F)
+     B   JSMS,     IGRE,     PRELD1,   STF_F,
+     C   DT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE H3D_MOD
       USE PRELOAD_AXIAL_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -91,6 +94,7 @@ C-----------------------------------------------
 C
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE (DT_), INTENT(IN) :: DT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

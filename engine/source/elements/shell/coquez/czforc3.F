@@ -68,6 +68,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    crackxfem_mod       ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod           ../engine/share/modules/drape_mod.F
+      !||    dt_mod              ../engine/source/modules/dt_mod.F
+      !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod        ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
@@ -104,7 +106,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Q   NODEDGE,     CRKNODIAD,   CONDN,       CONDNSKY,
      R   STACK,       ISUBSTACK,   XFEM_STR,    CRKEDGE,
      S   DRAPE_SH4N,  NEL,         NLOC_DMG,    INDX_DRAPE,
-     T   IGRE,        JTUR         )
+     T   IGRE,        JTUR,        DT           )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -116,6 +118,8 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD        
       USE DRAPE_MOD       
       USE SENSOR_MOD
+      USE ELBUFDEF_MOD
+      USE DT_MOD
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -172,6 +176,7 @@ C     REAL OU REAL*8
       TYPE (DRAPE_) , DIMENSION(NUMELC_DRAPE) :: DRAPE_SH4N
       TYPE (SENSORS_)  ,INTENT(IN)    :: SENSORS
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
+      TYPE (DT_)       ,INTENT(IN)    :: DT
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C   L O C A L   V A R I A B L E S
 C--------------------------------
@@ -231,6 +236,9 @@ C--------------------------------
      .  A_IT(MVSIZ),F_DEF(MVSIZ,8), U13(MVSIZ,2),U24(MVSIZ,2),
      .  AXYZ(MVSIZ,4),WXY(MVSIZ),FAC58(MVSIZ,2) 
        my_real , DIMENSION (NEL) :: ZOFFSET
+!     variables for heat transfer
+      my_real, dimension(mvsiz) :: fheat
+!
 C--- Variables pour le non-local
       INTEGER :: NDDL, K, INOD(4),NC1(MVSIZ), NC2(MVSIZ), NC3(MVSIZ), NC4(MVSIZ),
      .           IPOS(4), L_NLOC, IMAT, INLOC,IINT
@@ -265,7 +273,8 @@ C-----
       NLAY  = ELBUF_STR%NLAY
       SEDRAPE = SCDRAPE
       NUMEL_DRAPE = NUMELC_DRAPE
-      TEMPEL(1:MVSIZ) = ZERO
+      TEMPEL(:) = ZERO
+      FHEAT(:)  = ZERO
 c
 c      NPT  = MAX(NLAY,NPTT) --> set to = IPARG(6) , keeping it original
 c                                to allow for NPT = 0 (global LAW_3
@@ -526,11 +535,9 @@ c-------------------------------------------
         ENDDO
       ENDIF     
 C-----------------
-C     CONTRAINTES
-C-----------------
-      IF (JTHE > 0) THEN
-        CALL TEMPCG(JFT  ,JLT    ,PM     ,MAT    ,IXC     ,
-     .              TEMP ,TEMPEL )
+      ! transfer nodal temperature to gauss points (/heat/mat)
+      IF (JTHE /= 0) THEN      
+        CALL TEMPCG(NUMNOD,NEL   ,IXC  ,TEMP ,TEMPEL )
       ENDIF
 C-----------------------------------------------     
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
@@ -549,7 +556,7 @@ C-----------------------------------------------
      B      NGL       ,ZCFAC     ,SHF       ,GS        ,GBUF%EPSD  ,
      C      KFTS      ,IHBE      ,ALPE      ,
      D      DIR_A     ,DIR_B     ,IGEO      ,
-     E      IPM       ,IFAILURE  ,NPG       ,
+     E      IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F      TEMPEL    ,DIE       ,JTHE      ,IEXPAN    ,GBUF%TEMP  ,
      G      IBID      ,BID       ,
      H      BID       ,BID       ,BID       ,BID       ,BID        ,
@@ -561,7 +568,7 @@ C-----------------------------------------------
      N      ISMSTR    ,IR        ,IS        ,NLAY      ,NPT        ,
      O      IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P      F_DEF     ,ITASK     ,DRAPE_SH4N  ,VAR_REG   ,NLOC_DMG   ,
-     R      INDX_DRAPE,THKE        ,SEDRAPE     ,NUMEL_DRAPE)
+     R      INDX_DRAPE,THKE        ,SEDRAPE     ,NUMEL_DRAPE,DT    )
 C-----------------------------------------------
 c        
       IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
@@ -697,15 +704,21 @@ c-------------------------------
 C-------------------------
 c     Thermique des coques 
 C--------------------------
-        IF (JTHE > 0) THEN  
-          CALL THERMC(JFT    ,JLT     ,PM      ,MAT  ,THK0 ,IXC  ,
-     .                Y24    ,PX2     ,PY1     ,PY2  ,AREA ,DT1C ,
-     .                TEMP   ,TEMPEL  ,DIE     ,THEM )
+        IF (JTHE /= 0) THEN  
+          IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
+            CALL THERMC(JFT    ,JLT     ,PM      ,MAT  ,THK0 ,IXC  ,
+     .                  Y24    ,PX2     ,PY1     ,PY2  ,AREA ,DT1C ,
+     .                  TEMP   ,TEMPEL  ,FHEAT   ,THEM )
+          ELSE
+            CALL THERMC(JFT    ,JLT     ,PM      ,MAT  ,THK0 ,IXC  ,
+     .                  Y24    ,PX2     ,PY1     ,PY2  ,AREA ,DT1C ,
+     .                  TEMP   ,TEMPEL  ,DIE    ,THEM )
+          END IF
         ENDIF 
 c--------------------------
 c     THERMAL TIME STEP
 c--------------------------
-        IF (JTHE > 0 .AND. IDT_THERM == 1) THEN
+        IF (JTHE /= 0 .AND. IDT_THERM == 1) THEN
            CALL DTTHERM(
      1   JFT,     JLT,     PM,      TEMPEL,
      2   GBUF%RE, RHO,     GBUF%RK, VOL0,

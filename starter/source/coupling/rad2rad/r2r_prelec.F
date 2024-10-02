@@ -47,6 +47,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    message_mod                ../starter/share/message_module/message_mod.F
       !||    nod2el_mod                 ../starter/share/modules1/nod2el_mod.F
       !||    r2r_mod                    ../starter/share/modules1/r2r_mod.F
+      !||    reader_old_mod             ../starter/share/modules1/reader_old_mod.F90
       !||    restmod                    ../starter/share/modules1/restart_mod.F
       !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
       !||====================================================================
@@ -71,6 +72,7 @@ C-----------------------------------------------
         USE INIVOL_DEF_MOD , ONLY : NUM_INIVOL
         USE DETONATORS_MOD
         USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY, NCHARFIELD
+        USE READER_OLD_MOD , ONLY : KINTER, KCUR, LINE, NSLASH
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

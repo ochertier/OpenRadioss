@@ -42,6 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    inivol_def_mod         ../starter/share/modules1/inivol_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||    r2r_mod                ../starter/share/modules1/r2r_mod.F
+      !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
       !||    restmod                ../starter/share/modules1/restart_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
@@ -71,12 +72,13 @@ C-----------------------------------------------
         USE DETONATORS_MOD
         USE MATPARAM_DEF_MOD
         USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+        USE READER_OLD_MOD , ONLY : KINTER, NSLASH
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   A n a l y s e   M o d u l e
+C   A r g u m e n t s
 C-----------------------------------------------
         INTEGER,INTENT(IN) :: IGEO_(NPROPGI,NUMGEO)
 C-----------------------------------------------
