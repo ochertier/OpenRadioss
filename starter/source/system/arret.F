@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,7 +41,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_preread_pblast       ../starter/source/loads/pblast/hm_preread_pblast.F
       !||    hm_read_bem             ../starter/source/loads/bem/hm_read_bem.F
       !||    hm_read_fail_user       ../starter/source/materials/fail/failuser/hm_read_fail_user.F
-      !||    hm_read_mat             ../starter/source/materials/mat/hm_read_mat.F
       !||    hm_read_mat29_31        ../starter/source/materials/mat/matuser/hm_read_mat_user29_31.F
       !||    hm_read_mat_99          ../starter/source/materials/mat/matuser/hm_read_mat_user_99.F
       !||    hm_read_pblast          ../starter/source/loads/pblast/hm_read_pblast.F

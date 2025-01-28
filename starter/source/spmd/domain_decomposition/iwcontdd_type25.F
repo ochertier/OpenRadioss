@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,9 +34,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !
 !       IWCONTDD_TYPE25 organization :
 !           for S node :
-!            * add the weith to the S node
+!            * add the weight to the S node
 !           for M node :
-!            * add the weith to the M node
+!            * add the weight to the M node
 !           for edge to edge :
 !            * add the weight to the 4 M nodes (e2s)
 !            * add the weight to the 2 M nodes (e2e)

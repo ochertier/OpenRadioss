@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -178,7 +178,7 @@ C-----------------------------------------------
  
         IELE(J)=NEL
         ITYPE(J)=NNODE
-        IF (TYPE == 8 .OR. TYPE == 9 .OR. TYPE == 10) THEN
+        IF (TYPE == 8 .OR. TYPE == 9 .OR. TYPE == 10 .OR. TYPE == 11) THEN
            IFAC(J) = NF
         ENDIF
         M=IX(1,NEL)

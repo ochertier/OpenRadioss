@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,27 +42,30 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_tri7gat                 ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri7vox0                ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri7vox_optimized       ../engine/source/mpi/interfaces/spmd_tri7vox_optimized.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+      !||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    inter_sorting_mod            ../engine/share/modules/inter_sorting_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I7MAIN_TRI(
+      SUBROUTINE I7MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,V       ,
      2                  MS      ,NIN     ,ITASK   ,MWAG    ,WEIGHT  ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM ,
      4                  ITAB    ,KINET   ,TEMP    ,NRTM_T  ,RENUM   ,
      5                  NSNFIOLD,ESHIFT  ,NUM_IMP ,IND_IMP ,NODNX_SMS,
-     6                  INTBUF_TAB,H3D_DATA,IXS,MULTI_FVM)
+     6                  INTBUF_TAB,H3D_DATA,IXS,MULTI_FVM,GLOB_THERM)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TRI7BOX
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
@@ -70,6 +73,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE INTER_SORTING_MOD
       use check_sorting_criteria_mod , only : check_sorting_criteria
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -96,6 +100,7 @@ C common pour variable globale en memoire partagee
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER NIN ,ITASK, RETRI, NRTM_T,ESHIFT,
      .        NUM_IMP ,IND_IMP(*),
      .        ITAB(*), KINET(*),
@@ -110,6 +115,7 @@ C     REAL
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT) :: MULTI_FVM
+      TYPE(GLOB_THERM_), INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -355,7 +361,7 @@ C
 
         CALL MY_BARRIER
 
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,26)
         CALL SPMD_TRI7VOX0(
      1      X           ,BMINMA  ,IPARI(21,NIN),NRTM_T,INTBUF_TAB%STFM(1+ESHIFT),
      2      TZINF       ,CURV_MAX,GAPMIN ,GAPMAX,INTBUF_TAB%GAP_M(1+ESHIFT),
@@ -363,7 +369,7 @@ C
      4      DGAPLOADP  )
  
         CALL MY_BARRIER
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,26)
 
         IF(ITASK==0)THEN
 C
@@ -371,6 +377,7 @@ C recuperation des noeuds remote NSNR stockes dans XREM
 C    
            IF (MULTI_FVM%IS_USED .AND. NTY == 7 .AND. INACTI == 7) THEN
 C     Interface type 18 and law151
+              IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,25)
               CALL SPMD_TRI18_151VOX(
      1             INTBUF_TAB%NSV,NSN     ,X            ,V        ,MS  ,
      2             BMINMA       ,WEIGHT  ,INTBUF_TAB%STFNS,NIN  ,ISENDTO,
@@ -380,8 +387,12 @@ C     Interface type 18 and law151
      6             NUM_IMP     ,NODNX_SMS,INTBUF_TAB%GAP_SL,NTY   ,IDUM1  ,
      7             RDUM1       ,RDUM1,RDUM1,RDUM1,IDUM1  ,IDUM1 ,IDUM1, IXS, MULTI_FVM,
      8             IPARI(72,NIN),INTBUF_TAB%IPARTFRICS)
+             IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,25)
+
               
            ELSE
+              IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,25)
+
               CALL SPMD_TRI7VOX_OPTIMIZED(
      1             INTBUF_TAB%NSV,NSN     ,X            ,V        ,MS  ,
      2             BMINMA       ,WEIGHT  ,INTBUF_TAB%STFNS,NIN  ,ISENDTO,
@@ -391,6 +402,8 @@ C     Interface type 18 and law151
      6             NUM_IMP     ,NODNX_SMS,INTBUF_TAB%GAP_SL,NTY   ,IDUM1  ,
      7             RDUM1       ,RDUM1,RDUM1,RDUM1,IDUM1  ,IDUM1   ,IDUM1 ,
      8             IPARI(72,NIN),INTBUF_TAB%IPARTFRICS   ,ITIED, IVIS2, INTBUF_TAB%IF_ADH)
+             IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,25)
+
 
            ENDIF
 C
@@ -442,7 +455,7 @@ C
         INTBUF_TAB%METRIC%TIC = NINT(100.0 * T1) 
       ENDIF
 #endif
-      IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(30,1)
+      IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,30)
 C
       IF(INTBUF_TAB%METRIC%ALGO == ALGO_VOXEL .OR.  INTBUF_TAB%METRIC%ALGO == TRY_ALGO_VOXEL) THEN
         CALL I7BUCE_VOX(
@@ -457,7 +470,7 @@ C
      C INTBUF_TAB%GAP_ML(1+ESHIFT),INTTH ,ITASK  , INTBUF_TAB%VARIABLES(bgapsmx_index),I_MEM     ,  
      D INTBUF_TAB%KREMNODE(1+2*ESHIFT),INTBUF_TAB%REMNODE,ITAB , IPARI(63,NIN),DRAD         ,
      E ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP,REMOTE_S_NODE,LIST_REMOTE_S_NODE,
-     F NRTM)
+     F NRTM  ,GLOB_THERM%INTHEAT,GLOB_THERM%IDT_THERM,GLOB_THERM%NODADT_THERM)
       ELSE
         CALL I7BUCE(
      1 X      ,INTBUF_TAB%IRECTM(1+4*ESHIFT),INTBUF_TAB%NSV  ,INACTI    ,INTBUF_TAB%CAND_P,
@@ -470,7 +483,7 @@ C
      B GAPMIN ,GAPMAX      ,CURV_MAX_MAX   ,NUM_IMP   ,INTBUF_TAB%GAP_SL,
      C INTBUF_TAB%GAP_ML(1+ESHIFT),INTTH ,ITASK  , INTBUF_TAB%VARIABLES(bgapsmx_index),I_MEM     ,  
      D INTBUF_TAB%KREMNODE(1+2*ESHIFT),INTBUF_TAB%REMNODE,ITAB , IPARI(63,NIN),DRAD         ,
-     E ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP)
+     E ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP,GLOB_THERM%INTHEAT, GLOB_THERM%IDT_THERM, GLOB_THERM%NODADT_THERM)
 
       ENDIF
       
@@ -511,7 +524,7 @@ C        UPGRADE_MULTIMP routine !!!!
       ENDIF
 
 C
-      IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,30)
       IF( ITASK == 0) THEN
         IF( INTBUF_TAB%METRIC%ALGO == TRY_ALGO_VOXEL) THEN ! if test phase
           INTBUF_TAB%METRIC%ALGO =  TRY_ALGO_BUCKET
@@ -557,20 +570,20 @@ C mise a - de dist temporairement pour reperage dans partie frontiere
       IF(NSPMD>1)THEN
 C mono tache
 !$OMP SINGLE
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
         INTBUF_TAB%VARIABLES(distance_index) = -INTBUF_TAB%VARIABLES(distance_index)
 C
         CALL SPMD_TRI7GAT(
      1      RESULT       ,NSN     ,INTBUF_TAB%CAND_N,INTBUF_TAB%I_STOK(1),NIN,
      2      IPARI(21,NIN),NSNR    ,MULTIMP        ,NTY         ,IPARI(47,NIN),  
      3      IDUM1        ,NSNFIOLD, IPARI        , H3D_DATA    ,IPARI(72,NIN),
-     4      MULTI_FVM)
+     4      MULTI_FVM,GLOB_THERM%NODADT_THERM)
         IPARI(24,NIN) = NSNR
 C
         IF (NUM_IMP>0) 
      .     CALL IMP_RNUMCD(INTBUF_TAB%CAND_N,NIN,NSN,NUM_IMP,IND_IMP )
 C
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 !$OMP END SINGLE
       END IF
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,12 +24,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sigeps41                ../engine/source/materials/mat/mat041/sigeps41.F
       !||--- called by ------------------------------------------------------
       !||    mulaw                   ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8                  ../engine/source/materials/mat_share/mulaw8.F
+      !||    mulaw8                  ../engine/source/materials/mat_share/mulaw8.F90
       !||--- calls      -----------------------------------------------------
       !||    burn_fraction_ireac1    ../engine/source/materials/mat/mat041/sigeps41.F
       !||    burn_fraction_ireac2    ../engine/source/materials/mat/mat041/sigeps41.F
       !||    mixture_equilibrium     ../engine/source/materials/mat/mat041/sigeps41.F
       !||--- uses       -----------------------------------------------------
+      !||    output_mod              ../common_source/modules/output/output_mod.F90
       !||    root_finding_algo_mod   ../common_source/modules/root_finding_algo_mod.F90
       !||====================================================================
       SUBROUTINE SIGEPS41 (
@@ -41,7 +42,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9     SIGVXX ,SIGVYY ,SIGVZZ  ,SIGVXY  ,SIGVYZ  ,SIGVZX ,
      A     SOUNDSP,VISCMAX,UVAR    ,DELTVOL ,BFRAC  ,
      B     TEMP)
+C-----------------------------------------------
+C   D e s c r i p t i o n
+C-----------------------------------------------
       USE ROOT_FINDING_ALGO_MOD
+      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -66,7 +71,7 @@ C     GROWTH TERM   : rateg = G1 * (1.-F)**b * F**d * pres**y  , if P>0
 C
 C   *** IREAC = 2 ***
 C   EXTENDED 3-TERM-MODEL   --> dF/dT = IGNITION TERM + GROWTH TERM 1 + GROWTH TERM 2
-C        IGNITION TERM :  ratei = I * (1.-F+tol)**b * abs(etar-1.-ccrit)**x     , if 0<f<Figmax & P>0 & compression thresold (etar-1>=ccrit)
+C        IGNITION TERM :  ratei = I * (1.-F+tol)**b * abs(etar-1.-ccrit)**x     , if 0<f<Figmax & P>0 & compression threshold (etar-1>=ccrit)
 C        GROWTH TERM 1 : rateg1 = G1 * (1.-F+tol)**c * (F+tol)**d * pres**y     , if 0<f<FG1max & P>0
 C        GROWTH TERM 2 : rateg2 = G2 * (1.-F+tol)**e * (F+tol)**g * pres**z     , if FG2min<f<1 & P>0
 C
@@ -154,7 +159,7 @@ C-----------------------------------------------
      .        cappa,chi,ccrit,tol,cv,dedv,
      .        artvisc,dt,pres,fc,cburn,enq,SHEAR,vol_rel,dvol_rel
       my_real oldfc,tem1,tem2,chydro,chydro2,dpdmu,dpde,heat
-      my_real mt,pold,er,tfextt,wr,wp
+      my_real mt,pold,er,WFEXTt,wr,wp
       integer  itrmax,i_reac,i
       my_real :: beta !volumic fraction of reagent
       my_real, dimension(25) :: funct_parameter
@@ -162,7 +167,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      TFEXTT=ZERO        
+      WFEXTT=ZERO
       if (TIME == ZERO) then
         do i=1,nel
           uvar(i,1) = ZERO       ! Burn Fraction (F)
@@ -331,14 +336,14 @@ C       Burn fraction
         uvar(i,8) = ONE - beta !volume fraction of products
 C       energie released by the reaction = D(energie totale) - (-P.DV)
         er=mt*cv*tmp + HALF*(pres+pold)*DELTVOL(I)  !misunderstanding between volumetric heat capacity (J/m3/K = Pa/K) and heat capacity(J/K) ? law41 to be verified.
-        TFEXTT=TFEXTT+er-EINT(I)
+        WFEXTT=WFEXTT+er-EINT(I)
         EINT(I)=mt*cv*tmp + HALF*(pres+pold)*DELTVOL(I)
 C       EINT(I)=EINT(I)-0.5*(pres+pold)*DELTVOL(I) done in mulaw.
         TEMP(I) = tmp !temperature
       enddo
 c
 #include "atomic.inc"
-      TFEXT=TFEXT+TFEXTT
+      WFEXT=WFEXT+WFEXTT
 #include "atomend.inc"
 C-----------------------------------------------
       RETURN
@@ -389,7 +394,7 @@ C-----------------------------------------------
       cburn = ZERO
       if (pres <= ZERO) return              !no rate to calculate for material expansion
       if (artvisc >= (cappa*pres)) return   !
-      if (fc == ONE) return                 !everything alread reacted, 100% products, Fc remains 1.00
+      if (fc == ONE) return                 !everything already reacted, 100% products, Fc remains 1.00
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -421,7 +426,7 @@ C   D e s c r i p t i o n
 C-----------------------------------------------
 C   *** IREAC = 2 ***
 C   EXTENDED 3-TERM-MODEL   --> dF/dT = IGNITION TERM + GROWTH TERM 1 + GROWTH TERM 2
-C        IGNITION TERM :  ratei = I * (1.-F+tol)**b * abs(etar-1.-ccrit)**x     , if 0<f<Figmax & P>0 & compression thresold (etar-1>=ccrit)
+C        IGNITION TERM :  ratei = I * (1.-F+tol)**b * abs(etar-1.-ccrit)**x     , if 0<f<Figmax & P>0 & compression threshold (etar-1>=ccrit)
 C        GROWTH TERM 1 : rateg1 = G1 * (1.-F+tol)**c * (F+tol)**d * pres**y , if 0<f<FG1max & P>0
 C        GROWTH TERM 2 : rateg2 = G2 * (1.-F+tol)**e * (F+tol)**g * pres**z     , if FG2min<f<1 & P>0
 c
@@ -507,7 +512,7 @@ C   D e s c r i p t i o n
 C-----------------------------------------------
 c  fc massic fraction (F function) ;
 c  beta : volume fraction of reagent (unreacted explosive)
-c  T,v,fc knwon : find beta such as Pr=Pp  (hypothesis : equilibrium between two phase for system closure)
+c  T,v,fc known : find beta such as Pr=Pp  (hypothesis : equilibrium between two phase for system closure)
 c  Iterative method : iterate on b value until delta = Pp-Pr < eps
 c
 c  input : vol_rel, etar, etap, fc, tmp
@@ -604,7 +609,7 @@ c
 c   pressure
       pres = (preac+pprod)*HALF
 c
-c   local derrivatives
+c   local derivatives
       transr = bthr / beta
       transp = bthp / (ONE - beta)
       trans = transr*etar + transp*etap

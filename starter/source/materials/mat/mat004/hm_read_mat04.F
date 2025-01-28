@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat04            ../starter/source/materials/mat/mat004/hm_read_mat04.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
@@ -37,7 +37,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       SUBROUTINE HM_READ_MAT04(
      .           LSUBMODEL ,MTAG     ,UNITAB   ,IPM    ,PM      ,
-     .           MAT_ID    ,TITR     ,ISRATE ,MATPARAM)
+     .           MAT_ID    ,TITR     ,ISRATE   ,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -79,7 +79,7 @@ C-----------------------------------------------
       TYPE(UNIT_TYPE_) ,INTENT(IN) :: UNITAB
       TYPE(SUBMODEL_DATA), DIMENSION(NSUBMOD),INTENT(IN) :: LSUBMODEL
       TYPE(MLAW_TAG_), INTENT(INOUT)               :: MTAG
-      TYPE(MATPARAM_STRUCT_),INTENT(INOUT)  :: MATPARAM
+      TYPE(MATPARAM_STRUCT_),INTENT(INOUT)  :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -175,7 +175,10 @@ C-----------------------------------------------
         IEOS   = 18   ! Linear EOS is used by default 
       ENDIF                                                                                        
 !
-      MATPARAM%IEOS = IEOS
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"ELASTO_PLASTIC")
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"INCREMENTAL")
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"LARGE_STRAIN") 
+      MAT_PARAM%IEOS = IEOS
       IPM(4)        = IEOS  ! keep this temporarily for output and fluid sections
      
       IF (PMIN==ZERO) PMIN=-EP20
@@ -245,14 +248,18 @@ C     Formulation for solid elements time step computation.
       MTAG%L_EPSD = 1   
 
       ! Material compatibility with /EOS option
-      CALL INIT_MAT_KEYWORD(MATPARAM,"EOS")
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"EOS")
 
       ! EOS/Thermo keyword for pressure treatment in elements
-      CALL INIT_MAT_KEYWORD(MATPARAM,"HYDRO_EOS")
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"HYDRO_EOS")
 
       ! Properties compatibility
-      CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")
-      CALL INIT_MAT_KEYWORD(MATPARAM,"SPH")
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"SOLID_ISOTROPIC")
+      CALL INIT_MAT_KEYWORD(MAT_PARAM,"SPH")
+!
+      ! activate heat source calculation in material for /heat/mat
+
+      MAT_PARAM%HEAT_FLAG = 1
       
 C--------------------------------
       WRITE(IOUT,2001) TITR,MAT_ID,4

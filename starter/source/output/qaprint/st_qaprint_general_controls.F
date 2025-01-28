@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -571,7 +571,7 @@ C----------------------------------------------
 C       
         IF (NPERTURB > 0) THEN 
 C
-!         Sort by ID to ensure internal order independant output
+!         Sort by ID to ensure internal order independent output
           DO I = 1,NPERTURB 
             IDS(I)    = QP_IPERTURB(I,1)
             IDX(I)    = I
@@ -617,7 +617,7 @@ C     /EIG
 C-----------------------------------------------
       IF (MYQAKEY('/EIG')) THEN
 C          
-!     Sort by ID to ensure internal order independant output
+!     Sort by ID to ensure internal order independent output
           DO I = 1, NEIG
             IDSEIG(I)    = EIGIPM(1,I)
             IDXEIG(I)    = I

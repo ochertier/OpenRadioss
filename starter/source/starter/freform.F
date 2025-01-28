@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -568,7 +568,7 @@ C=======================================================================
       !||    hm_read_inter_struct         ../starter/source/interfaces/reader/hm_read_inter_struct.F
       !||    hm_read_intsub               ../starter/source/output/subinterface/hm_read_intsub.F
       !||    hm_read_link                 ../starter/source/constraints/rigidlink/hm_read_rlink.F
-      !||    hm_read_mat                  ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                  ../starter/source/materials/mat/hm_read_mat.F90
       !||    hm_read_merge                ../starter/source/constraints/general/merge/hm_read_merge.F
       !||    hm_read_mpc                  ../starter/source/constraints/general/mpc/hm_read_mpc.F
       !||    hm_read_nbcs                 ../starter/source/constraints/general/bcs/hm_read_nbcs.F
@@ -700,7 +700,6 @@ C-----------------------------------------------
       !||    hm_read_rbody                 ../starter/source/constraints/general/rbody/hm_read_rbody.F
       !||    hm_read_sphcel                ../starter/source/elements/reader/hm_read_sphcel.F
       !||    hm_read_subset                ../starter/source/model/assembling/hm_read_subset.F
-      !||    hm_read_therm_stress          ../starter/source/materials/therm/hm_read_therm_stress.F
       !||    hm_read_thgrki                ../starter/source/output/th/hm_read_thgrki.F
       !||    hm_read_thgrki_rbody          ../starter/source/output/th/hm_read_thgrki_rbody.F
       !||    hm_read_thgrne                ../starter/source/output/th/hm_read_thgrne.F

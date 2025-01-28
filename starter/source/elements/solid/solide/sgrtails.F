@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -150,6 +150,8 @@ C
         IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                           MSGTYPE=MSGERROR,
      .                           C1='XNUM_RNOISE')
+      ELSE
+        ALLOCATE(XNUM_RNOISE(0,0))
       ENDIF
 C
 C phase 1 : domain decomposition
@@ -439,6 +441,7 @@ C
       DO 300 N=1,ND
        NFT = 0
        DO P = 1, NSPMD
+        ICPT10 = -HUGE(ICPT10)
         NGP(P)=0
         NEL = DD_IAD(P+1,NSPGROUP+N)-DD_IAD(P,NSPGROUP+N)
         IF (NEL>0) THEN
@@ -501,7 +504,6 @@ C         PARAMETRE GROUPE
             ITET10  = IGEO(50,PID)
 c
             ISVIS  = IGEO(33,PID)                       
-C   is a material flag   IVISC  = IGEO(34,PID)
             IPARTSPH=IGEO(38,PID)          
 C            
             IF ((ISSN == 10.OR.ISSN == 11).AND.(IGT == 14.OR.IGT == 6)) THEN
@@ -605,7 +607,8 @@ c
             IF(MLN /= 14 .AND. MLN /= 12 .AND. MLN /= 25  .AND.
      .         MLN /= 28 .AND. MLN /= 50 .AND. MLN /= 68  .AND. 
      .         MLN /= 53 .AND. MLN /= 93 .AND. MLN /= 107 .AND.
-     .         MLN /= 112.AND. MLN /= 122) THEN
+     .         MLN /= 112.AND. MLN /= 122 .AND. MLN /= 127 .AND. MLN /= 128) THEN
+
             CALL ANCMSG(MSGID=1225,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_2,
@@ -665,18 +668,18 @@ c
      .                  I2=IGEO(1,PID))
           ENDIF
           IF (JHBE ==  2) JHBE=0     ! Hourglass Halquist
-          IF (JHBE == 15) THEN
-            IF(MLN == 1 .AND. NPT /= 1.AND.IGT /= 22) THEN
+          IF(MLN == 1 .AND.IGT /= 22) THEN
+            IF ((JHBE == 14 .AND. NPT /= 222).OR.(JHBE == 15 .AND. NPT /= 2) ) THEN
+              NPT = 2
+              IF(JHBE==14 ) NPT = 222
               CALL ANCMSG(MSGID=791,
      .                    MSGTYPE=MSGWARNING,
      .                    ANMODE=ANINFO_BLIND_1,
      .                    I1=ID,
+     .                    I2=JHBE,
      .                    C1=TITR)
             ENDIF
-            IF(NPT ==  0) NPT = 3
-            IF(MLN == 1 .AND. NPT /= 1.AND.IGT /= 22) NPT = 2
           ENDIF
-          IF(JHBE==14 .AND. MLN==1.AND.IGT /= 22) NPT = 222
 C
           JALE_FROM_MAT = NINT(PM(72,MID))
           JALE_FROM_PROP = IGEO(62,PID)
@@ -1085,7 +1088,7 @@ C--------elasto-plastic (not large plasticity)
              CASE(21,22,23,24,27,52,79,81,84)                                             
               ICPRE = 2
 C--------orhtotropic,composite (P isn't calculated independently)           
-             CASE(12,14,15,25,28,50,53,68,76,93,107,112)                                             
+             CASE(12,14,15,25,28,50,53,68,76,93,107,112,127)                                             
               ICPRE = 0
             END SELECT 
            IF (ICP0 ==3) THEN
@@ -1236,12 +1239,18 @@ C--------------error out
      .                      I2=MLN)
             END IF
           ENDIF
-          IF((MLN == 70 .OR. MLN == 77) .AND. ISSN /= 11 .AND. ISSN /= 1) ISSN = 11
+          IF(MLN == 70 .OR. MLN == 77) THEN 
+            IF (ITSH==1) THEN  ! not compatible to total strain
+              ISSN = 1 
+            ELSEIF (ISSN /= 11 .AND. ISSN /= 1) THEN
+              ISSN = 11 
+            END IF
+          ENDIF
 C---------------remove Icpre=11 excepting for certain visco-elastic 34
           IF( ICPRE==1.AND.IKSNOD0 ==8.AND.(JHBE==14.OR.JHBE==17))THEN
 C
             IF(MLN == 34 )THEN
-C---------- no warnning message as ICPRE = 11 is the internal flag 
+C---------- no warning message as ICPRE = 11 is the internal flag 
                ICPRE = 11
                IGEO(13, PID) = 11
             END IF
@@ -1374,8 +1383,8 @@ C-------
           ISSN = 10
           ENDIF
         ENDIF
-        IVISC = IPM(222,MID)
-        IF(IVISC == 2 .AND. ISSN /=10 .AND. ISSN /=12) THEN
+        IVISC = MATPARAM%IVISC
+        IF (IVISC == 2 .AND. ISSN /=10 .AND. ISSN /=12) THEN
             CALL ANCMSG(MSGID=3018,
      .                      MSGTYPE=MSGWARNING,
      .                      ANMODE=ANINFO_BLIND_2,
@@ -1601,9 +1610,7 @@ C-----------
      .                  PRMOD=MSG_PRINT)
 c-----
       DEALLOCATE(INDEXS2)
-      IF (NPERTURB > 0) THEN
-        IF (ALLOCATED(XNUM_RNOISE)) DEALLOCATE(XNUM_RNOISE) 
-      ENDIF
+      IF (ALLOCATED(XNUM_RNOISE)) DEALLOCATE(XNUM_RNOISE) 
 c------------------------------------------------------------
  1010 FORMAT(//,
      + 7X,'8-NODE ELEMENT GROUPS'/

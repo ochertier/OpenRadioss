@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    get_neighbour_surface                    ../engine/source/interfaces/interf/get_neighbour_surface.F90
       !||    get_neighbour_surface_from_remote_proc   ../engine/source/interfaces/interf/get_neighbour_surface_from_remote_proc.F90
       !||    get_segment_interface_id                 ../engine/source/interfaces/interf/get_segment_interface_id.F90
+      !||    get_segment_orientation                  ../engine/source/interfaces/interf/get_segment_orientation.F90
       !||    init_nodal_state                         ../engine/source/interfaces/interf/init_nodal_state.F
       !||    resol                                    ../engine/source/engine/resol.F
       !||    spmd_exch_deleted_surf_edge              ../engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
@@ -50,6 +51,23 @@ C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
 C-----------------------------------------------
+        type offset_elem_
+          integer :: sol_up_bound !< upper bound for solid
+          integer :: sol_low_bound !< lower bound for solid
+          integer :: quad_up_bound !< upper bound for quad
+          integer :: quad_low_bound!< lower bound for quad
+          integer :: shell_up_bound !< upper bound for shell
+          integer :: shell_low_bound!< lower bound for shell
+          integer :: truss_up_bound !< upper bound for truss
+          integer :: truss_low_bound!< lower bound for truss
+          integer :: beam_up_bound !< upper bound for beam
+          integer :: beam_low_bound!< lower bound for beam
+          integer :: spring_up_bound !< upper bound for spring
+          integer :: spring_low_bound!< lower bound for spring
+          integer :: shell3n_up_bound !< upper bound for shell3n
+          integer :: shell3n_low_bound!< lower bound for shell3n
+        end type offset_elem_
+
         TYPE working_array
             INTEGER, DIMENSION(:), ALLOCATABLE :: SURF  ! working array for surface
             INTEGER, DIMENSION(:), ALLOCATABLE :: PROC  ! working array for processor            
@@ -70,7 +88,7 @@ C-----------------------------------------------
             INTEGER, DIMENSION(:), ALLOCATABLE :: SEC_NODE_ID ! ID of secondary nodes in each interface
             ! ------------------------------
             ! main node array
-            INTEGER :: MAX_PROC_NB      ! maximun number of processor
+            INTEGER :: MAX_PROC_NB      ! maximum number of processor
             INTEGER :: SIZE_M_NODE_PROC ! size of M_NODE_PROC
             INTEGER, DIMENSION(:), ALLOCATABLE :: SHIFT_M_NODE_PROC ! shift to point to M_NODE_PROC array & number of processor per node
             INTEGER, DIMENSION(:), ALLOCATABLE :: M_NODE_PROC       ! list of processor per node
@@ -125,6 +143,7 @@ C-----------------------------------------------
 
 
             TYPE(remote_elm), DIMENSION(:), ALLOCATABLE :: INTER
+            type(offset_elem_) :: offset_elem !< upper and lower bound
         END TYPE shooting_node_type 
 
 

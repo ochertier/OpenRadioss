@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,23 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    mmodul       ../engine/source/elements/solid/solidez/mmodul.F
+      !||    mmodul             ../engine/source/elements/solid/solidez/mmodul.F
       !||--- called by ------------------------------------------------------
-      !||    szhour3_or   ../engine/source/elements/solid/solidez/szhour3_or.F
+      !||    szhour3_or         ../engine/source/elements/solid/solidez/szhour3_or.F
       !||--- calls      -----------------------------------------------------
-      !||    c33stif2el   ../engine/source/elements/solid/solidez/c33stif2el.F
-      !||    gettransv    ../engine/source/elements/solid/solidez/gettransv.F
-      !||    mstiforthv   ../engine/source/elements/solid/solidez/mstiforthv.F
+      !||    c33stif2el         ../engine/source/elements/solid/solidez/c33stif2el.F
+      !||    gettransv          ../engine/source/elements/solid/solidez/gettransv.F
+      !||    mstiforthv         ../engine/source/elements/solid/solidez/mstiforthv.F
+      !||--- uses       -----------------------------------------------------
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||====================================================================
       SUBROUTINE MMODUL(JFT     ,JLT     ,PM    ,MAT    ,MTN    ,
-     .                  GAMA    ,UPARAM  ,CC    ,CG     ,G33    )
+     .                  GAMA    ,UPARAM  ,CC    ,CG     ,G33    ,
+     .                  mat_param)
+! ---------------------------------------------------------------------------------
+!                modules
+! ---------------------------------------------------------------------------------
+      use matparam_def_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,6 +59,7 @@ C     REAL
       my_real
      .   PM(NPROPM,*),CC(MVSIZ,3,3),UPARAM(*),
      .   GAMA(MVSIZ,6),CG(MVSIZ,3,3),G33(MVSIZ,3,3)
+      type(matparam_struct_)  , intent(in) :: mat_param
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -164,7 +172,7 @@ C----- w/o armature :--> isotropic
         ENDDO
         CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
      .                  QG     ,CC    ,G3  ,G33  ,CG     ) 
-       ELSEIF (MTN==28.OR.MTN==50.OR.MTN==68) THEN
+       ELSEIF (MTN==28.OR.MTN==68) THEN
         DO I=JFT,JLT
          MX  =MAT(I)
          CC(I,1,1) = UPARAM(1)
@@ -179,6 +187,20 @@ C----- w/o armature :--> isotropic
         ENDDO
         CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
      .                  QG     ,CC    ,G3  ,G33  ,CG     ) 
+       ELSEIF (MTN == 50) THEN
+         DO I=JFT,JLT
+           CC(I,1,1) = mat_param%uparam(1)
+           CC(I,2,2) = mat_param%uparam(2)
+           CC(I,3,3) = mat_param%uparam(3)
+           CC(I,1,2) = ZERO
+           CC(I,2,3) = ZERO
+           CC(I,1,3) = ZERO
+           G3(I,1)   = mat_param%uparam(4)
+           G3(I,2)   = mat_param%uparam(5)
+           G3(I,3)   = mat_param%uparam(6)
+         ENDDO
+         CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
+     .                   QG     ,CC    ,G3  ,G33  ,CG     ) 
        ELSEIF (MTN==53) THEN
         DO I=JFT,JLT
          MX  =MAT(I)
@@ -208,7 +230,7 @@ C----- w/o armature :--> isotropic
          G3(I,3)   = UPARAM(12)
         ENDDO
         CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
-     .                  QG     ,CC    ,G3  ,G33  ,CG     )        
+     .                  QG     ,CC    ,G3  ,G33  ,CG     )  
        ELSEIF (MTN==107) THEN
         DO I=JFT,JLT
           MX = MAT(I)
@@ -259,6 +281,38 @@ C----- w/o armature :--> isotropic
         ENDDO
         CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
      .                  QG     ,CC    ,G3  ,G33  ,CG     )   
+      ELSEIF (MTN == 127) THEN     
+        DO I=JFT,JLT
+          CC(I,1,1) = mat_param%uparam(41)
+          CC(I,2,2) = mat_param%uparam(42)
+          CC(I,3,3) = mat_param%uparam(43)
+          CC(I,1,2) = mat_param%uparam(44)
+          CC(I,2,3) = mat_param%uparam(46)
+          CC(I,1,3) = mat_param%uparam(45)
+          G3(I,1)   = mat_param%uparam(47)
+          G3(I,2)   = mat_param%uparam(48)
+          G3(I,3)   = mat_param%uparam(49)
+        ENDDO
+        CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
+     .                  QG     ,CC    ,G3  ,G33  ,CG     ) 
+
+      ELSEIF (MTN == 128) THEN
+        NU    = MAT_PARAM%NU
+        LAMDA = THREE*NU*MAT_PARAM%BULK/(ONE+NU)
+        DO I=JFT,JLT
+         CC(I,1,1) = LAMDA + TWO*MAT_PARAM%SHEAR
+         CC(I,2,2) = CC(I,1,1)
+         CC(I,3,3) = CC(I,1,1)
+         CC(I,1,2) = LAMDA
+         CC(I,2,3) = LAMDA
+         CC(I,1,3) = LAMDA
+         G3(I,1)   = MAT_PARAM%SHEAR
+         G3(I,2)   = MAT_PARAM%SHEAR
+         G3(I,3)   = MAT_PARAM%SHEAR
+        ENDDO
+        CALL MSTIFORTHV(JFT    ,JLT   ,QC  ,QCG  ,QGC    ,
+     .                  QG     ,CC    ,G3  ,G33  ,CG     )       
+
        ELSE
 C----------warring out isotrope effective       
         DO I=JFT,JLT

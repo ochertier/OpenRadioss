@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -349,6 +349,7 @@ C
 C
 C ---recherche cnode par boite tt d'abord
 C
+                  DVOIS = HUGE(DVOIS)
                   DO IBZ=1,NBZ+1
                      DO KP= NPCZ(IBZ-1)+1,NPCZ(IBZ) 
                        NC =IPCZ(KP) 

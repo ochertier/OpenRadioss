@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -729,6 +729,7 @@ C
       ! -> Number of abscissa is the same 
       ! --------------------------------------------------------------------
       FLAG = 0
+      SIZE_FREQ = 0
       IF (SIZE_FREQS == SIZE_FREQL) THEN 
         ! If there is no difference at all between abscissa
         IF (SQRT(DOT_PRODUCT(FREQS-FREQL,FREQS-FREQL))<EM08) THEN
@@ -886,6 +887,7 @@ C
       NU     = TWO
       CONV   = .FALSE.
       NITER  = 0
+      JACTDY_N2 = ZERO
 C
       !-------------------------------------------------------------------------------------
       ! Levenberg     Marquardt Algorithm + Line-search

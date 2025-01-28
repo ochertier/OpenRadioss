@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
       !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
       !||====================================================================
@@ -47,7 +47,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  NERCVOIS,NESDVOIS, LERCVOIS,LESDVOIS,
      .                  ID_ELEM      ,ITY_ELEM  ,IPARTS      ,LAYER_INPUT ,
      .                  IR_INPUT        ,IS_INPUT     ,IT_INPUT  ,IUVAR_INPUT ,H3D_PART    ,
-     .                  IS_WRITTEN_SOLID,INFO1        ,KEYWORD   ,FANI_CELL   ,
+     .                  IS_WRITTEN_SOLID,INFO1        ,KEYWORD   ,ITHERM      ,FANI_CELL   ,
      .                  MULTI_FVM       , IDMDS     ,IMDSVAR     ,
      .                  ID              ,MAT_PARAM    ,MODE         )
 C-----------------------------------------------
@@ -80,6 +80,7 @@ C-----------------------------------------------
      .     SOLID_SCALAR(*),X(3,*),V(3,*),W(3,*),EHOUR(*),
      .     PM(NPROPM,*)
         my_real, INTENT(IN),TARGET :: BUFMAT(*)
+        INTEGER, INTENT(IN) :: ITHERM
         INTEGER IPARG(NPARG,*),IXS(NIXS,*),
      .     IPM(NPROPMI,*),
      .     ID_ELEM(*),ITY_ELEM(*),IPARTS(*),ID,
@@ -106,7 +107,7 @@ C
         !     INITIALIZATION IF SCHLIEREN DEFINED               !
         !-------------------------------------------------------!
         IF(KEYWORD == 'SCHLIEREN')THEN
-          CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM)
+          CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM,ITHERM)
         ENDIF
 c
         DO 900 NG=1,NGROUP

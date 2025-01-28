@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -94,6 +94,7 @@
       integer :: elem_dmg(nel)
 !=======================================================================
       debug = 0
+      nix = 0
       if (ity == 3) then
         nix = 4
       else if (ity == 7) then
@@ -102,6 +103,7 @@
 !
       do ifract = 1,fail_fractal%nfail
         mat_fail = fail_fractal%fractal(ifract)%imat
+        dmg = 0
         do ifail = 1,mat_param(mat_fail)%nfail
           if (mat_param(mat_fail)%fail(ifail)%irupt == 12) then
             dmg = mat_param(mat_fail)%fail(ifail)%uparam(1)
@@ -119,10 +121,10 @@
             lay_dmg(nlay_dmg) = ilay
           end if
         end do
+        nelem_dmg   = 0
         if (nlay_dmg > 0) then
           tagsh(:)    = 0
           elem_dmg(:) = 0
-          nelem_dmg   = 0
           do i=1,fail_fractal%fractal(ifract)%nelem
             if (fail_fractal%fractal(ifract)%random_walk(i)%nix  == nix .and.   &
                 fail_fractal%fractal(ifract)%random_walk(i)%damage > zero) then

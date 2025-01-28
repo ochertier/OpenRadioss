@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,47 +21,53 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    restalloc              ../engine/source/output/restart/arralloc.F
+      !||    restalloc               ../engine/source/output/restart/arralloc.F
       !||--- called by ------------------------------------------------------
-      !||    radioss2               ../engine/source/engine/radioss2.F
+      !||    radioss2                ../engine/source/engine/radioss2.F
       !||--- calls      -----------------------------------------------------
-      !||    alefvm_init            ../engine/source/ale/alefvm/alefvm_init.F
-      !||    ancmsg                 ../engine/source/output/message/message.F
-      !||    arret                  ../engine/source/system/arret.F
-      !||    intstamp_zero          ../engine/share/modules/intstamp_mod.F
-      !||    multi_allocate         ../engine/source/multifluid/multi_allocate.F
-      !||    sz_print               ../engine/source/output/restart/arralloc.F
+      !||    alefvm_init             ../engine/source/ale/alefvm/alefvm_init.F
+      !||    allocate_rbe3           ../common_source/modules/constraints/rbe3_mod.F90
+      !||    ancmsg                  ../engine/source/output/message/message.F
+      !||    arret                   ../engine/source/system/arret.F
+      !||    intstamp_zero           ../engine/share/modules/intstamp_mod.F
+      !||    multi_allocate          ../engine/source/multifluid/multi_allocate.F
+      !||    sz_print                ../engine/source/output/restart/arralloc.F
       !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    ale_mod                ../common_source/modules/ale/ale_mod.F
-      !||    aleanim_mod            ../engine/share/modules/aleanim_mod.F
-      !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
-      !||    alemuscl_mod           ../common_source/modules/ale/alemuscl_mod.F
-      !||    cluster_mod            ../engine/share/modules/cluster_mod.F
-      !||    damp_mod               ../engine/share/modules/damp_mod.F
-      !||    drape_mod              ../engine/share/modules/drape_mod.F
-      !||    ecnd_mod               ../engine/share/modules/ecdn_mod.F
-      !||    eig_mod                ../engine/share/modules/eig_mod.F
-      !||    fskyi_mod              ../engine/share/modules/restart_mod.F
-      !||    fxb_mod                ../engine/share/modules/fxb_mod.F
-      !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    intstamp_glob_mod      ../engine/share/modules/intstamp_glob_mod.F
-      !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
-      !||    my_alloc_mod           ../common_source/tools/memory/my_alloc.F90
-      !||    outmax_mod             ../common_source/modules/outmax_mod.F
-      !||    outputs_mod            ../common_source/modules/outputs_mod.F
-      !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
-      !||    rbody_mod              ../engine/share/modules/rbody_mod.F
-      !||    restmod                ../engine/share/modules/restart_mod.F
-      !||    seatbelt_mod           ../common_source/modules/seatbelt_mod.F
-      !||    segvar_mod             ../engine/share/modules/segvar_mod.F
-      !||    skew_mod               ../common_source/modules/skew_mod.F90
-      !||    sph_mod                ../engine/share/modules/sph_mod.F
-      !||    stack_mod              ../engine/share/modules/stack_mod.F
-      !||    trimat_mod             ../engine/share/modules/trimat.F
+      !||    ale_connectivity_mod    ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    ale_mod                 ../common_source/modules/ale/ale_mod.F
+      !||    aleanim_mod             ../engine/share/modules/aleanim_mod.F
+      !||    alefvm_mod              ../common_source/modules/ale/alefvm_mod.F
+      !||    alemuscl_mod            ../common_source/modules/ale/alemuscl_mod.F
+      !||    cluster_mod             ../engine/share/modules/cluster_mod.F
+      !||    connectivity_mod        ../common_source/modules/connectivity.F90
+      !||    damp_mod                ../engine/share/modules/damp_mod.F
+      !||    drape_mod               ../engine/share/modules/drape_mod.F
+      !||    ecnd_mod                ../engine/share/modules/ecdn_mod.F
+      !||    eig_mod                 ../engine/share/modules/eig_mod.F
+      !||    fskyi_mod               ../engine/share/modules/restart_mod.F
+      !||    fxb_mod                 ../engine/share/modules/fxb_mod.F
+      !||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    h3d_mod                 ../engine/share/modules/h3d_mod.F
+      !||    intstamp_glob_mod       ../engine/share/modules/intstamp_glob_mod.F
+      !||    message_mod             ../engine/share/message_module/message_mod.F
+      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    my_alloc_mod            ../common_source/tools/memory/my_alloc.F90
+      !||    nodal_arrays_mod        ../engine/source/engine/node_spliting/nodal_arrays.F90
+      !||    outmax_mod              ../common_source/modules/outmax_mod.F
+      !||    outputs_mod             ../common_source/modules/outputs_mod.F
+      !||    pinchtype_mod           ../common_source/modules/pinchtype_mod.F
+      !||    rbe3_mod                ../common_source/modules/constraints/rbe3_mod.F90
+      !||    rbody_mod               ../engine/share/modules/rbody_mod.F
+      !||    restmod                 ../engine/share/modules/restart_mod.F
+      !||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
+      !||    segvar_mod              ../engine/share/modules/segvar_mod.F
+      !||    skew_mod                ../common_source/modules/skew_mod.F90
+      !||    sph_mod                 ../engine/share/modules/sph_mod.F
+      !||    stack_mod               ../engine/share/modules/stack_mod.F
+      !||    trimat_mod              ../engine/share/modules/trimat.F
       !||====================================================================
-      SUBROUTINE RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS)
+      SUBROUTINE RESTALLOC(ELEMENT, NODES,MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS,
+     .                     GLOB_THERM,RBE3)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -94,6 +100,10 @@ C-----------------------------------------------
       USE INTERFACES_MOD
       USE SKEW_MOD
       USE MY_ALLOC_MOD
+      use glob_therm_mod
+      USE connectivity_mod
+      USE nodal_arrays_mod
+      use rbe3_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -119,12 +129,13 @@ C-----------------------------------------------
 #include      "intstamp_c.inc"
 #include      "spmd_c.inc"
 #include      "sphcom.inc"
-#include      "thermal_c.inc"
 #include      "fxbcom.inc"
 #include      "eigcom.inc"
 #include      "inter18.inc"
 #include      "stati_c.inc"
 C-----------------------------------------------
+      TYPE(connectivity_) :: ELEMENT
+      TYPE(NODAL_ARRAYS_) :: NODES
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(PINCH) :: PINCH_DATA
@@ -132,6 +143,8 @@ C-----------------------------------------------
       TYPE(t_SEGVAR) :: SEGVAR
       TYPE(INTERFACES_) :: INTERFACES
       TYPE(SKEW_) , INTENT(INOUT)       :: SKEWS
+      type(glob_therm_) ,intent(inout) :: GLOB_THERM
+      type(rbe3_) ,intent(inout) :: RBE3
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -144,14 +157,17 @@ C   -----------------------------------------------
 C             allocations entieres 
 C   -----------------------------------------------
 
-C       
-        ALLOCATE (ICODE(SICODE),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ICODE = 0
+        CALL ALLOCATE_NODAL_ARRAYS(NODES, NUMNOD, NTHREAD, IRODDL, IPARIT, 
+     .      ISECUT, IISROTS, IMPOSE_DR, IDROT, NRCVVOIS, SICODT)
 
-        ALLOCATE (ISKEW(SISKEW),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ISKEW = 0
+C       
+c       ALLOCATE (ICODE(SICODE),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       ICODE = 0
+
+c       ALLOCATE (ISKEW(SISKEW),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       ISKEW = e
 
         ALLOCATE (ISKWN(SISKWN),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -198,8 +214,13 @@ C
         IXQ = 0  
 
         ALLOCATE (IXC(SIXC),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
+        ALLOCATE(ELEMENT%shell%ixc(NIXC,SIXC/NIXC))
+        ALLOCATE(ELEMENT%shell%nodes(4,SIXC/NIXC))
+        ALLOCATE(ELEMENT%shell%pid(SIXC/NIXC))
+        ALLOCATE(ELEMENT%shell%matid(SIXC/NIXC))
+        ALLOCATE(ELEMENT%shell%user_id(SIXC/NIXC))
         IXC = 0  
+        ELEMENT%shell%ixc = 0
 
         ALLOCATE (IXT(SIXT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -213,13 +234,13 @@ C
         IF (IERR/=0) GOTO 1000
         IXR = 0  
 
-        ALLOCATE (ITAB(SITAB),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITAB = 0  
+c       ALLOCATE (ITAB(SITAB),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       ITAB = 0  
 
-        ALLOCATE (ITABM1(SITABM1),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ITABM1 = 0
+c       ALLOCATE (ITABM1(SITABM1),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       ITABM1 = 0
 
         ALLOCATE (GJBUFI(SGJBUFI),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -353,13 +374,7 @@ C
         IF (IERR/=0) GOTO 1000
         LRBE2 = 0  
 
-        ALLOCATE (IRBE3(SIRBE3),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IRBE3 = 0  
-
-        ALLOCATE (LRBE3(SLRBE3),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        LRBE3 = 0  
+        call allocate_rbe3(RBE3, NSPMD)
 
         ALLOCATE (IACTIV(SIACTIV),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -525,10 +540,6 @@ c        IF (IERR/=0) GOTO 1000
         IF (IERR/=0) GOTO 1000
         IAD_RBE2 = 0 
 
-        ALLOCATE (IAD_RBE3M(SIAD_RBE3M),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IAD_RBE3M = 0 
-
         ALLOCATE (IAD_SEC(SIAD_SEC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         IAD_SEC = 0 
@@ -615,14 +626,6 @@ C
         IF (IERR/=0) GOTO 1000
         FR_RBE2 = 0
 
-        ALLOCATE (FR_RBE3M(SFR_RBE3M),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FR_RBE3M = 0
-
-        ALLOCATE (FR_RBE3MP(SFR_RBE3M),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FR_RBE3MP = 0
-
         ALLOCATE (FR_SEC(SFR_SEC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         FR_SEC = 0 
@@ -702,13 +705,13 @@ C
         IF (IERR/=0) GOTO 1000
         MAIN_PROC = 0 
 
-        ALLOCATE (WEIGHT(SWEIGHT),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        WEIGHT = 0 
+c       ALLOCATE (WEIGHT(SWEIGHT),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       WEIGHT = 0 
 
-        ALLOCATE (WEIGHT_MD(SWEIGHT),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        WEIGHT_MD = 0 
+c       ALLOCATE (WEIGHT_MD(SWEIGHT),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       WEIGHT_MD = 0 
 
         ALLOCATE (NEWFRONT(SNEWFRONT),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -783,21 +786,22 @@ C
         IF (IERR/=0) GOTO 1000
         LLAGF = 0 
 
-        ALLOCATE (ICODT(SICODT),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ICODT = 0 
+!       ALLOCATE (ICODT(SICODT),STAT=IERR)
+!       IF (IERR/=0) GOTO 1000
+!       ICODT = 0 
 
-        ALLOCATE (ICODR(SICODR),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        ICODR = 0 
+!       ALLOCATE (ICODR(SICODR),STAT=IERR)
+!       IF (IERR/=0) GOTO 1000
+!       ICODR = 0 
 
         ALLOCATE (ISKY(SISKY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         ISKY = 0  
 
-        ALLOCATE (ADSKY(SADSKY),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%ADSKY(SADSKY),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        ADSKY = 0 
+        ELEMENT%PON%ADSKY = 0 
+        ELEMENT%PON%SADSKY = SADSKY
 
         ALLOCATE (PROCNE(SPROCNE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -811,17 +815,36 @@ C
         IF (IERR/=0) GOTO 1000
         PROCNI2 = 0 
 
-        ALLOCATE (IADSDP(SIADSDP),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%IADSDP(SIADSDP),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        IADSDP = 0  
+        ELEMENT%PON%IADSDP = 0  
 
-        ALLOCATE (IADRCP(SIADRCP),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%IADRCP(SIADRCP),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        IADRCP = 0  
+        ELEMENT%PON%IADRCP = 0  
 
-        ALLOCATE (IADS(SIADS),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IADS = 0 
+        CALL MY_ALLOC(ELEMENT%PON%IADS,8,NUMELS,MSG="IADS")
+        CALL MY_ALLOC(ELEMENT%PON%IADS10,6,NUMELS10,MSG="IADS10")
+        CALL MY_ALLOC(ELEMENT%PON%IADS20,12,NUMELS20,MSG="IADS20")
+        CALL MY_ALLOC(ELEMENT%PON%IADS16,8,NUMELS16,MSG="IADS16")
+        CALL MY_ALLOC(ELEMENT%PON%IADQ,4,NUMELQ,MSG="IADQ")
+        CALL MY_ALLOC(ELEMENT%PON%IADC,4,NUMELC,MSG="IADC")                             
+        CALL MY_ALLOC(ELEMENT%PON%IAD_TRUSS,2,NUMELT,MSG="IAD_TRUSS")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_BEAM,2,NUMELP,MSG="IAD_BEAM")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_SPRING,3,NUMELR,MSG="IAD_SPRING")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_TG,3,NUMELTG,MSG="IAD_TG")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_TG6,3,NUMELTG6,MSG="IAD_TG6")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_MV,4,NSKYMV0,MSG="IAD_MV")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_CONLD,4,NCONLD,MSG="IAD_CONLD")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_CONV,4,GLOB_THERM%NUMCONV,MSG="IAD_CONV")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_RADIA,4,GLOB_THERM%NUMRADIA,MSG="IAD_RADIA")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_LOADP,SLLOADP,MSG="IAD_LOADP")
+        CALL MY_ALLOC(ELEMENT%PON%IAD_FXFLUX,4,GLOB_THERM%NFXFLUX,MSG="IAD_FXFLUX")
+
+
+c       ALLOCATE (IADS(SIADS),STAT=IERR)
+c       IF (IERR/=0) GOTO 1000
+c       IADS = 0 
 
         ALLOCATE (IADWAL(SIADWAL),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -979,10 +1002,10 @@ C
 
         END IF
 
-        ALLOCATE (FSKYD(SFSKYD),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%FSKYD(SFSKYD),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        FSKYD = ZERO 
-        
+        ELEMENT%PON%FSKYD = 0 
+
         ALLOCATE (IBCSCYC(SIBCSCYC),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         IBCSCYC = 0  
@@ -994,26 +1017,26 @@ C
 C   -----------------------------------------------
 C             allocations flottantes
 C   -----------------------------------------------
+!        ALLOCATE (X(SX),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        X = 0 
 
-        ALLOCATE (X(SX),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        X = 0 
+!        ALLOCATE (D(SD),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        D = 0 
 
-        ALLOCATE (D(SD),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        D = 0 
+!        ALLOCATE (V(SV),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        V = 0 
 
-        ALLOCATE (V(SV),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        V = 0 
+!        ALLOCATE (VR(SVR),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        VR = 0
 
-        ALLOCATE (VR(SVR),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        VR = 0
+!        ALLOCATE (DR(SDR),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        DR = 0
 
-        ALLOCATE (DR(SDR),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        DR = 0
 
         ALLOCATE (THKE(STHKE),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1027,13 +1050,13 @@ C   -----------------------------------------------
         IF (IERR/=0) GOTO 1000
         DAMP = 0 
 
-        ALLOCATE (MS(SMS),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        MS = 0 
-
-        ALLOCATE (IN(SIN),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        IN = 0
+!        ALLOCATE (MS(SMS),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        MS = 0 
+!
+!        ALLOCATE (IN(SIN),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        IN = 0
 
         ALLOCATE (TF(STF),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1178,10 +1201,6 @@ C
         IF (IERR/=0) GOTO 1000
         FBVEL = 0  
 
-        ALLOCATE (FRBE3(SFRBE3),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        FRBE3 = 0  
-
         ALLOCATE (FACTIV(LRACTIV*NACTIV),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         FACTIV = 0 
@@ -1258,38 +1277,38 @@ C
         IF (IERR/=0) GOTO 1000
         FV = 0 
 
-        ALLOCATE (A(SA),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        A = 0  
-
-        ALLOCATE (AR(SAR),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        AR = 0 
-
-        ALLOCATE (STIFN(SSTIFN),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        STIFN = 0 
-
-        ALLOCATE (VISCN(SVISCN),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        VISCN = 0 
-
-        ALLOCATE (STIFR(SSTIFR),STAT=IERR)
-        IF (IERR/=0) GOTO 1000
-        STIFR = 0 
+!        ALLOCATE (A(SA),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        A = 0  
+!
+!        ALLOCATE (AR(SAR),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        AR = 0 
+!
+!        ALLOCATE (STIFN(SSTIFN),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        STIFN = 0 
+!
+!        ALLOCATE (VISCN(SVISCN),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        VISCN = 0 
+!
+!        ALLOCATE (STIFR(SSTIFR),STAT=IERR)
+!        IF (IERR/=0) GOTO 1000
+!        STIFR = 0 
 
         ALLOCATE (PARTSAV(SPARTSAV),STAT=IERR)
         IF (IERR/=0) GOTO 1000
         PARTSAV = 0
 
-        ALLOCATE (FSKY(SFSKY),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%FSKY(8,SFSKY/8),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        FSKY = 0 
+        ELEMENT%PON%FSKY = 0 
 
 
-        ALLOCATE (FSKYM(SFSKYM),STAT=IERR)
+        ALLOCATE (ELEMENT%PON%FSKYM(SFSKYM),STAT=IERR)
         IF (IERR/=0) GOTO 1000
-        FSKYM = 0 
+        ELEMENT%PON%FSKYM = 0 
 
         ALLOCATE (FSKYI(LSKYI,NFSKYI),STAT=IERR)
         IF (IERR/=0) GOTO 1000
@@ -1454,7 +1473,7 @@ C
           ALLOCATE(PADMESH(KPADMESH,NPART),STAT=IERR)
           IERROR = IERROR+IERR
 
-          IF(ITHERM_FE > 0)THEN
+          IF(GLOB_THERM%ITHERM_FE > 0)THEN
 
             ALLOCATE(MCPC(NUMELC),STAT=IERR)
             IERROR = IERROR+IERR
@@ -1504,44 +1523,44 @@ C
          ENDIF
 C--------------------------------------------
 C   thermal bc   
-         IF(NUMCONV > 0) THEN                                          
-          ALLOCATE(IBCV(NICONV*NUMCONV),STAT=IERR)
+         IF(GLOB_THERM%NUMCONV > 0) THEN                                          
+          ALLOCATE(IBCV(GLOB_THERM%NICONV*GLOB_THERM%NUMCONV),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             IBCV = 0  
-          ALLOCATE(FCONV(LFACTHER*NUMCONV),STAT=IERR)
+          ALLOCATE(FCONV(GLOB_THERM%LFACTHER*GLOB_THERM%NUMCONV),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             FCONV = ZERO 
          ELSE                                                          
            ALLOCATE(IBCV(0),FCONV(0))                                 
          ENDIF 
                  
-         IF(NUMRADIA > 0) THEN                                          
-          ALLOCATE(IBCR(NIRADIA*NUMRADIA),STAT=IERR)
+         IF(GLOB_THERM%NUMRADIA > 0) THEN                                          
+          ALLOCATE(IBCR(GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             IBCR = 0  
-          ALLOCATE(FRADIA(LFACTHER*NUMRADIA),STAT=IERR)
+          ALLOCATE(FRADIA(GLOB_THERM%LFACTHER*GLOB_THERM%NUMRADIA),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             FRADIA = ZERO 
          ELSE                                                          
            ALLOCATE(IBCR(0),FRADIA(0))                                 
          ENDIF 
                  
-         IF(NFXFLUX > 0) THEN                                          
-          ALLOCATE(IBFFLUX(NITFLUX*NFXFLUX),STAT=IERR)
+         IF(GLOB_THERM%NFXFLUX > 0) THEN                                          
+          ALLOCATE(IBFFLUX(GLOB_THERM%NITFLUX*GLOB_THERM%NFXFLUX),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             IBFFLUX = 0  
-          ALLOCATE(FBFFLUX(LFACTHER*NFXFLUX),STAT=IERR)
+          ALLOCATE(FBFFLUX(GLOB_THERM%LFACTHER*GLOB_THERM%NFXFLUX),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             FBFFLUX = ZERO 
          ELSE                                                          
            ALLOCATE(IBFFLUX(0),FBFFLUX(0))                                 
          ENDIF 
                  
-         IF(NFXTEMP > 0) THEN                                        
-           ALLOCATE(IBFTEMP(NIFT*NFXTEMP),STAT=IERR)
+         IF(GLOB_THERM%NFXTEMP > 0) THEN                                        
+           ALLOCATE(IBFTEMP(GLOB_THERM%NIFT*GLOB_THERM%NFXTEMP),STAT=IERR)
            IF (IERR/=0) GOTO 1000
             IBFTEMP = 0  
-           ALLOCATE(FBFTEMP(LFACTHER*NFXTEMP),STAT=IERR)
+           ALLOCATE(FBFTEMP(GLOB_THERM%LFACTHER*GLOB_THERM%NFXTEMP),STAT=IERR)
            IF(IERR/=0) GOTO 1000
             FBFTEMP = ZERO  
          ELSE                                                          
@@ -1617,8 +1636,8 @@ C
            ALLOCATE(WAGAP(0),STAT=IERR)
          ENDIF   
 C--------------------------------------------
-         ALLOCATE(MS0(NUMNOD),STAT=IERR)
-         ALLOCATE(IN0(SIN),STAT=IERR)
+c        ALLOCATE(MS0(NUMNOD),STAT=IERR)
+c        ALLOCATE(IN0(SIN),STAT=IERR)
          IF(IDTMINS_OLD==1) THEN
            ALLOCATE(ADMSMS(NUMNOD),STAT=IERR)
            IF (IERR/=0) GOTO 1000
@@ -1966,7 +1985,8 @@ C
         IF (IERR/=0) GOTO 1000
         KNOT = ZERO
 
-        ALLOCATE (WIGE(NUMNOD),STAT=IERR)
+C       ALLOCATE (WIGE(NUMNOD),STAT=IERR)
+        ALLOCATE( WIGE(1), STAT=IERR)
         IF (IERR/=0) GOTO 1000
         WIGE = ZERO
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod          ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    groupdef_mod          ../common_source/modules/groupdef_mod.F
-      !||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod         ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
         SUBROUTINE INT18_LAW151_UPDATE(ITASK,MULTI_FVM,IGRBRIC,IPARI,IXS,
      1                               IGROUPS ,IPARG   ,ELBUF_TAB  ,FORCE_INT   ,
@@ -100,7 +100,7 @@ C-----------------------------------------------
         NODL = (1 + ITASK) * NUMNOD / NTHREAD 
 
         !   1:NUMNOD --> classical x/v/mass
-        X_APPEND(1:3,NODF:NODL) = X(1:3,NODF:NODL) !strcture nodes must also be updated
+        X_APPEND(1:3,NODF:NODL) = X(1:3,NODF:NODL) !structure nodes must also be updated
         V_APPEND(1:3,NODF:NODL) = V(1:3,NODF:NODL)
         MASS_APPEND(NODF:NODL) = MS(NODF:NODL)
         KINET_APPEND(NODF:NODL) = KINET(NODF:NODL)

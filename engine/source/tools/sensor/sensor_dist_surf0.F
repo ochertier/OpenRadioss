@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,9 +30,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_allreduce_db   ../engine/source/mpi/generic/spmd_allreduce_db.F
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod        ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE SENSOR_DIST_SURF0(NSENSOR,SENSOR_TAB,X,IGRSURF)
+      SUBROUTINE SENSOR_DIST_SURF0(NSENSOR,SENSOR_TAB,X,IGRSURF,COMM_SENS16)
 !$COMMENT
 !       SENSOR_DIST_SURF0 description
 !       computation of distance to surface for sensor typ16
@@ -64,6 +64,7 @@ C-----------------------------------------------
       my_real ,DIMENSION(3,NUMNOD) :: X
       TYPE (SURF_) ,DIMENSION(NSURF), TARGET :: IGRSURF
       TYPE (SENSOR_STR_), DIMENSION(NSENSOR),INTENT(INOUT) :: SENSOR_TAB
+      TYPE (SENSOR_COMM), INTENT(IN) :: COMM_SENS16
 C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------

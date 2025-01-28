@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,6 +36,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    nsvis_stab       ../engine/source/elements/solid/solide10/nsvis_stab.F
       !||    nsvis_stab11     ../engine/source/elements/solid/solidez/nsvis_stab11.F
       !||    nsvis_stab18     ../engine/source/elements/solid/solide8e/nsvis_stab18.F
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
       SUBROUTINE M1LAWTOT(
      1   PM,      OFF,     SIG,     EINT,
@@ -56,7 +58,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G   ISELECT, IPM,     RHOREF,  RHOSP,
      H   SIGL,    ITY,     ISMSTR,  JTUR,
      I   JTHE,    JCVT,    JSPH,    JSMS,
-     J   NPG )
+     J   NPG ,    glob_therm)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -100,6 +106,7 @@ C
      .   MFXX(*)  ,MFXY(*)  ,MFXZ(*)  ,MFYX(*)  ,MFYY(*)  ,
      .   MFYZ(*)  ,MFZX(*)  ,MFZY(*)  ,MFZZ(*)  ,OFFG0(*) ,VOL_AVG(*),
      .   EPSTH(*),DTEL(*),ETOTSH(NEL,6), RHOREF(*), RHOSP(*),AMU(*)
+      type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -431,7 +438,7 @@ C
      9   FACQ0,   CONDE,   DTEL,    G_DT,
      A   IPM,     RHOREF,  RHOSP,   NEL,
      B   ITY,     ISMSTR,  JTUR,    JTHE,
-     C   JSMS,    NPG  )
+     C   JSMS,    NPG   ,   glob_therm)
       ELSE
        CALL MDTSPH(
      1   PM,      OFF,     RHO,     BID1,

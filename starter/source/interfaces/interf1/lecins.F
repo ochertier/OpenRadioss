@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i20surfi               ../starter/source/interfaces/inter3d1/i20surfi.F
       !||    i24surfi               ../starter/source/interfaces/inter3d1/i24surfi.F
       !||    i25surfi               ../starter/source/interfaces/inter3d1/i25surfi.F
+      !||    i2_surfi               ../starter/source/interfaces/inter3d1/i2_surfi.F90
       !||    ingrbric               ../starter/source/interfaces/interf1/ingrbric.F
       !||    ingrbric_centroids     ../starter/source/interfaces/interf1/ingrbric_centroids.F
       !||    ingrbric_nodes         ../starter/source/interfaces/interf1/ingrbric_nodes.F
@@ -42,6 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    insurfigeo             ../starter/source/interfaces/interf1/insurfigeo.F
       !||    nsegmt                 ../starter/source/interfaces/interf1/nsegmt.F
       !||--- uses       -----------------------------------------------------
+      !||    i2_surfi_mod           ../starter/source/interfaces/inter3d1/i2_surfi.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||====================================================================
       SUBROUTINE LECINS(IPARI   ,ITAB       ,PM       ,IPM       ,BUFMAT  ,
@@ -62,6 +64,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE INTERFACES_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE I2_SURFI_MOD ,         ONLY : I2_SURFI
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -229,7 +232,7 @@ c            END IF
         ELSEIF (NTYP == 25) THEN
         ELSE
           IF(IS1/=0) THEN
-            IF(NRTS == 0.AND.IS1/=2.AND.IS1/=5) THEN
+            IF(NRTS == 0.AND.IS1/=2.AND.IS1/=5.AND.IS1/=-1) THEN
               CALL ANCMSG(MSGID=118, MSGTYPE=MSGERROR, ANMODE=ANINFO, I1=ID, C1=TITR)
             ENDIF
             IF(IPRI>=1) WRITE(IOUT,'(//,A)')' SECONDARY SURFACE'
@@ -348,7 +351,7 @@ C--------------------------------------------
               CALL ANCMSG(MSGID=119, MSGTYPE=MSGERROR,  ANMODE=ANINFO, I1=ID, C1=TITR)
             ENDIF
             IF(IPRI>=1) WRITE(IOUT,'(//,A)')' MAIN SURFACE'
-            IF(IS2 == 1)THEN
+            IF(IS2 == 1 )THEN
               SURF_NODES => IGRSURF(ISU2)%NODES(1:NRTM_FE,1:4)
               CALL INSURF(NRTM_FE,NMN_FE,IRM,INTBUF_TAB(NI)%IRECTM,
      .                    SURF_NODES,ITAB,INTBUF_TAB(NI)%MSR,ID,TITR,
@@ -376,7 +379,7 @@ C--------------------------------------------
             IF (NTYP==3 ) THEN
              CALL ELTY_SURF(NRTS,NRTM,IGRSURF(ISU2)%NSEG,IGRSURF(ISU2)%ELTYP,
      .                      INTBUF_TAB(NI)%MSEGTYP,ISU2)
-            ELSEIF (NTYP==2 .OR. NTYP==5 .OR. NTYP==7 .OR. 
+            ELSEIF ((NTYP==2.AND.IS2>0) .OR. NTYP==5 .OR. NTYP==7 .OR. 
      +         NTYP==10 .OR. NTYP==21) THEN
              CALL ELTY_SURF(0,NRTM,IGRSURF(ISU2)%NSEG,IGRSURF(ISU2)%ELTYP,
      .                      INTBUF_TAB(NI)%MSEGTYP,ISU2)
@@ -408,6 +411,15 @@ C-------
             INTBUF_TAB(NI)%RUPT(5)   = I2RUPT(5,NI)
             INTBUF_TAB(NI)%RUPT(6)   = I2RUPT(6,NI)
           ENDIF
+          IF (IS1==-1.AND. IS2==-1) THEN
+               IF(IPRI>=1) WRITE(IOUT,'(//,A,I10)')' SURFACE TO SURFACE INFO OF INTERFACE NUMBER :',ID
+               CALL I2_SURFI(NPARI   ,IPARI(1,NI),NSURF   ,IGRSURF ,                
+     1                       NSN     ,INTBUF_TAB(NI)%NSV,NRTM ,INTBUF_TAB(NI)%IRECTM,
+     2                       NMN     ,INTBUF_TAB(NI)%MSR,INTBUF_TAB(NI)%MSEGTYP,
+     3                       FRIGAP(4,NI),X       ,NUMNOD,ITAB ,IPRI ,IOUT  ,
+     4                       IXS     ,NUMELS  ,NOINT   ,INTBUF_TAB(NI)%IRTLM    ,
+     5                       INTBUF_TAB(NI)%CSTS,INTBUF_TAB(NI)%DPARA  )
+          END IF
 C-------
         ELSEIF (NTYP == 3 .OR. NTYP == 4 .OR. NTYP == 9) THEN
           IF(IPARI(30,NI)/=0) THEN

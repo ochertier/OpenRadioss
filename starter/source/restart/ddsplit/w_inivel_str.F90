@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -124,6 +124,7 @@
              igqd   = inivel_t(n)%fvm%grqd_id
              igtria = inivel_t(n)%fvm%grtria_id
                  if (igbric > 0) then
+                    igbric_loc = -HUGE(igbric_loc)
                     do j = 1,ngrbric
                        if (igbric == igrbric(j)%id) igbric_loc = j
                     enddo
@@ -136,6 +137,7 @@
                    end do
                  endif
                  if (igqd > 0) then
+                    igqd_loc = -HUGE(igqd_loc)
                     do j = 1,ngrquad
                        if (igqd == igrquad(j)%id) igqd_loc = j
                     enddo    
@@ -148,6 +150,7 @@
                    end do
                  endif
                  if (igtria > 0) then
+                    igtria_loc = -HUGE(igtria_loc)
                     do j = 1,ngrsh3n
                        if (igtria == igrsh3n(j)%id) igtria_loc = j
                     enddo      

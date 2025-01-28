@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,12 +33,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      3                            IBCR      ,FRADIA    ,IBCV      ,FCONV     , IGRV     ,
      4                            LGRV      ,AGRV      ,ICFIELD   ,LCFIELD   ,CFIELD    ,
      5                            IPRELOAD  ,PRELOAD   ,IFLAG_BPRELOAD, 
-     6                            LIFLOW, LRFLOW, IFLOW,RFLOW     ,ISPHIO    ,VSPHIO    )
+     6                            LIFLOW, LRFLOW, IFLOW,RFLOW     ,ISPHIO    ,VSPHIO    ,
+     7                            GLOB_THERM,PBLAST)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use glob_therm_mod
+      USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -107,21 +110,21 @@ C      INOM_OPT(30)= INOM_OPT(29)+ NINTERFRIC
 C      INOM_OPT(31)= INOM_OPT(30)+ NRBMERGE
 C      .. TO BE MAINTAINED (cf doc/inom_opt.txt) ..
 C-----------------------------------------------
+      TYPE (glob_therm_) ,intent(in)      :: glob_therm
+      TYPE (PBLAST_)     ,intent(in)      :: PBLAST
       INTEGER, INTENT(IN) :: NUMLOADP, ILOADP(SIZLOADP,NLOADP), LLOADP(NUMLOADP)
       INTEGER, INTENT(IN) :: ICFIELD(SIZFIELD,NLOADC), LCFIELD(SLCFIELD)
       INTEGER, INTENT(IN) :: IBCL(NIBCLD,NCONLD-NPRELD), IPRES(NIBCLD,NPRELD)
-      INTEGER, INTENT(IN) :: IBCR(NIRADIA,NUMRADIA)
-      INTEGER, INTENT(IN) :: IBCV(NICONV,NUMCONV)
+      INTEGER, INTENT(IN) :: IBCR(GLOB_THERM%NIRADIA,GLOB_THERM%NUMRADIA)
+      INTEGER, INTENT(IN) :: IBCV(GLOB_THERM%NICONV,GLOB_THERM%NUMCONV)
       INTEGER, INTENT(IN) :: IGRV(NIGRV,NGRAV), LGRV(*)
       INTEGER, INTENT(IN) :: IPRELOAD(3,*), IFLAG_BPRELOAD(NUMELS)
       my_real, INTENT(IN) ::
      .                       LOADP(LFACLOAD,NLOADP), CFIELD(LFACLOAD,NLOADC),
      .                       FORC(LFACCLD,NCONLD-NPRELD), PRES(LFACCLD,NPRELD),
      .                       AGRV(LFACGRV,NGRAV),PRELOAD(6,*) 
-      my_real, INTENT(IN) ::  
-     .                       FRADIA(LFACTHER,NUMRADIA)
-      my_real, INTENT(IN) ::  
-     .                       FCONV(LFACTHER,NUMCONV)
+      my_real, INTENT(IN) :: FRADIA(GLOB_THERM%LFACTHER,GLOB_THERM%NUMRADIA)
+      my_real, INTENT(IN) :: FCONV(GLOB_THERM%LFACTHER,GLOB_THERM%NUMCONV)
       INTEGER, INTENT(IN) :: LIFLOW, LRFLOW
       INTEGER, DIMENSION(LIFLOW), INTENT(IN) :: IFLOW
       my_real, DIMENSION(LRFLOW), INTENT(IN) :: RFLOW
@@ -187,7 +190,9 @@ C-----------------------------------------------
       OK_QA = MYQAKEY('/LOAD/PFLUID') .OR. MYQAKEY('/LOAD/PBLAST') .OR. MYQAKEY('/LOAD/PRESSURE') 
       
       IF (OK_QA) THEN
-
+          !output pressure only
+        IOPT_FIRST = 0
+        IOPT_LAST = 0
         IF(MYQAKEY('/LOAD/PFLUID'))THEN
           !output pfluid only
           IOPT_FIRST = 1
@@ -195,11 +200,11 @@ C-----------------------------------------------
         ELSEIF(MYQAKEY('/LOAD/PBLAST'))THEN
           !output pblast only
           IOPT_FIRST = 1+NLOADP_F
-          IOPT_LAST = NLOADP_F+NLOADP_B
+          IOPT_LAST = NLOADP_F+PBLAST%NLOADP_B
         ELSEIF(MYQAKEY('/LOAD/PRESSURE'))THEN
           !output pressure only
-          IOPT_FIRST = 1+NLOADP_F+NLOADP_B
-          IOPT_LAST = NLOADP_F+NLOADP_B+NLOADP_HYD
+          IOPT_FIRST = 1+NLOADP_F+PBLAST%NLOADP_B
+          IOPT_LAST = NLOADP_F+PBLAST%NLOADP_B+NLOADP_HYD
         ENDIF
             
         !common procedure for /LOAD/PFLUID, /LOAD/PBLAST, /LOAD/PRESSURE options.
@@ -343,7 +348,7 @@ C-----------------------------------------------
 C     /RADIATION
 C-----------------------------------------------
       IF (MYQAKEY('/RADIATION')) THEN
-        DO MY_LOAD=1,NUMRADIA
+        DO MY_LOAD=1,GLOB_THERM%NUMRADIA
 C
 C         Title of the option was not stored in NOM_OPT ... TBD
 C         and Radiation ID is not stored 
@@ -354,7 +359,7 @@ C         and Radiation ID is not stored
             CALL QAPRINT('A_RADIATION_FAKE_NAME',MY_LOAD,0.0_8)
           END IF
 C
-          DO I=1,NIRADIA
+          DO I=1,GLOB_THERM%NIRADIA
             IF(IBCR(I,MY_LOAD) /=0)THEN
 C
 C             VARNAME: variable name in ref.extract (without blanks)
@@ -363,7 +368,7 @@ C             VARNAME: variable name in ref.extract (without blanks)
             END IF
           END DO
 C
-          DO I=1,LFACTHER
+          DO I=1,GLOB_THERM%LFACTHER
             IF(FRADIA(I,MY_LOAD)/=ZERO)THEN
 C
 C             VARNAME: variable name in ref.extract (without blanks)
@@ -379,7 +384,7 @@ C-----------------------------------------------
 C     /CONVEC
 C-----------------------------------------------
       IF (MYQAKEY('/CONVEC')) THEN
-        DO MY_LOAD=1,NUMCONV
+        DO MY_LOAD=1,GLOB_THERM%NUMCONV
 C
 C         Title of the option was not stored in NOM_OPT ... TBD
 C         and Convev ID is not stored 
@@ -390,7 +395,7 @@ C         and Convev ID is not stored
             CALL QAPRINT('A_CONVEC_FAKE_NAME',MY_LOAD,0.0_8)
           END IF
 C
-          DO I=1,NICONV
+          DO I=1,GLOB_THERM%NICONV
             IF(IBCV(I,MY_LOAD) /=0)THEN
 C
 C             VARNAME: variable name in ref.extract (without blanks)
@@ -399,7 +404,7 @@ C             VARNAME: variable name in ref.extract (without blanks)
             END IF
           END DO
 C
-          DO I=1,LFACTHER
+          DO I=1,GLOB_THERM%LFACTHER
             IF(FCONV(I,MY_LOAD)/=ZERO)THEN
 C
 C             VARNAME: variable name in ref.extract (without blanks)
@@ -550,7 +555,7 @@ C-----------------------------------------------
       IF (MYQAKEY('/SPH/INOUT')) THEN
         IF (NSPHIO > 0) THEN 
 C        
-!     Sort by ID to ensure internal order independant output
+!     Sort by ID to ensure internal order independent output
           DO I = 1, NSPHIO
             IDS(I) = ISPHIO(NISPHIO,I)
             IDX(I) = I

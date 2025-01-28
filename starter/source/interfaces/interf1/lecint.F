@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i20surfi                     ../starter/source/interfaces/inter3d1/i20surfi.F
       !||    i24surfi                     ../starter/source/interfaces/inter3d1/i24surfi.F
       !||    i25surfi                     ../starter/source/interfaces/inter3d1/i25surfi.F
+      !||    i2_surfi_dim                 ../starter/source/interfaces/inter3d1/i2_surfi_dim.F90
       !||    ingrbric                     ../starter/source/interfaces/interf1/ingrbric.F
       !||    ingrbric_dx                  ../starter/source/interfaces/interf1/ingrbric_dx.F
       !||    ingrbric_nodes               ../starter/source/interfaces/interf1/ingrbric_nodes.F
@@ -43,6 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    nintri                       ../starter/source/system/nintrr.F
       !||    presegmt                     ../starter/source/interfaces/interf1/presegmt.F
       !||--- uses       -----------------------------------------------------
+      !||    i2_surfi_dim_mod             ../starter/source/interfaces/inter3d1/i2_surfi_dim.F90
       !||    message_mod                  ../starter/share/message_module/message_mod.F
       !||    r2r_mod                      ../starter/share/modules1/r2r_mod.F
       !||====================================================================
@@ -72,6 +74,7 @@ C-----------------------------------------------
       USE ALE_MOD
       USE INTERFACES_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE I2_SURFI_DIM_MOD ,     ONLY : I2_SURFI_DIM
 C-----------------------------------------------      
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -348,7 +351,16 @@ C
         IPARI(79,NI) = NMN_IGE
         IPARI(80,NI) = NMN_FE
 C
-        IF (NTYP == 14) THEN
+        IF (NTYP == 2 .AND. IS1==-1.AND. IS2==-1) THEN
+            CALL I2_SURFI_DIM( NPARI   ,IPARI(1,NI),NSURF   ,IGRSURF ,           
+     1                         NSN     ,NRTM    ,NMN        ,FRIGAP(4,NI) ,                
+     2                         X       ,NUMNOD  )
+           IPARI(4,NI)  = NRTM
+           IPARI(5,NI)  = NSN 
+           IPARI(6,NI)  = NMN 
+           IPARI(78,NI)  = NSN 
+           IPARI(74,NI)  = NRTM
+        ELSEIF (NTYP == 14) THEN
           NMNT = MAX(NMNT,4*NUMNOD)
         ELSEIF (NTYP == 15) THEN
           NMNT = MAX(NMNT,9*NUMNOD+12*NUMELS+2*NUMELC+2*NUMELTG)
@@ -466,14 +478,18 @@ C Subinter : Case Inter corresponding to id inter
               ISU1 =NOM_OPT(3,NINTER+JSUB)
               ISU2 =NOM_OPT(6,NINTER+JSUB)
               IF(IGR/=0)IPARI(37,NI)=IPARI(37,NI)+IGRNOD(IGR)%NENTITY
-              IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU1)%NSEG
               IF(ISU2/=0)THEN
                 IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU2)%NSEG
-                IPARI(37,NI)=IPARI(37,NI)+4*IGRSURF(ISU1)%NSEG
                 IPARI(37,NI)=IPARI(37,NI)+4*IGRSURF(ISU2)%NSEG
                 IF(IEDGE/=0)THEN
-                  IPARI(90,NI)=IPARI(90,NI)+4*IGRSURF(ISU1)%NSEG
                   IPARI(90,NI)=IPARI(90,NI)+4*IGRSURF(ISU2)%NSEG
+                END IF
+              END IF
+              IF(ISU1/=0)THEN
+                IPARI(38,NI)=IPARI(38,NI)+IGRSURF(ISU1)%NSEG
+                IPARI(37,NI)=IPARI(37,NI)+4*IGRSURF(ISU1)%NSEG
+                IF(IEDGE/=0)THEN
+                  IPARI(90,NI)=IPARI(90,NI)+4*IGRSURF(ISU1)%NSEG
                 END IF
               END IF
             END IF
@@ -710,7 +726,7 @@ C--------------------------------------------
      .       NTYP/=23.and.NTYP/=24.and.NTYP/=25) THEN
 C--------------------------------------------
           IF(IS1  /= 0) THEN
-            IF(NRTS_FE == 0.AND.NRTS_IGE == 0.AND.IS1  /= 2.AND.IS1  /= 5) THEN
+            IF(NRTS_FE == 0.AND.NRTS_IGE == 0.AND.IS1  /= 2.AND.IS1  /= 5 .AND. IS1 /=-1) THEN
               CALL ANCMSG(MSGID=118, MSGTYPE=MSGERROR, ANMODE=ANINFO, I1=ID, C1=TITR)
             ENDIF
             IF(IS1 == 1)THEN
@@ -850,7 +866,9 @@ C--------------------------------------------
             IF(NRTM_FE == 0 .AND. NRTM_IGE == 0) THEN
               CALL ANCMSG(MSGID=119,  MSGTYPE=MSGERROR,  ANMODE=ANINFO, I1=ID,  C1=TITR)
             ENDIF
-            IF(IS2 == 1)THEN
+            IF(NTYP == 2 .AND. IS2 == -1)THEN
+               NMN_FE = IPARI(6,NI)
+            ELSEIF(IS2 == 1)THEN
               SURF_NODES => IGRSURF(ISU2)%NODES(1:NRTM_FE,1:4)
               CALL INSURF(NRTM_FE,NMN_FE,IRM,IRECTM,
      .                    SURF_NODES,ITAB,MSR,ID,TITR,
@@ -926,11 +944,15 @@ c              print*,'error interface user'
 C
           ELSEIF (ILEV == 27 . OR . ILEV == 28) THEN
 C-------- Dimension of arrays for TYPE2 incompatible spt27 or 28
-            DO I=1,IGRNOD(ISU1)%NENTITY
-              ISL = IGRNOD(ISU1)%ENTITY(I)
-              T2_NB_CONNEC(ISL) = T2_NB_CONNEC(ISL) + 1
-              IF (T2_NB_CONNEC(ISL) == 2) NSN_MULTI_CONNEC = NSN_MULTI_CONNEC + 1
-            ENDDO            
+            IF (IS1==-1) THEN 
+               NSN_MULTI_CONNEC = NSN_MULTI_CONNEC + NSN
+            ELSE
+              DO I=1,IGRNOD(ISU1)%NENTITY
+                ISL = IGRNOD(ISU1)%ENTITY(I)
+                T2_NB_CONNEC(ISL) = T2_NB_CONNEC(ISL) + 1
+                IF (T2_NB_CONNEC(ISL) == 2) NSN_MULTI_CONNEC = NSN_MULTI_CONNEC + 1
+              ENDDO
+            END IF            
           ENDIF
 C
           IF (ILAGM == 1)THEN

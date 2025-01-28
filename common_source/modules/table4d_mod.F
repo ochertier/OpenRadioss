@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,14 +27,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    asso_qplas76c       ../engine/source/materials/mat/mat076/asso_qplas76c.F
       !||    condamage           ../engine/source/materials/mat/mat190/condamage.F
       !||    conversion          ../engine/source/materials/mat/mat190/conversion.F
+      !||    eos_param_mod       ../common_source/modules/mat_elem/eos_param_mod.F90
       !||    fail_param_mod      ../common_source/modules/mat_elem/fail_param_mod.F90
-      !||    law50_table         ../starter/source/materials/mat/mat050/law50_table.F90
+      !||    func_table_copy     ../starter/source/materials/tools/func_table_copy.F90
       !||    law70_table         ../starter/source/materials/mat/mat070/law70_table.F
       !||    matparam_def_mod    ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    no_asso_lplas76c    ../engine/source/materials/mat/mat076/no_asso_lplas76c.F
       !||    no_asso_plas76      ../engine/source/materials/mat/mat076/no_asso_plas76.F
       !||    no_asso_qplas76c    ../engine/source/materials/mat/mat076/no_asso_qplas76c.F
       !||    read_mat_table      ../engine/source/materials/tools/read_mat_table.F
+      !||    sigeps128c          ../engine/source/materials/mat/mat128/sigeps128c.F90
+      !||    sigeps128s          ../engine/source/materials/mat/mat128/sigeps128s.F90
       !||    table_mat_vinterp   ../engine/source/materials/tools/table_mat_vinterp.F
       !||    table_rresti_mat    ../engine/source/materials/tools/table_rresti_mat.F
       !||    table_slope         ../starter/source/materials/tools/table_slope.F

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    resol                        ../engine/source/engine/resol.F
       !||    scoor3_fvm                   ../engine/source/ale/alefvm/scoor3_fvm.F
       !||    sigeps105                    ../engine/source/materials/mat/mat105/sigeps105.F
-      !||    sigeps51                     ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51                     ../engine/source/materials/mat/mat051/sigeps51.F90
       !||    sigeps97                     ../engine/source/materials/mat/mat097/sigeps97.F
       !||    sinit22_fvm                  ../engine/source/interfaces/int22/sinit22_fvm.F
       !||    srho3                        ../engine/source/elements/solid/solide/srho3.F
@@ -103,7 +103,9 @@ C-----------------------------------------------
 #include      "my_real.inc"
 C-----------------------------------------------
       TYPE(BRICK_ENTITY), TARGET,ALLOCATABLE,DIMENSION(:,:) :: BRICK_LIST 
-      TYPE(EDGE_ENTITY),  TARGET,ALLOCATABLE,DIMENSION(:,:) :: EDGE_LIST 
+      TYPE(EDGE_ENTITY),  TARGET,ALLOCATABLE,DIMENSION(:,:) :: EDGE_LIST
+
+      INTEGER :: NINTER22 !< number of /INTER/TYPE22
       
       TYPE INT22_BUF_t
         INTEGER, DIMENSION(2,12)  :: iEDGE                   !12 without diagonals, 24 with diagonals
@@ -195,7 +197,7 @@ C
       !||    resol                        ../engine/source/engine/resol.F
       !||    scoor3_fvm                   ../engine/source/ale/alefvm/scoor3_fvm.F
       !||    sigeps105                    ../engine/source/materials/mat/mat105/sigeps105.F
-      !||    sigeps51                     ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51                     ../engine/source/materials/mat/mat051/sigeps51.F90
       !||    sigeps97                     ../engine/source/materials/mat/mat097/sigeps97.F
       !||    sinit22_fvm                  ../engine/source/interfaces/int22/sinit22_fvm.F
       !||    spmd_tri22vox                ../engine/source/mpi/interfaces/spmd_tri22vox.F

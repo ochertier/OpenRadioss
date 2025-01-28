@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,27 +21,28 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    r23law114       ../engine/source/elements/spring/r23law114.F
+      !||    r23law114          ../engine/source/elements/spring/r23law114.F
       !||--- called by ------------------------------------------------------
-      !||    r23forc3        ../engine/source/elements/spring/r23forc3.F
+      !||    r23forc3           ../engine/source/elements/spring/r23forc3.F
       !||--- calls      -----------------------------------------------------
-      !||    r23_114_coor3   ../engine/source/tools/seatbelts/r23_114_coor3.F
-      !||    r23bilan        ../engine/source/elements/spring/r23bilan.F
-      !||    r23coor3        ../engine/source/elements/spring/r23coor3.F
-      !||    r23l114def3     ../engine/source/elements/spring/r23l114def3.F
-      !||    r23sens3        ../engine/source/elements/spring/r23sens3.F
-      !||    r2len3          ../engine/source/elements/spring/r2len3.F
-      !||    r4cum3          ../engine/source/elements/spring/r4cum3.F
-      !||    r4cum3p         ../engine/source/elements/spring/r4cum3p.F
-      !||    r4evec3         ../engine/source/elements/spring/r4evec3.F
-      !||    r4tors          ../engine/source/elements/spring/r4tors.F
+      !||    r23_114_coor3      ../engine/source/tools/seatbelts/r23_114_coor3.F
+      !||    r23bilan           ../engine/source/elements/spring/r23bilan.F
+      !||    r23coor3           ../engine/source/elements/spring/r23coor3.F
+      !||    r23l114def3        ../engine/source/elements/spring/r23l114def3.F
+      !||    r23sens3           ../engine/source/elements/spring/r23sens3.F
+      !||    r2len3             ../engine/source/elements/spring/r2len3.F
+      !||    r4cum3             ../engine/source/elements/spring/r4cum3.F
+      !||    r4cum3p            ../engine/source/elements/spring/r4cum3p.F
+      !||    r4evec3            ../engine/source/elements/spring/r4evec3.F
+      !||    r4tors             ../engine/source/elements/spring/r4tors.F
       !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    h3d_mod         ../engine/share/modules/h3d_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
-      !||    table_mod       ../engine/share/modules/table_mod.F
+      !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    h3d_mod            ../engine/share/modules/h3d_mod.F
+      !||    python_funct_mod   ../common_source/modules/python_mod.F90
+      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
+      !||    table_mod          ../engine/share/modules/table_mod.F
       !||====================================================================
-      SUBROUTINE R23LAW114(
+      SUBROUTINE R23LAW114(PYTHON,
      1   ELBUF_STR,            JFT,                  JLT,                  NEL,
      2   MTN,                  IGEO,                 GEO,                  IPM,
      3   IXR,                  X,                    TABLE,                XDP,
@@ -57,7 +58,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D   MY1,                  MY2,                  MZ1,                  MZ2,
      E   GRESAV,               GRTH,                 IGRTH,                MSRT,
      F   DMELRT,               FLAG_SLIPRING_UPDATE, FLAG_RETRACTOR_UPDATE,H3D_DATA,
-     G   JSMS,                 IGRE,                 NFT,                  NSENSOR )
+     G   JSMS,                 IGRE,                 NFT,                  NSENSOR,
+     h   STF,                  SANIN ,               IRESP,                SNPC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -65,6 +67,7 @@ C-----------------------------------------------
       USE TABLE_MOD
       USE H3D_MOD
       USE SENSOR_MOD
+      USE python_funct_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -82,6 +85,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(python_), intent(in) :: PYTHON
+      INTEGER, INTENT(IN) :: STF !< Size of TF
+      INTEGER, INTENT(IN) :: SANIN !< Size of ANIM
+      INTEGER, INTENT(IN) :: IRESP !< Single Precision flag
+      INTEGER, INTENT(IN) :: SNPC   !< Size of NPF
       INTEGER, INTENT(IN) :: IGRE,NSENSOR
       INTEGER, INTENT(IN) :: NFT
       INTEGER, INTENT(IN) :: JSMS
@@ -90,7 +98,7 @@ C-----------------------------------------------
      .        NEL,MTN,GRTH(*),IGRTH(*),FLG_KJ2,IPM(NPROPMI,*),FLAG_SLIPRING_UPDATE,
      .        FLAG_RETRACTOR_UPDATE
       my_real DT2T ,
-     .   GEO(NPROPG,*),X(*),F(*),TF(*),SKEW(LSKEW,*),FSKY(*),
+     .   GEO(NPROPG,*),X(*),F(*),TF(STF),SKEW(LSKEW,*),FSKY(*),
      .   VR(*), V(*), AR(*), STIFN(*),STIFR(*),MS(*), IN(*),
      .   ANIM(*),PARTSAV(*),TANI(15,*),
      .   FR_WAVE(*),BUFMAT(*),BUFGEO(*),PM(*),RBY(*),
@@ -216,7 +224,7 @@ C
           NUVAR = MAX(NUVAR, NINT(BUFMAT(IADBUF + 4)))
         ENDDO
 !!   is like r4def3 (spring type113)     
-        CALL R23L114DEF3(
+        CALL R23L114DEF3(PYTHON,
      1   SKEW,                   IPM,                    IGEO,                   MID,
      2   PID,                    GEO,                    BUFMAT,                 GBUF%FOR(II(1)),
      3   GBUF%FOR(II(2)),        GBUF%FOR(II(3)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),
@@ -253,7 +261,8 @@ C
      Y   SENSOR_TAB,             GBUF%INTVAR(II(1)),     GBUF%SLIPRING_FRAM_ID,  GBUF%FRAM_FACTOR,
      Z   GBUF%INTVAR(II(2)),     GBUF%INTVAR(II(3)),     GBUF%INTVAR(II(4)),     GBUF%INTVAR(II(5)),
      1   GBUF%INTVAR(II(6)),     GBUF%INTVAR(II(7)),     GBUF%INTVAR(II(8)),     GBUF%INTVAR(II(9)),
-     2   NFT               ,     NSENSOR)
+     2   NFT               ,     NSENSOR,                STF,                    SANIN,
+     3   IRESP,                  SNPC)
 C
         DO I=JFT,JLT
           IF (GBUF%UPDATE(I) == -1) THEN

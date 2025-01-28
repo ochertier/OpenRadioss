@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -77,7 +77,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           allocate(intage(numelc+numeltg))
           intage(1:numelc+numeltg)=-itagsh(1:numelc+numeltg)
-! for the moment sencondary node isn't taken into account
+! for the moment secondary node isn't taken into account
           do ni = 1,ninter
             ntyp  = ipari(7,ni)
             isu1  = ipari(45,ni)

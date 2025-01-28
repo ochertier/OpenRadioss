@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -73,7 +73,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_fail_wilkins      ../starter/source/materials/fail/wilkins/hm_read_fail_wilkins.F
       !||    hm_read_fractal_dmg       ../starter/source/materials/fail/fractal/hm_read_fractal_dmg.F90
       !||    hm_read_mullins_or        ../starter/source/materials/fail/mullins_or/hm_read_fail_mullins_or.F
-      !||    init_mat_keyword          ../starter/source/materials/mat/init_mat_keyword.F
       !||--- uses       -----------------------------------------------------
       !||    elbuftag_mod              ../starter/share/modules1/elbuftag_mod.F
       !||    hm_option_read_mod        ../starter/share/modules1/hm_option_read_mod.F
@@ -98,7 +97,7 @@ C-----------------------------------------------
       USE HM_OPTION_READ_MOD
       USE TABLE_MOD
       USE HM_READ_FRACTAL_DMG_MOD
-      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE
+      USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARLINE, NCHARKEY
 C============================================================================
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -128,7 +127,8 @@ C-----------------------------------------------
       INTEGER I,J,N,IMAT,IFAIL,IFL,ILAW,MAT_ID,FAIL_ID,
      .   ILOC,IRUPT,IFAILWAVE,UNIT_ID,IXFEM,HM_NBFAIL,IUNIT,IFLAGUNIT
       INTEGER ,DIMENSION(:) ,ALLOCATABLE :: FAIL_MAT_NUM
-      CHARACTER KEY*20,MESS*40
+      CHARACTER MESS*40
+      CHARACTER(LEN = NCHARKEY) :: KEY
       CHARACTER(LEN=NCHARTITLE) :: TITR
 C----------------------------------      
       my_real UNITAB_SUB(4)
@@ -277,8 +277,8 @@ c
               UNITAB_SUB(2) = UNITAB%FAC_M(IUNIT)
               UNITAB_SUB(3) = UNITAB%FAC_L(IUNIT)
               UNITAB_SUB(4) = UNITAB%FAC_T(IUNIT)
-              IUSER_KEY = KEY(1:LEN_TRIM(KEY))
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
+              IUSER_KEY = REPEAT(' ', NCHARLINE)
+              IUSER_KEY(1:LEN_TRIM(KEY)) = KEY(1:LEN_TRIM(KEY))
 !
               CALL HM_READ_FAIL_USER(MAT_PARAM(IMAT)%FAIL(IFL), 
      .             IRUPT,IUSER_KEY,USERL_AVAIL,
@@ -290,8 +290,8 @@ c
               UNITAB_SUB(2) = UNITAB%FAC_M(IUNIT)
               UNITAB_SUB(3) = UNITAB%FAC_L(IUNIT)
               UNITAB_SUB(4) = UNITAB%FAC_T(IUNIT)
-              IUSER_KEY = KEY(1:LEN_TRIM(KEY))
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
+              IUSER_KEY = REPEAT(' ', NCHARLINE)
+              IUSER_KEY(1:LEN_TRIM(KEY)) = KEY(1:LEN_TRIM(KEY))
 !
               CALL HM_READ_FAIL_USER(MAT_PARAM(IMAT)%FAIL(IFL), 
      .             IRUPT,IUSER_KEY,USERL_AVAIL,
@@ -303,8 +303,8 @@ c
               UNITAB_SUB(2) = UNITAB%FAC_M(IUNIT)
               UNITAB_SUB(3) = UNITAB%FAC_L(IUNIT)
               UNITAB_SUB(4) = UNITAB%FAC_T(IUNIT)
-              IUSER_KEY = KEY(1:LEN_TRIM(KEY))
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
+              IUSER_KEY = REPEAT(' ', NCHARLINE)
+              IUSER_KEY(1:LEN_TRIM(KEY)) = KEY(1:LEN_TRIM(KEY))
 !
               CALL HM_READ_FAIL_USER(MAT_PARAM(IMAT)%FAIL(IFL), 
      .             IRUPT,IUSER_KEY,USERL_AVAIL,
@@ -315,7 +315,6 @@ c
               CALL HM_READ_FAIL_FLD(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,IXFEM    ,
      .             LSUBMODEL,UNITAB   )
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               FAIL_TAG(IRUPT)%LF_DAM  = 1    ! damage factor for ANIM output
               FAIL_TAG(IRUPT)%LF_INDX = 1    ! FLD zone index for ANIM output
 c     
@@ -332,7 +331,6 @@ c
 c     
             ELSEIF (KEY(1:8) == 'TENSSTRA') THEN
               IRUPT = 10
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_TENSSTRAIN(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,
      .             LSUBMODEL,UNITAB   ,UNIT_ID  )
@@ -357,7 +355,6 @@ c
 c     
             ELSEIF (KEY(1:6) == 'HASHIN') THEN
               IRUPT = 14
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_HASHIN(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,IFAILWAVE,
      .             LSUBMODEL,UNITAB   ,FAIL_TAG(IRUPT))
@@ -415,7 +412,6 @@ c
 c     
             ELSEIF (KEY(1:10) == 'ORTHSTRAIN') THEN
               IRUPT = 24 
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_ORTHSTRAIN(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,IRUPT    ,LSUBMODEL,UNITAB   )
 c     
@@ -472,7 +468,6 @@ c
 c     
             ELSEIF (KEY(1:9) == 'COCKCROFT') THEN
               IRUPT = 34
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_COCKCROFT(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,LSUBMODEL,UNITAB   )
 c     
@@ -495,7 +490,6 @@ c
 c     
             ELSEIF (KEY(1:5) == 'GENE1') THEN
               IRUPT = 39
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_GENE1(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,
      .             MAT_PARAM(IMAT)%TITLE ,LSUBMODEL,UNITAB,    
@@ -515,7 +509,6 @@ c
 c
             ELSEIF (KEY(1:7) == 'SYAZWAN') THEN
               IRUPT = 43
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_SYAZWAN(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,
      .             MAT_PARAM(IMAT)%TITLE ,LSUBMODEL,UNITAB   )
@@ -540,7 +533,6 @@ c
 c
             ELSEIF (KEY(1:9) == 'MAXSTRAIN') THEN
               IRUPT = 47
-              CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"TOTAL")
               CALL HM_READ_FAIL_MAXSTRAIN(MAT_PARAM(IMAT)%FAIL(IFL),
      .             MAT_ID   ,FAIL_ID  ,IRUPT    ,LSUBMODEL,UNITAB  ,
      .             FAIL_TAG(IRUPT))

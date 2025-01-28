@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,15 +39,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sr8bilan               ../engine/source/elements/solid/solide8/sr8bilan.F
       !||    sr8coor3               ../engine/source/elements/solid/solide8/sr8coor3.F
       !||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE S8FORC3(
+      SUBROUTINE S8FORC3(TIMERS,
      1                   ELBUF_STR,PM       ,GEO    ,IXS      ,X      ,
      2                   A        ,V        ,MS     , 
      3                   VEUL     ,FV       ,ALE_CONNECT  ,IPARG    ,
@@ -55,14 +58,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5                   STIFN ,FSKY ,IADS  ,OFFSET ,IPARTS  ,
      6                   NEL      ,DT2T     ,NELTST ,ITYPTST ,IPM      ,
      7                   ITASK    ,GRESAV   ,GRTH   ,IGRTH   ,MSSA     ,
-     8                   DMELS    ,TABLE    ,IOUTPRT,MAT_ELEM,NG,SVIS       )
+     8                   DMELS    ,TABLE    ,IOUTPRT,MAT_ELEM,NG,SVIS ,GLOB_THERM,
+     9                   SNPC     ,NUMGEO   ,SBUFMAT  ,STF    ,NTABLE,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD         
       USE ALE_CONNECTIVITY_MOD
       USE ELBUFDEF_MOD
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -82,6 +89,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      INTEGER,INTENT(IN) :: SNPC
+      INTEGER,INTENT(IN) :: NUMGEO
+      INTEGER,INTENT(IN) :: SBUFMAT
+      INTEGER,INTENT(IN) :: STF
+      INTEGER,INTENT(IN) :: NTABLE
       INTEGER IXS(*),  IPARG(NPARG,*), NPF(*),IADS(8,*),
      .        IPARTS(*),IPM(*),OFFSET,NEL, NELTST, ITYPTST,ITASK,
      .        GRTH(*),IGRTH(*) ,IOUTPRT, NG
@@ -95,6 +108,8 @@ C     REAL
       TYPE (MAT_ELEM_) ,TARGET ,INTENT(INOUT) :: MAT_ELEM
       TYPE(TTABLE) TABLE(*)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
+      type (glob_therm_) ,intent(inout)    :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -201,8 +216,8 @@ C
 C------------------------------------------------------
 C     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
 C------------------------------------------------------
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
-      CALL MMAIN8(PM   ,GEO   ,ELBUF_STR,MAT_ELEM ,
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
+      CALL MMAIN8(TIMERS, PM   ,GEO   ,ELBUF_STR,MAT_ELEM ,
      2            IXS  ,IPARG ,V        ,TF    ,    
      3            NPF  ,BUFMAT,STI    ,X     ,D1    ,
      4            D2   ,D3    ,D4     ,D5    ,D6    ,
@@ -213,8 +228,9 @@ C------------------------------------------------------
      9            R31  ,R12   ,R22    ,R32   ,R13   , 
      A            R23  ,R33   ,OFF    ,IPM   ,GAMA  ,
      B            MSSA ,DMELS ,TABLE  ,SSP   ,ITASK ,
-     C            SVIS)
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+     C            SVIS ,SNPC  ,NUMGEO ,SBUFMAT ,STF ,
+     D            NTABLE)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C--------------------------
 C     BILANS PAR MATERIAU
 C--------------------------
@@ -230,12 +246,12 @@ c           IF (MTN==11) NB3S = NB14
            IF (JCVT==0)THEN
             CALL S8BILAN(PARTSAV,EINT,GBUF%RHO,GBUF%RK,GBUF%VOL,
      .                  VOLN,VXLOC,VYLOC,VZLOC,IPARTS,
-     .                  GRESAV,GRTH,IGRTH,XLOC,YLOC,ZLOC,ITASK,IPARG(1,NG))
+     .                  GRESAV,GRTH,IGRTH,XLOC,YLOC,ZLOC,ITASK,IPARG(1,NG),SENSORS)
            ELSE
             CALL SR8BILAN(PARTSAV,EINT,GBUF%RHO,GBUF%RK,GBUF%VOL,
      .                  VOLN,VGXA,VGYA,VGZA,VGA2,IPARTS,
      .                  GRESAV,GRTH,IGRTH,XGXA,XGYA,XGZA,
-     .                  XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG))
+     .                  XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),SENSORS)
            ENDIF
         ENDIF
 C----------------------------
@@ -306,7 +322,7 @@ C-------------------------
      G   FBI,     FBI,     FBI,     FBI,
      H   FBI,     FBI,     FBI,     FBI,
      I   NEL,     NFT,     JTHE,    ISROT,
-     J   IPARTSPH)
+     J   IPARTSPH,GLOB_THERM%NODADT_THERM)
       ENDIF
 C
 C-----------

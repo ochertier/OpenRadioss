@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,18 +40,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    m2law8              ../engine/source/materials/mat/mat002/m2law8.F
       !||    m3law8              ../engine/source/materials/mat/mat003/m3law8.F
       !||    meos8               ../engine/source/materials/mat_share/meos8.F
-      !||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F
+      !||    mulaw8              ../engine/source/materials/mat_share/mulaw8.F90
       !||    nvar                ../engine/source/input/nvar.F
       !||    put_etfac           ../engine/source/elements/solid/solide8z/put_etfac.F
-      !||    startime            ../engine/source/system/timer.F
-      !||    stoptime            ../engine/source/system/timer.F
+      !||    startime            ../engine/source/system/timer_mod.F90
+      !||    stoptime            ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mulaw8_mod          ../engine/source/materials/mat_share/mulaw8.F
+      !||    mulaw8_mod          ../engine/source/materials/mat_share/mulaw8.F90
       !||    table_mod           ../engine/share/modules/table_mod.F
+      !||    timer_mod           ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE MMAIN8(PM     ,GEO      ,ELBUF_STR,MAT_ELEM ,
+      SUBROUTINE MMAIN8(TIMERS, PM     ,GEO      ,ELBUF_STR,MAT_ELEM ,
      2                  IX     ,IPARG    ,V        ,TF       ,
      3                  NPF    ,BUFMAT   ,STIFN    ,X        ,D1      ,
      4                  D2     ,D3       ,D4       ,D5       ,D6      ,
@@ -62,10 +63,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9                  RZ     ,SX       ,SY       ,SZ       ,TX      ,
      A                  TY     ,TZ       ,OFF      ,IPM      ,GAMA    ,
      B                  MSSA   ,DMELS    ,TABLE    ,SSP      ,ITASK   ,
-     C                  SVIS)
+     C                  SVIS   ,SNPC     ,NUMGEO   ,SBUFMAT  ,STF,
+     D                  NTABLE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD         
       USE MULAW8_MOD
@@ -90,6 +93,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      INTEGER, INTENT(IN) :: SNPC
+      INTEGER, INTENT(IN) :: NUMGEO
+      INTEGER, INTENT(IN) :: SBUFMAT
+      INTEGER, INTENT(IN) :: STF
+      INTEGER, INTENT(IN) :: NTABLE
       INTEGER IX(*), IPARG(*), NPF(*),MAT(*),NC(*),NGL(*),
      .        NEL, NELTST, ITYPTST, PID(MVSIZ,*),IPM(NPROPMI,*),
      .        ITASK
@@ -202,8 +211,8 @@ c     user-type laws
           NUVAR  = MAX(NUVAR,IPM(8,MAT(I)))  
         ENDDO
 c
-        CALL MULAW8(
-     1   1,        NEL,      NFT,      MTN,
+        CALL MULAW8(TIMERS,
+     1   1,        NEL,      MTN,
      2   NPT,      D1,       D2,       D3,
      3   D4,       D5,       D6,       PM,
      4   OFF,      GBUF%SIG, GBUF%EINT,GBUF%RHO,
@@ -220,14 +229,17 @@ c
      F   ISORTH,   ET,       MSSA,     DMELS,
      G   TABLE,    IHET,     SSP,      ITASK,
      H   NEL,      ITY,      JSMS,     JSPH,
-     I   JTHE,     JTUR,     IMPL_S   ,MAT_ELEM%NUMMAT,
-     J   MAT_ELEM%MAT_PARAM,SVIS)
+     I   JTHE,     JTUR,     MAT_ELEM%NUMMAT,
+     J   MAT_ELEM%MAT_PARAM, SVIS,     SNPC,
+     K   DT1,      TT,       MAXFUNC,  NPROPMI,
+     L   NPROPG,   NPROPM,   IMON_MAT, NUMGEO,
+     M   SBUFMAT,  STF,      NTABLE)
 C-----
       ENDIF 
 C---------------------------
 C       Failure Model 
 C --------------------------
-      IF ((ITASK==0).AND.((IMON_MAT==1)))CALL STARTIME(121,1)
+      IF ((ITASK==0).AND.((IMON_MAT==1)))CALL STARTIME(TIMERS,121)
       IF (IFAILURE == 1)THEN
         IF (MTN < 28) THEN
         IMAT = MAT(1)
@@ -357,7 +369,7 @@ c
        ENDIF
       ENDIF
 
-      IF ((ITASK==0).AND.((IMON_MAT==1)))CALL STOPTIME(121,1)
+      IF ((ITASK==0).AND.((IMON_MAT==1)))CALL STOPTIME(TIMERS,121)
       IF (IMPL_S>0) CALL PUT_ETFAC(NEL     ,ET    ,MTN  )
 
       IF(BUFLY%L_SSP /=0 )THEN

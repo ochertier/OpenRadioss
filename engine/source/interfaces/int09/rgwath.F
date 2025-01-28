@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -80,6 +80,14 @@ C-----------------------------------------------
       DOUBLE PRECISION 
      .   FRWL6(6,6)
 C
+      M1 = 0
+      M2 = 0
+      M3 = 0
+      I = 0     
+      N = 0
+      N1 = 0
+      N2 = 0
+      N3 = 0
       IF(MSR==0)THEN
        XWL=RWL(4)
        YWL=RWL(5)
@@ -239,10 +247,7 @@ C   si proc concerne par le rgwall
         ENDIF
 
         IF(ISPMD+1==PMAIN)THEN
-C
-CGW   TFEXT=TFEXT 
-CCG   L' ENERGIE DE FROTTEMENT EST MISE DS LES ELEMENTS
-C
+
           FSAV(1)=FSAV(1)+FXN
           FSAV(2)=FSAV(2)+FYN
           FSAV(3)=FSAV(3)+FZN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    st_qaprint_driver       ../starter/source/output/qaprint/st_qaprint_driver.F
       !||    st_qaprint_userwi       ../starter/source/output/qaprint/st_qaprint_userwi.F
       !||    starter0                ../starter/source/starter/starter0.F
-      !||    user_interface_mod      ../engine/share/modules/user_interface_mod.F
+      !||    user_interface_mod      ../engine/source/modules/user_interface_mod.F90
       !||    user_windows_routine    ../engine/source/user_interface/user_windows.F
       !||    userwi_read             ../engine/source/user_interface/userwindow_interface_routines.F
       !||    userwi_write            ../engine/source/user_interface/userwindow_interface_routines.F

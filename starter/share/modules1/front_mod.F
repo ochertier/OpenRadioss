@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -85,7 +85,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 #include "my_real.inc"
 
       TYPE my_front
-        INTEGER, DIMENSION(:,:), POINTER :: P
+          INTEGER, DIMENSION(:,:), POINTER :: P
           INTEGER, DIMENSION(:)  , ALLOCATABLE :: IENTRY
       END TYPE my_front     
       
@@ -93,7 +93,7 @@ c IFRONT chained-list
       TYPE(my_front) :: IFRONT
 
       TYPE my_connectdom
-        INTEGER, DIMENSION(:,:), POINTER :: PDOM
+          INTEGER, DIMENSION(:,:), ALLOCATABLE :: PDOM
           INTEGER, DIMENSION(:,:)  , ALLOCATABLE :: IENTRYDOM
       END TYPE my_connectdom     
       

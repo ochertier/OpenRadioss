@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -721,26 +721,25 @@ C--------------------------------------------
       !||    gravit_imp    ../engine/source/loads/general/grav/gravit_imp.F
       !||    spmd_max_i    ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_sumf_a   ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime      ../engine/source/system/timer.F
-      !||    stoptime      ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod       ../engine/share/modules/h3d_mod.F
       !||    imp_dyna      ../engine/share/modules/impbufdef_mod.F
       !||    message_mod   ../engine/share/message_module/message_mod.F
-      !||    sensor_mod    ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod    ../common_source/modules/sensor_mod.F90
       !||    skew_mod      ../common_source/modules/skew_mod.F90
       !||    th_surf_mod   ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE DYNA_INA(IBCL      ,FORC    ,SNPC    ,NPC    ,TF     ,A     ,
      2                    V         ,X       ,SKEWS   ,AR     ,VR     ,
-     3                    SENSOR_TAB,WEIGHT  ,TFEXC   ,IADS_F ,
+     3                    SENSOR_TAB,WEIGHT  ,WFEXC   ,IADS_F ,
      4                    FSKY      ,IGRV    ,AGRV    ,MS     ,IN     ,
      5                    LGRAV     ,ITASK   ,NRBYAC  ,IRBYAC ,NPBY   ,
      6                    RBY       ,FR_ELEM ,IAD_ELEM,NDDL   ,NNZK   ,
      7                    IDIV      ,H3D_DATA,CPTREAC ,FTHREAC,NODREAC,
      8                    NSENSOR   ,TH_SURF ,DPL0CLD,
      9                    VEL0CLD   ,D       ,DR      ,NUMNOD ,NSURF  ,
-     A                    NFUNCT    ,NCONLD  ,NGRAV   ,NINVEL ,STF    ,NUMSKW)
+     A                    NFUNCT    ,NCONLD  ,NGRAV   ,NINVEL ,STF    ,NUMSKW ,
+     B                    WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -774,11 +773,10 @@ C-----------------------------------------------
      .        IGRV(*),WEIGHT(*),LGRAV(*),IDIV,
      .        CPTREAC,NODREAC(*)
       INTEGER FR_ELEM(*),IAD_ELEM(2,*),NRBYAC,IRBYAC(*),NDDL ,NNZK
-C     REAL
       my_real
      .   X(3,*)    ,V(3,*)   ,VR(3,*),MS(*)   ,AGRV(*),
      .   TF(*) ,FORC(*)  ,RBY(NRBY,*),IN(*),
-     .   A(3,*) ,AR(3,*),TFEXC,FSKY(*),FTHREAC(6,*)
+     .   A(3,*) ,AR(3,*),WFEXC,FSKY(*),FTHREAC(6,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
       TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
@@ -786,6 +784,7 @@ C     REAL
       my_real, INTENT(IN) :: 
      .   DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD),
      .   D(3,NUMNOD),DR(3,NUMNOD)
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -850,14 +849,14 @@ C---estimation a(t=0)----
         NCL_MAX = 0
         IF (TT==DT2) TT = ZERO
         IF(NCONLD/=0) THEN
-          IF (IMON>0) CALL STARTIME(4,ITASK+1)
+!         IF (IMON>0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
           CALL FORCE_IMP(IBCL    ,FORC       ,SNPC       ,NPC        ,TF         ,
      2                   DY_A    ,V          ,X          ,SKEWS      ,
-     3                   DY_AR   ,VR         ,NSENSOR    ,SENSOR_TAB ,TFEXC      ,
+     3                   DY_AR   ,VR         ,NSENSOR    ,SENSOR_TAB ,WFEXC      ,
      4                   IADS_F  ,FSKY       ,DUMMY_FEXT ,H3D_DATA   ,CPTREAC    ,
      5                   FTHREAC ,NODREAC    ,TH_SURF    ,
      6                   DPL0CLD ,VEL0CLD    ,D          ,DR         ,NCONLD     ,
-     7                   NUMNOD  ,NFUNCT     ,STF )
+     7                   NUMNOD  ,NFUNCT     ,STF        ,WFEXT)
          IF (NSPMD>1) THEN
           DO I=IAD_ELEM(1,1),IAD_ELEM(1,NSPMD+1)-1
             J = FR_ELEM(I)
@@ -866,7 +865,7 @@ C---estimation a(t=0)----
             IF (TMP>ZERO) NCL_MAX = NCL_MAX + 1
           ENDDO
          ENDIF
-          IF (IMON>0) CALL STOPTIME(4,ITASK+1)
+!         IF (IMON>0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
         ENDIF
         IF (NSPMD>1) THEN
          CALL SPMD_MAX_I(NCL_MAX)
@@ -881,12 +880,12 @@ C---estimation a(t=0)----
          ENDIF
         ENDIF
         IF(NGRAV/=0) THEN
-          IF (IMON>0) CALL STARTIME(4,ITASK+1)
+!         IF (IMON>0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
           CALL GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,DY_A,
-     2                    V     ,X     ,SKEWS%SKEW  ,MS,TFEXC,
+     2                    V     ,X     ,SKEWS%SKEW  ,MS,WFEXC,
      3                    NSENSOR,SENSOR_TAB,WEIGHT,LGRAV,ITASK,
      4                    NRBYAC,IRBYAC,NPBY  ,RBY    )
-          IF (IMON>0) CALL STOPTIME(4,ITASK+1)
+!         IF (IMON>0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
         ENDIF
          DO N=NODFT,NODLT
           IF(MS(N)>0.) THEN
@@ -976,19 +975,17 @@ C
       !||--- calls      -----------------------------------------------------
       !||    force_imp     ../engine/source/loads/general/force_imp.F
       !||    gravit_imp    ../engine/source/loads/general/grav/gravit_imp.F
-      !||    startime      ../engine/source/system/timer.F
-      !||    stoptime      ../engine/source/system/timer.F
       !||    wfv_imp       ../engine/source/constraints/general/impvel/fv_imp0.F
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod       ../engine/share/modules/h3d_mod.F
       !||    imp_dyna      ../engine/share/modules/impbufdef_mod.F
-      !||    sensor_mod    ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod    ../common_source/modules/sensor_mod.F90
       !||    skew_mod      ../common_source/modules/skew_mod.F90
       !||    th_surf_mod   ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE DYNA_WEX(IBCL  ,FORC   ,SNPC,NPC   ,TF    ,A     ,
      2                    V     ,X      ,SKEWS  ,AR    ,VR    ,
-     3                    SENSOR_TAB,WEIGHT,TFEXT ,IADS_F ,
+     3                    SENSOR_TAB,WEIGHT,WFEXT ,IADS_F ,
      4                    FSKY  ,IGRV   ,AGRV  ,MS    ,IN    ,
      5                    LGRAV ,ITASK ,NRBYAC,IRBYAC ,NPBY  ,
      6                    RBY   ,IBFV  ,VEL   ,D      ,DR    ,
@@ -1031,7 +1028,7 @@ C-----------------------------------------------
       INTEGER NRBYAC,IRBYAC(*)
       my_real X(3,*)    ,V(3,*)   ,VR(3,*),MS(*)   ,AGRV(*),
      .        TF(*) ,FORC(*)  ,RBY(NRBY,*),IN(*),
-     .        A(3,*) ,AR(3,*),TFEXT,FSKY(*),
+     .        A(3,*) ,AR(3,*),FSKY(*),
      .        VEL(LFXVELR,*), D(3,*), DR(3,*),XFRAME(NXFRAME,*),
      .        FTHREAC(6,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
@@ -1039,49 +1036,50 @@ C-----------------------------------------------
       TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
       TYPE(SKEW_),INTENT(INOUT) :: SKEWS
       my_real, INTENT(IN) :: DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD)
+      DOUBLE PRECISION,INTENt(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER N,IBID,IW ,I,J,ND,J1
-      my_real  TFEXC,DUMMY_FEXT(3,1)
+      my_real  WFEXC,DUMMY_FEXT(3,1)
 C--------------------------------
        DUMMY_FEXT=ZERO
 C--------------------------------
-       IF (IMON>0) CALL STARTIME(4,ITASK+1)
+!      IF (IMON>0 .AND. ITASK ==0) CALL STARTIME(TIMERS,4)
         IF(NCONLD/=0) THEN
           CALL FORCE_IMP( IBCL    ,FORC    ,SNPC       ,NPC        ,TF         ,
      2                    A       ,V       ,X          ,SKEWS      ,
-     3                    AR      ,VR      ,NSENSOR    ,SENSOR_TAB ,TFEXC      ,
+     3                    AR      ,VR      ,NSENSOR    ,SENSOR_TAB ,WFEXC      ,
      4                    IADS_F  ,FSKY    ,DUMMY_FEXT ,H3D_DATA   ,CPTREAC    ,
      5                    FTHREAC ,NODREAC ,TH_SURF    ,
      6                    DPL0CLD ,VEL0CLD ,D          ,DR         ,NCONLD     ,
-     7                    NUMNOD  ,NFUNCT  ,STF)
+     7                    NUMNOD  ,NFUNCT  ,STF        ,WFEXT)
 
-          TFEXT = TFEXT + TFEXC*DT2
+          WFEXT = WFEXT + WFEXC*DT2
         ENDIF
         IF(NGRAV/=0) THEN
           CALL GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,A    ,
-     2                    V     ,X     ,SKEWS%SKEW  ,MS,TFEXC,
+     2                    V     ,X     ,SKEWS%SKEW  ,MS,WFEXC,
      3                    NSENSOR,SENSOR_TAB,WEIGHT,LGRAV,ITASK,
      5                    NRBYAC,IRBYAC,NPBY  ,RBY    )
-          TFEXT = TFEXT + TFEXC*DT2
+          WFEXT = WFEXT + WFEXC*DT2
         ENDIF
         IF(NFXVEL/=0) THEN
           CALL WFV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
      1                D      ,DR     ,IKC   ,IDDL  ,NSENSOR   ,
      2                SKEWS%SKEW  ,IFRAME ,XFRAME  ,DY_A  ,DY_AR ,
      3                X     ,NDOF    ,MS     ,IN    ,WEIGHT,
-     4                RBY   ,TFEXC   )
-          TFEXT = TFEXT + TFEXC
+     4                RBY   ,WFEXC   )
+          WFEXT = WFEXT + WFEXC
         ENDIF
         IF(IDY_DAMP>0) THEN
-         TFEXC = ZERO
+         WFEXC = ZERO
 C----------DY_DAM has been already condensed---
          DO I = 1 ,NUMNOD
           DO J=1,3
            ND = IDDL(I)+J
            IF (IKC(ND) == 0 )
-     .      TFEXC = TFEXC +D(J,I)*(DY_DAM(J,I)+DY_DAM0(J,I))*HALF
+     .      WFEXC = WFEXC +D(J,I)*(DY_DAM(J,I)+DY_DAM0(J,I))*HALF
           END DO
          ENDDO
          DO I = 1 ,NUMNOD
@@ -1095,7 +1093,7 @@ C----------DY_DAM has been already condensed---
             ND = IDDL(I)+J
             J1=J-3
             IF (IKC(ND) == 0 )
-     .      TFEXC = TFEXC +DR(J,I)*(DY_DAMR(J,I)+DY_DAMR0(J,I))*HALF
+     .      WFEXC = WFEXC +DR(J,I)*(DY_DAMR(J,I)+DY_DAMR0(J,I))*HALF
            ENDDO
           ENDDO
           DO I = 1 ,NUMNOD
@@ -1104,11 +1102,11 @@ C----------DY_DAM has been already condensed---
            DY_DAMR0(3,I) = DY_DAMR(3,I)
           ENDDO
          END IF
-         DY_EDAMP = DY_EDAMP + TFEXC
+         DY_EDAMP = DY_EDAMP + WFEXC
 C     DY_EDAMP will added in Eint instead of W_ext (as explicit)
 C     which makes high error (energy) in case of high Rayleigh damping
         ENDIF
-       IF (IMON>0) CALL STOPTIME(4,ITASK+1)
+!      IF (IMON>0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
 C
       RETURN
       END

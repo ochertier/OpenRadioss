@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,18 +34,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod               ../engine/share/modules/h3d_mod.F
       !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||    th_surf_mod           ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE PFLUID(ILOADP     ,RLOAD      ,NPC    ,TF     ,A          ,
      2                  V          ,X          ,XFRAME ,MS     ,       
-     3                  NSENSOR    ,SENSOR_TAB ,TFEXC  ,IADC   ,
+     3                  NSENSOR    ,SENSOR_TAB ,WFEXC  ,WFEXT  ,IADC       ,
      4                  FSKY       ,FSKYV      ,LLOADP ,FEXT   ,H3D_DATA   ,
      5                  TH_SURF    ,PYTHON )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------- 
-C This subroutine is modeling a pressure load on given strucutral faces (4 or 3 nodes). 
+C This subroutine is modeling a pressure load on given structural faces (4 or 3 nodes). 
 C The pressure load results into a normal force at face centroid. This normal force is then expanded to the nodes composing the face.
 C
 C ILOADP     : Integer array related to /LOAD/PBLAST option
@@ -60,10 +60,10 @@ C AR         : rotationnal acceleration
 C VR         : rotationnal velocities
 C SENSOR_TAB : data structure for /SENSOR option
 C WEIGHT     : -
-C TFEXC      : -
+C WFEXC      : -
 C IADC       : (Parith/on only) contains index to be used with FSKY array
 C FSKY       : (Parith/on only) Nodal force    (directly apply as a nodal acceleration in A array in case of Parith/off)
-C LLOADP     : array used to retieve nodes N1,N2,N3,N4 of the structural face to be loaded
+C LLOADP     : array used to retrieve nodes N1,N2,N3,N4 of the structural face to be loaded
 C FEXT       : storage of nodal forces for animation purpose (/ANIM/VECT/FEXT)
 C H3D_DATA   : data structure for H3D parameters
 C
@@ -94,7 +94,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
+!#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "parit_c.inc"
 #include      "scr14_c.inc"
@@ -115,12 +115,13 @@ C-----------------------------------------------
       INTEGER ILOADP(SIZLOADP,NLOADP)
       INTEGER IADC(DSNCOL)
       my_real RLOAD(LFACLOAD,NLOADP), TF(STF), A(3,NUMNOD), V(3,NUMNOD),
-     .        X(3,NUMNOD), XFRAME(NXFRAME,NUMFRAM+1),TFEXC,
+     .        X(3,NUMNOD), XFRAME(NXFRAME,NUMFRAM+1),WFEXC,
      .        FSKY(8,SFSKY/8), FSKYV(SFSKY/8,8),FEXT(3,NUMNOD)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
       TYPE(PYTHON_) :: PYTHON
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -128,7 +129,7 @@ C-----------------------------------------------
      .        IAD,N_OLD,IFRA1,DIR_HSP,I,
      .        FUN_CX,FUN_VEL,DIR_VEL,IFRA2, IANIM,IJK,UP_BOUND,NS,KSURF,NSEGPL
       my_real NX, NY, NZ, AA,FX, FY, FZ, DYDX, TS,
-     .        SIXTH,TFEXTT,X_OLD,XSENS,FCX,FCY,
+     .        SIXTH,WFEXTT,X_OLD,XSENS,FCX,FCY,
      .        FCX1,FCY1,FCX2,FCY2,VEL,VSEG,FINTER,
      .        CENTROID_DEPTH,PVEL,NORM,NSIGN,AREA,PA,MASS,AN,VN,PVEL0
       EXTERNAL FINTER
@@ -139,8 +140,8 @@ C-----------------------------------------------
 
       ! init.
       SIXTH  = ONE_OVER_6  
-      TFEXC  = ZERO
-      TFEXTT = ZERO
+      WFEXC  = ZERO
+      WFEXTT = ZERO
       N_OLD  = 0
       X_OLD  = ZERO
       NSEGPL = 0
@@ -270,12 +271,12 @@ C---------------------------------------
               FZ=FZ*FOURTH                                  
                                                                                              
               !External Force Work
-              TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
+              WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                          +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
      +                          +FZ*(V(3,N1)+V(3,N2)+V(3,N3)+V(3,N4)))
      
 #include "lockon.inc"
-              !/PARITH/OFF: force is direcctly added in A array. It will be dividedby nodal mass later
+              !/PARITH/OFF: force is directly added in A array. It will be divided by nodal mass later
               !-node_1
               A(1,N1)=A(1,N1)+FX                                                                   
               A(2,N1)=A(2,N1)+FY                                                                   
@@ -439,13 +440,13 @@ C
               FZ=FZ*THIRD                                                                                                                                                                                              
 
               !External Force Work
-              TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))  
+              WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
      +                          +FY*(V(2,N1)+V(2,N2)+V(2,N3))  
      +                          +FZ*(V(3,N1)+V(3,N2)+V(3,N3)))  
      
 
 #include "lockon.inc"
-              !/PARITH/OFF: force is direcctly added in A array. It will be dividedby nodal mass later
+              !/PARITH/OFF: force is directly added in A array. It will be dividedby nodal mass later
               !-node_1
               A(1,N1)=A(1,N1)+FX                                                                    
               A(2,N1)=A(2,N1)+FY                                                                    
@@ -510,7 +511,7 @@ C
         ENDDO !nextNL
 
 #include "atomic.inc"
-              TFEXT = TFEXT + TFEXTT
+              WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
 
 
@@ -694,7 +695,7 @@ C---------------------------------------
                FSKY(3,IAD) = FZ
 
                !External force work
-               TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
+               WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                           +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
      +                           +FZ*(V(3,N1)+V(3,N2)+V(3,N3)+V(3,N4)))
      
@@ -775,6 +776,7 @@ C
                  CENTROID_DEPTH =                  (XFRAME(K1,IFRA1)*(X(1,N1)+X(1,N2)+X(1,N3))/THREE)
                  CENTROID_DEPTH = CENTROID_DEPTH + (XFRAME(K2,IFRA1)*(X(2,N1)+X(2,N2)+X(2,N3))/THREE)
                  CENTROID_DEPTH = CENTROID_DEPTH + (XFRAME(K3,IFRA1)*(X(3,N1)+X(3,N2)+X(3,N3))/THREE)
+                 ISMOOTH = 0
                  IF (FUN_HSP > 0) ISMOOTH = NPC(2*NFUNCT+FUN_HSP+1)
                  IF(ISMOOTH < 0) THEN
                    CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,(CENTROID_DEPTH-XFRAME(9+DIR_HSP,IFRA1))*FCX , AA)
@@ -861,7 +863,7 @@ C
                FSKY(3,IAD) = FZ
 
                !external force work
-               TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
+               WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
      +                           +FY*(V(2,N1)+V(2,N2)+V(2,N3))
      +                           +FZ*(V(3,N1)+V(3,N2)+V(3,N3)))
      
@@ -915,7 +917,7 @@ C
          ENDDO!next NL
 
 #include "atomic.inc"
-                TFEXT = TFEXT + TFEXTT
+                WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
 
          ELSE
@@ -976,6 +978,7 @@ C-----------------------------------
                  CENTROID_DEPTH =          (XFRAME(K1,IFRA1)*(X(1,N1)+X(1,N2)+X(1,N3)+X(1,N4))/FOUR)
                  CENTROID_DEPTH = CENTROID_DEPTH+(XFRAME(K2,IFRA1)*(X(2,N1)+X(2,N2)+X(2,N3)+X(2,N4))/FOUR)
                  CENTROID_DEPTH = CENTROID_DEPTH+(XFRAME(K3,IFRA1)*(X(3,N1)+X(3,N2)+X(3,N3)+X(3,N4))/FOUR)
+                 ISMOOTH = 0
                  IF (FUN_HSP > 0) ISMOOTH = NPC(2*NFUNCT+FUN_HSP+1)
                  IF(ISMOOTH < 0) THEN
                    CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,(CENTROID_DEPTH-XFRAME(9+DIR_HSP,IFRA1))*FCX , AA)
@@ -1068,7 +1071,7 @@ C-----------------------------------
                FSKYV(IAD,3) = FZ
                
                !external force work               
-               TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
+               WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                           +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
      +                           +FZ*(V(3,N1)+V(3,N2)+V(3,N3)+V(3,N4)))
      
@@ -1152,6 +1155,7 @@ C
                  CENTROID_DEPTH =                (XFRAME(K1,IFRA1)*(X(1,N1)+X(1,N2)+X(1,N3))/THREE)
                  CENTROID_DEPTH = CENTROID_DEPTH+(XFRAME(K2,IFRA1)*(X(2,N1)+X(2,N2)+X(2,N3))/THREE)
                  CENTROID_DEPTH = CENTROID_DEPTH+(XFRAME(K3,IFRA1)*(X(3,N1)+X(3,N2)+X(3,N3))/THREE)
+                 ISMOOTH = 0
                  IF (FUN_HSP > 0) ISMOOTH = NPC(2*NFUNCT+FUN_HSP+1)
                  IF(ISMOOTH < 0) THEN
                    CALL PYTHON_CALL_FUNCT1D(PYTHON, -ISMOOTH,(CENTROID_DEPTH-XFRAME(9+DIR_HSP,IFRA1))*FCX , AA)
@@ -1287,7 +1291,7 @@ C
               ENDIF 
                 
                !external force work
-               TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
+               WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
      +                           +FY*(V(2,N1)+V(2,N2)+V(2,N3))
      +                           +FZ*(V(3,N1)+V(3,N2)+V(3,N3)))
              ENDIF
@@ -1296,7 +1300,7 @@ C
          ENDDO!next NL
 C
 #include "atomic.inc"
-                TFEXT = TFEXT + TFEXTT
+                WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
          ENDIF ! IF(IVECTOR == 0)
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    i25trivox    ../engine/source/interfaces/intsort/i25trivox.F
+      !||    i25trivox      ../engine/source/interfaces/intsort/i25trivox.F
       !||--- called by ------------------------------------------------------
-      !||    i25buce      ../engine/source/interfaces/intsort/i25buce.F
+      !||    i25buce        ../engine/source/interfaces/intsort/i25buce.F
       !||--- calls      -----------------------------------------------------
-      !||    i25sto       ../engine/source/interfaces/intsort/i25sto.F
-      !||    my_barrier   ../engine/source/system/machine.F
+      !||    i25sto         ../engine/source/interfaces/intsort/i25sto.F
+      !||    my_barrier     ../engine/source/system/machine.F
       !||--- uses       -----------------------------------------------------
-      !||    tri7box      ../engine/share/modules/tri7box.F
+      !||    my_alloc_mod   ../common_source/tools/memory/my_alloc.F90
+      !||    tri7box        ../engine/share/modules/tri7box.F
       !||====================================================================
       SUBROUTINE I25TRIVOX(
      1      NSN    ,NSNR    ,ISZNSNR ,I_MEM   ,VMAXDT   ,
@@ -46,6 +47,7 @@ C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
       USE TRI7BOX
+      use my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -125,18 +127,20 @@ C     REAL
      .   XMIN, XMAX,YMIN, YMAX,ZMIN, ZMAX, TZ, GAPSMX, GAPL,
      .   XX1,XX2,XX3,XX4,YY1,YY2,YY3,YY4,ZZ1,ZZ2,ZZ3,ZZ4,
      .   D1X,D1Y,D1Z,D2X,D2Y,D2Z,DD1,DD2,D2,A2,GS
-c provisoire
-      INTEGER  LAST_NOD(NSN+NSNR)
+c 
       INTEGER  IX,IY,IZ,NEXT,M1,M2,M3,M4,
      .         IX1,IY1,IZ1,IX2,IY2,IZ2
+      INTEGER,  DIMENSION(:),ALLOCATABLE :: LAST_NOD
       INTEGER,  DIMENSION(:),ALLOCATABLE :: IIX,IIY,IIZ
       my_real
      .   XMINB,YMINB,ZMINB,XMAXB,YMAXB,ZMAXB,
      .   XMINE,YMINE,ZMINE,XMAXE,YMAXE,ZMAXE,AAA
       INTEGER FIRST,NEW,LAST
       SAVE IIX,IIY,IIZ
-      INTEGER, DIMENSION(NUMNOD) :: TAG
+      INTEGER, DIMENSION(:),ALLOCATABLE :: TAG
 C-----------------------------------------------
+      CALL MY_ALLOC(TAG,NUMNOD)
+      CALL MY_ALLOC(LAST_NOD,NSN+NSNR)
       IF(ITASK == 0)THEN
         ALLOCATE(NEXT_NOD(NSN+NSNR))
         ALLOCATE(IIX(NSN+NSNR))
@@ -669,6 +673,8 @@ C
         DEALLOCATE(IIZ)
       ENDIF
 
+      DEALLOCATE(TAG)
+      DEALLOCATE(LAST_NOD)
       RETURN
       END
 

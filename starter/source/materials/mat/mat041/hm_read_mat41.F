@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat41            ../starter/source/materials/mat/mat041/hm_read_mat41.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
       !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
@@ -74,7 +74,7 @@ C     GROWTH TERM   : rateg = G1 * (1.-F)**b * F**d * pres**y  , if P>0
 C
 C   *** IREAC = 2 ***
 C   EXTENDED 3-TERM-MODEL   --> dF/dT = IGNITION TERM + GROWTH TERM 1 + GROWTH TERM 2
-C        IGNITION TERM :  ratei = I * (1.-F+tol)**b * abs(etar-1.-ccrit)**x     , if 0<F<Figmax & P>0 & compression thresold (etar-1>=ccrit)
+C        IGNITION TERM :  ratei = I * (1.-F+tol)**b * abs(etar-1.-ccrit)**x     , if 0<F<Figmax & P>0 & compression threshold (etar-1>=ccrit)
 C        GROWTH TERM 1 : rateg1 = G1 * (1.-F+tol)**c * (F+tol)**d * pres**y     , if 0<F<FG1max & P>0
 C        GROWTH TERM 2 : rateg2 = G2 * (1.-F+tol)**e * (F+tol)**g * pres**z     , if FG2min<F<1 & P>0
 C

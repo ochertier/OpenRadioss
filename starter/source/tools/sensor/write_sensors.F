@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,16 +27,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    fretitl                ../starter/source/starter/freform.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||====================================================================
       SUBROUTINE WRITE_SENSORS(SENSORS,NUMNOD,NODLOCAL)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE SENSOR_MOD , ONLY : SENSORS_, SENSOR_STR_, LOGICAL_SENSORS_LIST, 
-     .                        ISENBUF, LSENBUF, NSENPARR, NSENPARI, LOGICAL_SENSOR_COUNT
+      USE SENSOR_MOD , ONLY : SENSORS_, SENSOR_STR_,
+     .                        ISENBUF, LSENBUF, NSENPARR, NSENPARI
       USE WRITE_MOD, ONLY : WRITE_INTEGER
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE PYTHON_FUNCT_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -147,14 +147,17 @@ c
             CALL WRITE_DB(SENSOR%FLOAT_USERPARAM,NSENPARR)
             CALL WRITE_DB(SENSOR%FLOAT_USERBUF,LSENBUF)
           ENDIF
+          IF(TYP == 40) THEN
+            CALL WRITE_INTEGER(SENSOR%PYTHON_FUNCTION_ID)
+          ENDIF
 c
         END DO
 c---------------------------------------
 c       Write Logical sensor index array
 c---------------------------------------
 
-        CALL WRITE_INTEGER(LOGICAL_SENSOR_COUNT)
-        CALL WRITE_I_C(LOGICAL_SENSORS_LIST,LOGICAL_SENSOR_COUNT)
+        CALL WRITE_INTEGER(SENSORS%LOGICAL_SENSOR_COUNT)
+        CALL WRITE_I_C(SENSORS%LOGICAL_SENSORS_LIST,SENSORS%LOGICAL_SENSOR_COUNT)
 
 c---------------------------------------
 c       Write spmd/PON exchange arrays

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -199,7 +199,7 @@ C
            ENDDO
          ELSEIF (NTY==7.OR.NTY==22) THEN
            DO I=1,NN
-              INS=INTBUF_TAB(N)%NSV(II)
+              INS=INTBUF_TAB(N)%NSV(I)
               IF (ITAG(INS)/=0) ITAG(INS)=2
            ENDDO
            DO I=1,NRTM

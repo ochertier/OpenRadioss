@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,7 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+
       !||====================================================================
       !||    hm_read_therm          ../starter/source/materials/therm/hm_read_therm.F
       !||--- called by ------------------------------------------------------
@@ -42,7 +43,7 @@ C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
 C Material Parameters (hm_read_therm.F)
-C  PM(71) = JTHE is a material flag.  1: thermal parameters are input    0:no thermal parameter
+C  PM(71) = JTHE is a material flag.  1: thermal parameters are input    0: no thermal parameter
 C
 C GLOBAL FLAGS (hm_read_part.F)
 C  ITHERM_FE : 1 if at least one PART has thermal parameter and lagrangian framework
@@ -99,7 +100,7 @@ C-----------------------------------------------
       CHARACTER :: KEY*80
       LOGICAL IS_AVAILABLE,IS_AVAILABLE_IFORM
 C=======================================================================
-c     COUNT EOS MODELS USING CFG FILES
+c     COUNT /HEAT MODELS USING CFG FILES
 c--------------------------------------------------
 c      
       CALL HM_OPTION_COUNT('/HEAT',NTHERM)
@@ -129,7 +130,7 @@ c--------------------------------------------------
         ENDDO
         IF (MAT_ID > 0 .AND. FLAGMAT == 0) THEN
           CALL ANCMSG(MSGID=1663,ANMODE=ANINFO,MSGTYPE=MSGERROR,
-     .                I1= MAT_ID, C1='HEAT/MAT', C2='HEAT/MAT', C3='')
+     &                I1= MAT_ID, C1='HEAT/MAT', C2='HEAT/MAT', C3='')
         ENDIF
         ILAW = MAT_PARAM(IMAT)%ILAW
 c--------------------------------------------------
@@ -144,11 +145,11 @@ c--------------------------------------------------
         ENDDO
         IF (UID > 0 .AND. FLAGUNIT == 0) THEN
           CALL ANCMSG(MSGID=659, ANMODE=ANINFO, MSGTYPE=MSGERROR,
-     .                I1= MAT_ID,
-     .                I2= UID,
-     .                C1='HEAT/MAT',
-     .                C2='HEAT/MAT',
-     .                C3= '')                             
+     &                I1= MAT_ID,
+     &                I2= UID,
+     &                C1='HEAT/MAT',
+     &                C2='HEAT/MAT',
+     &                C3= '')                             
         ENDIF
 c--------------------------------------------------
 c       Reading user parameters
@@ -170,11 +171,11 @@ c--------------------------------------------------
           LAW2_FORM = NINT(PM(50,IMAT))
           IF (TMELT /= PM(54,IMAT) .AND. LAW2_FORM == 1) THEN  ! zerilli
             CALL ANCMSG(MSGID=764, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
-     .                  I1=MAT_ID, C1=TITR, I2=MAT_ID, I3=MAT_ID)
+     &                  I1=MAT_ID, C1=TITR, I2=MAT_ID, I3=MAT_ID)
           END IF
           IF (RHO_CP /= PM(69,IMAT)) THEN
             CALL ANCMSG(MSGID=765, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
-     .                  I1=MAT_ID, C3=TITR, I2=MAT_ID, I3=MAT_ID)
+     &                  I1=MAT_ID, C3=TITR, I2=MAT_ID, I3=MAT_ID)
           ENDIF
 c--------------------------------------------------
 c       Specific Case : law73
@@ -183,7 +184,7 @@ c--------------------------------------------------
           IAD_THERM = IPM(7,IMAT)-1
           IF (BUFMAT(IAD_THERM+20) /= PM(79,IMAT) ) THEN
             CALL ANCMSG(MSGID=764, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
-     .                  I1=MAT_ID, C1=TITR, I2=MAT_ID, I3=MAT_ID)
+     &                  I1=MAT_ID, C1=TITR, I2=MAT_ID, I3=MAT_ID)
           ENDIF
           IF (RHO_CP == ZERO) THEN
               RHO_CPM1 = ZERO
@@ -192,7 +193,7 @@ c--------------------------------------------------
           ENDIF
           IF (BUFMAT(IAD_THERM+21) /= RHO_CPM1) THEN
             CALL ANCMSG(MSGID=765, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
-     .                  I1=MAT_ID, C1=TITR, I2=MAT_ID, I3=MAT_ID)
+     &                  I1=MAT_ID, C1=TITR, I2=MAT_ID, I3=MAT_ID)
           ENDIF
         ENDIF
 c-------
@@ -219,15 +220,15 @@ c
           IF(IFORM /=0 .AND. LAG == 0)THEN
             IFORM = 0
             CALL ANCMSG(MSGID=1609, MSGTYPE=MSGWARNING, ANMODE=ANINFO_BLIND_1,
-     .           I1=MAT_ID, C1="WARNING", C2=TITR,
-     .           C3="IFORM = 1 IS INCOMPATIBLE WITH /ALE AND /EULER MATERIALS, IT WILL BE IGNORED")
+     &           I1=MAT_ID, C1="WARNING", C2=TITR,
+     &           C3="IFORM = 1 IS INCOMPATIBLE WITH /ALE AND /EULER MATERIALS, IT WILL BE IGNORED")
           ENDIF          
         ENDIF
 c
         IF (RHO_CP == ZERO .AND. LAG == 0) THEN
            CALL ANCMSG(MSGID=1609, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
-     .          I1=MAT_ID, C1="ERROR", C2=TITR,
-     .          C3="RHO_0 Cp PARAMETER MUST BE GREATER THAN ZERO")
+     &          I1=MAT_ID, C1="ERROR", C2=TITR,
+     &          C3="RHO_0 Cp PARAMETER MUST BE GREATER THAN ZERO")
         ENDIF       
 c--------------------------------------------------
 c       Default Values
@@ -248,10 +249,20 @@ c--------------------------------------------------
         PM(79,IMAT) = TREF                                             
         PM(80,IMAT) = TMELT
         PM(90,IMAT) = EFRAC
+        
+        MAT_PARAM(IMAT)%ITHERM      = 1         ! setting jthe=1
+        MAT_PARAM(IMAT)%THERM%RHOCP = RHO_CP
+        MAT_PARAM(IMAT)%THERM%TREF  = TREF
+        MAT_PARAM(IMAT)%THERM%TMELT = TMELT
+        MAT_PARAM(IMAT)%THERM%AS    = AS
+        MAT_PARAM(IMAT)%THERM%BS    = BS
+        MAT_PARAM(IMAT)%THERM%AL    = AL
+        MAT_PARAM(IMAT)%THERM%BL    = BL
+        MAT_PARAM(IMAT)%THERM%EFRAC = EFRAC
 c--------------------------------------------------
 c       Output
 c--------------------------------------------------
-        WRITE(IOUT,2000) MAT_ID,TREF,RHO_CP,AS,BS,TMELT,AL,BL,EFRAC
+        WRITE(IOUT,2000) MAT_ID,TREF,TMELT,RHO_CP,AS,BS,AL,BL,EFRAC
 C        
       ENDDO   ! I = 1,NTHERM     
 
@@ -260,11 +271,11 @@ c-----------------------------------------
      & 5X,'    THERMAL PARAMETERS  ',/,
      & 5X,'    ------------------  ',/,
      & 5X,'MATERIAL NUMBER . . . . . . . . . . . . . . . =',I10/,
-     & 5X,'T0 (INITIAL TEMPERATURE). . . . . . . . . . . =',1PG20.13/,
+     & 5X,'T0 (REFERENCE TEMPERATURE). . . . . . . . . . =',1PG20.13/,
+     & 5X,'TMELT (MELTING TEMPERATURE) . . . . . . . . . =',1PG20.13/,
      & 5X,'SPECIFIC HEAT . . . . . . . . . . . . . . . . =',1PG20.13/,
      & 5X,'AS (SOLID PHASE). . . . . . . . . . . . . . . =',1PG20.13/,
      & 5X,'BS (SOLID PHASE). . . . . . . . . . . . . . . =',1PG20.13/,
-     & 5X,'T1 (MELTING TEMPERATURE). . . . . . . . . . . =',1PG20.13/,
      & 5X,'AL (LIQUID PHASE) . . . . . . . . . . . . . . =',1PG20.13/,
      & 5X,'BL (LIQUID PHASE) . . . . . . . . . . . . . . =',1PG20.13/,
      & 5X,'FRACTION OF STRAIN ENERGY CONVERTED INTO HEAT =',1PG20.13/)

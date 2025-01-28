@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -676,6 +676,8 @@ C-----------------------------------------------
       DATA NEXTK/2,3,4,1/
 C=======================================================================
       NLMAX = 0
+      I1 = 0
+      I2 = 0
       IF(ISU /= 0)NLMAX = 4*NSEG
 
       ALLOCATE (LINEIX(2,NLMAX)    ,STAT=stat)
@@ -688,9 +690,9 @@ C=======================================================================
 c---------------------------------------
 c       recherche de toutes les lignes dans la surface
 c---------------------------------------
+      LL = 0
       IF(ISU /= 0)THEN
         IS = 0
-        LL = 0
         DO J=1,NSEG
           IS = IS+1
           I1=SURF_NODES(J,1)

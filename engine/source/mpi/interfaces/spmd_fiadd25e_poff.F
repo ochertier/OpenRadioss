@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    anim_mod             ../common_source/modules/output/anim_mod.F
       !||    debug_mod            ../engine/share/modules/debug_mod.F
       !||    h3d_mod              ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod        ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod        ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
       SUBROUTINE SPMD_FIADD25E_POFF(
      1       NB    ,LEN     ,BUFR   ,NSV    ,A       ,
@@ -39,7 +39,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      4       FCONT ,INACTI  ,IADM   ,INTTH  ,FTHE    ,
      5       CONDN ,H3D_DATA, MULTI_FVM,LEDGE,NEDGE  ,
      6       NIN   ,TAGNCONT,KLOADPINTER,LOADPINTER  ,
-     7       LOADP_HYD_INTER)
+     7       LOADP_HYD_INTER,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -77,6 +77,7 @@ C-----------------------------------------------
      .        BUFR(LEN,*), A(3,*), STIFN(*), VISCN(*),
      .        SECFCUM(7,NUMNOD,NSECT),
      .        FCONT(3,*),FTHE(*),CONDN(*)
+      INTEGER, INTENT(IN) :: NODADT_THERM
       INTEGER, INTENT(IN) :: NEDGE
       INTEGER, INTENT(IN) :: LEDGE(NLEDGE,NEDGE)
       TYPE(H3D_DATABASE) :: H3D_DATA

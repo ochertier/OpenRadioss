@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,14 +38,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
+      !||    my_alloc_mod                 ../common_source/tools/memory/my_alloc.F90
       !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
       !||    stack_mod                    ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE DFUNCC(ELBUF_TAB ,FUNC      ,IFUNC     ,IPARG       ,GEO        ,
      .                  IXQ       ,IXC       ,IXTG      ,MASS        ,PM         ,
-     .                  EL2FA     ,NBF       ,IADP        ,
+     .                  EL2FA     ,NBF       ,IADP      ,ITHERM      ,
      .                  NBF_L     ,EHOUR     ,ANIM      ,NBPART      ,IADG       ,
      .                  IPM       ,IGEO      ,THKE      ,ERR_THK_SH4 ,ERR_THK_SH3,
      .                  INVERT    ,X         ,V         ,W           ,ALE_CONNECTIVITY,
@@ -63,6 +64,7 @@ C-----------------------------------------------
       USE ALEFVM_MOD , only:ALEFVM_Param
       USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
       USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,7 +90,7 @@ C-----------------------------------------------
      .   IXQ(NIXQ,NUMELQ),IFUNC,NBF,
      .   IADP(*),NBF_L, NBPART,IADG(NSPMD,*),IPM(NPROPMI,NUMMAT),
      .   IGEO(NPROPGI,NUMGEO),INVERT(*), NV46
-      REAL WAL(NBF_L)
+      INTEGER, INTENT(IN) :: ITHERM
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY)         :: STACK
       TYPE(BUF_MAT_)  ,POINTER :: MBUF 
@@ -124,6 +126,7 @@ C-----------------------------------------------
      .        PTE(4),PTP(4),PTMAT(4),PTVAR(4),LENCOM,NPT_ALL,IPLY,ITRIMAT,IPOS,
      .        ISUBMAT, ISH_EINT, IS_ALE, IS_EULER,IPG,IPINCH,
      .        IMAT_TILLOTSON, NTILLOTSON,NVAREOS,IEOS,IDRAPE,IVAR
+      REAL,DIMENSION(:),ALLOCATABLE:: WAL
       REAL R4
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF     
@@ -141,6 +144,7 @@ C-----------------------------------------------
       DATA NS/10/
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
 C-----------------------------------------------
+      CALL MY_ALLOC(WAL,NBF_L)
       NINTY = 90.
       NN1  = 1
       NN3  = 1
@@ -154,7 +158,8 @@ C-----------------------------------------------
       !     INITIALIZATION IF SCHLIEREN DEFINED               !
       !-------------------------------------------------------!      
       IF(IFUNC==10672)THEN
-         CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM)
+         CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM,
+     .                                      ITHERM)
       ENDIF!(IFUNC==10672)
 
 C-----------------------------------------------
@@ -929,7 +934,7 @@ C-------------------------------------
               ENDDO
 c------------------------------------ Tillotson Region id
               ! /ANIM/ELEM/TILLOTSON
-            ELSEIF( IFUNC == 14596 + 4*MX_PLY_ANIM ) THEN
+            ELSEIF( IFUNC == 15898 + 4*MX_PLY_ANIM ) THEN
               DO I=LFT,LLT
                 FUNC(EL2FA(NN3+NFT+I)) = ZERO
               ENDDO 
@@ -977,7 +982,58 @@ c------------------------------------ Tillotson Region id
                     FUNC(EL2FA(NN3+NFT+I)) = EBUF%VAR(I)
                   ENDDO
                 ENDIF
-              ENDIF              
+              ENDIF
+
+c------------------------------------ Volumetric Strain (VSTRAIN)
+            ELSEIF( IFUNC == 15899 + 4*MX_PLY_ANIM  ) THEN
+              DO I=LFT,LLT
+                FUNC(EL2FA(NN3+NFT+I)) = ZERO
+              ENDDO
+              IF(ITY == 2)THEN
+                MT = IXQ(1,NFT+1)
+              ELSEIF(ITY == 7 .AND. N2D > 0)THEN
+                MT = IXTG(1,NFT+1)
+              ENDIF
+              IF(PM(89,MT) > ZERO)THEN
+                DO I=LFT,LLT
+                  FUNC(EL2FA(NN3+NFT+I)) = GBUF%RHO(I) / PM(89,MT) - ONE
+                ENDDO
+              ENDIF
+
+           ELSEIF(IFUNC >= 14999+4*MX_PLY_ANIM+1 .AND. IFUNC <= 14999+4*MX_PLY_ANIM+21 )THEN
+              EVAR(LFT:LLT) = ZERO
+              ISUBMAT = IFUNC-(14999+4*MX_PLY_ANIM)
+                IF(ITY ==2)THEN
+                  MT = IXQ(1,1+NFT)
+                ELSEIF(ITY == 7 .AND. N2D > 0)THEN
+                  MT = IXTG(1,1+NFT)
+                ENDIF
+              IF(MLW == 151)THEN
+                MT = MAT_PARAM(MT)%MULTIMAT%MID(ISUBMAT)
+                DO I=LFT,LLT
+                  EVAR(I) = MULTI_FVM%RHO(I + NFT)  / PM(89,MT) - ONE
+                ENDDO
+              ELSEIF(MLW == 51)THEN
+                   ISUBMAT = IFUNC - 5173
+                   !bijection for iform=12
+                   IADBUF = IPM(7,MT)
+                   NUPARAM= IPM(9,MT)
+                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                   ISUBMAT = UPARAM(276+ISUBMAT) !bijective order
+                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                   !
+                   LLT       = IPARG(2,NG)
+                   IPOS      = 20
+                   K         = LLT * ((IUS )+IPOS-1)
+                   MT = MAT_PARAM(MT)%MULTIMAT%MID(ISUBMAT)
+                   DO I=LFT,LLT
+                     EVAR(I) = MBUF%VAR(K+I) / PM(89,MT) - ONE
+                   ENDDO
+              ENDIF
+              DO I = LFT,LLT
+                FUNC(EL2FA(NN3+NFT+I)) = EVAR(I)
+              ENDDO
+
 c------------------------------------ 
             ELSE                                                      
               DO  I=LFT,LLT                                           
@@ -4932,6 +4988,7 @@ C
       ENDIF
 c-----------
       IF(ALLOCATED(WA_L))DEALLOCATE(WA_L)
+      DEALLOCATE(WAL)
       RETURN
       END
       !||====================================================================

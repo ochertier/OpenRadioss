@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -149,7 +149,7 @@
 
                 s = delta
                 delta = d
-                ! check if interpolation is good enought
+                ! check if interpolation is good enough
                 if ( (two*r3>=(three*length*r1-abs(new_tol*r1)) ).or.( r3>=abs(half*s*r1) ) ) then
                   delta = length
                   d = delta

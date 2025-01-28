@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,14 +31,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_exch_a_rb6              ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
       !||    spmd_exch_a_rb6_vrel         ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
       !||    spmd_exch_a_rb6g             ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6g.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    damping_vref_rby_mod         ../engine/source/assembly/damping_vref_rby.F90
       !||    damping_vref_rby_stiff_mod   ../engine/source/assembly/damping_vref_rby_stiff.F90
       !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE RBYFOR(
+      SUBROUTINE RBYFOR(TIMERS,
      1   RBY      ,A      ,AR     ,X      ,VR      ,
      2   FSAV     ,IN     ,STIFN  ,STIFR  ,FANI    ,
      3   LPBY     ,NPBY   ,WEIGHT ,MS     ,V       ,
@@ -47,11 +48,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6   NRBYKIN_L,NATIV_SMS,DIMFB,FBSAV6 ,STABSEN ,
      7   TABSENSOR,NODREAC,FTHREAC,CPTREAC,DAMPR   ,
      8   SDAMP    ,DAMP   ,NDAMP_VREL,ID_DAMP_VREL,IGRNOD,
-     9   TAGSLV_RBY,IPARIT,TFEXT,NDAMP_VREL_RBYG,SIZE_RBY6_C,
+     9   TAGSLV_RBY,IPARIT,WFEXT,NDAMP_VREL_RBYG,SIZE_RBY6_C,
      A   RBY6_C)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE GROUPDEF_MOD
       USE damping_vref_rby_mod
       USE damping_vref_rby_stiff_mod
@@ -73,20 +75,17 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(in) :: TIMERS
       INTEGER ICODR(*),ISKEW(*),WEIGHT(*),LPBY(*),NPBY(NNPBY,*),
      .        KIND(NRBYKIN),FR_RBY6(*),IAD_RBY(*),IRBKIN_L(*),
      .        NRBYKIN_L, NATIV_SMS(*),DIMFB,STABSEN,TABSENSOR(*),
      .        NODREAC(*),CPTREAC,NDAMP_VREL_RBYG,SIZE_RBY6_C
-C     REAL
-      my_real
-     .   RBY(NRBY,*) ,A(3,*) ,AR(3,*) ,X(3,*) ,VR(3,*),FSAV(NTHVKI,*),
-     .   IN(*) ,STIFN(*),STIFR(*),FANI(3,*),MS(*),V(3,*) ,
-     .   BUFSF(*), SKEW(LSKEW,*),FTHREAC(6,*)
+      my_real RBY(NRBY,*) ,A(3,*) ,AR(3,*) ,X(3,*) ,VR(3,*),FSAV(NTHVKI,*),
+     .        IN(*) ,STIFN(*),STIFR(*),FANI(3,*),MS(*),V(3,*) ,
+     .        BUFSF(*), SKEW(LSKEW,*),FTHREAC(6,*)
       DOUBLE PRECISION RBY6(8,6,NRBYKIN),RBY6_C(2,6,SIZE_RBY6_C)
-      DOUBLE PRECISION
-     .        FBSAV6(12,6,DIMFB),RBID(12,6),TFEXT
-      TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
-C
+      DOUBLE PRECISION FBSAV6(12,6,DIMFB),RBID(12,6),WFEXT
+      TYPE (SURF_), DIMENSION(NSURF) :: IGRSURF
       INTEGER ,INTENT(IN) :: NDAMP_VREL,IPARIT,SDAMP
       INTEGER ,INTENT(IN) :: ID_DAMP_VREL(NDAMP_VREL),TAGSLV_RBY(NUMNOD)
       my_real, INTENT(INOUT) :: DAMPR(NRDAMP,NDAMP),DAMP(SDAMP)
@@ -269,7 +268,7 @@ C-------------------------------------
      .                        NDAMP_VREL,IPARIT   ,NUMNOD  ,DT1       ,ID_DAMP_VREL,
      .                        TT        ,NNPBY    ,NRBYKIN  ,NPBY      ,RBY6      ,
      .                        RBY6_C    ,TAGSLV_RBY,WEIGHT  ,LSKEW     ,NUMSKW    ,
-     .                        DIM       ,DAMP     ,SKEW     ,TFEXT     ,SIZE_RBY6_C)
+     .                        DIM       ,DAMP     ,SKEW     ,WFEXT     ,SIZE_RBY6_C)
 !$OMP END SINGLE
       ENDIF 
 
@@ -277,7 +276,7 @@ C-------------------------------------
 
 !$OMP SINGLE
 
-        IF (IMON>0) CALL STARTIME(11,1)
+        IF (IMON>0) CALL STARTIME(TIMERS,11)
 C
 C Comm non multi-thread
 C
@@ -298,7 +297,7 @@ C routine G/S de calcul Parith/ON de A AR STIFN STIFR noeuds main RB
             CALL SPMD_EXCH_A_RB6G(NPBY,RBY6)
           END IF
 
-        IF (IMON>0) CALL STOPTIME(11,1)
+        IF (IMON>0) CALL STOPTIME(TIMERS,11)
 
 !$OMP END SINGLE
 

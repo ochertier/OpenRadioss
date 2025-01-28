@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      3                  ICODT   ,ISKEW  ,SKEW    ,MS    ,FSAV    ,
      4                  IXS     ,IXQ  ,ELBUF_TAB,IPARG  ,
      5                  PM      ,NALE  ,TF    ,NPF    ,WEIGHT  ,
-     6                  IAD_ELEM,FR_ELEM,FR_WALL )
+     6                  IAD_ELEM,FR_ELEM,FR_WALL ,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -66,6 +66,7 @@ C-----------------------------------------------
      .        FSAV(NTHVKI,*), SKEW(LSKEW,*),
      .        PM(NPROPM,NUMMAT), TF(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

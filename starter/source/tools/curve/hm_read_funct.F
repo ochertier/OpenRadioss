@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -167,7 +167,7 @@ c
               IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .             MSGTYPE=MSGERROR,
      .             C1='TABLE')
-              ALLOCATE(TABLE(L)%Y,STAT=stat)
+              ALLOCATE(TABLE(L)%Y,STAT=stat) ! Y or Y(1) ?
               IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .             MSGTYPE=MSGERROR,
      .             C1='TABLE')

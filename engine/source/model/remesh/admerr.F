@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,6 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    admerr_mod   ../engine/source/model/remesh/admerr.F
-      !||--- called by ------------------------------------------------------
-      !||    admerr       ../engine/source/model/remesh/admerr.F
-      !||====================================================================
-      MODULE ADMERR_MOD
-#include "my_real.inc"
-
-        my_real , 
-     .    DIMENSION(:), ALLOCATABLE :: 
-     .      THICK_SH4, THICK_SH3,
-     .      THICK_NOD, AREA_NOD
-        my_real , 
-     .    DIMENSION(:), ALLOCATABLE :: 
-     .      AREA_SH4, AREA_SH3
-      END MODULE ADMERR_MOD
-      !||====================================================================
       !||    admerr         ../engine/source/model/remesh/admerr.F
       !||--- called by ------------------------------------------------------
       !||    resol          ../engine/source/engine/resol.F
@@ -45,18 +29,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ancmsg         ../engine/source/output/message/message.F
       !||    arret          ../engine/source/system/arret.F
       !||--- uses       -----------------------------------------------------
-      !||    admerr_mod     ../engine/source/model/remesh/admerr.F
       !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    message_mod    ../engine/share/message_module/message_mod.F
       !||====================================================================
       SUBROUTINE ADMERR(
      .           IXC      ,IXTG    ,X       ,IPARG       ,ELBUF_TAB   ,
      .           IPART    ,IPARTC  ,IPARTTG ,ERR_THK_SH4 ,ERR_THK_SH3 ,
-     .           IAD_ELEM ,FR_ELEM ,WEIGHT  ,SH4TREE     ,SH3TREE     )
+     .           IAD_ELEM ,FR_ELEM ,WEIGHT  ,SH4TREE     ,SH3TREE ,
+     .           AREA_SH4 ,AREA_SH3,  AREA_NOD,
+     .           THICK_SH4, THICK_SH3, THICK_NOD)    
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ADMERR_MOD
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD            
 C-----------------------------------------------
@@ -83,16 +67,18 @@ C     REAL
       my_real
      .   X(3,*), ERR_THK_SH4(*), ERR_THK_SH3(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
+      my_real AREA_SH4(NUMELC)
+      my_real AREA_SH3(NUMELTG)
+      my_real AREA_NOD(NUMNOD)
+      my_real THICK_SH4(NUMELC)
+      my_real THICK_SH3(NUMELTG)
+      my_real THICK_NOD(NUMNOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IERROR
 C     REAL
 C-----------------------------------------------
-      ALLOCATE(
-     .   AREA_SH4(NUMELC), AREA_SH3(NUMELTG), AREA_NOD(NUMNOD),
-     .   THICK_SH4(NUMELC), THICK_SH3(NUMELTG), THICK_NOD(NUMNOD),
-     .   STAT=IERROR)
 C
       IF(IERROR/=0) THEN
         CALL ANCMSG(MSGID=153,ANMODE=ANINFO_BLIND,
@@ -116,9 +102,6 @@ C     elts belonging to adapted parts
      .       THICK_SH3 ,THICK_NOD , ERR_THK_SH4, ERR_THK_SH3,
      .       SH4TREE ,SH3TREE )
 
-
-      DEALLOCATE(AREA_SH4, AREA_SH3, AREA_NOD,
-     .   THICK_SH4, THICK_SH3, THICK_NOD)
 c-----------
       RETURN
       END

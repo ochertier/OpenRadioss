@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,12 +30,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_i_c          ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    crackxfem_mod      ../engine/share/modules/crackxfem_mod.F
+      !||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE PARSOR_CRK(IPARG  ,IXC     ,IXTG  ,EL2FA,IDCRK   ,
      .                      IAD_CRK,IAD_CRKG,NBF_L ,NBF  ,IEL_CRK ,
      .                      NODGLOBXFE,INDX_CRK,ITAB     )
 C-----------------------------------------------
       USE CRACKXFEM_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,10 +61,12 @@ C     REAL
       my_real OFF
       INTEGER IE,NG,ITY,LFT,LLT,N,I,J,NEL,NFT,JJ,K,BUF,IXFEM,
      .        IPT,ELC,CRKS,ICRK,IE_EL2FA,NEL_CRK,EMPL,NLEVXF
-      INTEGER II(4),NP(NBF_L*4)
+      INTEGER II(4)
+      INTEGER,DIMENSION(:),ALLOCATABLE::NP
 C=======================================================================
 C     CRK ELEMS INIT
 C-----------------------------------------------
+      CALL my_alloc(NP, NBF_L*4)
       NEL_CRK = 0
       JJ = 0
       IE = 0
@@ -169,5 +173,6 @@ C
         END DO
       ENDIF
 C-----------
+      DEALLOCATE(NP)
       RETURN
       END

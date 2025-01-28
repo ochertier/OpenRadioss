@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,17 +29,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i25free_bound         ../engine/source/interfaces/int25/i25free_bound.F
       !||    my_barrier            ../engine/source/system/machine.F
       !||    spmd_get_stif25_edg   ../engine/source/mpi/interfaces/spmd_getstif25_edg.F
-      !||    startime              ../engine/source/system/timer.F
-      !||    stoptime              ../engine/source/system/timer.F
+      !||    startime              ../engine/source/system/timer_mod.F90
+      !||    stoptime              ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
+      !||    timer_mod             ../engine/source/system/timer_mod.F90
       !||    tri7box               ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I25MAIN_FREE(
+      SUBROUTINE I25MAIN_FREE(TIMERS,
      1                  ITASK, IPARI  ,INTBUF_TAB, INTLIST25, ISENDTO,
      2                  IRECVFROM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTBUFDEF_MOD   
       USE TRI7BOX
 C-----------------------------------------------
@@ -58,6 +60,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER IPARI(NPARI,NINTER),ITASK,INTLIST25(*)
       INTEGER ISENDTO(NSPMD+1,*),IRECVFROM(NSPMD+1,*)
 C     REAL
@@ -95,7 +98,7 @@ C
       END DO
 C-----------------------------------------------------------
       IF (IMON>0 .AND. ITASK==0) THEN
-        CALL STARTIME(MACRO_TIMER_T25STFE,1)
+        CALL STARTIME(TIMERS,MACRO_TIMER_T25STFE)
       ENDIF
 C       
 !$OMP SINGLE
@@ -113,7 +116,7 @@ C        Also needed in SMP for resetting STFE !
 !$OMP END SINGLE
 C
       IF (IMON>0 .AND. ITASK==0) THEN
-        CALL STOPTIME(MACRO_TIMER_T25STFE,1)
+        CALL STOPTIME(TIMERS,MACRO_TIMER_T25STFE)
       ENDIF
 C-----------------------------------------------------------
       RETURN

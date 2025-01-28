@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,6 +76,8 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
 
+      EBCS%title = TRIM(TITR)
+
       CALL HM_OPTION_IS_ENCRYPTED(IS_ENCRYPTED)
       CALL HM_GET_INTV('entityid',  SURF  ,IS_AVAILABLE,LSUBMODEL)
 
@@ -104,7 +106,7 @@ C-----------------------------------------------
            WRITE(IOUT,1104)SURF,NSEG,RHO,C,LCAR
         ENDIF
        
-        
+        EBCS%title = TITR
         EBCS%c = C
         EBCS%rho = RHO
         EBCS%lcar = LCAR

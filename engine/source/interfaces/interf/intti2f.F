@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -65,7 +65,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6   MS_PENA,DT2T   ,NELTST ,ITYPTST,INTBUF_TAB,TEMP,
      7   FTHE   ,FTHESKYI2,CONDN,CONDNSKYI2,ITAB,
      8   SAV_INER_POFF  ,H3D_DATA,T2FAC_SMS,FNCONTP ,
-     A   FTCONTP)
+     A   FTCONTP,IDT_THERM    ,THEACCFACT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -81,7 +81,8 @@ C-----------------------------------------------
       INTEGER IPARI(*), IADI2(*),WEIGHT(*),IGEO(NPROPGI,*),
      .        NODNX_SMS(*),ITAB(*)
       INTEGER I2MSCH, I0, NIR, I2SIZE,NELTST,ITYPTST
-C     REAL
+      INTEGER ,intent(in) :: IDT_THERM
+      my_real ,intent(in) :: theaccfact
       my_real
      .   X(*), V(*), A(*),DMAST,ADM(*), 
      .   MS(*),IN(*),AR(*),VR(*),STIFN(*),STIFR(*),FSKYI2(*),
@@ -435,7 +436,7 @@ C
      1       X       ,NSN     ,INTBUF_TAB%NSV     ,INTBUF_TAB%IRTLM    ,MS      ,
      2       WEIGHT  ,INTBUF_TAB%IRECTM   ,INTBUF_TAB%CSTS    ,IADI2   ,KTHE    ,
      3       TEMP    ,INTBUF_TAB%AREAS2   ,FTHE              ,FTHESKYI2,CONDN   ,
-     4       CONDNSKYI2,I0                ,ITAB     )
+     4       CONDNSKYI2,I0                ,ITAB     ,IDT_THERM    ,THEACCFACT)
        ENDIF
 C
       RETURN

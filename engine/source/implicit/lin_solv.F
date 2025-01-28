@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,40 +22,39 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C  |---- version non //------------
       !||====================================================================
-      !||    lin_solv        ../engine/source/implicit/lin_solv.F
+      !||    lin_solv             ../engine/source/implicit/lin_solv.F
       !||--- called by ------------------------------------------------------
-      !||    imp_chkm        ../engine/source/implicit/imp_solv.F
-      !||    imp_solv        ../engine/source/implicit/imp_solv.F
-      !||    nl_solv         ../engine/source/implicit/nl_solv.F
+      !||    imp_chkm             ../engine/source/implicit/imp_solv.F
+      !||    imp_solv             ../engine/source/implicit/imp_solv.F
+      !||    nl_solv              ../engine/source/implicit/nl_solv.F
       !||--- calls      -----------------------------------------------------
-      !||    bfgs_h1         ../engine/source/implicit/imp_bfgs.F
-      !||    bfgs_h1p        ../engine/source/implicit/imp_bfgs.F
-      !||    bfgs_h2         ../engine/source/implicit/imp_bfgs.F
-      !||    bfgs_h2p        ../engine/source/implicit/imp_bfgs.F
-      !||    diag_kif        ../engine/source/implicit/imp_solv.F
-      !||    imp_smpini      ../engine/source/implicit/imp_solv.F
-      !||    ini_kisc        ../engine/source/implicit/lin_solv.F
-      !||    lin_solv2       ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh0      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvh1      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvhm      ../engine/source/implicit/lin_solv.F
-      !||    lin_solvih2     ../engine/source/implicit/lin_solv.F
-      !||    lin_solvp2      ../engine/source/implicit/lin_solv.F
-      !||    mav_lth0        ../engine/source/implicit/produt_v.F
-      !||    my_barrier      ../engine/source/system/machine.F
-      !||    produt_hp       ../engine/source/implicit/produt_v.F
-      !||    qstat_end       ../engine/source/implicit/imp_dyna.F
-      !||    qstat_it        ../engine/source/implicit/imp_dyna.F
-      !||    recu_kdis       ../engine/source/airbag/monv_imp0.F
-      !||    recu_kdis0      ../engine/source/implicit/lin_solv.F
-      !||    recudis         ../engine/source/implicit/recudis.F
-      !||    set_ksym        ../engine/source/implicit/imp_solv.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
+      !||    bfgs_h1              ../engine/source/implicit/imp_bfgs.F
+      !||    bfgs_h1p             ../engine/source/implicit/imp_bfgs.F
+      !||    bfgs_h2              ../engine/source/implicit/imp_bfgs.F
+      !||    bfgs_h2p             ../engine/source/implicit/imp_bfgs.F
+      !||    diag_kif             ../engine/source/implicit/imp_solv.F
+      !||    imp_smpini           ../engine/source/implicit/imp_solv.F
+      !||    ini_kisc             ../engine/source/implicit/lin_solv.F
+      !||    lin_solv2            ../engine/source/implicit/lin_solv.F
+      !||    lin_solvh0           ../engine/source/implicit/lin_solv.F
+      !||    lin_solvh1           ../engine/source/implicit/lin_solv.F
+      !||    lin_solvhm           ../engine/source/implicit/lin_solv.F
+      !||    lin_solvih2          ../engine/source/implicit/lin_solv.F
+      !||    lin_solvp2           ../engine/source/implicit/lin_solv.F
+      !||    mav_lth0             ../engine/source/implicit/produt_v.F
+      !||    my_barrier           ../engine/source/system/machine.F
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+      !||    produt_hp            ../engine/source/implicit/produt_v.F
+      !||    qstat_end            ../engine/source/implicit/imp_dyna.F
+      !||    qstat_it             ../engine/source/implicit/imp_dyna.F
+      !||    recu_kdis            ../engine/source/airbag/monv_imp0.F
+      !||    recu_kdis0           ../engine/source/implicit/lin_solv.F
+      !||    recudis              ../engine/source/implicit/recudis.F
+      !||    set_ksym             ../engine/source/implicit/imp_solv.F
       !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_workh       ../engine/share/modules/impbufdef_mod.F
+      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
       !||====================================================================
       SUBROUTINE LIN_SOLV(NDDL  ,IDDL  ,NDOF  ,IKC   ,D     ,
      1                    DR    ,TOL   ,NNZ   ,IADK  ,JDIK  ,
@@ -217,7 +216,7 @@ C---------------------
        ELSE
         IPRINT=0
        ENDIF
-      IF (IMON>0) CALL STARTIME(33,1)
+!     IF (IMON>0) CALL STARTIME(TIMERS,33)
       IF (NSPMD==1.AND.(ISOLV==3.OR.ISOLV==4).AND.IMUMPSV==0)THEN 
 C-----------BCS,DS
 citask0       IF (ITASK==0) THEN
@@ -312,7 +311,7 @@ citask0        END IF !(ITASK == 0) THEN
 C----------------------
 c      CALL MY_BARRIER
 C---------------------
-      IF (IMON>0) CALL STOPTIME(33,1)
+!     IF (IMON>0) CALL STOPTIME(TIMERS,33)
 C
        IF (IMP_CHK>0.OR.(ISTOP>0.AND.IMPDEB==0)) GOTO 200
 C---------------------------------
@@ -679,18 +678,19 @@ C
 #endif
       END
       !||====================================================================
-      !||    lin_solvh0      ../engine/source/implicit/lin_solv.F
+      !||    lin_solvh0           ../engine/source/implicit/lin_solv.F
       !||--- called by ------------------------------------------------------
-      !||    lin_solv        ../engine/source/implicit/lin_solv.F
+      !||    lin_solv             ../engine/source/implicit/lin_solv.F
       !||--- calls      -----------------------------------------------------
-      !||    imp_lanzp       ../engine/source/implicit/imp_lanz.F
-      !||    imp_pcgh        ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||    set_ksym        ../engine/source/implicit/imp_solv.F
+      !||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
+      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+      !||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+      !||    set_ksym             ../engine/source/implicit/imp_solv.F
       !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_workh       ../engine/share/modules/impbufdef_mod.F
+      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
       !||====================================================================
       SUBROUTINE LIN_SOLVH0(TOL  ,
      1                    NDDL  ,NNZ     ,IADK   ,JDIK  ,DIAG_K ,
@@ -763,7 +763,7 @@ c     isolv=2 => P.LANCZOS
 c     isolv=4 => direct multi-condensation
 C------------------------------------------
       NNZM = 0
-C      IF (IMON>0) CALL STARTIME(33,1)
+C      IF (IMON>0) CALL STARTIME(TIMERS,33)
 c      IF (ITASK == 0) THEN
        CALL SET_KSYM(NDDL,IADK,JDIK,LT_K,IADK0,JDIK0,LT_K0)
 c      END IF !(ITASK == 0) THEN
@@ -830,34 +830,33 @@ C---------------------
        ENDIF
 !$OMP END PARALLEL 
 C
-C       IF (IMON>0) CALL STOPTIME(33,1)
+C       IF (IMON>0) CALL STOPTIME(TIMERS,33)
       RETURN
 #endif
       END
 C  |---- version Hybrid------------
       !||====================================================================
-      !||    lin_solvh1      ../engine/source/implicit/lin_solv.F
+      !||    lin_solvh1           ../engine/source/implicit/lin_solv.F
       !||--- called by ------------------------------------------------------
-      !||    lin_solv        ../engine/source/implicit/lin_solv.F
+      !||    lin_solv             ../engine/source/implicit/lin_solv.F
       !||--- calls      -----------------------------------------------------
-      !||    fr_dlft         ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diags       ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diagsn      ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_fsa_invhp   ../engine/source/implicit/imp_fsa_inv.F
-      !||    imp_lanzp       ../engine/source/implicit/imp_lanz.F
-      !||    imp_pcgh        ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh       ../engine/source/implicit/imp_pcg.F
-      !||    monv_diag       ../engine/source/airbag/monv_imp0.F
-      !||    set_ksym        ../engine/source/implicit/imp_solv.F
-      !||    spmd_max_i      ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumf_k     ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumf_v     ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
+      !||    fr_dlft              ../engine/source/mpi/implicit/imp_fri.F
+      !||    imp_diags            ../engine/source/mpi/implicit/imp_fri.F
+      !||    imp_diagsn           ../engine/source/mpi/implicit/imp_fri.F
+      !||    imp_fsa_invhp        ../engine/source/implicit/imp_fsa_inv.F
+      !||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
+      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+      !||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
+      !||    monv_diag            ../engine/source/airbag/monv_imp0.F
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+      !||    set_ksym             ../engine/source/implicit/imp_solv.F
+      !||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
+      !||    spmd_sumf_k          ../engine/source/mpi/implicit/imp_spmd.F
+      !||    spmd_sumf_v          ../engine/source/mpi/implicit/imp_spmd.F
       !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_workh       ../engine/share/modules/impbufdef_mod.F
+      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
       !||====================================================================
       SUBROUTINE LIN_SOLVH1(TOL  ,MAX_L  ,
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
@@ -942,7 +941,7 @@ C     [K]:matrice de rigidite [M]:matrice de preconditionnement
        ISTOP = INEGA
 C
       IF (IPREC==2) NNZM=0 
-      IF (IMON>0) CALL STARTIME(32,1)
+!     IF (IMON>0) CALL STARTIME(TIMERS,32)
       IF (ICPREC==1) THEN
        IF (IPREC==2) THEN
         DO I=1,NDDL
@@ -1041,7 +1040,7 @@ C
        WRITE(IOUT,2001)NNE
        WRITE(ISTDO,2001)NNE
       ENDIF
-      IF (IMON>0) CALL STOPTIME(32,1)
+!     IF (IMON>0) CALL STOPTIME(TIMERS,32)
       IF (ISTOP>0) RETURN
 C
 citask0      IF (ITASK == 0) THEN
@@ -1059,7 +1058,7 @@ citask0      END IF !(ITASK == 0) THEN
 C----------------------
 c      CALL MY_BARRIER
 C---------------------
-C      IF (IMON>0) CALL STARTIME(33,1)
+C      IF (IMON>0) CALL STARTIME(TIMERS,33)
 !$OMP PARALLEL PRIVATE(ITSK)
        ITSK = OMP_GET_THREAD_NUM()
        IF (ISOLV==1.OR.ISOLV==7.OR.ISOLV==8) THEN
@@ -1120,7 +1119,7 @@ C      IF (IMON>0) CALL STARTIME(33,1)
        ENDIF
 !$OMP END PARALLEL 
 C
-C       IF (IMON>0) CALL STOPTIME(33,1)
+C       IF (IMON>0) CALL STOPTIME(TIMERS,33)
 C--------------------------------------------
  1002 FORMAT(3X,'PRECONDITION METHOD : JACOBIEN '/)
  1003 FORMAT(3X,'PRECONDITION METHOD : Ic0 ')
@@ -1132,29 +1131,28 @@ C--------------------------------------------
 #endif
       END
       !||====================================================================
-      !||    lin_solvih2      ../engine/source/implicit/lin_solv.F
+      !||    lin_solvih2          ../engine/source/implicit/lin_solv.F
       !||--- called by ------------------------------------------------------
-      !||    lin_solv         ../engine/source/implicit/lin_solv.F
+      !||    lin_solv             ../engine/source/implicit/lin_solv.F
       !||--- calls      -----------------------------------------------------
-      !||    fr_dlft          ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diags        ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_diagsn       ../engine/source/mpi/implicit/imp_fri.F
-      !||    imp_fsa_inv2hp   ../engine/source/implicit/imp_fsa_inv.F
-      !||    imp_lanzp        ../engine/source/implicit/imp_lanz.F
-      !||    imp_pcgh         ../engine/source/implicit/imp_pcg.F
-      !||    imp_ppcgh        ../engine/source/implicit/imp_pcg.F
-      !||    ind_span         ../engine/source/implicit/ind_glob_k.F
-      !||    monv_diag        ../engine/source/airbag/monv_imp0.F
-      !||    set_ksym         ../engine/source/implicit/imp_solv.F
-      !||    spmd_max_i       ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sum_s       ../engine/source/mpi/implicit/imp_spmd.F
-      !||    spmd_sumf_k      ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
+      !||    fr_dlft              ../engine/source/mpi/implicit/imp_fri.F
+      !||    imp_diags            ../engine/source/mpi/implicit/imp_fri.F
+      !||    imp_diagsn           ../engine/source/mpi/implicit/imp_fri.F
+      !||    imp_fsa_inv2hp       ../engine/source/implicit/imp_fsa_inv.F
+      !||    imp_lanzp            ../engine/source/implicit/imp_lanz.F
+      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+      !||    imp_ppcgh            ../engine/source/implicit/imp_pcg.F
+      !||    ind_span             ../engine/source/implicit/ind_glob_k.F
+      !||    monv_diag            ../engine/source/airbag/monv_imp0.F
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+      !||    set_ksym             ../engine/source/implicit/imp_solv.F
+      !||    spmd_max_i           ../engine/source/mpi/implicit/imp_spmd.F
+      !||    spmd_sum_s           ../engine/source/mpi/implicit/imp_spmd.F
+      !||    spmd_sumf_k          ../engine/source/mpi/implicit/imp_spmd.F
       !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod      ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
-      !||    imp_workh        ../engine/share/modules/impbufdef_mod.F
+      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
       !||====================================================================
       SUBROUTINE LIN_SOLVIH2(TOL  ,N_PAT,MAXB1  ,
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
@@ -1240,7 +1238,7 @@ C------------------------------------------
 C     [K]:matrice de rigidite [M]:matrice de preconditionnement
       ISTOP = INEGA
 C
-      IF (IMON>0.AND.ITASK==0) CALL STARTIME(32,1)
+!     IF (IMON>0.AND.ITASK==0) CALL STARTIME(TIMERS,32)
       IF (ICPREC==1) THEN
        IF (IPREC==5) THEN
 C     ----- approx. (by each colonne of L_T) inverse ---------
@@ -1318,7 +1316,7 @@ citask0       END IF !(ITASK == 0) THEN
 
       ENDIF
 C
-      IF (IMON>0) CALL STOPTIME(32,1)
+!     IF (IMON>0) CALL STOPTIME(TIMERS,32)
       IF (ISTOP>0) RETURN
 C
 citask0      IF (ITASK == 0) THEN
@@ -1405,27 +1403,26 @@ C---------------------
        ENDIF
 !$OMP END PARALLEL
 C
-C       IF (IMON>0) CALL STOPTIME(33,1)
+C       IF (IMON>0) CALL STOPTIME(TIMERS,33)
  1002 FORMAT(3X,'END PRECONDITION WITH RELATIVE DENSITY =',E11.4/)
 C--------------------------------------------
       RETURN
 #endif
       END
       !||====================================================================
-      !||    lin_solvhm      ../engine/source/implicit/lin_solv.F
+      !||    lin_solvhm           ../engine/source/implicit/lin_solv.F
       !||--- called by ------------------------------------------------------
-      !||    lin_solv        ../engine/source/implicit/lin_solv.F
+      !||    lin_solv             ../engine/source/implicit/lin_solv.F
       !||--- calls      -----------------------------------------------------
-      !||    imp_pcgh        ../engine/source/implicit/imp_pcg.F
-      !||    lin_solv2       ../engine/source/implicit/lin_solv.F
-      !||    lin_solvp2      ../engine/source/implicit/lin_solv.F
-      !||    set_ksym        ../engine/source/implicit/imp_solv.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
+      !||    imp_pcgh             ../engine/source/implicit/imp_pcg.F
+      !||    lin_solv2            ../engine/source/implicit/lin_solv.F
+      !||    lin_solvp2           ../engine/source/implicit/lin_solv.F
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
+      !||    set_ksym             ../engine/source/implicit/imp_solv.F
       !||--- uses       -----------------------------------------------------
-      !||    dsgraph_mod     ../engine/share/modules/dsgraph_mod.F
-      !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    imp_workh       ../engine/share/modules/impbufdef_mod.F
+      !||    dsgraph_mod          ../engine/share/modules/dsgraph_mod.F
+      !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+      !||    imp_workh            ../engine/share/modules/impbufdef_mod.F
       !||====================================================================
       SUBROUTINE LIN_SOLVHM(TOL  ,
      1                    NDDL  ,NNZ     ,IADK   ,JDIK  ,DIAG_K ,
@@ -1511,7 +1508,7 @@ C-----------------------------------------------
       ISOL = ISOLV-2
 C------to avoid the modif of IDSC with LIN_SOLV2,LIN_SOLVP2 :issue oof nt>1     
       IDS = IDSC
-C      IF (IMON>0) CALL STARTIME(33,1)
+C      IF (IMON>0) CALL STARTIME(TIMERS,33)
       IF (IDSC==0) THEN
 citask0       IF (ITASK==0) THEN
         IF (INTP_C>=0) THEN
@@ -1547,8 +1544,7 @@ C---------------------
      I                    IRBE2 ,LRBE2 )
 !$OMP END PARALLEL 
        ELSE
-citask0        IF (ITASK == 0) THEN
-         IF (IMON>0) CALL STARTIME(32,1)
+!        IF (IMON>0) CALL STARTIME(TIMERS,32)
          IF (NSPMD == 1.AND.IMUMPSV==0) THEN
          CALL LIN_SOLV2(
      1                    NDDL  ,NNZ   ,IADK  ,JDIK  ,DIAG_K ,   
@@ -1566,7 +1562,7 @@ citask0        IF (ITASK == 0) THEN
      5                  ISOL ,  IDS ,   IDDL,  IKC,       INLOC,
      6                  NDOF  , ITASK )
          END IF 
-         IF (IMON>0) CALL STOPTIME(32,1)
+!        IF (IMON>0) CALL STOPTIME(TIMERS,32)
 citask0        END IF !(ITASK==0) THEN
 Cas --imcompabilite avec MONVOL-----
         IF (NMONV>0)THEN
@@ -1621,7 +1617,7 @@ citask0      END IF !(ITASK == 0) THEN
 C----------------------
 c      CALL MY_BARRIER
 C---------------------
-C      IF (IMON>0) CALL STOPTIME(33,1)
+C      IF (IMON>0) CALL STOPTIME(TIMERS,33)
       RETURN
 #endif
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -198,6 +198,10 @@ C---
             WRITE(IOUT, 2100)
           ELSEIF (ISOLID == 2) THEN
             WRITE(IOUT, 2200)
+          ELSEIF (ISOLID == 3) THEN 
+            WRITE(IOUT, 2300)
+          ELSEIF (ISOLID == 4) THEN
+            WRITE(IOUT, 2400)
           ENDIF
         ENDIF
 C
@@ -231,7 +235,12 @@ c-----------------------------------------------------------
  1400 FORMAT(
      & 5X,'   SHELL ELEMENT CRACKING AFTER FAILURE')   
  2200 FORMAT(
-     & 5X,'   DEVIATORIC STRESS IN SOLID WILL VANISH AFTER FAILURE')    
+     & 5X,'   DEVIATORIC STRESS TENSOR IN SOLID WILL VANISH AFTER FAILURE')
+ 2300 FORMAT(
+     & 5X,'   DEVIATORIC STRESS TENSOR IN SOLID WILL VANISH AFTER FAILURE',/,
+     & 5X,'   PRESSURE CAN STILL BE POSITIVE OR NULL')
+ 2400 FORMAT(
+     & 5X,'   THE STRESS TENSOR IN SOLID WILL VANISH AFTER FAILURE')
 C
  1010 FORMAT(
      & 5X,'  ----------------------------------------------------   ',/

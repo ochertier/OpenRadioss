@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,11 +26,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_exch_deleted_surf_edge     ../engine/source/mpi/interfaces/spmd_exch_deleted_surf_edge.F
       !||--- calls      -----------------------------------------------------
       !||    check_surface_state             ../engine/source/interfaces/interf/check_surface_state.F
-      !||    sysfus2                         ../engine/source/system/sysfus.F
+      !||    get_local_node_id               ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||--- uses       -----------------------------------------------------
+      !||    nodal_arrays_mod                ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    shooting_node_mod               ../engine/share/modules/shooting_node_mod.F
       !||====================================================================
-        SUBROUTINE FIND_SURFACE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_SURFACE,LIST_NODE,INTBUF_TAB,ITABM1,
+        SUBROUTINE FIND_SURFACE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_SURFACE,LIST_NODE,INTBUF_TAB,NODES,
      .                                           IPARI,GEO,
      .                                           IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                                           ADDCNEL,CNEL,TAG_NODE,TAG_ELEM )
@@ -43,6 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !           - intersection of lists of surface for the node to obtain the surface id
 !           - deactivation of the surface 
 !$ENDCOMMENT
+        USE nodal_arrays_mod
         USE INTBUFDEF_MOD   
         USE SHOOTING_NODE_MOD
 C-----------------------------------------------
@@ -60,7 +62,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         INTEGER, INTENT(in) :: NB_SURFACE   ! number of "surface" (ie. 4 nodes)
         INTEGER, DIMENSION(4*NB_SURFACE), INTENT(in) :: LIST_NODE   ! list of 4 nodes
-        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITABM1    ! array of global id
+        TYPE(nodal_arrays_), INTENT(INOUT) :: NODES
         TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo  
         TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data         
 
@@ -93,7 +95,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
-        INTEGER SYSFUS2 
 C-----------------------------------------------
         ALLOCATE( LIST_SURFACE_R_PROC(4*NB_SURFACE) )
         NB_SURFACE_R_PROC = 0
@@ -108,7 +109,7 @@ C-----------------------------------------------
         DO I=1,NB_SURFACE
             GLOBAL_NODE(1:4) = LIST_NODE( (I-1)*4+1:(I-1)*4+4)
             DO J=1,4
-                LOCAL_NODE(J) = SYSFUS2(GLOBAL_NODE(J),ITABM1,NUMNOD)
+                LOCAL_NODE(J) = GET_LOCAL_NODE_ID(NODES,GLOBAL_NODE(J))
             ENDDO
             NODE_ID = LOCAL_NODE(1)    ! get the node ID
       

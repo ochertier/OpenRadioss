@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -166,6 +166,8 @@ C
         IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                           MSGTYPE=MSGERROR,
      .                           C1='XNUM_RNOISE')
+      ELSE
+        ALLOCATE(XNUM_RNOISE(0,0))
       ENDIF
 C
       IPTUN = 1
@@ -175,7 +177,7 @@ C         BORNAGE DES GROUPES DE MVSIZ
 C--------------------------------------------------------------
       NGR1 = NGROUP + 1
 C
-C phase 1 : domain decompostition
+C phase 1 : domain decomposition
 C
       IDX=IDX+ND*(NSPMD+1)
       CALL ZEROIN(1,ND*(NSPMD+1),DD_IAD(1,NSPGROUP+1))
@@ -758,10 +760,8 @@ c          ENDIF
      .                    PRMOD=MSG_CUMU)
               ISMST = 2
             ENDIF
-            IF (MLN /=42 .AND. MLN /=69 .AND. MLN /=88) THEN  ! 
-              CALL ANCMSG(MSGID=3020,
-     .                    ANMODE=ANINFO,
-     .                    MSGTYPE=MSGWARNING,
+            IF (MLN /=42 .AND. MLN /=69 .AND. MLN /=88 .and. MLN /= 99) THEN
+              CALL ANCMSG(MSGID=3020, ANMODE=ANINFO, MSGTYPE=MSGWARNING,
      .                    I1=ID,
      .                    C1=TITR,
      .                    I2=MLN,
@@ -1128,9 +1128,7 @@ C-----------
  1001 FORMAT(12(1X,I10))
 cc 1002 FORMAT(/6X,'BUFFER LENGTH : ',I10 )
 C
-      IF (NPERTURB > 0) THEN
-        IF (ALLOCATED(XNUM_RNOISE)) DEALLOCATE(XNUM_RNOISE) 
-      ENDIF
+      IF (ALLOCATED(XNUM_RNOISE)) DEALLOCATE(XNUM_RNOISE) 
 C
 
       DEALLOCATE(INDEXS2)

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,7 +24,6 @@
       !||    polygon_clipping_mod      ../common_source/tools/clipping/polygon_clipping_mod.F90
       !||--- called by ------------------------------------------------------
       !||    init_inivol_2d_polygons   ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
-      !||    points_array_reindex      ../common_source/tools/sort/array_reindex.F90
       !||--- uses       -----------------------------------------------------
       !||    polygon_mod               ../common_source/tools/clipping/polygon_mod.F90
       !||====================================================================
@@ -108,6 +107,7 @@
     integer ii, jj
     logical is_found
     is_found = .false.
+    out_edge_pos = -HUGE(out_edge_pos)
     do ii=1,list_size
       do jj=2,List_Edge(ii)%numpoints-1
         if(List_Edge(ii)%point_id(jj) == point_id)then
@@ -149,7 +149,9 @@
 
       ii = currentPoint%id_edge
       kk = currentPoint%id_point
-
+      num_pt_on_edge = 2
+      size_ = 0
+      iorient = -1
       if(icur_list == 1)then
         size_ = size1
         iorient = list1(ii)%iorient(kk)
@@ -237,7 +239,7 @@
       !||--- calls      -----------------------------------------------------
       !||    integer_array_reindex            ../common_source/tools/sort/array_reindex.F90
       !||    nextpoint                        ../common_source/tools/clipping/polygon_clipping_mod.F90
-      !||    points_array_reindex             ../common_source/tools/sort/array_reindex.F90
+      !||    points_array_reindex             ../common_source/tools/clipping/polygon_clipping_mod.F90
       !||    polygon_addpoint                 ../common_source/tools/clipping/polygon_mod.F90
       !||    polygon_create                   ../common_source/tools/clipping/polygon_mod.F90
       !||    real_insertion_sort_with_index   ../common_source/tools/sort/insertion_sort.F90
@@ -250,6 +252,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
           use constant_mod , only : zero, em10, em06, one, ep20
           use insertion_sort_mod , only : real_insertion_sort_with_index
+          use array_reindex_mod , only : integer_array_reindex
           implicit none
 #include "my_real.inc"
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -312,6 +315,7 @@
           numPtmax = num_points_1*num_points_2
           point_id = 0
           iStatus = 0
+          kk_bis = 0
 
           ! init. list 1 (Clipped polygon)
           allocate(list_edges_1(num_edges_1))
@@ -395,7 +399,7 @@
 
               !ADDING INTERSECTION POINT ON list_edges_1
               icur_1 = icur_1 + 1 ; list_edges_1(ii)%alpha(icur_1) = alpha ;  !alpha \in ]0,1[ : position on edge
-              !storing interection point
+              !storing intersection point
               list_edges_1(ii)%coor(icur_1)%y = tmpPoint%y
               list_edges_1(ii)%coor(icur_1)%z = tmpPoint%z
               list_edges_1(ii)%point_id(icur_1) = total_int_pt
@@ -503,7 +507,7 @@
             !find first intersection points which is entering
             if (list_edges_1(ii)%numpoints == 2) cycle ! numpoints = 2 => 2 endpoints only
             do kk=2,list_edges_1(ii)%numpoints-1 !num_inter_pt : intersection points without endpoints
-              if(list_edges_1(ii)%iorient(kk) /= 1)cycle !first point is first vertice (first enpoint) : not an intersection point
+              if(list_edges_1(ii)%iorient(kk) /= 1)cycle !first point is first vertice (first endpoint) : not an intersection point
               numEnteringPoints1 = numEnteringPoints1 + 1
               pointer_entering_points_1(numEnteringPoints1)%id_edge = ii
               pointer_entering_points_1(numEnteringPoints1)%id_point = kk
@@ -517,7 +521,7 @@
             !find first intersection points which is leaving
             if (list_edges_1(ii)%numpoints == 2) cycle ! numpoints = 2 => 2 endpoints only
             do kk=2,list_edges_1(ii)%numpoints-1 !num_inter_pt : intersection points without endpoints
-              if(list_edges_1(ii)%iorient(kk) /= -1)cycle !first point is first vertice (first enpoint) : not an intersection point
+              if(list_edges_1(ii)%iorient(kk) /= -1)cycle !first point is first vertice (first endpoint) : not an intersection point
               numLeavingPoints1 = numLeavingPoints1 + 1
               pointer_leaving_points_1(numLeavingPoints1)%id_edge = ii
               pointer_leaving_points_1(numLeavingPoints1)%id_point = kk
@@ -531,7 +535,7 @@
             !find first intersection points which is leaving
             if (list_edges_2(jj)%numpoints == 2) cycle ! numpoints = 2 => 2 endpoints only
             do kk=2,list_edges_2(jj)%numpoints-1 !num_inter_pt : intersection points without endpoints
-              if(list_edges_2(jj)%iorient(kk) /= -1)cycle !first point is first vertice (first enpoint) : not an intersection point
+              if(list_edges_2(jj)%iorient(kk) /= -1)cycle !first point is first vertice (first endpoint) : not an intersection point
               numLeavingPoints2 = numLeavingPoints2 + 1
               pointer_leaving_points_2(numLeavingPoints2)%id_edge = jj
               pointer_leaving_points_2(numLeavingPoints2)%id_point = kk
@@ -739,7 +743,7 @@
           my_real dy,dz
           my_real lambda
           my_real tol
-          logical cond1, cond2  !< conditionnal test to determine the final result
+          logical cond1, cond2  !< conditional test to determine the final result
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -777,6 +781,44 @@
       end function polygon_is_point_inside
 
 
+! ======================================================================================================================
+!                                                   PROCEDURES
+! ======================================================================================================================
+!! \brief   This subroutine is reindexing a array of POINTS using index(1:n) array
+!! \details      Example array = (/ P1 P2 P3 P4/)
+!! \details              index = (/4 3 2 1/)
+!! \details      result will be  (/ P4 P3 P2 P1 /)
+      !||====================================================================
+      !||    points_array_reindex       ../common_source/tools/clipping/polygon_clipping_mod.F90
+      !||--- called by ------------------------------------------------------
+      !||    clipping_weiler_atherton   ../common_source/tools/clipping/polygon_clipping_mod.F90
+      !||====================================================================
+      subroutine points_array_reindex(array, index, n)
+        implicit none
+#include "my_real.inc"
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Arguments
+! ----------------------------------------------------------------------------------------------------------------------
+        integer, intent(in) :: n
+        type(polygon_point_), intent(inout) :: array(n)
+        integer, intent(inout) :: index(n)
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Local Variables
+! ----------------------------------------------------------------------------------------------------------------------
+        integer :: ii
+        type(polygon_point_) :: temp_array(n)
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Body
+! ----------------------------------------------------------------------------------------------------------------------
+        do ii=1,n
+          temp_array(ii)%y=array(ii)%y
+          temp_array(ii)%z=array(ii)%z
+        end do
+        do ii = 1, n
+          array(ii)%y = temp_array(index(ii))%y
+          array(ii)%z = temp_array(index(ii))%z
+        end do
+      end subroutine points_array_reindex
 
 
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    sigeps56c   ../engine/source/materials/mat/mat056/sigeps56c.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
       !||--- calls      -----------------------------------------------------
       !||    finter      ../engine/source/tools/curve/finter.F
       !||    vinter      ../engine/source/tools/curve/vinter.F

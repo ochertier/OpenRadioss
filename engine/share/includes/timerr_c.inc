@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,11 +24,3 @@ C PARASIZ defini dans task_c.inc
 C.../TIMERR/
       INTEGER NTIMAX,LTIMERR
       PARAMETER(NTIMAX = 150)
-C 150 timers et au plus PARASIZ taches smp
-      COMMON /TIMERR/TIMER(4,NTIMAX,PARASIZ),CPUTIME(NTIMAX,PARASIZ),
-     .               SYSTIME(NTIMAX,PARASIZ),REALTIME(NTIMAX,PARASIZ),
-     .               CLOCKINI(NTIMAX,PARASIZ),OMP_STARTING_TIME,
-     .               OMP_INITIME(NTIMAX,NTHMAX)
-      REAL TIMER,CPUTIME,SYSTIME,REALTIME
-      INTEGER CLOCKINI
-      REAL(KIND=8) :: OMP_STARTING_TIME,OMP_INITIME

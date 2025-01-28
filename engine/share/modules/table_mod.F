@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -69,8 +69,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mmain                      ../engine/source/materials/mat_share/mmain.F90
       !||    mmain8                     ../engine/source/materials/mat_share/mmain8.F
       !||    mulaw                      ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8                     ../engine/source/materials/mat_share/mulaw8.F
-      !||    mulawc                     ../engine/source/materials/mat_share/mulawc.F
+      !||    mulaw8                     ../engine/source/materials/mat_share/mulaw8.F90
+      !||    mulawc                     ../engine/source/materials/mat_share/mulawc.F90
       !||    mulawglc                   ../engine/source/materials/mat_share/mulawglc.F
       !||    mulawglcpinch              ../engine/source/elements/shell/coqueba/mulawglcpinch.F
       !||    press_seg3                 ../engine/source/loads/general/load_pcyl/press_seg3.F
@@ -83,6 +83,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    r23law114                  ../engine/source/elements/spring/r23law114.F
       !||    r3def3                     ../engine/source/elements/spring/r3def3.F
       !||    resol                      ../engine/source/engine/resol.F
+      !||    retractor_table_inv        ../engine/source/tools/seatbelts/retractor_table_inv.F90
+      !||    retractor_table_inv2       ../engine/source/tools/seatbelts/retractor_table_inv2.F90
       !||    rforc3                     ../engine/source/elements/spring/rforc3.F
       !||    s10forc3                   ../engine/source/elements/solid/solide10/s10forc3.F
       !||    s16forc3                   ../engine/source/elements/thickshell/solide16/s16forc3.F
@@ -95,6 +97,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    s8sforc3                   ../engine/source/elements/solid/solide8s/s8sforc3.F
       !||    s8zforc3                   ../engine/source/elements/solid/solide8z/s8zforc3.F
       !||    scforc3                    ../engine/source/elements/thickshell/solidec/scforc3.F
+      !||    seatbelt_mod               ../common_source/modules/seatbelt_mod.F
       !||    sforc3                     ../engine/source/elements/solid/solide/sforc3.F
       !||    sigeps107                  ../engine/source/materials/mat/mat107/sigeps107.F
       !||    sigeps107c                 ../engine/source/materials/mat/mat107/sigeps107c.F
@@ -121,6 +124,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sigeps74                   ../engine/source/materials/mat/mat074/sigeps74.F
       !||    sigeps80                   ../engine/source/materials/mat/mat080/sigeps80.F
       !||    sigeps80c                  ../engine/source/materials/mat/mat080/sigeps80c.F
+      !||    sigeps87c                  ../engine/source/materials/mat/mat087/sigeps87c.F90
       !||    sortie_main                ../engine/source/output/sortie_main.F
       !||    spstres                    ../engine/source/elements/sph/spstres.F
       !||    suforc3                    ../engine/source/user_interface/suforc3.F
@@ -215,6 +219,7 @@ C-----------------------------------------------
       !||    sigeps74                   ../engine/source/materials/mat/mat074/sigeps74.F
       !||    sigeps80                   ../engine/source/materials/mat/mat080/sigeps80.F
       !||    sigeps80c                  ../engine/source/materials/mat/mat080/sigeps80c.F
+      !||    sigeps87c                  ../engine/source/materials/mat/mat087/sigeps87c.F90
       !||--- uses       -----------------------------------------------------
       !||    table_mod                  ../engine/share/modules/table_mod.F
       !||====================================================================
@@ -246,7 +251,7 @@ C
         TYPE(TTABLE) TABLE
         INTEGER ,INTENT(IN)                  :: ISMOOTH
         INTEGER ,INTENT(IN)                  :: NEL
-        INTEGER ,VALUE ,INTENT(IN)           :: DIMX
+        INTEGER ,INTENT(IN)                  :: DIMX
         INTEGER ,DIMENSION(DIMX,TABLE%NDIM)  :: IPOS
         my_real ,DIMENSION(DIMX,TABLE%NDIM)  :: XX
         my_real ,DIMENSION(NEL)              :: YY, DYDX1, DYDX2

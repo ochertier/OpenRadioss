@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -91,6 +91,7 @@ C---  Condensed nodes of TETRA10 are excluded
         TAGN(ND) = -1
       ENDDO 
 C
+      IGROUP = 0
       IF (IGRP_USR < 0) THEN
         DO I=1,NGRNOD
           IF (-IGRP_USR==IGRNOD(I)%ID) IGROUP = I

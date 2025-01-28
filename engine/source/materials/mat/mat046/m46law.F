@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    m46law     ../engine/source/materials/mat/mat046/m46law.F
+      !||    m46law           ../engine/source/materials/mat/mat046/m46law.F
       !||--- called by ------------------------------------------------------
-      !||    mmain      ../engine/source/materials/mat_share/mmain.F90
+      !||    mmain            ../engine/source/materials/mat_share/mmain.F90
       !||--- calls      -----------------------------------------------------
-      !||    mqviscb    ../engine/source/materials/mat_share/mqviscb.F
-      !||    sigeps46   ../engine/source/materials/mat/mat046/sigeps46.F
+      !||    mqviscb          ../engine/source/materials/mat_share/mqviscb.F
+      !||    sigeps46         ../engine/source/materials/mat/mat046/sigeps46.F
       !||--- uses       -----------------------------------------------------
-      !||    ale_mod    ../common_source/modules/ale/ale_mod.F
+      !||    ale_mod          ../common_source/modules/ale/ale_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
       SUBROUTINE M46LAW(
      1   LFT,     LLT,     NFT,     MTN,
@@ -47,11 +48,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      E   VOL_AVG, DTEL,    G_DT,    NEL,
      F   D4,      D5,      D6,      RHOREF,
      G   RHOSP,   ISMSTR,  ITY,     JSMS,
-     H   JTUR,    JTHE  ,  NPG ,    SVIS)
+     H   JTUR,    JTHE  ,  NPG ,    SVIS,   glob_therm)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
       USE ALE_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -89,6 +91,7 @@ C-----------------------------------------------
      .         VOL_AVG(*),DTEL(*),D4(MVSIZ),D5(MVSIZ),D6(MVSIZ),
      .         RHOREF(*)  ,RHOSP(*)  
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
+      type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -175,7 +178,7 @@ C-----------------------
      9   FACQ0,   CONDE,   DTEL,    G_DT,
      A   IPM,     RHOREF,  RHOSP,   NEL,
      B   ITY,     ISMSTR,  JTUR,    JTHE,
-     C   JSMS,    NPG )
+     C   JSMS,    NPG   ,   glob_therm)
 C
       DO I=LFT,LLT
         P2 = -(SOLD1(I)+SIG(I,1)+SOLD2(I)+SIG(I,2)+SOLD3(I)+SIG(I,3))/THREE

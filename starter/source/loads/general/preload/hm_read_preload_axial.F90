@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -135,7 +135,6 @@
       !||    bpreload_mod            ../starter/share/modules1/bpreload_mod.F
       !||    hm_option_read_mod      ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod             ../starter/share/message_module/message_mod.F
-      !||    sensor_mod              ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod            ../starter/share/modules1/submodel_mod.F
       !||====================================================================
         subroutine hm_read_preload_axial(                                     &
@@ -183,10 +182,10 @@
           integer, intent (inout) ,dimension(numelt)      :: itagprld_truss   !< tag truss element using /PRELOAD
           integer, intent (inout)                         :: npreload_a       !< number of /PRELOAD/AXIAL
           integer, intent (in   )                         :: iout             !< id of out file
-          type (prel1d_), target ,dimension(npreload_a)   :: preload_a        !< structrue data of /PRELOAD/AXIAL
-          type (unit_type_),intent(in)                    :: unitab           !< structrue data of unity
-          type (sensors_) ,intent(in)                     :: sensors          !< structrue data of sensor
-          type(submodel_data) lsubmodel(*)                                    !< structrue data of submodel
+          type (prel1d_), target ,dimension(npreload_a)   :: preload_a        !< structure data of /PRELOAD/AXIAL
+          type (unit_type_),intent(in)                    :: unitab           !< structure data of unity
+          type (sensors_) ,intent(in)                     :: sensors          !< structure data of sensor
+          type(submodel_data) lsubmodel(*)                                    !< structure data of submodel
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -297,7 +296,7 @@
                case(4)
                 np=igrtruss(nn)%nentity
                 do j=1,np
-                  is = igrtruss(nn)%entity(j)      ! sys_id alread
+                  is = igrtruss(nn)%entity(j)      ! sys_id already
                   if(is>0) itagprld_truss(is)=i
                 enddo
                 key ='TRUSS'

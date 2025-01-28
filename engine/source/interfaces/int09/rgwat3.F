@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -82,6 +82,7 @@ c---
      .            3, 2, 6, 7,
      .            4, 3, 7, 8,
      .            2, 5, 9, 6/
+       I = 0
 C----------------------
 C     DECOMPTE DES ELEMENTS PAR NOEUD
 C     POUR ENERGIE DE FROTTEMENT

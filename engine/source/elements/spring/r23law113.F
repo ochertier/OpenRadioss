@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,10 +39,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_mod             ../engine/share/modules/h3d_mod.F
       !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    python_funct_mod    ../common_source/modules/python_mod.F90
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    table_mod           ../engine/share/modules/table_mod.F
       !||====================================================================
-      SUBROUTINE R23LAW113(
+      SUBROUTINE R23LAW113( PYTHON,
      1   ELBUF_STR, JFT,       JLT,       NEL,
      2   MTN,       IGEO,      GEO,       IPM,
      3   IXR,       X,         TABLE,     XDP,
@@ -58,10 +59,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D   MY1,       MY2,       MZ1,       MZ2,
      E   GRESAV,    GRTH,      IGRTH,     MSRT,
      F   DMELRT,    H3D_DATA,  JSMS,      IGRE,
-     G   NFT,       PRELD1,    STF_F)
+     G   NFT,       PRELD1,    STF_F,     STF)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
       USE ELBUFDEF_MOD
       USE TABLE_MOD
       USE H3D_MOD
@@ -84,6 +86,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(python_), intent(inout) :: PYTHON
+      INTEGER, INTENT(IN) :: STF  !< Size of TF
       INTEGER, INTENT(IN) :: IGRE,NSENSOR
       INTEGER, INTENT(IN) :: NFT
       INTEGER, INTENT(IN) :: JSMS
@@ -91,7 +95,7 @@ C-----------------------------------------------
      .        IGEO(NPROPGI,*),JFT,JLT,NELTST ,ITYPTST,OFFSET,
      .        NEL,MTN,GRTH(*),IGRTH(*),FLG_KJ2,IPM(NPROPMI,*)
       my_real DT2T ,
-     .   GEO(NPROPG,*),X(*),F(*),TF(*),SKEW(LSKEW,*),FSKY(*),
+     .   GEO(NPROPG,*),X(*),F(*),TF(STF),SKEW(LSKEW,*),FSKY(*),
      .   VR(*), V(*), AR(*), STIFN(*),STIFR(*),MS(*), IN(*),
      .   ANIM(*),PARTSAV(*),TANI(15,*),
      .   FR_WAVE(*),BUFMAT(*),BUFGEO(*),PM(*),RBY(*),
@@ -209,7 +213,7 @@ C
           NUVAR = MAX(NUVAR, NINT(BUFMAT(IADBUF + 4))) 
         ENDDO
 !!   is like r4def3 (spring type113)     
-        CALL R23L113DEF3(
+        CALL R23L113DEF3(PYTHON,
      1   SKEW,                   IPM,                    IGEO,                   MID,
      2   PID,                    GEO,                    BUFMAT,                 GBUF%FOR(II(1)),
      3   GBUF%FOR(II(2)),        GBUF%FOR(II(3)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),

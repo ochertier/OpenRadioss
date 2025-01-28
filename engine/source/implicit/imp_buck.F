@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -56,15 +56,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    drape_mod              ../engine/share/modules/drape_mod.F
       !||    dsgraph_mod            ../engine/share/modules/dsgraph_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    genani_mod             ../engine/source/output/anim/generate/genani.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    imp_workg              ../engine/share/modules/impbufdef_mod.F
       !||    impbufdef_mod          ../engine/share/modules/impbufdef_mod.F
       !||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    output_mod             ../common_source/modules/output/output_mod.F90
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    stack_mod              ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE IMP_BUCK(
@@ -100,12 +101,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Y                    XEDGE3N     ,SPH2SOL      ,STIFN     ,STIFR     ,DRAPE_SH4N   ,
      Z                    DRAPE_SH3N    ,H3D_DATA     ,SUBSET    ,IGRNOD    ,FCONT_MAX  ,
      a                    FNCONTP2    ,FTCONTP2     ,NDDL0     ,NNZK0     ,IMPBUF_TAB ,
-     b                    DRAPEG      ,MATPARAM_TAB )
+     b                    DRAPEG      ,MATPARAM_TAB ,GLOB_THERM,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE DSGRAPH_MOD
-      USE GENANI_MOD
       USE IMP_WORKG
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD         
@@ -122,6 +122,8 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ANIM_MOD
       USE MATPARAM_DEF_MOD
+      use glob_therm_mod
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -211,6 +213,8 @@ C-----------------------------------------------
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
       TYPE(DRAPEG_)    :: DRAPEG
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
+      type (glob_therm_) ,intent(inout)       :: glob_therm
+      TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 #if defined(MUMPS5) && defined(DNC)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -376,7 +380,7 @@ C-------------
      5     NT_RW       ,IDDL     ,IKC    ,IMCONV,NDOF,FRWL6,
      6     WEIGHT_MD   ,DIMFB    , FBSAV6,STABSEN,TABSENSOR)
          IF(NT_RW>0) THEN
-          CALL FV_RW(IDDL   ,IKC   ,NDOF  ,D_IMP  ,V )
+          CALL FV_RW(IDDL   ,IKC   ,NDOF  ,D_IMP  ,V , OUTPUT%WFEXT, OUTPUT%WFEXT_MD)
          ENDIF
         ENDIF
 
@@ -885,7 +889,7 @@ C
      Y             LESDVOIS   ,CRKEDGE   ,INDX_CRK   ,XEDGE4N     ,XEDGE3N   ,
      Z             STACK      ,SPH2SOL   ,STIFN      ,STIFR       ,IGRNOD    ,
      1             H3D_DATA   ,SUBSET    ,MULTI_FVM  ,RRBID       ,RRBID     ,
-     2             FCONT_MAX  ,FNCONTP2 ,FTCONTP2    )
+     2             FCONT_MAX  ,FNCONTP2 ,FTCONTP2    ,GLOB_THERM  )
          ENDIF
 C
          IF (DTOUTP>ZERO) THEN
@@ -905,7 +909,7 @@ C
      6             VR    ,ELBUF_TAB ,DD_IAD,WEIGHT,
      7             IPM       ,KXSP   ,SPBUF ,NODGLOB,LENG ,
      8             FOPT  ,NOM_OPT   ,NPBY   ,FNCONT   ,FTCONT    ,
-     9             GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N ,DRAPEG )
+     9             GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N ,DRAPEG,OUTPUT )
          ENDIF
       ENDDO
 c

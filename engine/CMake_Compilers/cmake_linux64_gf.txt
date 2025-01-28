@@ -93,25 +93,28 @@ set (zlib_lib "${source_directory}/../extlib/zlib/linux64/lib/libz.a")
 #     a) clean: if you already built OpenRadioss without mumps, you need to run:  ./build_script.sh -arch=linux64_gf -nt=4 -mpi=ompi -clean 
 #     b) To build penRadioss with MUMPS and implicit feature, you need to run the following command, replacing ${absolute_path} by the absolute path to the engine directory.
 #        ./build_script.sh -arch=linux64_gf -nt=4 -mpi=ompi -mumps_root=${absolute_path}/extlib/MUMPS_5.5.1 -scalapack_root=${absolute_path}/extlib/scalapack-2.2.0/build/lib -lapack_root=${absolute_path}/extlib/lapack-3.10.1/
-if( DEFINED mumps_root)
-    set(MUMPSLIB "${mumps_root}/lib")
-    set(mumps_inc "-I${mumps_root}/include")
-    set(mumps_flag "-Dpord -Dmetis -Dthr_all -DMUMPS5 -DAdd_")
-    set(mumps_dep_path "${mumps_root}/../")
-    if(NOT DEFINED scalapack_root)
-        message(WARNING "MUMPS needs Scalapack: provide -scalapack_root=<path_to_scalapack>") 
-        set(scalapack_root "${mumps_root}/../scalapack-2.2.0")
-    endif()
-    if(NOT DEFINED lapack_root)
-        message(WARNING "MUMPS needs Lapack: provide -lapack_root=<path_to_lapack>") 
-        set(lapack_root "${mumps_root}/../lapack-3.10.1")
-    endif()
-    set(mumps_dep_libs "${scalapack_root}/libscalapack.a")        
-    set(mumps_dep_libs "${mumps_dep_libs} ${lapack_root}/liblapack.a ${lapack_root}/libtmglib.a ${lapack_root}/librefblas.a")
-    set(mumps_libs "${MUMPSLIB}/libdmumps.a ${MUMPSLIB}/libmumps_common.a ${MUMPSLIB}/libpord.a ${mumps_dep_libs}")
-    set(WITH_LINEAR_ALGEBRA "yes")
+if( DEFINED mumps_root AND NOT "${mumps_root}" STREQUAL "")
+  set(MUMPSLIB "${mumps_root}/lib")
+  set(mumps_inc "-I${mumps_root}/include")
+  set(mumps_flag "-Dpord -Dmetis -Dthr_all -DMUMPS5 -DAdd_")
+  set(mumps_dep_path "${mumps_root}/../")
+  if(NOT DEFINED scalapack_root)
+    message(WARNING "MUMPS needs Scalapack: provide -scalapack_root=<path_to_scalapack>") 
+    set(scalapack_root "${mumps_root}/../scalapack-2.2.0")
+  endif()
+  if(NOT DEFINED lapack_root)
+    message(WARNING "MUMPS needs Lapack: provide -lapack_root=<path_to_lapack>") 
+    set(lapack_root "${mumps_root}/../lapack-3.10.1")
+  endif()
+  set(mumps_dep_libs "${scalapack_root}/libscalapack.a")        
+  set(mumps_dep_libs "${mumps_dep_libs} ${lapack_root}/liblapack.a ${lapack_root}/libtmglib.a ${lapack_root}/librefblas.a")
+  set(mumps_libs "${MUMPSLIB}/libdmumps.a ${MUMPSLIB}/libmumps_common.a ${MUMPSLIB}/libpord.a ${mumps_dep_libs}")
+  set(WITH_LINEAR_ALGEBRA "yes")
 endif()
 
+if ("${mumps_root}" STREQUAL "")
+    unset(mumps_root)
+endif()
 
  
 # compiler Flags
@@ -140,11 +143,20 @@ if ( NOT DEFINED WITH_LINEAR_ALGEBRA)
 set ( wo_linalg "-DWITHOUT_LINALG" )
 endif()
 
+
+#add openmp parallelization if lto is not used
+set( OPENMP "-fopenmp" )
+
+#In current GCC version, LTO does not work with Openmp. 
+#uncommnent the next line to use LTO
+#set( OPENMP "-fopenmp-simd -fmax-stack-var-size=1280000  -flto  -ffat-lto-objects -Wno-surprising" )
+
+
 if ( CMAKE_C_COMPILER_VERSION VERSION_GREATER 10) 
 set( portability "-fallow-argument-mismatch -fallow-invalid-boz -std=legacy")
 endif()
 
-set ( opt_flag " ${wo_linalg} -DCOMP_GFORTRAN=1 -ffp-contract=off -frounding-math -fopenmp " )
+set ( opt_flag " ${wo_linalg} -DCOMP_GFORTRAN=1 -ffp-contract=off -frounding-math ${OPENMP} " )
 
 if ( sanitize STREQUAL "1" )
 set( FSANITIZE "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-strict -DSANITIZE") 
@@ -161,15 +173,15 @@ if ( debug STREQUAL "1" )
 
 set( legacy_flags "${FSANITIZE} -Wall -O0 -g -fdec-math -fbacktrace ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF}  ")
 
-set( unused_dummy_arg_strict_flags "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict_wo_mpi} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  ")
+set( unused_dummy_arg_strict_flags "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${strict_wo_mpi} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  ")
 
-set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  " )
+set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${strict} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  " )
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${zlib_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  -fopenmp " )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${zlib_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  ${OPENMP} " )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${zlib_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g -fopenmp -std=c++11  " )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${zlib_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g ${OPENMP} -std=c++11  " )
 
 
 elseif ( debug STREQUAL "asan" )
@@ -178,16 +190,16 @@ set( FSANITIZE "-fsanitize=address -fsanitize=undefined  -fsanitize=bounds-stric
 
 set( legacy_flags "${FSANITIZE} -Wall -O0 -g -fdec-math -fbacktrace ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF}  ")
 
-set( unused_dummy_arg_strict_flags "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict_wo_mpi} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  ")
+set( unused_dummy_arg_strict_flags "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace  ${strict_wo_mpi} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  ")
 
-set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${opt_flag} ${strict} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  " )
+set_source_files_properties(${source_files}  PROPERTIES COMPILE_FLAGS "${FSANITIZE} -Wall -Warray-temporaries -O0 -g -fdec-math -fbacktrace ${strict} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${mpi_flag} ${ADF}  " )
 
 
 # C source files
-set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  -fopenmp  ${zlib_inc}" )
+set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${precision_flag}  ${cppmach} ${cpprel} -O0 -g  ${OPENMP}  ${zlib_inc}" )
 
 # CXX source files
-set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g -fopenmp  ${zlib_inc} -std=c++11" )
+set_source_files_properties(${cpp_source_files} PROPERTIES COMPILE_FLAGS "${FSANITIZE} ${h3d_inc} ${precision_flag} ${cppmach} ${cpprel}  -O0 -g ${OPENMP}  ${zlib_inc} -std=c++11" )
 
 
 else ()
@@ -196,9 +208,9 @@ else ()
 
 set( legacy_flags " -nostdinc -w -O3 -fdec-math ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none  ${portability} ${mpi_flag} ${ADF} " )
 
-set( unused_dummy_arg_strict_flags " -nostdinc -O3 -fdec-math  ${opt_flag} ${strict_wo_mpi} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none ${mpi_flag} ${ADF} ")
+set( unused_dummy_arg_strict_flags " -nostdinc -O3 -fdec-math ${strict_wo_mpi} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none ${mpi_flag} ${ADF} ")
 
-set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " -nostdinc -O3 -fdec-math  ${opt_flag} ${strict} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none ${mpi_flag} ${ADF} " )
+set_source_files_properties( ${source_files}  PROPERTIES COMPILE_FLAGS " -nostdinc -O3 -fdec-math ${strict}  ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} -DCPP_comp=f90 -ffixed-line-length-none ${mpi_flag} ${ADF} " )
 
 # C source files
 set_source_files_properties(${c_source_files} PROPERTIES COMPILE_FLAGS " -w -O2 ${h3d_inc} ${zlib_inc} ${opt_flag} ${precision_flag} ${cppmach} ${cpprel} " )
@@ -210,7 +222,7 @@ endif()
 
 
 # Linking flags
-set (CMAKE_EXE_LINKER_FLAGS "-rdynamic -fopenmp  -ldl -lrt -lstdc++ ${FSANITIZE}  " )
+set (CMAKE_EXE_LINKER_FLAGS "-rdynamic ${OPENMP}  -ldl -lrt -lstdc++ ${FSANITIZE}  " )
 
 #Libraries
 

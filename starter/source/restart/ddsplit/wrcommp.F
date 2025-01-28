@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE WRCOMIP(
@@ -70,7 +69,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
      5   NUMSH4N_L,NUMSH3N_L,INTER_PARAMETERS,SENSORS,NLOAD_CYL,
      6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB,
-     7   LWAMP_L,LWANMP_L,NINIVELT_L)
+     7   LWAMP_L,LWANMP_L,NINIVELT_L,GLOB_THERM,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -89,6 +88,8 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE SUBMODEL_MOD , ONLY : NSUBMOD
       USE UNITAB_MOD
+      use glob_therm_mod
+      USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -145,6 +146,8 @@ C-----------------------------------------------
       TYPE (PARAMETERS_) ,INTENT(INOUT)     :: INTER_PARAMETERS
       TYPE (SENSORS_)    ,INTENT(IN)        :: SENSORS
       TYPE (UNIT_TYPE_), INTENT(IN)         :: UNITAB
+      TYPE(glob_therm_) ,intent(inout)      :: glob_therm
+      TYPE(PBLAST_)     ,INTENT(IN)      :: PBLAST
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -173,7 +176,6 @@ C-----------------------------------------------
 #include      "sphcom.inc"
 #include      "spmd_c.inc"
 #include      "tabsiz_c.inc"
-#include      "thermal_c.inc"
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -197,7 +199,7 @@ C-----
       TABVINT(9)  =LBUFEL_L
       TABVINT(10) =IRODDL
       TABVINT(11) =IEULER
-      TABVINT(12) =ITHERM
+      TABVINT(12) =GLOB_THERM%ITHERM
       TABVINT(13) =IHSH
       TABVINT(14) =ITESTV
       TABVINT(15) =ITURB
@@ -248,7 +250,7 @@ C taille locale inutile
       TABVINT(57) = 2*NUMNOD_L
       TABVINT(58) = LKJNI*NGJOINT*ISP0
       TABVINT(59) = NUMNOD_L*MAX(IALE,IEULER, IALELAG)
-      TABVINT(60) = (NUMELS_L*6+NUMELQ_L*4+NUMELTG_L*3)*MAX(IALE,IEULER,ITHERM,IALELAG)
+      TABVINT(60) = (NUMELS_L*6+NUMELQ_L*4+NUMELTG_L*3)*MAX(IALE,IEULER,GLOB_THERM%ITHERM,IALELAG)
       IF(ALE_CONNECTIVITY%has_nn_connect)THEN
         TABVINT(61) = MAX(IALE,IALELAG)*ALE%GLOBAL%NALENOVS*NUMNOD_L
       ELSE
@@ -364,7 +366,7 @@ c si cas Inl Outl on passe LPRTSPH_L et LONFSPH_L en tableaux locaux
       TABVINT(145) = NUMNOD_L
       TABVINT(146) = NINTER
       TABVINT(147) = NUMNOD_L
-      IF(IALE+IEULER+ITHERM + IALELAG/=0) THEN
+      IF(IALE+IEULER+GLOB_THERM%ITHERM + IALELAG/=0) THEN
 c SNBRCVOIS
         TABVINT(148) = NSPMD+1
 c SNBSDVOIS
@@ -415,6 +417,11 @@ C -------- Tailles des tableaux flottants --------
       TABVINT(163) = 3*(NUMNOD_L+NRCVVOIS_L)
       TABVINT(164) = 3*(NUMNOD_L+NRCVVOIS_L)
       TABVINT(165) = 3*NUMNOD_L*IRODDL
+C     SX        = TABVINT(162)
+C     SD        = TABVINT(163)
+C     SV        = TABVINT(164)
+C     SVR       = TABVINT(165)
+C     SDR       = TABVINT(166)
       IF(ISECUT > 0 .OR. IISROT > 0 .OR. IMPOSE_DR /= 0 .OR. IDROT > 0)THEN
         TABVINT(166) = 3*NUMNOD_L*IRODDL
       ELSE
@@ -1152,7 +1159,7 @@ C .dynain files
       TABVINT(LVARINT)=DYNAIN_DATA%DYNAIN_CHECK
 C  heat transfer + int7
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = INTHEAT
+      TABVINT(LVARINT) = GLOB_THERM%INTHEAT
 C xfem
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=NUMELCRK
@@ -1160,7 +1167,7 @@ C xfem
       TABVINT(LVARINT)=NINICRACK
 C heat trasfert
        LVARINT=LVARINT+1
-       TABVINT(LVARINT) = ITHERM_FE
+       TABVINT(LVARINT) = GLOB_THERM%ITHERM_FE
 C     Static condensation
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=ISTATCND
@@ -1209,11 +1216,11 @@ C p on rigid material
       TABVINT(LVARINT)=  NSKYRBMK_L
 C thermal bc
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=  NIFT
+      TABVINT(LVARINT)=  GLOB_THERM%NIFT
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=  NICONV
+      TABVINT(LVARINT)=  GLOB_THERM%NICONV
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=  LFACTHER
+      TABVINT(LVARINT)=  GLOB_THERM%LFACTHER
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=  NCONV_L
       LVARINT=LVARINT+1
@@ -1293,12 +1300,12 @@ C   ----for output of rotational dof -----
 C
 C radiative flux
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=  NIRADIA
+      TABVINT(LVARINT)=  GLOB_THERM%NIRADIA
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=  NRADIA_L
 C imposed heat flux
       LVARINT=LVARINT+1
-      TABVINT(LVARINT)=  NITFLUX
+      TABVINT(LVARINT)=  GLOB_THERM%NITFLUX
       LVARINT=LVARINT+1
       TABVINT(LVARINT)=  NFXFLUX_L
 C
@@ -1572,7 +1579,7 @@ C /LOAD/PBLAST
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = NLOADP_F
       LVARINT=LVARINT+1
-      TABVINT(LVARINT) = NLOADP_B           
+      TABVINT(LVARINT) = PBLAST%NLOADP_B           
 C /LOAD/PCYL
       LVARINT=LVARINT+1
       TABVINT(LVARINT) = NLOAD_CYL           

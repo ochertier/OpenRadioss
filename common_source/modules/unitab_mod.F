@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -73,12 +73,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_ebcs_normv              ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_normv.F
       !||    hm_read_ebcs_nrf                ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_nrf.F
       !||    hm_read_ebcs_pres               ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_pres.F
+      !||    hm_read_ebcs_propergol          ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_propergol.F90
       !||    hm_read_ebcs_valvin             ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_valvin.F
       !||    hm_read_ebcs_valvout            ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_valvout.F
       !||    hm_read_ebcs_vel                ../starter/source/boundary_conditions/ebcs/hm_read_ebcs_vel.F
       !||    hm_read_eig                     ../starter/source/general_controls/computation/hm_read_eig.F
       !||    hm_read_eos                     ../starter/source/materials/eos/hm_read_eos.F
-      !||    hm_read_eos_compaction          ../starter/source/materials/eos/hm_read_eos_compaction.F
+      !||    hm_read_eos_compaction          ../starter/source/materials/eos/hm_read_eos_compaction.F90
+      !||    hm_read_eos_compaction2         ../starter/source/materials/eos/hm_read_eos_compaction2.F90
       !||    hm_read_eos_exponential         ../starter/source/materials/eos/hm_read_eos_exponential.F90
       !||    hm_read_eos_gruneisen           ../starter/source/materials/eos/hm_read_eos_gruneisen.F
       !||    hm_read_eos_ideal_gas           ../starter/source/materials/eos/hm_read_eos_ideal_gas.F
@@ -90,6 +92,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_eos_noble_abel          ../starter/source/materials/eos/hm_read_eos_noble_abel.F
       !||    hm_read_eos_osborne             ../starter/source/materials/eos/hm_read_eos_osborne.F
       !||    hm_read_eos_polynomial          ../starter/source/materials/eos/hm_read_eos_polynomial.F
+      !||    hm_read_eos_powderburn          ../starter/source/materials/eos/hm_read_eos_powderburn.F90
       !||    hm_read_eos_puff                ../starter/source/materials/eos/hm_read_eos_puff.F
       !||    hm_read_eos_sesame              ../starter/source/materials/eos/hm_read_eos_sesame.F
       !||    hm_read_eos_stiffened_gas       ../starter/source/materials/eos/hm_read_eos_stiffened_gas.F
@@ -156,7 +159,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_inistate_d00            ../starter/source/elements/initia/hm_read_inistate_d00.F
       !||    hm_read_initemp                 ../starter/source/initial_conditions/thermic/hm_read_initemp.F
       !||    hm_read_inivel                  ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
-      !||    hm_read_inivol                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_inject1                 ../starter/source/properties/injector/hm_read_inject1.F
       !||    hm_read_inject2                 ../starter/source/properties/injector/hm_read_inject2.F
       !||    hm_read_inter_fsi               ../starter/source/interfaces/reader/hm_read_inter_fsi.F
@@ -188,7 +191,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_lines                   ../starter/source/groups/hm_read_lines.F
       !||    hm_read_load_centri             ../starter/source/loads/general/load_centri/hm_read_load_centri.F
       !||    hm_read_load_pressure           ../starter/source/loads/general/load_pressure/hm_read_load_pressure.F
-      !||    hm_read_mat                     ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                     ../starter/source/materials/mat/hm_read_mat.F90
       !||    hm_read_mat00                   ../starter/source/materials/mat/mat000/hm_read_mat00.F
       !||    hm_read_mat01                   ../starter/source/materials/mat/mat001/hm_read_mat01.F
       !||    hm_read_mat02                   ../starter/source/materials/mat/mat002/hm_read_mat02.F
@@ -226,6 +229,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat125                  ../starter/source/materials/mat/mat125/hm_read_mat125.F90
       !||    hm_read_mat126                  ../starter/source/materials/mat/mat126/hm_read_mat126.F90
       !||    hm_read_mat127                  ../starter/source/materials/mat/mat127/hm_read_mat127.F90
+      !||    hm_read_mat128                  ../starter/source/materials/mat/mat128/hm_read_mat128.F90
       !||    hm_read_mat13                   ../starter/source/materials/mat/mat013/hm_read_mat13.F
       !||    hm_read_mat14                   ../starter/source/materials/mat/mat014/hm_read_mat14.F
       !||    hm_read_mat15                   ../starter/source/materials/mat/mat015/hm_read_mat15.F
@@ -260,13 +264,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat46                   ../starter/source/materials/mat/mat046/hm_read_mat46.F
       !||    hm_read_mat48                   ../starter/source/materials/mat/mat048/hm_read_mat48.F
       !||    hm_read_mat49                   ../starter/source/materials/mat/mat049/hm_read_mat49.F
-      !||    hm_read_mat50                   ../starter/source/materials/mat/mat050/hm_read_mat50.F
+      !||    hm_read_mat50                   ../starter/source/materials/mat/mat050/hm_read_mat50.F90
       !||    hm_read_mat51                   ../starter/source/materials/mat/mat051/hm_read_mat51.F
       !||    hm_read_mat51_iform11           ../starter/source/materials/mat/mat051/hm_read_mat51_iform11.F
       !||    hm_read_mat52                   ../starter/source/materials/mat/mat052/hm_read_mat52.F
       !||    hm_read_mat53                   ../starter/source/materials/mat/mat053/hm_read_mat53.F
       !||    hm_read_mat54                   ../starter/source/materials/mat/mat054/hm_read_mat54.F
-      !||    hm_read_mat57                   ../starter/source/materials/mat/mat057/hm_read_mat57.F
+      !||    hm_read_mat57                   ../starter/source/materials/mat/mat057/hm_read_mat57.F90
       !||    hm_read_mat58                   ../starter/source/materials/mat/mat058/hm_read_mat58.F
       !||    hm_read_mat59                   ../starter/source/materials/mat/mat059/hm_read_mat59.F
       !||    hm_read_mat60                   ../starter/source/materials/mat/mat060/hm_read_mat60.F
@@ -288,11 +292,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat78                   ../starter/source/materials/mat/mat078/hm_read_mat78.F
       !||    hm_read_mat79                   ../starter/source/materials/mat/mat079/hm_read_mat79.F
       !||    hm_read_mat80                   ../starter/source/materials/mat/mat080/hm_read_mat80.F
-      !||    hm_read_mat81                   ../starter/source/materials/mat/mat081/hm_read_mat81.F
+      !||    hm_read_mat81                   ../starter/source/materials/mat/mat081/hm_read_mat81.F90
       !||    hm_read_mat82                   ../starter/source/materials/mat/mat082/hm_read_mat82.F
       !||    hm_read_mat83                   ../starter/source/materials/mat/mat083/hm_read_mat83.F
       !||    hm_read_mat84                   ../starter/source/materials/mat/mat084/hm_read_mat84.F
-      !||    hm_read_mat87                   ../starter/source/materials/mat/mat087/hm_read_mat87.F
+      !||    hm_read_mat87                   ../starter/source/materials/mat/mat087/hm_read_mat87.F90
       !||    hm_read_mat88                   ../starter/source/materials/mat/mat088/hm_read_mat88.F
       !||    hm_read_mat90                   ../starter/source/materials/mat/mat090/hm_read_mat90.F
       !||    hm_read_mat92                   ../starter/source/materials/mat/mat092/hm_read_mat92.F
@@ -408,7 +412,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_table2_0                ../starter/source/tools/curve/hm_read_table2_0.F
       !||    hm_read_table2_1                ../starter/source/tools/curve/hm_read_table2_1.F
       !||    hm_read_therm                   ../starter/source/materials/therm/hm_read_therm.F
-      !||    hm_read_therm_stress            ../starter/source/materials/therm/hm_read_therm_stress.F
+      !||    hm_read_therm_stress            ../starter/source/materials/therm/hm_read_therm_stress.F90
       !||    hm_read_tria                    ../starter/source/elements/reader/hm_read_tria.F
       !||    hm_read_unit                    ../starter/source/general_controls/computation/hm_read_unit.F
       !||    hm_read_upwind                  ../starter/source/general_controls/computation/hm_read_upwind.F
@@ -421,7 +425,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_yctrl                        ../starter/source/elements/initia/hm_yctrl.F
       !||    init_monvol                     ../starter/source/airbag/init_monvol.F
       !||    inivel                          ../starter/source/initial_conditions/general/inivel/inivel.F
-      !||    inivol_interf_mod               ../starter/share/modules1/inivol_mod.F
       !||    lcgeo19                         ../starter/source/elements/shell/coque/lcgeo19.F
       !||    lec_dof_jnt                     ../starter/source/properties/spring/hm_read_prop45.F
       !||    lec_inistate                    ../starter/source/elements/initia/lec_inistate.F

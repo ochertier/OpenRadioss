@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -68,6 +68,7 @@ C     REAL
       TYPE(BUF_MAT_) ,POINTER :: MBUF  
 C=======================================================================
       IL_OLD = -1
+      VALUE = ZERO
       DO IC=1,NUMEL
        IL = NC(5,IC)
        IF(IL/=IL_OLD)THEN

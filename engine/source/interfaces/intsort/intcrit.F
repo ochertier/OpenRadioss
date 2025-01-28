@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,29 +31,31 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_get_stif20e             ../engine/source/mpi/interfaces/send_cand.F
       !||    spmd_get_stif25              ../engine/source/mpi/interfaces/send_cand.F
       !||    spmd_sync_mmxg2              ../engine/source/mpi/interfaces/spmd_sync_mmxg2.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
-      !||    sensor_mod                   ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE INTCRIT(
+      SUBROUTINE INTCRIT(TIMERS,
      1  ERRORS, IPARI  ,NEWFRONT,ISENDTO,NSENSOR ,
      2  IRCVFROM,DT2T   ,NELTST ,ITYPTST ,ITAB   ,
      3  XSLV    ,XMSR   ,VSLV   ,VMSR    ,INTLIST,
      4  NBINTC  ,SIZE_T ,SENSOR_TAB,DELTA_PMAX_GAP,
-     5  INTBUF_TAB,DELTA_PMAX_GAP_NODE,IDEL7NOK_SAV,MAXDGAP)
+     5  INTBUF_TAB,DELTA_PMAX_GAP_NODE,IDEL7NOK_SAV,MAXDGAP, V )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTBUFDEF_MOD  
       USE INTERFACE_MODIFICATION_MOD
       USE SENSOR_MOD
+      USE TRI7BOX
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-        USE TRI7BOX
 #include      "implicit_f.inc"
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -70,6 +72,8 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
+      my_real, intent(in) :: V(3,NUMNOD)
       INTEGER, INTENT(INOUT) :: ERRORS !< number of errors (vmaxdt too high, ...)
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*),
@@ -85,9 +89,10 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       LOGICAL, DIMENSION(NINTER) :: FORCE_COMPUTATION
-      INTEGER I,J,KK,IGN,IGE,
+      INTEGER I,J,KK,IGN,IGE,JJ, NSN, NMN,
      .        IAD,K,N,IADD,ICOMP,NTY,NME,NMES,NMET,
      .        NBNEW, LISTNEW(NBINTC), ISENS, INTERACT,DELTA_PMAX_GAP_NOD
+      INTEGER :: JMAX
       my_real
      .        XX,XY,XZ,DIST0,VX,VY,VZ,GAPINF,VV,DTI,VMAXDT,
      .        STARTT, STOPT, MINBOX,TZINFL,GAPSUP,PMAX_GAP,
@@ -158,12 +163,12 @@ C
 C Communication si SPMD
 C
       IF(NSPMD>1)THEN
-        IF (IMONM > 0) CALL STARTIME(27,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,27)
         CALL SPMD_SYNC_MMXG2(
      1    ISENDTO,IRCVFROM,NEWFRONT,XSLV  ,XMSR  ,
      2    VSLV   ,VMSR    ,LISTNEW ,NBNEW ,TZINF ,
      3    SIZE_T ,IPARI , DELTA_PMAX_GAP  ,MAXDGAP)
-        IF (IMONM > 0) CALL STOPTIME(27,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,27)
       END IF
 C
       DO KK=1,NBNEW
@@ -381,7 +386,9 @@ c (no need to communicate VMAXDT in SPMD)
 
          INTBUF_TAB(I)%VARIABLES(5) = DIST0
 
-         IF(VMAXDT > TEN * MARGE0) THEN
+
+
+         IF(VMAXDT > FIVE * MARGE0) THEN
            ! assuming that MARGE0 is identical on all processors
            ERRORS = ERRORS + 1
            IF(ISPMD == 0) THEN
@@ -390,9 +397,40 @@ c (no need to communicate VMAXDT in SPMD)
              WRITE(IOUT,'(A,I10)') "ERROR: NODAL VELOCITY IS TOO HIGH
      . FOR INTERFACE",IPARI(15,I) 
            ENDIF
+           NSN = IPARI(5,I)
+           NMN = IPARI(6,I)
+           D1 = ZERO
+           JMAX = 1
+           DO JJ=1,NSN
+             J=INTBUF_TAB(I)%NSV(JJ)
+             IF(INTBUF_TAB(I)%STFNS(JJ)/=ZERO .AND. J<=NUMNOD .AND. J > 0) THEN
+               VX = V(1,J) 
+               VY = V(2,J) 
+               VZ = V(3,J) 
+               IF( SQRT(VX**2+VY**2+VZ**2) > D1) THEN
+                 D1 = SQRT(VX**2+VY**2+VZ**2)
+                 JMAX = J
+               ENDIF
+             ENDIF
+           END DO
+           DO JJ=1,NMN
+             J=INTBUF_TAB(I)%MSR(JJ)
+             IF(J>0 .AND. J <= NUMNOD) THEN
+               VX = V(1,J) 
+               VY = V(2,J) 
+               VZ = V(3,J) 
+               IF( SQRT(VX**2+VY**2+VZ**2) > D1) THEN
+                 D1 = SQRT(VX**2+VY**2+VZ**2)
+                 JMAX = J
+               ENDIF
+             ENDIF
+           ENDDO
+           IF(D1 > FIVE * MARGE0 /TWO ) THEN
+             WRITE(ISTDO,*) "ERROR: NODAL VELOCITY IS TOO HIGH FOR NODE",ITAB(JMAX),D1
+             WRITE(IOUT,*) "ERROR: NODAL VELOCITY IS TOO HIGH FOR NODE",ITAB(JMAX),D1
+           ENDIF
+           INTBUF_TAB(I)%VARIABLES(24) = MARGE0
          ENDIF
-
-
 
 
          IF(DIST0<=ZERO.OR.KFORSMS/=0.OR.FORCE_COMPUTATION(I)) THEN

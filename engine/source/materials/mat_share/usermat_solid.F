@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -67,20 +67,22 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    nsvisul                     ../engine/source/materials/mat_share/nsvisul.F
       !||    nvar                        ../engine/source/input/nvar.F
       !||    sreploc3                    ../engine/source/elements/solid/solide/sreploc3.F
-      !||    startime                    ../engine/source/system/timer.F
-      !||    stoptime                    ../engine/source/system/timer.F
+      !||    startime                    ../engine/source/system/timer_mod.F90
+      !||    stoptime                    ../engine/source/system/timer_mod.F90
       !||    viscmain                    ../engine/source/materials/visc/viscmain.F
       !||--- uses       -----------------------------------------------------
       !||    dt_mod                      ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod                ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod              ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    law_userso                  ../engine/source/user_interface/law_userso.F
       !||    mat_elem_mod                ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod                 ../engine/share/message_module/message_mod.F
       !||    names_and_titles_mod        ../common_source/modules/names_and_titles_mod.F
       !||    nlocal_reg_mod              ../common_source/modules/nlocal_reg_mod.F
       !||    table_mod                   ../engine/share/modules/table_mod.F
+      !||    timer_mod                   ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE USERMAT_SOLID(
+      SUBROUTINE USERMAT_SOLID(TIMERS,
      1   LFT,      LLT,      NFT,      MTN,
      2   JCVT,     PM,       OFF,      SIG,
      3   EINT,     RHO,      QOLD,     VOL,
@@ -119,7 +121,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      1   ISELECT,  TSTAR,    MUOLD,    AMU2,
      2   DPDM,     RHOREF,   RHOSP,    NLOC_DMG,
      3   ITY,      JTUR  ,   MAT_ELEM, IDEL7NOK,SVIS,
-     4   DT)
+     4   DT  ,     glob_therm)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -131,6 +133,8 @@ C-----------------------------------------------
       USE NLOCAL_REG_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
+      USE TIMER_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -150,6 +154,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER, INTENT(IN) :: ITY
       INTEGER, INTENT(IN) :: JTUR
       INTEGER, INTENT(INOUT) :: IDEL7NOK
@@ -195,6 +200,7 @@ C
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (MAT_ELEM_)  ,INTENT(INOUT) :: MAT_ELEM
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -232,6 +238,8 @@ C-----------------------------------------------
 C----
       my_real, DIMENSION(:), POINTER  :: UPARAM,UPARAMF,UVARF,DFMAX,TDEL,EL_TEMP, 
      .                                   YLDFAC,DAM,EL_LEN,EL_PLA,DAMINI
+      my_real, DIMENSION(MVSIZ)       :: EL_BFRAC,EL_TB
+      INTEGER :: SIZBFRAC,SIZTB
       TYPE(ULAWINTBUF)                :: USERBUF
       TYPE(L_BUFEL_)  ,POINTER        :: LBUF, LBUF1, LBUF2    
       TYPE(G_BUFEL_)  ,POINTER        :: GBUF      
@@ -323,7 +331,23 @@ c
         EL_TEMP => LTEMP     ! LBUF%TEMP
       ELSE                                                  
         EL_TEMP => TEMPEL(LFT:LLT)                           
-      ENDIF 
+      ENDIF
+
+      IF (GBUF%G_BFRAC > 0) THEN
+        EL_BFRAC(1:NEL) = ELBUF_TAB(NG)%GBUF%BFRAC(1:NEL)     ! burn fraction for high explosive
+        SIZBFRAC = NEL
+      ELSE
+        EL_BFRAC(1:NEL) = ZERO
+        SIZBFRAC = 0
+      ENDIF
+
+      IF (GBUF%G_TB > 0) THEN
+        EL_TB(1:NEL) = ELBUF_TAB(NG)%GBUF%TB(1:NEL)     ! burning time for high explosive
+        SIZTB = NEL
+      ELSE
+        EL_TB(1:NEL) = ZERO
+        SIZTB = 0
+      ENDIF
 
       !initial scale factor for yield stress defined per IPG,NPI  
       SCALE1(LFT:LLT) = ONE                                        
@@ -640,7 +664,7 @@ c--------------------------------------------------------
 c     COMPUTE UNDAMAGED EFFECTIVE STRESSES
 c---------------------------------------------------------
       ! -> Isotropic stress softening
-      IF (DMG_FLAG > 0) THEN 
+      IF (DMG_FLAG == 1) THEN 
         DO I = 1,NEL
           SO1(I) = SO1(I)/MAX(LBUF%DMGSCL(I),EM20)
           SO2(I) = SO2(I)/MAX(LBUF%DMGSCL(I),EM20)
@@ -665,9 +689,7 @@ c---------------------------------------------------------
 c     SELECT MATERIAL LAW
 c---------------------------------------------------------
       IF (MTN == 29) THEN
-          DO I=LFT,LLT
-            U_TAGPLAS(I)=0
-          END DO
+          U_TAGPLAS(1:NEL) = 0
           IF (LOGICAL_USERL_AVAIL)THEN
             TT_LOCAL = TT
             CALL ENG_USERLIB_SIGEPS( MTN,
@@ -683,17 +705,6 @@ c---------------------------------------------------------
      .                  SSP ,VIS ,UVAR,OFF  )
             
           ELSE
-!            CALL SIGEPS29(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
-!     .                  NPF ,TF  ,TT,DT1,UPARAM,
-!     .                  RHO0,RHO ,VOLN,EINT,
-!     .                  EP1 ,EP2 ,EP3 ,EP4  ,EP5  ,EP6 ,
-!     .                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
-!     .                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
-!     .                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
-!     .                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
-!     .                  SV1 ,SV2 ,SV3 ,SV4  ,SV5  ,SV6 ,
-!     .                  SSP ,VIS ,UVAR,OFF  )
-!!!
               ! ----------------
               ! ERROR to be printed & exit
                 OPTION='/MAT/LAW29 - SOLID '
@@ -707,16 +718,13 @@ c---------------------------------------------------------
             IF(U_TAGPLAS(I)/=0)THEN
               SIGY(I)=U_YELD(I)
               DEFP(I)=U_DEFP(I)
-cc              DPLA(I) = DEFP(I) - DEFP0(I)              
             ELSE
               SIGY(I)=EP30
               DEFP(I)=ZERO
             END IF
           END DO
       ELSEIF(MTN == 30)THEN
-          DO I=LFT,LLT
-            U_TAGPLAS(I)=0
-          END DO
+          U_TAGPLAS(1:NEL) = 0
           IF (LOGICAL_USERL_AVAIL)THEN 
             TT_LOCAL = TT
             CALL ENG_USERLIB_SIGEPS( MTN,
@@ -732,17 +740,6 @@ cc              DPLA(I) = DEFP(I) - DEFP0(I)
      .                  SSP ,VIS ,UVAR,OFF  )
             
           ELSE
-!            CALL SIGEPS30(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
-!     .                  NPF ,TF  ,TT,DT1,UPARAM,
-!     .                  RHO0,RHO ,VOLN,EINT,
-!     .                  EP1 ,EP2 ,EP3 ,EP4  ,EP5  ,EP6 ,
-!     .                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
-!     .                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
-!     .                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
-!     .                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
-!     .                  SV1 ,SV2 ,SV3 ,SV4  ,SV5  ,SV6 ,
-!     .                  SSP ,VIS ,UVAR,OFF  )
-!!!
               ! ----------------
               ! ERROR to be printed & exit
                 OPTION='/MAT/LAW30 - SOLID '
@@ -756,16 +753,13 @@ cc              DPLA(I) = DEFP(I) - DEFP0(I)
             IF(U_TAGPLAS(I)/=0)THEN
               SIGY(I)=U_YELD(I)
               DEFP(I)=U_DEFP(I)
-cc              DPLA(I) = DEFP(I) - DEFP0(I)              
             ELSE
               SIGY(I)=EP30
               DEFP(I)=ZERO
             END IF
           END DO
       ELSEIF(MTN == 31)THEN
-          DO I=LFT,LLT
-            U_TAGPLAS(I)=0
-          END DO
+          U_TAGPLAS(1:NEL) = 0
           IF (LOGICAL_USERL_AVAIL)THEN
             TT_LOCAL = TT
             CALL ENG_USERLIB_SIGEPS( MTN,
@@ -781,17 +775,6 @@ cc              DPLA(I) = DEFP(I) - DEFP0(I)
      .                  SSP ,VIS ,UVAR,OFF  )
             
           ELSE
-!            CALL SIGEPS31(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
-!     .                  NPF ,TF  ,TT,DT1,UPARAM,
-!     .                  RHO0,RHO ,VOLN,EINT,
-!     .                  EP1 ,EP2 ,EP3 ,EP4  ,EP5  ,EP6 ,
-!     .                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
-!     .                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
-!     .                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
-!     .                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
-!     .                  SV1 ,SV2 ,SV3 ,SV4  ,SV5  ,SV6 ,
-!     .                  SSP ,VIS ,UVAR,OFF  )
-!!!
               ! ----------------
               ! ERROR to be printed & exit
                 OPTION='/MAT/LAW31 - SOLID '
@@ -799,13 +782,12 @@ cc              DPLA(I) = DEFP(I) - DEFP0(I)
                 CALL ANCMSG(MSGID=257,C1=OPTION(1:SIZE),ANMODE=ANINFO)
                 CALL ARRET(2)
               ! ----------------
-!!!
           ENDIF
+!
           DO I=LFT,LLT
             IF(U_TAGPLAS(I)/=0)THEN
               SIGY(I)=U_YELD(I)
               DEFP(I)=U_DEFP(I)
-cc              DPLA(I) = DEFP(I) - DEFP0(I)              
             ELSE
               SIGY(I)=EP30
               DEFP(I)=ZERO
@@ -813,16 +795,8 @@ cc              DPLA(I) = DEFP(I) - DEFP0(I)
           END DO
 c----------------------------------------
       ELSEIF(MTN  ==  99) THEN
-C chgrt de la structure 
-C
-           CALL SREPLOC3(
-     1   RX,      RY,      RZ,      SX,
-     2   SY,      SZ,      TX,      TY,
-     3   TZ,      R11,     R21,     R31,
-     4   R12,     R22,     R32,     R13,
-     5   R23,     R33,     LLT)
 
-         IF(LOGICAL_USERL_AVAIL)THEN
+        IF(LOGICAL_USERL_AVAIL)THEN
 
           IF (ISMSTR == 10) THEN
             DO I=LFT,LLT
@@ -836,32 +810,33 @@ C
             FPSYX = MFYX(1:MVSIZ)
             FPSZY = MFZY(1:MVSIZ)
             FPSZX = MFZX(1:MVSIZ)    
-C---------------------------
-C       ORTHOTROPE 
-C---------------------------
+            !------------
+            !  ORTHOTROPE 
+            !------------
             IF (ISORTH /= 0) THEN
-             CALL MREPLOC(
-     1   GAMA,    R11,     R12,     R13,
-     2   R21,     R22,     R23,     R31,
-     3   R32,     R33,     RX,      RY,
-     4   RZ,      SX,      SY,      SZ,
-     5   TX,      TY,      TZ,      NEL,
-     6   JSPH)
-             CALL MROTENSNS(LFT,LLT,
-     .               FPSXX,FPSXY,FPSXZ,
-     .               FPSYX,FPSYY,FPSYZ,
-     .               FPSZX,FPSZY,FPSZZ,
-     .               R11,R12,R13,
-     .               R21,R22,R23,
-     .               R31,R32,R33)
-            END IF !(ISORTH /= 0) THEN
-              CALL EPSF2U(
-     1      LLT    ,FPSXX    , FPSXY  , FPSXZ  , FPSYX  ,    
-     2      FPSYY  ,FPSYZ    , FPSZX  , FPSZY  , FPSZZ  , 
-     3      UPSXX  ,UPSYY    , UPSZZ  , UPSXY  , UPSYZ  ,
-     4      UPSXZ  )
+              CALL MREPLOC(
+     1             GAMA,    R11,     R12,     R13,
+     2             R21,     R22,     R23,     R31,
+     3             R32,     R33,     RX,      RY,
+     4             RZ,      SX,      SY,      SZ,
+     5             TX,      TY,      TZ,      NEL,
+     6             JSPH)
+              CALL MROTENSNS(LFT,LLT,
+     .             FPSXX,FPSXY,FPSXZ,
+     .             FPSYX,FPSYY,FPSYZ,
+     .             FPSZX,FPSZY,FPSZZ,
+     .             R11,R12,R13,
+     .             R21,R22,R23,
+     .             R31,R32,R33)
+            END IF ! ISORTH
 
-          ELSE  ! (ISMSTR == 10)          
+            CALL EPSF2U(
+     1           LLT    ,FPSXX    , FPSXY  , FPSXZ  , FPSYX  ,
+     2           FPSYY  ,FPSYZ    , FPSZX  , FPSZY  , FPSZZ  ,
+     3           UPSXX  ,UPSYY    , UPSZZ  , UPSXY  , UPSYZ  ,
+     4           UPSXZ  )
+
+          ELSE  !  ISMSTR /= 10         
             FPSXX(1:MVSIZ) = ZERO
             FPSYY(1:MVSIZ) = ZERO
             FPSZZ(1:MVSIZ) = ZERO
@@ -877,11 +852,10 @@ C---------------------------
             UPSXY(1:MVSIZ) = ZERO
             UPSYZ(1:MVSIZ) = ZERO
             UPSXZ(1:MVSIZ) = ZERO          
-          END IF! (ISMSTR == 10) 
-
+          END IF  ! ISMSTR
          
-C Fill Structure in dynamical library
-           CALL ENG_USERLIB_GET_LAW_VAR(
+          !  Fill Structure in dynamical library
+          CALL ENG_USERLIB_GET_LAW_VAR(
      *             NCYCLE, IMAT,IPTR, IPTS,IPTT,
      *             R11,    R12, R13, R21, R22, R23,  R31,
      *             R32,    R33, SO1, SO2, SO3, SO4,  SO5,
@@ -891,231 +865,97 @@ C Fill Structure in dynamical library
      *             S2,     S3,  S4,  S5,  S6,  SV1,  SV2,
      *             SV3,    SV4, SV5, SV6 )
      
-           IF(DLIBTKVERS >= 1301501260)THEN
+          IF (DLIBTKVERS >= 1301501260)THEN
              SIZNUL=0           
              CALL ENG_USERLIB_GET_LAW_VAR_2(
      *         FPSXX  ,MVSIZ ,FPSYY  ,MVSIZ ,
-     *         FPSZZ  ,MVSIZ ,FPSXY  ,MVSIZ ,FPSYZ  ,MVSIZ ,FPSZX  ,MVSIZ,
-     *         FPSYX  ,MVSIZ ,FPSZY  ,MVSIZ ,FPSXZ  ,MVSIZ ,UPSXX  ,MVSIZ, 
-     *         UPSYY  ,MVSIZ ,UPSZZ  ,MVSIZ ,UPSXY  ,MVSIZ ,UPSYZ  ,MVSIZ,
-     *         UPSXZ  ,MVSIZ ,EL_TEMP,MVSIZ ,DVOL   ,MVSIZ ,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL)
-           ENDIF
+     *         FPSZZ  ,MVSIZ ,FPSXY  ,MVSIZ ,FPSYZ  ,MVSIZ ,FPSZX   ,MVSIZ,
+     *         FPSYX  ,MVSIZ ,FPSZY  ,MVSIZ ,FPSXZ  ,MVSIZ ,UPSXX   ,MVSIZ,
+     *         UPSYY  ,MVSIZ ,UPSZZ  ,MVSIZ ,UPSXY  ,MVSIZ ,UPSYZ   ,MVSIZ,
+     *         UPSXZ  ,MVSIZ ,EL_TEMP,NEL ,DVOL   ,MVSIZ ,EL_BFRAC,SIZBFRAC,
+     *         EL_TB  ,SIZTB ,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL,
+     *         BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR ,SIZNUL)
+          ENDIF
 
-C Call SIGEPS99 in dynamical user library
-           TT_LOCAL = TT
-           CALL  ENG_USERLIB_SIGEPS99(
-     *                LLT     ,NPAR  ,NUVAR  ,ILAW_USER  ,NFUNC,
-     *                IFUNC   ,NPF   ,TF     ,TT_LOCAL   ,DT1,
-     *                UPARAM ,RHO    ,VOLN ,EINT ,NGL  ,
-     *                SSP            ,VIS    ,UVAR ,OFF  ,SIGY ,
-     *                DEFP  )
+          !  Call SIGEPS99 in dynamical user library
+          TT_LOCAL = TT
+          CALL  ENG_USERLIB_SIGEPS99(
+     *               LLT     ,NPAR  ,NUVAR  ,ILAW_USER  ,NFUNC,
+     *               IFUNC   ,NPF   ,TF     ,TT_LOCAL   ,DT1,
+     *               UPARAM ,RHO    ,VOLN ,EINT ,NGL  ,
+     *               SSP            ,VIS    ,UVAR ,OFF  ,SIGY ,
+     *               DEFP  )
 
-C Get back results from structure in user library
-            CALL ENG_USERLIB_SET_LAW_VAR(
-     *                 S1,  S2,   S3, S4,  S5,  S6,
-     *                 SV1, SV2,  SV3,SV4, SV5, SV6,
-     *                 DPLA )
+           !  Get back results from structure in user library
+           CALL ENG_USERLIB_SET_LAW_VAR(
+     *                S1,  S2,   S3, S4,  S5,  S6,
+     *                SV1, SV2,  SV3,SV4, SV5, SV6,
+     *                DPLA )
      
-           IF(DLIBTKVERS >= 1301501260)THEN
-             SIZNUL=0           
-             CALL ENG_USERLIB_SET_LAW_VAR_2(EL_TEMP,MVSIZ,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
-     *                                      BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL )
-           ENDIF
-         ELSE !(USERL_AVAIL)
-           USERBUF%NCYCLE = NCYCLE
-           USERBUF%ID     = IMAT
-           USERBUF%IPTR   = IPTR
-           USERBUF%IPTS   = IPTS
-           USERBUF%IPTT   = IPTT
-C
-           USERBUF%R11    = R11
-           USERBUF%R12    = R12
-           USERBUF%R13    = R13 
-C
-           USERBUF%R21    = R21
-           USERBUF%R22    = R22
-           USERBUF%R23    = R23 
-C
-           USERBUF%R31    = R31
-           USERBUF%R32    = R32
-           USERBUF%R33    = R33 
-C
-           USERBUF%SIGOXX = SO1
-           USERBUF%SIGOYY = SO2
-           USERBUF%SIGOZZ = SO3 
-           USERBUF%SIGOXY = SO4(1:MVSIZ)
-           USERBUF%SIGOYZ = SO5(1:MVSIZ)
-           USERBUF%SIGOZX = SO6(1:MVSIZ)
-C
-           USERBUF%EPSPXX = EP1
-           USERBUF%EPSPYY = EP2
-           USERBUF%EPSPZZ = EP3
-           USERBUF%EPSPXY = EP4(1:MVSIZ)
-           USERBUF%EPSPYZ = EP5(1:MVSIZ)
-           USERBUF%EPSPZX = EP6(1:MVSIZ)
-C                
-           USERBUF%EPSXX = ES1
-           USERBUF%EPSYY = ES2
-           USERBUF%EPSZZ = ES3
-           USERBUF%EPSXY = ES4(1:MVSIZ)
-           USERBUF%EPSYZ = ES5(1:MVSIZ)
-           USERBUF%EPSZX = ES6(1:MVSIZ)          
-C---------------------------
-           IF (ISMSTR == 10) THEN
-            IF (ISORTH /= 0) THEN
-C            ORTHOTROPE 
-             CALL MREPLOC(
-     1   GAMA,    R11,     R12,     R13,
-     2   R21,     R22,     R23,     R31,
-     3   R32,     R33,     RX,      RY,
-     4   RZ,      SX,      SY,      SZ,
-     5   TX,      TY,      TZ,      NEL,
-     6   JSPH)
-             DO I=LFT,LLT
-              MFXX(I) = ONE+MFXX(I)
-              MFYY(I) = ONE+MFYY(I)
-              MFZZ(I) = ONE+MFZZ(I)
-             END DO
-             CALL MROTENSNS(LFT,LLT,
-     .               MFXX,MFXY,MFXZ,
-     .               MFYX,MFYY,MFYZ,
-     .               MFZX,MFZY,MFZZ,
-     .               R11,R12,R13,
-     .               R21,R22,R23,
-     .               R31,R32,R33)
-            END IF !(ISORTH /= 0) THEN
-            USERBUF%FPSXX = MFXX(1:MVSIZ)
-            USERBUF%FPSYY = MFYY(1:MVSIZ)
-            USERBUF%FPSZZ = MFZZ(1:MVSIZ)
-            USERBUF%FPSXY = MFXY(1:MVSIZ)
-            USERBUF%FPSYZ = MFYZ(1:MVSIZ)
-            USERBUF%FPSXZ = MFXZ(1:MVSIZ)          
-            USERBUF%FPSYX = MFYX(1:MVSIZ)
-            USERBUF%FPSZY = MFZY(1:MVSIZ)
-            USERBUF%FPSZX = MFZX(1:MVSIZ)    
-                     CALL EPSF2U(
-     1           LLT    ,USERBUF%FPSXX,USERBUF%FPSXY,USERBUF%FPSXZ,USERBUF%FPSYX,    
-     2           USERBUF%FPSYY,USERBUF%FPSYZ,USERBUF%FPSZX,USERBUF%FPSZY,USERBUF%FPSZZ, 
-     3           USERBUF%UPSXX,USERBUF%UPSYY,USERBUF%UPSZZ,USERBUF%UPSXY,USERBUF%UPSYZ,
-     4           USERBUF%UPSXZ)
-           ELSE  ! ISMSTR /= 10          
-            USERBUF%FPSXX = ZERO
-            USERBUF%FPSYY = ZERO
-            USERBUF%FPSZZ = ZERO
-            USERBUF%FPSXY = ZERO
-            USERBUF%FPSYZ = ZERO
-            USERBUF%FPSXZ = ZERO          
-            USERBUF%FPSYX = ZERO
-            USERBUF%FPSZY = ZERO
-            USERBUF%FPSZX = ZERO
-C      
-            USERBUF%UPSXX = ZERO
-            USERBUF%UPSYY = ZERO
-            USERBUF%UPSZZ = ZERO
-            USERBUF%UPSXY = ZERO
-            USERBUF%UPSYZ = ZERO
-            USERBUF%UPSXZ = ZERO          
-           END IF  ! ISMSTR 
-C                
-           USERBUF%DEPSXX = DE1
-           USERBUF%DEPSYY = DE2
-           USERBUF%DEPSZZ = DE3
-           USERBUF%DEPSXY = DE4(1:MVSIZ)
-           USERBUF%DEPSYZ = DE5(1:MVSIZ)          
-           USERBUF%DEPSZX = DE6(1:MVSIZ)
-c
-           USERBUF%RHO0   = RHO0
-           USERBUF%TEMP   = EL_TEMP
-c          
-           USERBUF%SIGNXX = S1
-           USERBUF%SIGNYY = S2
-           USERBUF%SIGNZZ = S3
-           USERBUF%SIGNXY = S4(1:MVSIZ)
-           USERBUF%SIGNYZ = S5(1:MVSIZ)
-           USERBUF%SIGNZX = S6(1:MVSIZ)
-c
-           USERBUF%SIGVXX = SV1
-           USERBUF%SIGVYY = SV2
-           USERBUF%SIGVYY = SV3
-           USERBUF%SIGVXY = SV4(1:MVSIZ)
-           USERBUF%SIGVYZ = SV5(1:MVSIZ)
-           USERBUF%SIGVZX = SV6(1:MVSIZ)
-C           
-!          CALL SIGEPS99 (LLT          ,NPAR   ,NUVAR  ,ILAW_USER , NFUNC ,
-!     .                  IFUNC         ,NPF    ,TF     ,TT        ,DT1    ,
-!     .                  UPARAM,RHO    ,VOLN   ,EINT      ,NGL    ,
-!     .                  SSP           ,VIS    ,UVAR   ,OFF       ,SIGY   ,
-!     .                  DEFP          ,USERBUF)
-!!!
-              ! ----------------
-              ! ERROR to be printed & exit
-                CALL NOLIB_USERMAT99(ILAW_USER, IUSER_KEY)
-                OPTION='/MAT/'//IUSER_KEY//' - SOLID'
-                SIZE=LEN_TRIM(OPTION)
-                CALL ANCMSG(MSGID=257,C1=OPTION(1:SIZE),ANMODE=ANINFO)
-                CALL ARRET(2)
-              ! ----------------
-!!!     
-C
-          S1 = USERBUF%SIGNXX
-          S2 = USERBUF%SIGNYY
-          S3 = USERBUF%SIGNZZ
-          S4(1:MVSIZ) = USERBUF%SIGNXY
-          S5(1:MVSIZ) = USERBUF%SIGNYZ 
-          S6(1:MVSIZ) = USERBUF%SIGNZX
-C           
-          SV1 = USERBUF%SIGVXX
-          SV2 = USERBUF%SIGVYY
-          SV3 = USERBUF%SIGVZZ
-          SV4(1:MVSIZ) = USERBUF%SIGVXY
-          SV5(1:MVSIZ) = USERBUF%SIGVYZ 
-          SV6(1:MVSIZ) = USERBUF%SIGVZX 
-          DPLA   = USERBUF%DPLA  
-          IF (JTHE == 0) EL_TEMP = USERBUF%TEMP ! otherwise it's read only in user law
-         ENDIF
+          IF(DLIBTKVERS >= 1301501260)THEN
+            SIZNUL=0           
+            CALL ENG_USERLIB_SET_LAW_VAR_2(EL_TEMP,NEL,EL_BFRAC,SIZBFRAC,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,    
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,
+     *           BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL,BID_ARR,SIZNUL )
+
+            IF (SIZBFRAC > 0) THEN
+              ! set in element buffer the updated burn fraction for high explosive
+              ELBUF_TAB(NG)%GBUF%BFRAC(1:NEL) = EL_BFRAC(1:NEL)
+            ENDIF
+
+          ENDIF
+!
+        ELSE ! USERL_AVAIL = 0
+!
+           ! ----------------
+           ! ERROR to be printed & exit
+             CALL NOLIB_USERMAT99(ILAW_USER, IUSER_KEY)
+             OPTION='/MAT/'//IUSER_KEY//' - SOLID'
+             SIZE=LEN_TRIM(OPTION)
+             CALL ANCMSG(MSGID=257,C1=OPTION(1:SIZE),ANMODE=ANINFO)
+             CALL ARRET(2)
+           ! ----------------
+        ENDIF  ! USERL_AVAIL
 c
 #ifdef DNC
       ELSE IF (MTN == 200) THEN  ! MDS MATERIAL LAW INTERFACE (in construction)
@@ -1124,11 +964,11 @@ c
           ALLOCATE(ISMSTR10_FP(15,NEL))
 
           CALL SREPLOC3(
-     1   RX,      RY,      RZ,      SX,
-     2   SY,      SZ,      TX,      TY,
-     3   TZ,      R11,     R21,     R31,
-     4   R12,     R22,     R32,     R13,
-     5   R23,     R33,     LLT)
+     1         RX,      RY,      RZ,      SX,
+     2         SY,      SZ,      TX,      TY,
+     3         TZ,      R11,     R21,     R31,
+     4         R12,     R22,     R32,     R13,
+     5         R23,     R33,     LLT)
 
 
           IF (ISMSTR == 10) THEN
@@ -1231,7 +1071,7 @@ C
 C=======================================================================
 C                  FAILURE MODEL 
 C=======================================================================
-      IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(121,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(TIMERS,121)
       IF (NFAIL > 0) THEN
 c
         ! Failure criterion parameters scaling
@@ -1597,7 +1437,8 @@ C---- Tabulated failure model version 2
      3          NGL      ,EL_LEN   ,DPLA     ,EPSP1    ,UVARF    ,     
      5          S1       ,S2       ,S3       ,S4       ,S5       ,S6       ,               
      6          EL_TEMP  ,OFF      ,DFMAX    ,TDEL     ,LBUF%DMGSCL,
-     7          GBUF%UELR,IPG      ,NPG      ,LBUF%OFF ,NTABL_FAIL,ITABL_FAIL) 
+     7          GBUF%UELR,IPG      ,NPG      ,LBUF%OFF ,NTABL_FAIL,ITABL_FAIL,
+     8          GBUF%NOFF,VOLN     )
 c
           ELSEIF (IRUPT == 42) THEN                                      
 C---- Inievo failure model
@@ -1662,12 +1503,11 @@ c
           ENDIF
         ENDDO ! IR = 1,NFAIL
       ENDIF   ! NFAIL
-      IF ((ITASK==0).AND.(IMON_MAT==1))CALL STOPTIME(121,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1))CALL STOPTIME(TIMERS,121)
 C-----------------------------------------------------------------------
 C     viscous stress (/VISC models) 
 C-----------------------------------------------------------------------
-      IVISC = IPM(222,MX)
-      IF (IVISC > 0) THEN
+      IF (MAT_ELEM%MAT_PARAM(MAT(1))%IVISC > 0) THEN
          CALL VISCMAIN(MAT_ELEM%MAT_PARAM(MAT(1))%VISC    ,NEL     ,
      .        NVARVIS ,VBUF%VAR,RHO0    ,VIS     ,SSP     ,DT1     , 
      .        EP1     ,EP2     ,EP3     ,EP4     ,EP5     ,EP6     ,
@@ -1699,7 +1539,7 @@ c--------------------------------------------------------
 c     DAMAGED STRESSES
 c---------------------------------------------------------
       ! -> Isotropic stress softening
-      IF (DMG_FLAG > 0) THEN 
+      IF (DMG_FLAG == 1) THEN 
         DO I = 1,NEL
           S1(I) = S1(I)*LBUF%DMGSCL(I)
           S2(I) = S2(I)*LBUF%DMGSCL(I)
@@ -1720,41 +1560,80 @@ c---------------------------------------------------------
         ENDDO
       ENDIF
 c---------------------------------------------------------
-      DO I=LFT,LLT
-        SIG(I,1) = S1(I)*OFF(I)
-        SIG(I,2) = S2(I)*OFF(I)
-        SIG(I,3) = S3(I)*OFF(I)
-        SIG(I,4) = S4(I)*OFF(I)
-        SIG(I,5) = S5(I)*OFF(I)
-        SIG(I,6) = S6(I)*OFF(I)
-        SVIS(I,1)= SV1(I)*OFF(I)
-        SVIS(I,2)= SV2(I)*OFF(I)
-        SVIS(I,3)= SV3(I)*OFF(I)
-        SVIS(I,4)= SV4(I)*OFF(I)
-        SVIS(I,5)= SV5(I)*OFF(I)
-        SVIS(I,6)= SV6(I)*OFF(I)
+      IF (ISORTH /= 0) THEN
+        if (jcvt == 0) then
+          DO I=1,NEL
+            SIGL(I,1) = S1(I)*OFF(I)
+            SIGL(I,2) = S2(I)*OFF(I)
+            SIGL(I,3) = S3(I)*OFF(I)
+            SIGL(I,4) = S4(I)*OFF(I)
+            SIGL(I,5) = S5(I)*OFF(I)
+            SIGL(I,6) = S6(I)*OFF(I)
+            SV1(I)    = SV1(I)*OFF(I)
+            SV2(I)    = SV2(I)*OFF(I)
+            SV3(I)    = SV3(I)*OFF(I)
+            SV4(I)    = SV4(I)*OFF(I)
+            SV5(I)    = SV5(I)*OFF(I)
+            SV6(I)    = SV6(I)*OFF(I)
+          ENDDO
+!
+          call mrotens(1,nel,
+     &         s1 ,s2 ,s3 , s4 ,s5 ,s6 ,
+     &         r11,r21,r31, 
+     &         r12,r22,r32, 
+     &         r13,r23,r33)
+          call mrotens(1,nel,
+     &         sv1 ,sv2 ,sv3 , sv4 ,sv5 ,sv6 ,
+     &         r11,r21,r31, 
+     &         r12,r22,r32, 
+     &         r13,r23,r33)
+        else !  jcvt > 0
+          DO I=1,NEL
+            SV1(I) = SV1(I)*OFF(I)
+            SV2(I) = SV2(I)*OFF(I)
+            SV3(I) = SV3(I)*OFF(I)
+            SV4(I) = SV4(I)*OFF(I)
+            SV5(I) = SV5(I)*OFF(I)
+            SV6(I) = SV6(I)*OFF(I)
+          ENDDO
+        end if
+      END IF
+!
+      DO I=1,NEL
+        SIG(I,1)  = S1(I)*OFF(I)
+        SIG(I,2)  = S2(I)*OFF(I)
+        SIG(I,3)  = S3(I)*OFF(I)
+        SIG(I,4)  = S4(I)*OFF(I)
+        SIG(I,5)  = S5(I)*OFF(I)
+        SIG(I,6)  = S6(I)*OFF(I)
+        SVIS(I,1) = SV1(I)*OFF(I)
+        SVIS(I,2) = SV2(I)*OFF(I)
+        SVIS(I,3) = SV3(I)*OFF(I)
+        SVIS(I,4) = SV4(I)*OFF(I)
+        SVIS(I,5) = SV5(I)*OFF(I)
+        SVIS(I,6) = SV6(I)*OFF(I)
       ENDDO
 C
 C  isvis for outp
 C      
-      IF(ISVIS > 0) THEN
-        DO I=LFT,LLT
-            SIGV(I,1) = SVIS(I,1)
-            SIGV(I,2) = SVIS(I,2)
-            SIGV(I,3) = SVIS(I,3)
-            SIGV(I,4) = SVIS(I,4)
-            SIGV(I,5) = SVIS(I,5)
-            SIGV(I,6) = SVIS(I,6)
-          ENDDO
+      IF (ISVIS > 0) THEN
+        DO I=1,NEL
+          SIGV(I,1) = SVIS(I,1)
+          SIGV(I,2) = SVIS(I,2)
+          SIGV(I,3) = SVIS(I,3)
+          SIGV(I,4) = SVIS(I,4)
+          SIGV(I,5) = SVIS(I,5)
+          SIGV(I,6) = SVIS(I,6)
+        ENDDO
       ENDIF 
-       IF (IVISC > 0) THEN
-         DO I=LFT,LLT  
-           SVISC(I,1) = SVIS(I,1)
-           SVISC(I,2) = SVIS(I,2)
-           SVISC(I,3) = SVIS(I,3)
-           SVISC(I,4) = SVIS(I,4)
-           SVISC(I,5) = SVIS(I,5)
-           SVISC(I,6) = SVIS(I,6)
+      IF (MAT_ELEM%MAT_PARAM(MAT(1))%IVISC >  0) THEN
+        DO I=1,NEL 
+          SVISC(I,1) = SVIS(I,1)
+          SVISC(I,2) = SVIS(I,2)
+          SVISC(I,3) = SVIS(I,3)
+          SVISC(I,4) = SVIS(I,4)
+          SVISC(I,5) = SVIS(I,5)
+          SVISC(I,6) = SVIS(I,6)
         ENDDO    
       ENDIF  
 C------------------------------------------------------------
@@ -1796,7 +1675,7 @@ C-----------------------
      9   FACQ0,    CONDE,    GBUF%DT,  GBUF%G_DT,
      A   IPM,      RHOREF,   RHOSP,    NEL,
      B   ITY,      ISMSTR,   JTUR,     JTHE,
-     C   JSMS,     NPG )
+     C   JSMS,     NPG  ,  glob_therm)
 !------------------------------------------------
       ELSE
         CALL MDTSPH(
@@ -1824,6 +1703,7 @@ C-----------
         EINT(I) = EINT(I) + OFF(I)*EINC*HALF
       END DO                                                                 
       QOLD(LFT:LLT) = Q(LFT:LLT)
+
 C------------------------------------------
       RETURN
-      END
+      END SUBROUTINE USERMAT_SOLID

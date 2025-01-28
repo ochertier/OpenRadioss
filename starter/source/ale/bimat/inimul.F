@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,11 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    inimul               ../starter/source/ale/bimat/inimul.F
+      !||    inimul   ../starter/source/ale/bimat/inimul.F
       !||--- called by ------------------------------------------------------
-      !||    lectur               ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
+      !||    lectur   ../starter/source/starter/lectur.F
       !||====================================================================
-      SUBROUTINE INIMUL(PM,F,DF)
-C-----------------------------------------------
-C   M o d u l e s
-C-----------------------------------------------
-      USE MULTIMAT_PARAM_MOD , ONLY : M20_DISCRETE_FILL
+      SUBROUTINE INIMUL(PM,F,DF,M20_DISCRETE_FILL)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,6 +40,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real PM(NPROPM,*), F(NUMNOD,*), DF(NUMNOD,*)
+      logical M20_DISCRETE_FILL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

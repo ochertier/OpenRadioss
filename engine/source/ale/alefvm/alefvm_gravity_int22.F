@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER          :: I, J, K, K1, K2, K3, NL, NN, ISK, IFUNC, N2, IB, MNOD
       INTEGER          :: IADF,IADL,ISENS,N1,NVERTEX,INOd,II, NIN
-      my_real          :: TS,AA,FCX,FCY,VV,A0,DYDX,GAMA,TFEXTT
+      my_real          :: TS,AA,FCX,FCY,VV,A0,DYDX,GAMA
       my_real          :: M_CELL(MVSIZ),ACCEL(3,MVSIZ),SKEW(LSKEW,*)
       LOGICAL          :: debug_outp
       INTEGER          :: idbf,idbl , MCELL   

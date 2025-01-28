@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                    ELBUF_TAB,NODFT  ,NODLT ,IGEO   ,IPM  ,
      .                    SH4TREE,MSC  ,INC   ,SH3TREE,MSTG ,
      .                    INTG ,PTG    ,MSCND ,INCND  ,PM   ,
-     .                    MCP  ,MCPC   ,MCPTG )
+     .                    MCP  ,MCPC   ,MCPTG ,ITHERM_FE)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -67,6 +67,7 @@ C-----------------------------------------------
      .        IPART(LIPART1,*),ITASK,IPARG(NPARG,*),
      .        NODFT, NODLT, IGEO(NPROPGI,*), IPM(NPROPMI,*),
      .        SH4TREE(KSH4TREE,*),SH3TREE(KSH3TREE,*)
+      my_real ,INTENT(IN) :: ITHERM_FE
       my_real
      .        X(3,*),MS(*),IN(*),MSC(*), INC(*),
      .        MSTG(*), INTG(*), PTG(3,*), MSCND(*), INCND(*),

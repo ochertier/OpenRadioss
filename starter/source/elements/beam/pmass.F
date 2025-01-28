@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                 MSP   ,INP    ,IGEO    ,STIFINT,STP     ,
      .                 X1,X2,Y1,Y2,Z1,Z2,
      .                 NC1,NC2,MXT,MXG,AREA,AL,STRP , MCP     ,
-     .                 MCPP ,TEMP )
+     .                 MCPP ,TEMP ,NINTEMP)
 C----------------------------------------------
 C     INITIALISATION DES MASSES NODALES
 C----------------------------------------------
@@ -55,6 +55,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPART(*),IGEO(NPROPGI,*),
      .   NC1(MVSIZ), NC2(MVSIZ), MXT(MVSIZ), MXG(MVSIZ)
+      INTEGER, INTENT(IN) ::  NINTEMP
       my_real
      .   GEO(NPROPG,*), PM(NPROPM,*), MS(*), TINER(*),
      .   STIFN(*),STIFR(*),V(3,*),PARTSAV(20,*),MSP(*),INP(*),
@@ -255,8 +256,8 @@ C
      .     (V(1,I1)*V(1,I1)+V(2,I1)*V(2,I1)+V(3,I1)*V(3,I1)
      .     +V(1,I2)*V(1,I2)+V(2,I2)*V(2,I2)+V(3,I2)*V(3,I2))
       ENDDO
-      IF(JTHE > 0 ) THEN                                          
-        IF(NINTEMP > 0 ) THEN                                   
+      IF (JTHE > 0 ) THEN                                          
+        IF (NINTEMP > 0 ) THEN                                   
           DO I= LFT,LLT                                          
             IF(TEMP(NC1(I))== ZERO) TEMP(NC1(I)) = PM(79,MXT(I))   
             IF(TEMP(NC2(I))== ZERO) TEMP(NC2(I)) = PM(79,MXT(I))

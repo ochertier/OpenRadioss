@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat03            ../starter/source/materials/mat/mat003/hm_read_mat03.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
@@ -198,6 +198,9 @@ C-----------------------------------------------
       MTAG%G_TEMP  = 1
       MTAG%L_TEMP  = 1
 
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"INCREMENTAL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"LARGE_STRAIN") 
       ! Material compatibility with /EOS
       CALL INIT_MAT_KEYWORD(MATPARAM,"EOS")
 

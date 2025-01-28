@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -78,10 +78,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_mod             ../engine/share/modules/h3d_mod.F
       !||    message_mod         ../engine/share/message_module/message_mod.F
       !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    python_funct_mod    ../common_source/modules/python_mod.F90
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    table_mod           ../engine/share/modules/table_mod.F
       !||====================================================================
-      SUBROUTINE RFORC3(
+      SUBROUTINE RFORC3(PYTHON,
      1   ELBUF_STR, JFT,       JLT,       NEL,
      2   MTN,       IGEO,      GEO,       IXR,
      3   X,         TABLE,     XDP,       F,
@@ -97,10 +98,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D   MY2,       MZ1,       MZ2,       GRESAV,
      E   GRTH,      IGRTH,     MSRT,      DMELRT,
      F   ITASK,     H3D_DATA,  JSMS,      NFT,
-     G   IAD,       IGRE,      PRELD1,    STF_F)
+     G   IAD,       IGRE,      PRELD1,    STF_F,
+     H   STF,       SANIN,     IRESP,     IMPL_S,
+     I   IDYNA,     SNPC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
       USE ELBUFDEF_MOD
       USE TABLE_MOD
       USE SENSOR_MOD
@@ -127,17 +131,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(python_), INTENT(INOUT) :: PYTHON
+      INTEGER, INTENT(IN) :: STF    !< Size of TF
+      INTEGER, INTENT(IN) :: SANIN  !< Size of ANIM
+      INTEGER, INTENT(IN) :: IRESP  !< Single precision flag
+      INTEGER, INTENT(IN) :: IMPL_S !< Implicit solver flag
+      INTEGER, INTENT(IN) :: IDYNA  !< Dynamic condensation flag
+      INTEGER, INTENT(IN) :: SNPC   !< Size of NPF
       INTEGER, INTENT(INOUT) :: IAD
       INTEGER, INTENT(IN) :: IGRE
       INTEGER, INTENT(IN) :: NFT
-      INTEGER IXR(NIXR,*), NPF(*),IADR(3,*),IPARTR(*),
+      INTEGER IXR(NIXR,*), NPF(SNPC),IADR(3,*),IPARTR(*),
      .        IGEO(NPROPGI,*),JFT,JLT,NELTST ,ITYPTST,OFFSET,
      .        NEL,MTN,GRTH(*),IGRTH(*),FLG_KJ2,ITASK
       INTEGER, INTENT(IN) :: JSMS
       my_real DT2T ,
-     .   GEO(NPROPG,*),X(*),F(*),TF(*),SKEW(LSKEW,*),FSKY(*),
+     .   GEO(NPROPG,*),X(*),F(*),TF(STF),SKEW(LSKEW,*),FSKY(*),
      .   VR(*), V(3,*), AR(*), STIFN(*),STIFR(*),MS(*), IN(*),
-     .   ANIM(*),PARTSAV(*),TANI(15,*),
+     .   ANIM(SANIN),PARTSAV(*),TANI(15,*),
      .   FR_WAVE(*),BUFMAT(*),BUFGEO(*),PM(*),RBY(*),
      .   FX1(MVSIZ),FY1(MVSIZ),FZ1(MVSIZ),
      .   FX2(MVSIZ),FY2(MVSIZ),FZ2(MVSIZ),
@@ -150,7 +161,7 @@ C-----------------------------------------------
 C
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE(H3D_DATABASE) :: H3D_DATA
-      TYPE (SENSORS_) , INTENT(IN) :: SENSORS
+      TYPE (SENSORS_) , INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -240,16 +251,17 @@ C        spring may be activated by sensor and is actually inactive.
           ENDIF
         ENDDO
 C
-        CALL R1DEF3(
+        CALL R1DEF3(PYTHON,
      1   GEO,                    GBUF%FOR(II(1)),        GBUF%LENGTH(II(1)),     GBUF%EINT,
      2   GBUF%TOTDEPL(II(1)),    NPF,                    TF,                     OFF,
      3   GBUF%DEP_IN_TENS(II(1)),GBUF%FOREP(II(1)),      GBUF%DEP_IN_COMP(II(1)),ANIM,
-     4   GBUF%POSX,              FR_WAVE,                IGEO,                   GBUF%LENGTH_ERR,
+     4   GBUF%POSX,              IGEO,                   GBUF%LENGTH_ERR,
      5   X1DP,                   X2DP,                   V,                      GBUF%YIELD(II(1)),
      6   NGL,                    MGN,                    EX,                     EY,
      7   EZ,                     XK,                     XM,                     XC,
      8   AK,                     NC1,                    NC2,                    NUVAR,
-     9   GBUF%VAR,               GBUF%DEFINI,            NEL,                    NFT)
+     9   GBUF%VAR,               GBUF%DEFINI,            NEL,                    NFT,STF,
+     A   SANIN,                  IRESP,                  SNPC)
 C
         DO I=JFT,JLT
           IF (GBUF%OFF(I) /= -TEN .AND. OFF(I) < ONE) GBUF%OFF(I) = OFF(I)
@@ -266,7 +278,7 @@ C
      2   V,                 IPARTR,            GBUF%LENGTH(II(1)),GRESAV,
      3   GRTH,              IGRTH,             GBUF%OFF,          NC1,
      4   NC2,               X,                 VR,                ITASK,
-     5   NEL,               IGRE)
+     5   NEL,               IGRE,              SENSORS)
         CALL R1TORS(
      1   GBUF%FOR(II(1)),TANI,           H3D_DATA,       NEL)
 !        
@@ -317,7 +329,7 @@ C          spring may be activated by sensor and is actually inactive.
           ENDIF
         ENDDO
 C
-        CALL R26DEF3(
+        CALL R26DEF3(PYTHON,
      1   GBUF%FOR(II(1)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),    GBUF%LENGTH(II(1)),
      2   GBUF%DV,                GBUF%FOREP(II(1)),      GBUF%DEP_IN_COMP(II(1)),GBUF%POSX,
      3   GEO,                    IGEO,                   NPF,                    TF,
@@ -342,7 +354,7 @@ C
      2   V,                 IPARTR,            GBUF%LENGTH(II(1)),GRESAV,
      3   GRTH,              IGRTH,             GBUF%OFF,          NC1,
      4   NC2,               X,                 VR,                ITASK,
-     5   NEL,               IGRE)
+     5   NEL,               IGRE,              SENSORS)
         CALL R1TORS(
      1   GBUF%FOR(II(1)),TANI,           H3D_DATA,       NEL)
 !        
@@ -383,7 +395,7 @@ C        spring may be activated by sensor and is actually inactive.
           ENDIF
         ENDDO
 C
-        CALL R27DEF3(
+        CALL R27DEF3(PYTHON,
      1   GBUF%FOR(II(1)),    GBUF%EINT,          GBUF%TOTDEPL(II(1)),GBUF%LENGTH(II(1)),
      2   GBUF%POSX,          GEO,                IGEO,               NPF,
      3   TF,                 V,                  OFF,                ANIM,
@@ -407,7 +419,7 @@ C
      2   V,                 IPARTR,            GBUF%LENGTH(II(1)),GRESAV,
      3   GRTH,              IGRTH,             GBUF%OFF,          NC1,
      4   NC2,               X,                 VR,                ITASK,
-     5   NEL,               IGRE)
+     5   NEL,               IGRE,              SENSORS)
         CALL R1TORS(
      1   GBUF%FOR(II(1)),TANI,           H3D_DATA,       NEL)
 !        
@@ -453,7 +465,7 @@ C        spring may be activated by sensor and is actually inactive.
           ENDIF
         ENDDO
 C
-        CALL R2DEF3(
+        CALL R2DEF3(PYTHON,
      1   SKEW,                   GEO,                    GBUF%FOR(II(1)),        GBUF%FOR(II(2)),
      2   GBUF%FOR(II(3)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),    GBUF%TOTDEPL(II(2)),
      3   GBUF%TOTDEPL(II(3)),    NPF,                    TF,                     OFF,
@@ -465,7 +477,7 @@ C
      9   GBUF%ROT_IN_TENS(II(3)),GBUF%MOMEP(II(1)),      GBUF%MOMEP(II(2)),      GBUF%MOMEP(II(3)),
      A   GBUF%ROT_IN_COMP(II(1)),GBUF%ROT_IN_COMP(II(2)),GBUF%ROT_IN_COMP(II(3)),ANIM,
      B   GBUF%POSX,              GBUF%POSY,              GBUF%POSZ,              GBUF%POSXX,
-     C   GBUF%POSYY,             GBUF%POSZZ,             FR_WAVE,                V,
+     C   GBUF%POSYY,             GBUF%POSZZ,             V,
      D   IGEO,                   GBUF%E6,                GBUF%RUPTCRIT,          NEL,
      E   GBUF%LENGTH_ERR,        X1DP,                   X2DP,                   GBUF%YIELD(II(1)),
      F   GBUF%YIELD(II(2)),      GBUF%YIELD(II(3)),      GBUF%YIELD(II(4)),      GBUF%YIELD(II(5)),
@@ -478,7 +490,8 @@ C
      M   XCM,                    NC1,                    NC2,                    NUVAR,
      N   GBUF%VAR,               GBUF%DEFINI(II(1)),     GBUF%DEFINI(II(2)),     GBUF%DEFINI(II(3)),
      O   GBUF%DEFINI(II(4)),     GBUF%DEFINI(II(5)),     GBUF%DEFINI(II(6)),     IEQUIL,
-     P   GBUF%SKEW_ID,           NFT)
+     P   GBUF%SKEW_ID,           NFT,                    STF,                    SANIN,
+     Q   IRESP,                  SNPC)
 C
         DO I=JFT,JLT
           IF (GBUF%OFF(I) /= -TEN .AND. OFF(I) < ONE) GBUF%OFF(I) = OFF(I)
@@ -499,7 +512,7 @@ C
      2   V,        IPARTR,   BID,      GRESAV,
      3   GRTH,     IGRTH,    GBUF%OFF, NC1,
      4   NC2,      X,        VR,       ITASK,
-     5   NEL,      IGRE)
+     5   NEL,      IGRE,SENSORS)
         CALL R2TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           H3D_DATA,
@@ -552,19 +565,20 @@ C        spring may be activated by sensor and is actually inactive.
           ENDIF
         ENDDO
 C
-        CALL R3DEF3(
+        CALL R3DEF3(PYTHON,
      1   GEO,                    GBUF%FOR(II(1)),        GBUF%LENGTH(II(1)),     GBUF%EINT,
      2   GBUF%TOTDEPL(II(1)),    NPF,                    TF,                     OFF,
      3   GBUF%DEP_IN_TENS(II(1)),GBUF%FOREP(II(1)),      GBUF%DEP_IN_COMP(II(1)),GBUF%DFS,
      4   V,                      IXR,                    DF,                     ANIM,
-     5   GBUF%POSX,              FR_WAVE,                IGEO,                   GBUF%LENGTH_ERR,
+     5   GBUF%POSX,              IGEO,                   GBUF%LENGTH_ERR,
      6   X1DP,                   X2DP,                   X3DP,                   GBUF%YIELD(II(1)),
      7   TABLE,                  GBUF%INIFRIC,           NGL,                    MGN,
      8   EX,                     EY,                     EZ,                     XK,
      9   XM,                     XC,                     AK,                     EX2,
      A   EY2,                    EZ2,                    NC1,                    NC2,
      B   NC3,                    NUVAR,                  GBUF%VAR,               GBUF%DEFINI,
-     C   NEL,                    NFT)
+     C   NEL,                    NFT,                    STF,                    SANIN,
+     D   IRESP,                  SNPC)
 c
         DO I=JFT,JLT
           IF (GBUF%OFF(I) /= -TEN .AND. OFF(I) < ONE) GBUF%OFF(I) = OFF(I)
@@ -581,7 +595,7 @@ c
      2   V,                 IPARTR,            GBUF%LENGTH(II(1)),GRESAV,
      3   GRTH,              IGRTH,             NC1,               NC2,
      4   NC3,               X,                 VR,                ITASK,
-     5   NEL,               IGRE)
+     5   NEL,               IGRE,SENSORS)
         CALL R3TORS(
      1   GBUF%FOR(II(1)),DF,             TANI,           H3D_DATA,
      2   NEL)
@@ -635,7 +649,7 @@ C
      9   RY2,          RZ2,          VX1,          VX2,
      A   VY1,          VY2,          VZ1,          VZ2,
      B   NC1,          NC2,          NEL)
-        CALL R4DEF3(
+        CALL R4DEF3(PYTHON,
      1   SKEW,                   GEO,                    GBUF%FOR(II(1)),        GBUF%FOR(II(2)),
      2   GBUF%FOR(II(3)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),    GBUF%TOTDEPL(II(2)),
      3   GBUF%TOTDEPL(II(3)),    NPF,                    TF,                     OFF,
@@ -664,7 +678,8 @@ C
      Q   GBUF%VAR,               GBUF%DEFINI(II(1)),     GBUF%DEFINI(II(2)),     GBUF%DEFINI(II(3)),
      R   GBUF%DEFINI(II(4)),     GBUF%DEFINI(II(5)),     GBUF%DEFINI(II(6)),     GBUF%FORINI(II(1)),
      S   GBUF%FORINI(II(2)),     GBUF%FORINI(II(3)),     GBUF%FORINI(II(4)),     GBUF%FORINI(II(5)),
-     T   GBUF%FORINI(II(6)),     NFT)
+     T   GBUF%FORINI(II(6)),     NFT,                    STF,                    SANIN,
+     U   IRESP,                  SNPC)
 C
         DO I=JFT,JLT
           IF (GBUF%OFF(I) /= -TEN .AND. OFF(I) < ONE) GBUF%OFF(I) = OFF(I)
@@ -681,7 +696,7 @@ C
      2   V,                 IPARTR,            GBUF%LENGTH(II(1)),GRESAV,
      3   GRTH,              IGRTH,             GBUF%OFF,          NC1,
      4   NC2,               X,                 VR,                ITASK,
-     5   NEL,               IGRE)
+     5   NEL,               IGRE,SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,
@@ -756,7 +771,7 @@ C
      9   RY2,          RZ2,          VX1,          VX2,
      A   VY1,          VY2,          VZ1,          VZ2,
      B   NC1,          NC2,          NEL)
-        CALL R6DEF3(
+        CALL R6DEF3(PYTHON,
      1   SKEW,                   GEO,                    GBUF%FOR(II(1)),        GBUF%FOR(II(2)),
      2   GBUF%FOR(II(3)),        GBUF%EINT,              GBUF%TOTDEPL(II(1)),    GBUF%TOTDEPL(II(2)),
      3   GBUF%TOTDEPL(II(3)),    NPF,                    TF,                     GBUF%OFF,
@@ -768,7 +783,7 @@ C
      9   GBUF%ROT_IN_TENS(II(3)),GBUF%MOMEP(II(1)),      GBUF%MOMEP(II(2)),      GBUF%MOMEP(II(3)),
      A   GBUF%ROT_IN_COMP(II(1)),GBUF%ROT_IN_COMP(II(2)),GBUF%ROT_IN_COMP(II(3)),ANIM,
      B   GBUF%POSX,              GBUF%POSY,              GBUF%POSZ,              GBUF%POSXX,
-     C   GBUF%POSYY,             GBUF%POSZZ,             FR_WAVE,                GBUF%E6,
+     C   GBUF%POSYY,             GBUF%POSZZ,             GBUF%E6,
      D   NEL,                    AL2DP,                  EXX2,                   EYX2,
      E   EZX2,                   EXY2,                   EYY2,                   EZY2,
      F   EXZ2,                   EYZ2,                   EZZ2,                   IGEO,
@@ -782,7 +797,9 @@ C
      N   GBUF%VAR,               GBUF%DEFINI(II(1)),     GBUF%DEFINI(II(2)),     GBUF%DEFINI(II(3)),
      O   GBUF%DEFINI(II(4)),     GBUF%DEFINI(II(5)),     GBUF%DEFINI(II(6)),     GBUF%FORINI(II(1)),
      P   GBUF%FORINI(II(2)),     GBUF%FORINI(II(3)),     GBUF%FORINI(II(4)),     GBUF%FORINI(II(5)),
-     Q   GBUF%FORINI(II(6)),     GBUF%RUPTCRIT,          NFT)
+     Q   GBUF%FORINI(II(6)),     GBUF%RUPTCRIT,          NFT,                    STF,
+     R   SANIN,                  IRESP,                  IMPL_S,                 IDYNA,
+     S   SNPC)
 C
         DO I=JFT,JLT
           IF (GBUF%OFF(I) /= -TEN .AND. OFF(I) < ONE) GBUF%OFF(I) = OFF(I)
@@ -800,7 +817,7 @@ C
      2   V,                 IPARTR,            GBUF%LENGTH(II(1)),GRESAV,
      3   GRTH,              IGRTH,             GBUF%OFF,          NC1,
      4   NC2,               X,                 VR,                ITASK,
-     5   NEL,               IGRE)
+     5   NEL,               IGRE,              SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,
@@ -849,9 +866,10 @@ C=======================================================================
      7   RZ2,      VX1,      VX2,      VY1,
      8   VY2,      VZ1,      VZ2,      NC1,
      9   NC2,      NEL)
+
         CALL R5DEF3(
      1   AL,                    GBUF%V_REPCVT(II(1):), GBUF%V_REPCVT(II(2):), GBUF%V_REPCVT(II(3):),
-     2   GBUF%VR_REPCVT(II(1):),GBUF%VR_REPCVT(II(2):),GBUF%VR_REPCVT(II(3):),FR_WAVE,
+     2   GBUF%VR_REPCVT(II(1):),GBUF%VR_REPCVT(II(2):),GBUF%VR_REPCVT(II(3):), FR_WAVE,
      3   FR_W_E,                GBUF%EINT,             GBUF%FOR(II(1):),      GBUF%MOM(II(1):),
      4   GBUF%MOM(II(2):),      GBUF%MOM(II(3):),      GBUF%FOR(II(2):),      GBUF%FOR(II(3):),
      5   PARTSAV,               IPARTR,                EXX,                   EYX,
@@ -997,7 +1015,7 @@ C
      2   V,        IPARTR,   UINER,    X,
      3   VR,       GRESAV,   GRTH,     IGRTH,
      4   NC1,      NC2,      ITASK,    IAD,
-     5   IGRE,     NFT,      NEL)
+     5   IGRE,     NFT,      NEL,SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,
@@ -1097,7 +1115,7 @@ C
      2   V,        IPARTR,   UINER,    X,
      3   VR,       GRESAV,   GRTH,     IGRTH,
      4   NC1,      NC2,      ITASK,    IAD,
-     5   IGRE,     NFT,      NEL)
+     5   IGRE,     NFT,      NEL,      SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,
@@ -1230,7 +1248,7 @@ C
      2   V,        IPARTR,   UINER,    X,
      3   VR,       GRESAV,   GRTH,     IGRTH,
      4   NC1,      NC2,      ITASK,    IAD,
-     5   IGRE,     NFT,      NEL)
+     5   IGRE,     NFT,      NEL,      SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,
@@ -1328,7 +1346,7 @@ C
      2   V,        IPARTR,   UINER,    X,
      3   VR,       GRESAV,   GRTH,     IGRTH,
      4   NC1,      NC2,      ITASK,    IAD,
-     5   IGRE,     NFT,      NEL)
+     5   IGRE,     NFT,      NEL,SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,
@@ -1426,7 +1444,7 @@ C
      2   V,        IPARTR,   UINER,    X,
      3   VR,       GRESAV,   GRTH,     IGRTH,
      4   NC1,      NC2,      ITASK,    IAD,
-     5   IGRE,     NFT,      NEL)
+     5   IGRE,     NFT,      NEL,SENSORS)
         CALL R4TORS(
      1   GBUF%FOR(II(1)),GBUF%FOR(II(2)),GBUF%FOR(II(3)),GBUF%MOM(II(1)),
      2   GBUF%MOM(II(2)),GBUF%MOM(II(3)),TANI,           AL,

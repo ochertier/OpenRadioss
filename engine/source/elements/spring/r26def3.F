@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    r26def3   ../engine/source/elements/spring/r26def3.F
+      !||    r26def3            ../engine/source/elements/spring/r26def3.F
       !||--- called by ------------------------------------------------------
-      !||    rforc3    ../engine/source/elements/spring/rforc3.F
+      !||    rforc3             ../engine/source/elements/spring/rforc3.F
       !||--- calls      -----------------------------------------------------
-      !||    r26sig    ../engine/source/elements/spring/r26sig.F
+      !||    r26sig             ../engine/source/elements/spring/r26sig.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod   ../common_source/modules/python_mod.F90
       !||====================================================================
-      SUBROUTINE R26DEF3(
+      SUBROUTINE R26DEF3(python,
      1   F,       E,       DL,      AL0,
      2   DV0,     FEP,     DPL2,    IPOS,
      3   GEO,     IGEO,    NPF,     TF,
@@ -36,6 +38,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6   MGN,     EX,      EY,      EZ,
      7   XK,      XM,      XC,      AK,
      8   NEL,     NFT,     IAD,     CRIT)
+        use python_funct_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,6 +59,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(python_), intent(inout) :: python
       INTEGER, INTENT(IN) :: NFT
       INTEGER, INTENT(INOUT) :: IAD
       INTEGER, INTENT(IN) :: NEL
@@ -141,7 +145,7 @@ C
       ENDDO
 C
 C-----
-      CALL R26SIG(
+      CALL R26SIG(PYTHON,
      1   F,          XK,         DL,         DLOLD,
      2   E,          OFF,        XL0,        TF,
      3   NPF,        ANIM,       ANIM_FE(11),FR_WAVE,

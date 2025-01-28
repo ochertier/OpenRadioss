@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -102,7 +102,7 @@ C-----------------------------------------------
 C     REAL
       INTEGER IHBE,ISMSTR,IPLAST,ICPRE,ICSTR,IINT,JCVT,
      .   NPG,NPT,NPTR,NPTS,NPTT, ISTRAIN,IET,IHBE_OLD,ID,
-     .   IREP,IPOS,IHBE_DS,ISST_DS
+     .   IREP,IPOS,IHBE_DS,ISST_DS,ICONTROL_D,ICONTROL
       my_real
      .    CVIS,QA,QB,QH,VNS1,VNS2,DTMIN,ASHEAR
       INTEGER NUML(200), NLY, NLYMAX, N, J, M1, M2, M3,ICOMPA,
@@ -131,6 +131,7 @@ C----
 !--- defaults values      
       IHBE_DS=  DEFAULTS_SOLID%ISOLID
       ISST_DS=  DEFAULTS_SOLID%ISMSTR
+      ICONTROL_D=DEFAULTS_SOLID%ICONTROL
 C--------------------------------------------------
 C EXTRACT DATA (IS OPTION CRYPTED)
 C--------------------------------------------------
@@ -151,6 +152,7 @@ c      CALL HM_GET_INTV('Istrain',ISTRAIN,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('SKEW_CSID',IDSK,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('ORTHTROP',IREP,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Ipos',IPOS,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('Icontrol',ICONTROL,IS_AVAILABLE,LSUBMODEL)
 C--------------------------------------------------
 C EXTRACT DATAS (REAL VALUES)
 C--------------------------------------------------
@@ -222,6 +224,7 @@ C
 C  npt
 C
       NLY = 0
+      IP = 0
       SELECT CASE (IHBE)
       CASE(15)                                             
 c        NPT = NPTT
@@ -288,6 +291,9 @@ c        NPT = NPTT
      .               C1=TITR)
                NLY =NLYMAX
       ENDIF
+!     
+      IF (ICONTROL==0) ICONTROL=ICONTROL_D
+      IF (ICONTROL>1) ICONTROL=0
 C                                 
 C  viscosity
 C
@@ -363,6 +369,7 @@ C---------------------
       IGEO(16) = JCVT-1
       IGEO(30) = NLY
       IGEO(12) = ISTRAIN
+      IGEO(97) = ICONTROL
 C
       GEO(1)   = ZERO
       GEO(7)   = VX
@@ -453,19 +460,19 @@ C----------------------
            
            WRITE(IOUT,2100)IG,IHBE,ISMSTR,NPT,ICSTR,
      .                  CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,
-     .                  VX,VY,VZ
+     .                  VX,VY,VZ,ICONTROL
          ELSE
            WRITE(IOUT,2000)IG,IHBE,ISMSTR,NPT,ICSTR,
      .                  CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,
-     .                  VX,VY,VZ
+     .                  VX,VY,VZ,ICONTROL
          ENDIF
        ELSE
          IF(IGEO(31) == 1)THEN
            WRITE(IOUT,2101)IG,IHBE,ISMSTR,NPT,ICSTR,
-     .                CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,ISKN(4,ISK)
+     .                CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,ISKN(4,ISK),ICONTROL
          ELSE
            WRITE(IOUT,2001)IG,IHBE,ISMSTR,NPT,ICSTR,
-     .                CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,ISKN(4,ISK)
+     .                CVIS,QA,QB,DTMIN,NLY,IPOS,ASHEAR,IREP,ISKN(4,ISK),ICONTROL
          ENDIF
        ENDIF
        IF((VDEFMIN+VDEFMAX+ASPMAX+ASPTET)>ZERO) THEN
@@ -529,7 +536,8 @@ C---
      & 5X,'LOCAL ORTHOTROPY SYSTEM FORMULATION . .=',I10/,
      & 5X,'X COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
      & 5X,'Y COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
-     & 5X,'Z COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/)
+     & 5X,'Z COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  2001 FORMAT(//,
      & 5X,'COMPOSITE LAYERED THICK SHELL PROPERTY SET'/,
      & 5X,'WITH HETEROGENIOUS PROPERTY IN THICKNESS'/,
@@ -546,7 +554,8 @@ C---
      & 5X,'POSITION INPUT FLAG . . . . . . . . . .=',I10/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
      & 5X,'LOCAL ORTHOTROPY SYSTEM FORMULATION . .=',I10/,
-     & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/)
+     & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  2100 FORMAT(//,
      & 5X,'COMPOSITE LAYERED THICK SHELL PROPERTY SET'/,
      & 5X,'WITH HETEROGENIOUS PROPERTY IN THICKNESS'/,
@@ -569,7 +578,8 @@ C---
      & 5X,'LOCAL ORTHOTROPY SYSTEM FORMULATION . .=',I10/,
      & 5X,'X COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
      & 5X,'Y COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
-     & 5X,'Z COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/)
+     & 5X,'Z COMPONENT OF DIR 1 OF ORTHOTROPY. . .=',1PG20.13/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  2101 FORMAT(//,
      & 5X,'COMPOSITE LAYERED THICK SHELL PROPERTY SET'/,
      & 5X,'WITH HETEROGENIOUS PROPERTY IN THICKNESS'/,
@@ -590,7 +600,8 @@ C---
      & 5X,'POSITION INPUT FLAG . . . . . . . . . .=',I10/,
      & 5X,'SHEAR AREA REDUCTION FACTOR . . . . . .=',1PG20.13/,
      & 5X,'LOCAL ORTHOTROPY SYSTEM FORMULATION . .=',I10/,
-     & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/)
+     & 5X,'SKEW OF THE FIRST ORTHOTROPY DIRECTION.=',I10/,
+     & 5X,'SOLID DISTORTION CONTROL FLAG . . . . .=',I10/)
  3000 FORMAT(
      & 5X,'LAYER :',I3/,
      & 5X,'      ANGLE (DIR 1,PROJ(DIR 1 /TSHELL) .=',1PG20.13/,

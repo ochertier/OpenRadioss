@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -79,7 +79,7 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NSPMD) :: PROC_ARRAY
         LOGICAL, DIMENSION(:), ALLOCATABLE :: BOOL
         INTEGER, DIMENSION(:), ALLOCATABLE :: TEMP_ARRAY
-        TYPE(array_type), DIMENSION(:), ALLOCATABLE :: LOCAL_ARRAY
+        TYPE(array_type_int_1d), DIMENSION(:), ALLOCATABLE :: LOCAL_ARRAY
         INTEGER :: NB_LOCAL_ARRAY
         INTEGER, DIMENSION(:), ALLOCATABLE :: INDEX_LOCAL_ARRAY
 C-----------------------------------------------
@@ -144,7 +144,7 @@ C-----------------------------------------------
                 NEXT_OPERATION = .true.
                 ! -----------------------
                 ! find the processors where the nodes are defined
-                ! if the nodes are on 2 or more processors, neet to choose the main processor
+                ! if the nodes are on 2 or more processors, need to choose the main processor
                 ! (main processor is the processor that will compute the surface in the engine)
                 DO K=2,NUMBER_NODE
                     NODE_ID = LOADS%LOAD_CYL(I)%SEGNOD(J,K)

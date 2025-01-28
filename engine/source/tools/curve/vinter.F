@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    no_asso_lplas76c           ../engine/source/materials/mat/mat076/no_asso_lplas76c.F
       !||    no_asso_plas76             ../engine/source/materials/mat/mat076/no_asso_plas76.F
       !||    no_asso_qplas76c           ../engine/source/materials/mat/mat076/no_asso_qplas76c.F
-      !||    sigeps100                  ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps100                  ../engine/source/materials/mat/mat100/sigeps100.F90
+      !||    sigeps127                  ../engine/source/materials/mat/mat127/sigeps127.F90
+      !||    sigeps127c                 ../engine/source/materials/mat/mat127/sigeps127c.F90
       !||    sigeps187                  ../engine/source/materials/mat/mat187/sigeps187.F
       !||    sigeps36                   ../engine/source/materials/mat/mat036/sigeps36.F
       !||    sigeps36c                  ../engine/source/materials/mat/mat036/sigeps36c.F
@@ -52,7 +54,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sigeps56                   ../engine/source/materials/mat/mat056/sigeps56.F
       !||    sigeps56c                  ../engine/source/materials/mat/mat056/sigeps56c.F
       !||    sigeps56g                  ../engine/source/materials/mat/mat056/sigeps56g.F
-      !||    sigeps57c                  ../engine/source/materials/mat/mat057/sigeps57c.F
       !||    sigeps60                   ../engine/source/materials/mat/mat060/sigeps60.F
       !||    sigeps60c                  ../engine/source/materials/mat/mat060/sigeps60c.F
       !||    sigeps60g                  ../engine/source/materials/mat/mat060/sigeps60g.F
@@ -118,9 +119,7 @@ C
       !||    mat121_nice         ../engine/source/materials/mat/mat121/mat121_nice.F
       !||    mat121c_newton      ../engine/source/materials/mat/mat121/mat121c_newton.F
       !||    mat121c_nice        ../engine/source/materials/mat/mat121/mat121c_nice.F
-      !||    redef3              ../engine/source/elements/spring/redef3.F
       !||    redef3_law113       ../engine/source/elements/spring/redef3_law113.F
-      !||    redef_seatbelt      ../engine/source/tools/seatbelts/redef_seatbelt.F
       !||    rkenonl             ../engine/source/elements/spring/r4mat3.F
       !||    sigeps121           ../engine/source/materials/mat/mat121/sigeps121.F
       !||    sigeps121c          ../engine/source/materials/mat/mat121/sigeps121c.F
@@ -132,6 +131,7 @@ C
       !||    sigeps60            ../engine/source/materials/mat/mat060/sigeps60.F
       !||    sigeps68            ../engine/source/materials/mat/mat068/sigeps68.F
       !||    sigeps70            ../engine/source/materials/mat/mat070/sigeps70.F
+      !||    sigeps81            ../engine/source/materials/mat/mat081/sigeps81.F90
       !||    sigeps90            ../engine/source/materials/mat/mat090/sigeps90.F
       !||    sigeps96            ../engine/source/materials/mat/mat096/sigeps96.F
       !||    sigeps96c           ../engine/source/materials/mat/mat096/sigeps96c.F
@@ -201,7 +201,6 @@ C
       !||    vinter2dp       ../engine/source/tools/curve/vinter.F
       !||--- called by ------------------------------------------------------
       !||    m36iter_imp     ../engine/source/materials/mat/mat036/m36iter_imp.F
-      !||    redef3          ../engine/source/elements/spring/redef3.F
       !||    redef3_law113   ../engine/source/elements/spring/redef3_law113.F
       !||    rkenonl         ../engine/source/elements/spring/r4mat3.F
       !||    sigeps28        ../engine/source/materials/mat/mat028/sigeps28.F
@@ -262,6 +261,7 @@ ccc        Y(I)   = TF(2,J1) + DYDX(I)*(X(I)-TF(1,J1))
 C
       RETURN
       END
+
       !||====================================================================
       !||    finter2       ../engine/source/tools/curve/vinter.F
       !||--- called by ------------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,10 +25,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    ddsplit                ../starter/source/restart/ddsplit/ddsplit.F
       !||--- calls      -----------------------------------------------------
+      !||    write_eosparam         ../starter/source/materials/mat/write_eosparam.F90
       !||    write_failparam        ../starter/source/materials/fail/write_failparam.F
       !||    write_mat_table        ../starter/source/materials/tools/write_mat_table.F
+      !||    write_thermparam       ../starter/source/materials/mat/write_thermparam.F90
       !||    write_viscparam        ../starter/source/materials/mat/write_viscparam.F
       !||--- uses       -----------------------------------------------------
+      !||    write_therpmaram_mod   ../starter/source/materials/mat/write_thermparam.F90
       !||====================================================================
       SUBROUTINE WRITE_MATPARAM(MAT_ELEM,LEN)
 C-----------------------------------------------
@@ -36,6 +39,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE NAMES_AND_TITLES_MOD
+      use write_therpmaram_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,19 +52,20 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER :: I,NUMMAT,IMAT,NUPARAM,NIPARAM,NUMTABL,NFAIL,IAD,NFIX,NFIXR,LENI,LENR,NMOD,MOD
+      INTEGER :: I,NUMMAT,IMAT,NUPARAM,NIPARAM,NUMTABL,NFAIL,ITHERM
+      INTEGER :: IAD,NFIX,NFIXR,LENI,LENR,NMOD,MOD
       INTEGER ,DIMENSION(NCHARTITLE)     :: NAME
       INTEGER ,DIMENSION(:) ,ALLOCATABLE :: IBUF
       INTEGER :: NBSUBMAT, ISUB
       my_real ,DIMENSION(:) ,ALLOCATABLE :: RBUF
 C=======================================================================
-      NFIX = 20
+      NFIX = 24
       NUMMAT = MAT_ELEM%NUMMAT
+      LEN    = 0
       LENI   = NFIX*NUMMAT
       ALLOCATE (IBUF(LENI) )
-c      
-c     write integer parameters and flags
-c
+
+      ! write integer parameters and flags
       IAD = 0
       DO IMAT = 1,NUMMAT
         IBUF(IAD+ 1) = MAT_ELEM%MAT_PARAM(IMAT)%ILAW 
@@ -73,29 +78,29 @@ c
         IBUF(IAD+ 8) = MAT_ELEM%MAT_PARAM(IMAT)%NFAIL
         IBUF(IAD+ 9) = MAT_ELEM%MAT_PARAM(IMAT)%IVISC
         IBUF(IAD+10) = MAT_ELEM%MAT_PARAM(IMAT)%IEOS
-        IBUF(IAD+11) = MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG
-c
-        IBUF(IAD+12) = MAT_ELEM%MAT_PARAM(IMAT)%COMPRESSIBILITY
-        IBUF(IAD+13) = MAT_ELEM%MAT_PARAM(IMAT)%SMSTR
-        IBUF(IAD+14) = MAT_ELEM%MAT_PARAM(IMAT)%STRAIN_FORMULATION
-        IBUF(IAD+15) = MAT_ELEM%MAT_PARAM(IMAT)%IPRES
-        IBUF(IAD+16) = MAT_ELEM%MAT_PARAM(IMAT)%ORTHOTROPY
-c
-        IBUF(IAD+17) = MAT_ELEM%MAT_PARAM(IMAT)%NLOC
-        IBUF(IAD+18) = MAT_ELEM%MAT_PARAM(IMAT)%IFAILWAVE
-        IBUF(IAD+19) = MAT_ELEM%MAT_PARAM(IMAT)%IXFEM
-c
-        IBUF(IAD+20) = MAT_ELEM%MAT_PARAM(IMAT)%NMOD
-c
+        IBUF(IAD+11) = MAT_ELEM%MAT_PARAM(IMAT)%ITHERM
+        IBUF(IAD+12) = MAT_ELEM%MAT_PARAM(IMAT)%IEXPAN
+        IBUF(IAD+13) = MAT_ELEM%MAT_PARAM(IMAT)%IALE
+        IBUF(IAD+14) = MAT_ELEM%MAT_PARAM(IMAT)%ITURB
+        IBUF(IAD+15) = MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG
+        IBUF(IAD+16) = MAT_ELEM%MAT_PARAM(IMAT)%COMPRESSIBILITY
+        IBUF(IAD+17) = MAT_ELEM%MAT_PARAM(IMAT)%SMSTR
+        IBUF(IAD+18) = MAT_ELEM%MAT_PARAM(IMAT)%STRAIN_FORMULATION
+        IBUF(IAD+19) = MAT_ELEM%MAT_PARAM(IMAT)%IPRES
+        IBUF(IAD+20) = MAT_ELEM%MAT_PARAM(IMAT)%ORTHOTROPY
+        IBUF(IAD+21) = MAT_ELEM%MAT_PARAM(IMAT)%NLOC
+        IBUF(IAD+22) = MAT_ELEM%MAT_PARAM(IMAT)%IFAILWAVE
+        IBUF(IAD+23) = MAT_ELEM%MAT_PARAM(IMAT)%IXFEM
+        IBUF(IAD+24) = MAT_ELEM%MAT_PARAM(IMAT)%NMOD
+
         IAD = IAD + NFIX
       END DO
-c
+
       CALL WRITE_I_C(IBUF,LENI)
       LEN = LEN + LENI
       DEALLOCATE(IBUF)
-c      
-c     write real parameters
-c
+
+      ! write real parameters
       NFIXR = 9
       LENR  = NFIXR*NUMMAT
       IAD   = 0
@@ -115,9 +120,8 @@ c
       CALL WRITE_DB(RBUF ,LENR)
       LEN = LEN + LENR
       DEALLOCATE(RBUF)
-c      
-c     write material title
-c
+
+      ! write material title
       DO IMAT = 1,NUMMAT      
         IF(IMAT < NUMMAT) THEN
           DO I=1,NCHARTITLE
@@ -128,9 +132,8 @@ c
         ENDIF
         CALL WRITE_C_C(NAME,NCHARTITLE)
       END DO
-c           
-c     write material parameter array
-c
+
+      ! write material parameter array
       DO IMAT = 1,NUMMAT      
         NUPARAM = MAT_ELEM%MAT_PARAM(IMAT)%NUPARAM
         NIPARAM = MAT_ELEM%MAT_PARAM(IMAT)%NIPARAM
@@ -142,22 +145,29 @@ c
         END IF      
         LEN = LEN + NUPARAM + NIPARAM
       END DO
-c
-c     write function tables 4D
-c      
+
+      ! write function tables 4D
       DO IMAT = 1,NUMMAT
         NUMTABL = MAT_ELEM%MAT_PARAM(IMAT)%NTABLE
         IF (NUMTABL > 0) THEN
-          CALL WRITE_MAT_TABLE(MAT_ELEM%MAT_PARAM(IMAT)%TABLE, NUMTABL, LENI, LENR)
+          CALL WRITE_MAT_TABLE(MAT_ELEM%MAT_PARAM(IMAT)%TABLE, NUMTABL)
           LEN = LEN + LENI + LENR
         END IF
-      END DO      
-c           
-c     write viscosity model parameters
-c
+      END DO
+
+      ! write viscosity model parameters
       DO IMAT = 1,NUMMAT
         IF (MAT_ELEM%MAT_PARAM(IMAT)%IVISC > 0) THEN
           CALL WRITE_VISCPARAM(MAT_ELEM%MAT_PARAM(IMAT)%VISC,LEN)
+        END IF
+      END DO      
+c           
+c     write thermal parameters
+c
+      DO IMAT = 1,NUMMAT
+        itherm = mat_elem%mat_param(imat)%itherm
+        if (itherm > 0) then
+          CALL WRITE_THERMPARAM(MAT_ELEM%MAT_PARAM(IMAT)%THERM,LEN)
         END IF
       END DO      
 c      
@@ -171,9 +181,8 @@ c
           END DO      
         END IF
       END DO   
-c      
-c     write damage modes
-c     
+
+      ! write damage modes
       DO IMAT = 1,NUMMAT
         NMOD = MAT_ELEM%MAT_PARAM(IMAT)%NMOD
         IF (NMOD > 0) THEN
@@ -186,7 +195,7 @@ c
         ENDIF
       ENDDO
 
-      !Write multimaterial buffer
+      ! Write multimaterial buffer
       ALLOCATE (IBUF(21) ) !< mex is 21 submaterials
       ALLOCATE (RBUF(21) )
       DO IMAT = 1,NUMMAT
@@ -203,6 +212,13 @@ c
       DEALLOCATE(IBUF)
       DEALLOCATE(RBUF)
 
-c-----------
+      ! write eos model parameters
+      DO IMAT = 1,NUMMAT
+        IF (MAT_ELEM%MAT_PARAM(IMAT)%IEOS > 0) THEN
+          CALL WRITE_EOSPARAM(MAT_ELEM%MAT_PARAM(IMAT)%EOS)
+        END IF
+      END DO
+
+!-----------
       RETURN
       END

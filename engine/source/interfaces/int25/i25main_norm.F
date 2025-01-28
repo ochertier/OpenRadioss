@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    my_barrier      ../engine/source/system/machine.F
       !||--- uses       -----------------------------------------------------
       !||    mpi_commod      ../engine/share/modules/mpi_comm_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE I25MAIN_NORM(
      1                   INTLIST25,IPARI   ,INTBUF_TAB ,JTASK    ,X       ,
@@ -90,8 +90,9 @@ C
       IF(JTASK==1) THEN
         DO I=1,NINTER25
             N = INTLIST25(I)
-                  ALLOCATE(INTBUF_TAB(N)%TAGNOD(NUMNOD), INTBUF_TAB(N)%WNOD_NORMAL(3,4,NRTMX25))
-                  ALLOCATE(INTBUF_TAB(N)%TAGE(NRTMX25))
+            NRTM   = IPARI(4,N)
+            ALLOCATE(INTBUF_TAB(N)%TAGNOD(NUMNOD), INTBUF_TAB(N)%WNOD_NORMAL(3,4,NRTM))
+            ALLOCATE(INTBUF_TAB(N)%TAGE(NRTM))
         ENDDO
       END IF
 C
@@ -289,7 +290,7 @@ C       NEDGE  = IPARI(68,N) ! Updated in i25normp
       END DO
 C
 
-c         CALL STOPTIME(MACRO_TIMER_T25NORM,1)
+c         CALL STOPTIME(TIMERS,MACRO_TIMER_T25NORM)
       NCSHIFT = 1
       DO NI25=1,NINTER25
 C
@@ -320,7 +321,7 @@ C       NEDGE  = IPARI(68,N) ! Updated in i25normp
         ENDIF
 
       END DO
-c          CALL STARTIME(MACRO_TIMER_T25NORM,1)  
+c          CALL STARTIME(TIMERS,MACRO_TIMER_T25NORM)  
 C
       CALL MY_BARRIER()
 

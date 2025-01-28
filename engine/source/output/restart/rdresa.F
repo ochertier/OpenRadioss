@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,21 +31,23 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    rdcomi                 ../engine/source/output/restart/rdcomm.F
       !||    read_i_c               ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    loads_mod              ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
       !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    rbe3_mod               ../common_source/modules/constraints/rbe3_mod.F90
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    skew_mod               ../common_source/modules/skew_mod.F90
       !||    state_mod              ../common_source/modules/state_mod.F
       !||====================================================================
       SUBROUTINE RDRESA(ITSTV1 , LHEADER, LVARINT, LVARREA, PRADIOS,
      .                  PRESFIL,MULTI_FVM,H3D_DATA,
      .                  PINCH_DATA,DYNAIN_DATA,INTERFACES,SENSORS,LOADS,
-     .                  MAT_ELEM, NAMES_AND_TITLES,SKEWS  )
+     .                  MAT_ELEM, NAMES_AND_TITLES,SKEWS ,GLOB_THERM,PBLAST,
+     .                  RBE3)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -59,8 +61,11 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE LOADS_MOD
       USE MAT_ELEM_MOD
-      USE NAMES_AND_TITLES_MOD                                  !< NAMES_AND_TITLES host the input deck names and titles for outputs
-      USE SKEW_MOD                                              !< Skew type
+      USE NAMES_AND_TITLES_MOD         !< NAMES_AND_TITLES host the input deck names and titles for outputs
+      USE SKEW_MOD                     !< Skew type
+      use glob_therm_mod               !< Global parameters and flags for thermal analysis
+      use PBLAST_MOD                   !< PBLAST parameters
+      use RBE3_MOD                     !< RBE3 type
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -90,6 +95,9 @@ C-----------------------------------------------
       TYPE (MAT_ELEM_)      ,INTENT(INOUT)   :: MAT_ELEM
       TYPE (NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES
       TYPE (SKEW_)          ,INTENT(INOUT)   :: SKEWS
+      type (glob_therm_)    ,intent(inout)   :: glob_therm
+      TYPE (PBLAST_)        ,INTENT(INOUT)   :: PBLAST
+      TYPE (RBE3_)          ,INTENT(INOUT)   :: RBE3
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -168,7 +176,8 @@ C     Read integer variables
 C----------------------------
       CALL READ_I_C(TABVINT,LVARINT)
       CALL RDCOMI(TABVINT,MULTI_FVM,H3D_DATA,DYNAIN_DATA,
-     .            INTERFACES%PARAMETERS,SENSORS,LOADS  ,MAT_ELEM,SKEWS)
+     .            INTERFACES%PARAMETERS,SENSORS,LOADS  ,MAT_ELEM,SKEWS,
+     .            GLOB_THERM,PBLAST,RBE3 )
 
 C
       IF(ANIM_PLY > 0 .AND.IPLYXFEM == 0) THEN
@@ -185,19 +194,20 @@ C
       END
 
       !||====================================================================
-      !||    iniresa         ../engine/source/output/restart/rdresa.F
+      !||    iniresa          ../engine/source/output/restart/rdresa.F
       !||--- called by ------------------------------------------------------
-      !||    radioss2        ../engine/source/engine/radioss2.F
+      !||    radioss2         ../engine/source/engine/radioss2.F
       !||--- calls      -----------------------------------------------------
-      !||    nvar            ../engine/source/input/nvar.F
+      !||    nvar             ../engine/source/input/nvar.F
       !||--- uses       -----------------------------------------------------
-      !||    ale_mod         ../common_source/modules/ale/ale_mod.F
-      !||    aleanim_mod     ../engine/share/modules/aleanim_mod.F
-      !||    h3d_mod         ../engine/share/modules/h3d_mod.F
-      !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    pinchtype_mod   ../common_source/modules/pinchtype_mod.F
+      !||    ale_mod          ../common_source/modules/ale/ale_mod.F
+      !||    aleanim_mod      ../engine/share/modules/aleanim_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    h3d_mod          ../engine/share/modules/h3d_mod.F
+      !||    message_mod      ../engine/share/message_module/message_mod.F
+      !||    pinchtype_mod    ../common_source/modules/pinchtype_mod.F
       !||====================================================================
-      SUBROUTINE INIRESA(H3D_DATA,PINCH_DATA)
+      SUBROUTINE INIRESA(H3D_DATA,PINCH_DATA,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -206,6 +216,7 @@ C-----------------------------------------------
       USE PINCHTYPE_MOD
       USE ALE_MOD
       USE ALEANIM_MOD
+      USE glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -239,12 +250,12 @@ C-----------------------------------------------
 #include      "tabsiz_c.inc"
 #include      "scr17_c.inc"
 #include      "sms_c.inc"
-#include      "thermal_c.inc" 
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(PINCH) :: PINCH_DATA
+      type (glob_therm_)    ,intent(inout)   :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -279,7 +290,7 @@ C adding surfaces for MV as elems for parith/on SPMD
 C pressure loads 
           NISKY0 = NISKY0 + 4*NCONLD
 C thermal fluxes
-          NISKY0 = NISKY0 + 4*NUMCONV + 4*NUMRADIA + 4*NFXFLUX
+          NISKY0 = NISKY0 + 4*GLOB_THERM%NUMCONV + 4*GLOB_THERM%NUMRADIA + 4*GLOB_THERM%NFXFLUX
           NISKY0 = NISKY0 + SLLOADP
       END IF
 C
@@ -359,7 +370,7 @@ C pxfem
 C xfem for layered shell (cracks)
         LSKYCRKXFEM = LCNECRKXFEM
 C FSKY MASSE
-        IF(IALE+IEULER+ITHERM+IALELAG/=0) THEN
+        IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG/=0) THEN
            SFSKYM = LCNE0
         ELSE
            SFSKYM = 0
@@ -476,9 +487,9 @@ C
        END IF
 C
       IF(ALE%GLOBAL%INCOMP==0)THEN
-        SVAL2=MAX(IALE,ITHERM,IEULER,IALELAG)*(NUMELS+NUMELQ+NUMELTG+NSVOIS+NQVOIS+NTGVOIS)*MAX(1,NMULT)
+        SVAL2=MAX(IALE,GLOB_THERM%ITHERM,IEULER,IALELAG)*(NUMELS+NUMELQ+NUMELTG+NSVOIS+NQVOIS+NTGVOIS)*MAX(1,NMULT)
         ! working array phi & segsurf
-        SPHI = MAX(IALE,ITHERM,IEULER,IALELAG)*( NUMELS + NUMELQ + NUMELTG + NSVOIS + NQVOIS + NTGVOIS + NSEGFLU )
+        SPHI = MAX(IALE,GLOB_THERM%ITHERM,IEULER,IALELAG)*( NUMELS + NUMELQ + NUMELTG + NSVOIS + NQVOIS + NTGVOIS + NSEGFLU )
       ELSE
         SVAL2 = 0
         SPHI = 0

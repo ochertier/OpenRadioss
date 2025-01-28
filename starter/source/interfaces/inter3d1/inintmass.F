@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -101,7 +101,7 @@ C----------------------------------------------------------
                 ENDIF
              ENDIF
           ENDDO
-C---- ISTIF_DT flag to compute inital time step if no contact time step is set -----
+C---- ISTIF_DT flag to compute initial time step if no contact time step is set -----
           FLAGDT = 0
           DO N=1,NINTER
              NTY = IPARI(7,N)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,6 +58,7 @@ C-----------------------------------------------
       CLAUSE%NB_LINE_SEG= 0         ! CLAUSE nb of line/edge's segments
       CLAUSE%NB_RBODY= 0            ! CLAUSE nb of Rbodys
       CLAUSE%NB_SPHCEL= 0           ! CLAUSE nb of sphcel
+      CLAUSE%EXT_ALL = 0
 
       CLAUSE%NB_ELLIPSE= 0          ! CLAUSE nb of Ellipses within a SET (max = 1, one per /SET)
       CLAUSE%ELLIPSE_IAD_BUFR= 0

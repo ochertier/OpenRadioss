@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,16 +40,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sigeps83                  ../engine/source/materials/mat/mat083/sigeps83.F
       !||    smom43                    ../engine/source/elements/solid/sconnect/smom43.F
       !||    srrota3                   ../engine/source/elements/solid/solide/srrota3.F
-      !||    startime                  ../engine/source/system/timer.F
-      !||    stoptime                  ../engine/source/system/timer.F
+      !||    startime                  ../engine/source/system/timer_mod.F90
+      !||    stoptime                  ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod              ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    law_userso                ../engine/source/user_interface/law_userso.F
       !||    mat_elem_mod              ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    sigeps169_connect_mod     ../engine/source/materials/mat/mat169/sigeps169_connect.F90
       !||    table_mod                 ../engine/share/modules/table_mod.F
+      !||    timer_mod                 ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SUSER43(
+      SUBROUTINE SUSER43(TIMERS,
      1 ELBUF_STR,IOUT  ,IPROP  ,IMAT   ,NGL    ,TIME  ,TIMESTEP,FR_WAVE,
      2 XX1      ,XX2   ,XX3    ,XX4    ,XX5    ,XX6    ,XX7    ,XX8    ,   
      3 YY1      ,YY2   ,YY3    ,YY4    ,YY5    ,YY6    ,YY7    ,YY8    , 
@@ -70,6 +71,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
       USE LAW_USERSO
@@ -152,6 +154,7 @@ C-----------------------------------------------
 C----------------------------------------------------------
 C   D u m m y   A r g u m e n t s  
 C----------------------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER NEL,IOUT,IPROP,IMAT,IOUTPRT,IFAILURE,NPG, JSMS,JTHE
       INTEGER NGL(NEL),IPARTS(*),NPF(*),IPM(NPROPMI,*),
      .  IGEO(NPROPGI,*),ITASK
@@ -340,7 +343,7 @@ C-------------------
 C--------------------------------------------------
       DELTAE(1:NEL) = ZERO
 c--------------------------------------------------
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
 c--------------------------------------------------
 c     BOUCLE SUR LES POINTS DE GAUSS
 c--------------------------------------------------
@@ -385,7 +388,7 @@ C
 c--------------------------------------------------
 c       material laws           
 c--------------------------------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
 c--------------------------------------------------
         SELECT CASE(MTN)
 c---
@@ -460,13 +463,13 @@ C-----------------------------------------------
           CASE (169) ! MAT_ARUP_ADHESIVE
 
            CALL SIGEPS169_CONNECT(
-     1        NEL      ,TIME     ,MAT_PARAM(IMAT)%UPARAM,  MAT_PARAM(IMAT)%IPARAM ,
-     2        MAT_PARAM(IMAT)%NIPARAM     ,MAT_PARAM(IMAT)%NUPARAM    ,STIFM    ,
-     3        AREA     ,GBUF%OFF ,NUVAR   ,UVAR     ,IPG     ,
+     1        NEL      ,TIME     ,MAT_PARAM(IMAT)%IPARAM,  MAT_PARAM(IMAT)%UPARAM ,
+     2        MAT_PARAM(IMAT)%NIPARAM     ,MAT_PARAM(IMAT)%NUPARAM     ,STIFM    ,
+     3        AREA     ,GBUF%OFF ,NUVAR   ,UVAR     ,IPG      ,
      4        DEPSZZ   ,DEPSYZ   ,DEPSZX  ,EPSZZ    ,EPSYZ    ,EPSZX   ,
      5        SIG0ZZ   ,SIG0YZ   ,SIG0ZX  ,SIGNZZ   ,SIGNYZ   ,SIGNZX  ,
-     6        LBUF%PLA ,IOUT     ,JSMS       ,LBUF%DMG,NGL    ,DMELS   ,IDTMINS,DTFACS,
-     7        DTMINS,GBUF%THK)
+     6        LBUF%PLA ,IOUT     ,JSMS    ,LBUF%DMG ,NGL      ,DMELS   ,
+     7        IDTMINS  ,DTFACS   ,DTMINS  ,GBUF%THK)
 
 C-----------------------------------------------
          CASE (99)
@@ -532,11 +535,11 @@ c--------------------------------------------------
      .                DEPSZX(IEL)*(SIG0ZX(IEL) + SIGNZX(IEL)) ) 
         ENDDO
 c--------------------------------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 c--------------------------------------------------
 c       Failure Models
 c--------------------------------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(121,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(TIMERS,121)
 c--------------------------------------------------
         SOFT(1:NEL) = ONE
 c
@@ -584,7 +587,7 @@ c
 c--------------------------------------------------
         ISOLID = MIN(ISOLID, ISOLIDF)
 c--------------------------------------------------
-        IF (ITASK==0 .and. IMON_MAT==1) CALL STOPTIME(121,1)                                                           
+        IF (ITASK==0 .and. IMON_MAT==1) CALL STOPTIME(TIMERS,121)                                                           
 c--------------------------------------------------
 c       global element constraints in local frame (for output)
 c

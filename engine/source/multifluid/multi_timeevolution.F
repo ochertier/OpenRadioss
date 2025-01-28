@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,27 +40,32 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    my_barrier                       ../engine/source/system/machine.F
       !||    spmd_e1vois                      ../engine/source/mpi/fluid/spmd_cfd.F
       !||    spmd_envois                      ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    startime                         ../engine/source/system/timer_mod.F90
+      !||    stoptime                         ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod             ../common_source/modules/ale/ale_connectivity_mod.F
       !||    alefvm_mod                       ../common_source/modules/ale/alefvm_mod.F
-      !||    ebcs_mod                         ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    ebcs_mod                         ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||    elbufdef_mod                     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod                      ../engine/share/resol/initbuf.F
       !||    matparam_def_mod                 ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    message_mod                      ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod                    ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                    ../common_source/modules/ale/multi_fvm_mod.F90
       !||    th_surf_mod                      ../common_source/modules/interfaces/th_surf_mod.F
+      !||    timer_mod                        ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE MULTI_TIMEEVOLUTION(TIMESTEP, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
+      SUBROUTINE MULTI_TIMEEVOLUTION(TIMERS,TIMESTEP, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, VEL, ACCELE, WGRID, XGRID, DNOD, NALE,
      .     PARTSAV, IPARTS, GRESAV, IGRTH, GRTH, 
      .     NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, 
      .     ITAB, ITABM1, CURRENT_TIME,
      .     STIFN, FSKY, IADS, FSKYM, 
-     .     CONDN, CONDNSKY, BUFMAT, FUNC_VALUE, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPF,TF,FSAVSURF,MATPARAM)
+     .     CONDN, CONDNSKY, BUFMAT, FUNC_VALUE, PRED,ID_GLOBAL_VOIS,FACE_VOIS,EBCS_TAB,NPF,TF,FSAVSURF,MATPARAM,
+     .     WFEXT)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INITBUF_MOD      
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
@@ -87,6 +92,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       TYPE(MATPARAM_STRUCT_),DIMENSION(NUMMAT),INTENT(IN) :: MATPARAM !< material buffer
       my_real,INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
       my_real, INTENT(IN) :: TIMESTEP
@@ -116,6 +122,7 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
       INTEGER, INTENT(IN) :: NPF(SNPC)
       my_real, INTENT(IN) :: TF(STF)
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -215,7 +222,7 @@ C     ==============================
 C     gradients computation for MUSCL
 C     ==============================
       IF (MULTI_FVM%MUSCL > 0) THEN
-         CALL MULTI_MUSCL_GRADIENTS(ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
+         CALL MULTI_MUSCL_GRADIENTS(TIMERS,ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .        PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, MULTI_FVM%NBMAT, 
      .        CURRENT_TIME, BUFMAT)
       ENDIF
@@ -224,6 +231,7 @@ C     ==============================
 C     Gradient communication
       IF (NSPMD > 1 .AND. MULTI_FVM%MUSCL > 0) THEN
 !$OMP SINGLE
+         CALL STARTIME(TIMERS,TIMER_SPMDCFD)
          LENCOM = NERCVOIS(NSPMD + 1) + NESDVOIS(NSPMD + 1)
          IF (MULTI_FVM%MUSCL == 1) THEN
 C     Velocity gradients
@@ -252,6 +260,7 @@ C     SUBMAT gradients
      .              NERCVOIS, NESDVOIS, LERCVOIS, LESDVOIS, LENCOM)
             ENDIF
          ENDIF
+         CALL STOPTIME(TIMERS,TIMER_SPMDCFD)
 !$OMP END SINGLE
          CALL MY_BARRIER
       ENDIF
@@ -283,7 +292,8 @@ C---------------------
       IF (EBCS_TAB%nebcs_fvm > 0) THEN
          CALL MY_BARRIER
          CALL MULTI_EBCS(ITASK, MULTI_FVM, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM, FUNC_VALUE, 
-     .        EBCS_TAB,NPF,TF,FSAVSURF,NSURF,TIMESTEP)
+     .        EBCS_TAB,NPF,TF,FSAVSURF,NSURF,TIMESTEP,
+     .        NUMELS, NUMELQ, NUMELTG, NUMNOD, NCYCLE, NUMMAT, MATPARAM)
          CALL MY_BARRIER
       ENDIF
 C     ------------------------- 
@@ -317,7 +327,7 @@ C     -------------------------
 C     Multifluid law: update global values
 C     -------------------------
             CALL MULTI_EVOLVE_GLOBAL(TIMESTEP, NG, ELBUF_TAB, 
-     .           IPARG, ITASK, IXS, IXQ, IXTG, MULTI_FVM, ALEFVM_Buffer%VERTEX)  
+     .           IPARG, ITASK, IXS, IXQ, IXTG, MULTI_FVM, ALEFVM_Buffer%VERTEX, WFEXT)
             IF (NBMAT > 1) THEN
 C     -------------------------  
 C     Multifluid law: evolve partial values

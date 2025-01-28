@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    get_user_window_nodes   ../engine/source/user_interface/userwindow_interface_routines.F
       !||    mat_solid_get_nod_v     ../engine/source/user_interface/uaccess.F
       !||    mat_solid_get_nod_x     ../engine/source/user_interface/uaccess.F
-      !||    prepare_debug           ../engine/share/modules/debug_mod.F
       !||    radioss2                ../engine/source/engine/radioss2.F
       !||    rdresb                  ../engine/source/output/restart/rdresb.F
       !||    read_joint              ../engine/source/output/restart/read_joint.F
@@ -56,11 +55,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 #include "my_real.inc"
 
         INTEGER , DIMENSION(:), ALLOCATABLE :: 
-     .      ICODE,   ISKEW,    ISKWN,   IFRAME,  NETH,  
+     .      ISKWN,   IFRAME,  NETH,  
      .      IBCSLAG,
      .      IPART,   NOM_OPT, NPC,      IXTG,    IXTG1,
      .      IXS,     IXQ,     IXC,      IXT,     IXP,     IXR,
-     .      ITAB,    ITABM1,  GJBUFI,   
+     .      GJBUFI,   
      .      IFILL,   IMS,     ISUBS,
      .      KXX,     IXX,      KXSP,    IXSP,    NOD2SP,
      .      ISPSYM,  ISPCOND, ISPHIO,   LPRTSPH, LONFSPH, IBCL,
@@ -73,7 +72,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .      NPBY,    NPBYL,   LPBY,     LPBYL,   LRIVET,  NSTRF,
      .      LJOINT,  NODPOR,  MONVOL,   LAGBUF,  
      .      IPART_STATE,IRBYM ,LNRBYM, WEIGHT_RM,ICODRBYM,
-     .      IRBE3 ,LRBE3,INOD_PXFEM,IEL_PXFEM,
+     .      INOD_PXFEM,IEL_PXFEM,
      .      IADC_PXFEM, ADSKY_PXFEM, MADIDX,MADCLNOD,NOM_SECT,
      .      IRBE2    ,LRBE2, PROCNE_PXFEM, IADSDP_PXFEM,
      .      IADRCP_PXFEM     ,ITHVAR,ICFIELD,ILOADP,INOD_CRKXFEM,
@@ -93,21 +92,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .      IADCJ,     IAD_RBM,  IAD_RBM2, IAD_SEC,    IAD_CUT,   FR_ELEM, 
      .      FR_RBY,    FR_WALL,  FR_RBY2,  FR_I2M,     FR_MV,    FR_LL, 
      .      FR_CJ,     FR_RBM,   FR_RBM2,  FR_SEC,     FR_CUT,    RG_CUT, 
-     .      FR_MAD,    FR_I18,   WEIGHT,   NEWFRONT,   NODGLOB,   NBRCVOIS, 
+     .      FR_MAD,    FR_I18,   NEWFRONT,   NODGLOB,   NBRCVOIS, 
      .      LNRCVOIS,  NBSDVOIS, LNSDVOIS, NERCVOIS,   LERCVOIS,  NESDVOIS, 
      .      LESDVOIS,  NPSEGCOM, LSEGCOM,  NPORGEO, 
-     .      LNODPOR,   ICODT,    ICODR,    ADSKY,      PROCNE,
-     .      ADDCNI2,   PROCNI2,  IADSDP,   IADRCP,     IADS,      IADWAL, 
+     .      LNODPOR,   PROCNE,
+     .      ADDCNI2,   PROCNI2,   IADWAL, 
      .      IADRBK,    IADI2,    IADMV2,   IADMV3,     IADLL,     IADRBM, 
      .      IADI18,    ILINK,    FR_RL,    LLINK,      IADRL,     LINALE,
      .      NEFLSW,    NNFLSW,   ICUT,     LGRAV,      FASOLFR,   DD_R2R,
      .      FR_LAGF,   LLAGF,    IGEO,     IPM,        ICONTACT,  ISKWP,
      .      NSKWP,     ISENSP,   NSENSP,   IACCP,      NACCP,
-     .                                                 IAD_RBE3M, FR_RBE3M,
-     .      FR_RBE3MP ,FR_RBYM,  FR_RBYM2, IAD_RBYM   ,IAD_RBYM2, IADRBMK,
+     .      FR_RBYM,  FR_RBYM2, IAD_RBYM   ,IAD_RBYM2, IADRBMK,
      .      ICODE_PLY ,ICODT_PLY,ISKEW_PLY,IAD_RBE2   ,FR_RBE2,
      .      LCFIELD   ,LLOADP,
-     .      IAD_EDGE  ,FR_EDGE,  FR_NBEDGE,IGAUP      ,NGAUP,     NODLEVXF,WEIGHT_MD,
+     .      IAD_EDGE  ,FR_EDGE,  FR_NBEDGE,IGAUP      ,NGAUP,     NODLEVXF,
      .      NODGLOBXFE,ELCUTC,   NODENR,   KXFENOD2ELC,ENRTAG,
      .      TABSENSOR ,ADDCSRECT,FR_NOR,   IAD_FRNOR  , PROCNOR,    
      .      IDRAPE,   NATIV0_SMS , SEGQUADFR,ISKWP_L, NE_NERCVOIS,  
@@ -115,8 +113,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 
         my_real , 
      .    DIMENSION(:), ALLOCATABLE :: 
-     .      X,       D,       V,       VR,      DR,      THKE,
-     .      DAMPR,   DAMP,    MS,      IN,      TF,      PM, 
+!    .      X,       D,       V,       VR,      DR,      THKE,
+     .      THKE,
+     .      DAMPR,   DAMP,    TF,      PM, 
      .      XFRAME,  GEO,     EANI,    BUFMAT,  BUFGEO,
      .      BUFSF,   RBMPC,   GJBUFR,  W,       VEUL,    FILL, 
      .      DFILL,   ALPH,    WB,      DSAVE,   ASAVE, 
@@ -127,20 +126,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .      ELBUF,   
      .      RWBUF,   RWSAV,   RBY,     RBYL,    
      .      RIVET,   SECBUF,  VOLMON,  LAMBDA,  WA,      FV, 
-     .      A,       AR,      STIFN,   VISCN,   STIFR,   PARTSAV,
-     .      FSKY,    FSKYM,   FSKYD,   UWA,     VAL2,    PHI,
+     .      PARTSAV,
+     .      UWA,     VAL2,    PHI,
      .      R,       ESTIF,   CRFLSW,  FLSW,    FANI,
      .      XCUT,    ANIN,    TANI,    SECFCUM, WASPH, 
      .      W16,     DRETRIO, LBVRS,   PV,      RCONX  , RCONTACT,
      .      ACONTACT,PCONTACT,
-     .      FACTIV,           RBYM,    FRBE3 ,
-     .      MS_PLY,  ZI_PLY,  MS0,     ADMSMS,  DMELC,   DMELTG,
+     .      FACTIV,           RBYM,
+     .      MS_PLY,  ZI_PLY,  ADMSMS,  DMELC,   DMELTG,
      .      MSSA,    DMELS,   MSTR,    DMELTR,  MSP,     DMELP,
      .      MSRT,    DMELRT,  RES_SMS, PHIE,    MSF,
      .      CFIELD,  MSZ2,    DIAG_SMS,LOADP,   DMINT2,
      .      POR,     GAUGE,   WAGAP   ,RTHBUF,  KNOT,
      .      WIGE,    RDRAPE,  TAB_MAT, MS_2D ,KNOTLOCPC,KNOTLOCEL,
-     .      FCONT_MAX,IN0  ,  DGAPLOADINT,DPL0CLD,VEL0CLD
+     .      FCONT_MAX,DGAPLOADINT,DPL0CLD,VEL0CLD
         
       my_real, 
      .    DIMENSION(:, :), ALLOCATABLE :: XCELL
@@ -202,8 +201,6 @@ C-----------------------------------------------
       my_real, 
      .         DIMENSION(:),ALLOCATABLE :: MCPC, MCPTG
 C=======================================================================
-      DOUBLE PRECISION,
-     .         DIMENSION(:), ALLOCATABLE :: DDP
 
       END MODULE RESTMOD
 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i7ke3           ../engine/source/interfaces/int07/i7ke3.F
       !||    upd_int_k       ../engine/source/implicit/upd_glob_k.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE IMP_INT_K( A     ,V         ,
      1                      ICODT ,ICODR ,ISKEW  ,IBFV  ,NPC    ,
@@ -376,7 +376,7 @@ C
       !||    imp_icomcrit       ../engine/source/implicit/imp_int_k.F
       !||    spmd_min_s         ../engine/source/mpi/implicit/imp_spmd.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod         ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE IMP_INTDT(
      1       IPARI    ,INTBUF_TAB,X        ,
@@ -545,7 +545,7 @@ C
       !||    spmd_get_stif11   ../engine/source/mpi/interfaces/send_cand.F
       !||    spmd_sync_mmx     ../engine/source/mpi/interfaces/spmd_sync_mmx.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod        ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE IMP_ICOMCRIT(
      1  INTBUF_TAB,IPARI  ,NEWFRONT,ISENDTO,
@@ -700,12 +700,14 @@ C
       !||    imp_intdt        ../engine/source/implicit/imp_int_k.F
       !||    imp_tripi        ../engine/source/implicit/imp_int_k.F
       !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
       !||    h3d_mod          ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
+      !||    timer_mod        ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE IMP_INTTD0(
+      SUBROUTINE IMP_INTTD0(TIMERS,
      1       IPARI ,INTBUF_TAB     ,X       ,D       ,
      2       MS    ,ITAB   ,IN    ,D_IMP   ,DR_IMP  ,
      3       IMSCH ,I2MSCH ,ISIZXV,ILENXV  ,IGRBRIC ,
@@ -718,16 +720,18 @@ C
      A       IRLEN20T,ISLEN20T,IRLEN20E,ISLEN20E,
      B       IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,
      C       NSENSOR,SENSOR_TAB,XDP,H3D_DATA,MULTI_FVM,FORNEQS,
-     D       MAXDGAP,INTERFACES)
+     D       MAXDGAP,INTERFACES,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
       USE INTERFACES_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -744,6 +748,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
      .        NEWFRONT(*),NBINTC,INTLIST(*),
@@ -771,6 +776,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
       TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
+      type (glob_therm_) , INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -861,7 +867,7 @@ C
      2  INTBUF_TAB(N)%STFNS,X_TMP       ,D_IMP   ,DR_IMP       ,V     ,
      3  VR           ,FAC          ,FAC1         )
         ENDIF
-        CALL IMP_TRIPI(
+        CALL IMP_TRIPI(TIMERS,
      1       IPARI ,INTBUF_TAB,X_TMP   ,D       ,
      2       V     ,MS     ,ITAB ,VR      ,IN      ,
      3       IMSCH ,I2MSCH ,ISIZXV,ILENXV ,IGRBRIC ,
@@ -874,7 +880,7 @@ C
      A       IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      B       ISLEN20E,IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,
      C       SENSOR_TAB,XDP  ,H3D_DATA, MULTI_FVM  ,FORNEQS,
-     D       INTERFACES,NSENSOR)
+     D       INTERFACES,NSENSOR,GLOB_THERM)
  999   CONTINUE
       ENDDO
 C
@@ -1070,12 +1076,14 @@ C
       !||    spmd_ifront       ../engine/source/mpi/interfaces/spmd_ifront.F
       !||    spmd_sd_xv        ../engine/source/mpi/nodes/spmd_sd_xv.F
       !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod    ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod      ../common_source/modules/groupdef_mod.F
       !||    h3d_mod           ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod     ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod        ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod     ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
+      !||    timer_mod         ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE IMP_TRIPI(
+      SUBROUTINE IMP_TRIPI(TIMERS,
      1       IPARI ,INTBUF_TAB   ,X       ,D       ,
      2       V     ,MS     ,ITAB ,VR      ,IN      ,
      3       IMSCH ,I2MSCH ,ISIZXV,ILENXV ,IGRBRIC ,
@@ -1088,16 +1096,18 @@ C
      A       IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,IRLEN20E,
      B       ISLEN20E,IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,  
      C       SENSOR_TAB,XDP,H3D_DATA,MULTI_FVM,FORNEQS,
-     D       INTERFACES,NSENSOR )
+     D       INTERFACES,NSENSOR ,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE MULTI_FVM_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
       USE INTERFACES_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1113,6 +1123,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER IPARI(NPARI,*), ITAB(*),
      .        NEWFRONT(*),NBINTC,INTLIST(*),IKINE(*),
@@ -1139,6 +1150,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
       TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
+      type (glob_therm_), INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -1147,12 +1159,14 @@ C-----------------------------------------------
      .        I,L1,L2,L3,JTASK,LINDMAX,IBID ,IBIDLEN,NRTM_T,
      .        ESHIFT,RENUM(NUMNOD), NSNFIOLD(NSPMD), ISENS
       INTEGER INT24E2EUSE
+      INTEGER LSKYI_SMS_NEW   ! AMS Counter for Interface values. Not need in implicit but kept for compatibility
 C     REAL
       my_real
      .        DTI, TS
       my_real
      .  RDUM(3,1)
 C-------------dans inttri------
+        LSKYI_SMS_NEW = 0 ! Value is set to zero than ignored.
         INT24E2EUSE=0
         RDUM(1:3,1)=ZERO
         IBID =0
@@ -1196,23 +1210,23 @@ C
           ENDIF
 C
           IF(TT>=TS) THEN  ! If interface is activated
-            CALL I7MAIN_TRI(
+            CALL I7MAIN_TRI(TIMERS,
      1 IPARI   ,X       ,V         ,
      2 MS      ,N            ,ITASK        ,WAG     ,WEIGHT    ,
      3 ISENDTO ,IRECVFROM    ,RETRI        ,IAD_ELEM,FR_ELEM   ,
      4 ITAB    ,KINET        ,TEMP         ,NRTM_T  ,RENUM     ,
      5 NSNFIOLD,ESHIFT       ,IBID         ,IBID    ,IBID      ,
-     6 INTBUF_TAB,H3D_DATA,IXS,MULTI_FVM)
+     6 INTBUF_TAB,H3D_DATA,IXS,MULTI_FVM,GLOB_THERM)
          ENDIF
         ELSEIF(NTY==10)THEN
 C 
-          CALL I10MAIN_TRI(
+          CALL I10MAIN_TRI(TIMERS,
      1 npari     ,IPARI(1,N),X       ,V         ,
      2 MS        ,N            ,ITASK        ,WAG     ,WEIGHT    ,
      3 ISENDTO   ,IRECVFROM    ,RETRI        ,IAD_ELEM,FR_ELEM   ,
      4 NRTM_T    ,RENUM        ,NSNFIOLD     ,ESHIFT  ,IBID      ,
      5 IBID      ,IBID         ,ITAB         ,INTBUF_TAB         ,
-     6 H3D_DATA  )
+     6 H3D_DATA  ,GLOB_THERM   )
         ELSEIF(NTY==11)THEN
 C
          ISENS = IPARI(64,N)
@@ -1223,23 +1237,23 @@ C
          ENDIF
 C
          IF(TT>=TS) THEN  ! If interface is activated
-          CALL I11MAIN_TRI(
+          CALL I11MAIN_TRI(TIMERS,
      1 IPARI      ,X       ,V        ,
      2 MS         ,N            ,ITASK        ,WEIGHT  ,ISENDTO  ,
      3 IRECVFROM  ,RETRI        ,IAD_ELEM     ,FR_ELEM ,ITAB     ,
      4 NRTM_T     ,ESHIFT       ,IBID         ,RENUM   ,NSNFIOLD ,
-     5 INTBUF_TAB ,IBID)
+     5 INTBUF_TAB ,IBID         ,IBID)
         ENDIF
 
         ELSEIF(NTY == 20)THEN
 C 
-          CALL I20MAIN_TRI(
+          CALL I20MAIN_TRI(TIMERS,
      1 IPARI   ,X       ,V       ,
      2 MS      ,N            ,ITASK        ,WAG     ,WEIGHT  ,
      3 ISENDTO ,IRECVFROM    ,RETRI        ,IAD_ELEM,FR_ELEM ,
      4 ITAB    ,KINET        ,TEMP         ,NRTM_T  ,RENUM   ,
      5 NSNFIOLD,ESHIFT       ,IBID         ,IBID    ,DIAG_SMS,
-     5 IBID    ,INTBUF_TAB   ,H3D_DATA     )
+     5 IBID    ,INTBUF_TAB   ,H3D_DATA     ,GLOB_THERM)
         ENDIF
 C
         IF (IMACH==3.AND.NSPMD>1.AND.RETRI==1) THEN
@@ -1272,12 +1286,12 @@ C
           IF(TT>=TS) THEN  ! If interface is activated
             CALL I7MAIN_OPT_TRI(
      1       IPARI     ,INTBUF_TAB(N),X   ,V  ,
-     2       N         ,ITASK ,COUNT_REMSLV       )
+     2       N         ,ITASK ,COUNT_REMSLV, LSKYI_SMS_NEW      )
           ENDIF
         ELSEIF(NTY==10)THEN
           CALL I10MAIN_OPT_TRI(
      1       IPARI(1,N),INTBUF_TAB(N),X  ,V  ,
-     2       N         ,ITASK  ,COUNT_REMSLV      )
+     2       N         ,ITASK  ,COUNT_REMSLV  , LSKYI_SMS_NEW     )
         ELSEIF(NTY==11)THEN
 C
           ISENS = IPARI(64,N)
@@ -1290,7 +1304,7 @@ C
           IF(TT>=TS) THEN  ! If interface is activated
             CALL I11MAIN_OPT_TRI(
      1        IPARI     ,INTBUF_TAB(N),X  ,V  ,
-     2        N         ,ITASK  ,COUNT_REMSLV      )
+     2        N         ,ITASK  ,COUNT_REMSLV , LSKYI_SMS_NEW      )
           ENDIF
         ELSEIF(NTY == 20)THEN
           CALL I20MAIN_OPT_TRI(
@@ -1556,7 +1570,7 @@ C
       !||--- calls      -----------------------------------------------------
       !||    imp_intdt       ../engine/source/implicit/imp_int_k.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE IMP_DTKIN(
      1       IPARI ,INTBUF_TAB      ,X       ,V       ,

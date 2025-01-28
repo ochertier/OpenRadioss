@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -78,7 +76,6 @@ C
 C Updating X on adjacent domains
 C 
 
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
       LOC_PROC = ISPMD+1
       IDEB = 0
       IDEB2 = 0
@@ -132,7 +129,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 #endif
       RETURN
       END
@@ -143,8 +139,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -186,7 +180,6 @@ C-----------------------------------------------
 C
 C Updating X on adjacent domains
 C 
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -253,7 +246,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -268,8 +260,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -313,7 +303,6 @@ C-----------------------------------------------
 C
 C Updating X on adjacent domains
 C 
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -366,7 +355,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -388,8 +376,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait                        ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany                     ../engine/source/mpi/spmd_mod.F90
-      !||    startime                         ../engine/source/system/timer.F
-      !||    stoptime                         ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod                         ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -431,7 +417,6 @@ C-----------------------------------------------
 C
 C Updating Phi on adjacent elements
 C 
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -480,7 +465,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -493,8 +477,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -539,7 +521,6 @@ C-----------------------------------------------
 C
 C Updating Phi on adjacent elements
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -598,7 +579,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -611,8 +591,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -657,7 +635,6 @@ C-----------------------------------------------
 C
 C Updating Phi on adjacent elements
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -712,7 +689,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -726,8 +702,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait             ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany          ../engine/source/mpi/spmd_mod.F90
-      !||    startime              ../engine/source/system/timer.F
-      !||    stoptime              ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod              ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -771,7 +745,6 @@ C-----------------------------------------------
 C
 C Updating Phi on adjacent elements
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -824,7 +797,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -836,8 +808,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -880,7 +850,6 @@ C-----------------------------------------------
 C
 C Updating X on adjacent domains
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -949,7 +918,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -962,8 +930,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -1006,7 +972,6 @@ C-----------------------------------------------
 C
 C Updating X on adjacent domains
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -1066,7 +1031,6 @@ C
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -1078,8 +1042,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
@@ -1137,7 +1099,6 @@ C-----------------------------------------------
 C
 C Updating X on adjacent domains
 C 
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IDEB = 0
@@ -1255,7 +1216,6 @@ C
           CALL SPMD_WAIT(REQ_S(I))
         ENDIF
       ENDDO
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -1267,8 +1227,6 @@ C
       !||    alew4         ../engine/source/ale/grid/alew4.F
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait     ../engine/source/mpi/spmd_mod.F90
-      !||    startime      ../engine/source/system/timer.F
-      !||    stoptime      ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod      ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -1312,7 +1270,6 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD + 1
       L = 1
@@ -1389,7 +1346,6 @@ C
      .     CALL SPMD_WAIT(REQ_S(I))
         ENDDO
 C
-        CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -1403,8 +1359,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait         ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany      ../engine/source/mpi/spmd_mod.F90
-      !||    startime          ../engine/source/system/timer.F
-      !||    stoptime          ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -1452,7 +1406,6 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD + 1
 C SIZE = 6
@@ -1568,7 +1521,6 @@ C Wait terminaison isend
         ENDIF
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -1579,8 +1531,6 @@ C
       !||--- called by ------------------------------------------------------
       !||    wrrestp           ../engine/source/output/restart/wrrestp.F
       !||--- calls      -----------------------------------------------------
-      !||    startime          ../engine/source/system/timer.F
-      !||    stoptime          ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod          ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -1618,7 +1568,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       IF (LEN > 0) THEN
         CALL SPMD_REDUCE(V,VTMP,LEN,
@@ -1630,7 +1579,6 @@ C-----------------------------------------------
         END DO
       ENDIF
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -1642,8 +1590,6 @@ C
       !||    rgwat3       ../engine/source/interfaces/int09/rgwat3.F
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait    ../engine/source/mpi/spmd_mod.F90
-      !||    startime     ../engine/source/system/timer.F
-      !||    stoptime     ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    spmd_mod     ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
@@ -1686,7 +1632,6 @@ C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
 C
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD + 1
 C
@@ -1753,7 +1698,6 @@ C Wait terminaison isend
      .     CALL SPMD_WAIT(REQ_S(I))
       ENDDO
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -1765,8 +1709,6 @@ C
       !||    alemain        ../engine/source/ale/alemain.F
       !||--- calls      -----------------------------------------------------
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    ale_mod        ../common_source/modules/ale/ale_mod.F
       !||    segvar_mod     ../engine/share/modules/segvar_mod.F
@@ -1809,7 +1751,6 @@ C-----------------------------------------------
       DATA MSGOFF/3012/
       my_real WA(SIZE*ALE%GLOBAL%NVCONV)
 C-----------------------------------------------
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD+1
       IF(FLAG == 0) THEN  
@@ -1993,7 +1934,6 @@ C
         ENDIF
       ENDIF
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -2005,10 +1945,8 @@ C
       !||    alemain          ../engine/source/ale/alemain.F
       !||--- calls      -----------------------------------------------------
       !||    spmd_ibcast      ../engine/source/mpi/generic/spmd_ibcast.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod         ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    ebcs_mod         ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||    spmd_mod         ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
       SUBROUTINE SPMD_INIT_EBCS(V,ISIZXV,IAD_ELEM,FR_ELEM,EBCS_TAB)
@@ -2048,7 +1986,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
-      CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       LOC_PROC = ISPMD + 1
       E_LEN=3
@@ -2112,7 +2049,6 @@ C
         ENDIF
       ENDIF
 C
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN
@@ -2125,8 +2061,6 @@ C
       !||--- calls      -----------------------------------------------------
       !||    spmd_wait            ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany         ../engine/source/mpi/spmd_mod.F90
-      !||    startime             ../engine/source/system/timer.F
-      !||    stoptime             ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
@@ -2188,7 +2122,6 @@ C-----------------------------------------------
       TYPE(L_BUFEL_)  ,POINTER :: LBUF  
       TYPE(BUF_MAT_)  ,POINTER :: MBUF               
 C-----------------------------------------------
-       CALL STARTIME(MACRO_TIMER_SPMDCFD,1)
 
       ! X on remote nodes
       LOC_PROC             = ISPMD+1
@@ -2339,7 +2272,6 @@ C-----------------------------------------------
           CALL SPMD_WAIT(REQ_S(I))
         ENDIF
       ENDDO
-      CALL STOPTIME(MACRO_TIMER_SPMDCFD,1)
 
 #endif
       RETURN

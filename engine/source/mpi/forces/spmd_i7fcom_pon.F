@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,11 +51,12 @@ C
       !||    spmd_fiadd_pon         ../engine/source/mpi/interfaces/spmd_i7tool.F
       !||--- uses       -----------------------------------------------------
       !||    fskyi_mod              ../engine/share/modules/restart_mod.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    heat_mod               ../engine/share/modules/heat_mod.F
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    tri25ebox              ../engine/share/modules/tri25ebox.F
       !||    tri7box                ../engine/share/modules/tri7box.F
       !||====================================================================
@@ -65,7 +66,7 @@ C
      3                       IXS     ,IXS16  ,NISKYFIE,NBINT20,IFLAG   ,                        
      4                       INTBUF_TAB,SFSKYI,SISKY  ,H3D_DATA,MULTI_FVM  ,                                         
      5                       TAGNCONT  ,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,FSAV,
-     6                       INTERFACES)
+     6                       INTERFACES,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -79,6 +80,7 @@ C-----------------------------------------------
       USE GROUPDEF_MOD
       USE MULTI_FVM_MOD
       USE INTERFACES_MOD
+      USE GLOB_THERM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,7 +120,8 @@ C-----------------------------------------------
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
-      TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
+      TYPE (INTERFACES_)    ,INTENT(IN) :: INTERFACES
+      TYPE (GLOB_THERM_)    ,INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
 C-----------------------------------------------
@@ -169,7 +172,7 @@ C-----------------------------------------------
 C
       LEN = 5
       IF(KDTINT/=0) LEN = LEN+1
-      IF(NODADT_THERM == 1) LEN = LEN+1
+      IF(GLOB_THERM%NODADT_THERM == 1) LEN = LEN+1
       LEN7T = LEN + 1
 C type11 => 2 impacts pour une factte
       LEN11 = 2*(LEN-1)+1
@@ -269,7 +272,7 @@ C Thermique Option
                 ENDDO
                 TEMP_SIZ=TEMP_SIZ+1
                 
-                IF (NODADT_THERM == 1)THEN 
+                IF (GLOB_THERM%NODADT_THERM == 1)THEN 
                   DO J=1,NI
                     TEMPO(TEMP_SIZ,J)=CONDNSKYFI(NIN)%P(J)
                   ENDDO
@@ -303,7 +306,7 @@ C Thermique Option
                 ENDDO
                 TEMP_SIZ=TEMP_SIZ+1
                 
-                IF (NODADT_THERM == 1)THEN
+                IF (GLOB_THERM%NODADT_THERM == 1)THEN
                   DO J=1,NI
                     K=INDEX(J)
                     CONDNSKYFI(NIN)%P(J)=TEMPO(TEMP_SIZ,K)
@@ -316,7 +319,7 @@ C Thermique Option
      +            (NTY == 22 .AND. INTTH > 0 )) LENI = LEN7T
             ELSEIF(NTY==11) THEN
               IF(INTTH > 0) THEN
-               IF(NODADT_THERM == 1)THEN
+               IF(GLOB_THERM%NODADT_THERM == 1)THEN
                   CALL SORTI11TT(NI,ISKYFI(NIN)%P(1),FSKYFI(NIN)%P(1,1),
      +             FTHESKYFI(NIN)%P(1),CONDNSKYFI(NIN)%P(1),NFSKYI)
                ELSE
@@ -516,7 +519,7 @@ C
 C --- interface type 7 + la thermique
 C
                 ELSE
-                 IF(NODADT_THERM ==1) THEN
+                 IF(GLOB_THERM%NODADT_THERM ==1) THEN
                   LENI = LEN7T
                   IF(KDTINT==0)THEN
                    DO N = 1, NB
@@ -726,7 +729,7 @@ C noeud generant une force
 C   Type 11 + thermal modelling
                ELSE ! INTTH
                 LENI=LEN11T
-                IF(NODADT_THERM == 1)THEN ! Thermal time step
+                IF(GLOB_THERM%NODADT_THERM == 1)THEN ! Thermal time step
                  IF(NB>0) THEN
                   LL = L+1
                   L = L + 1
@@ -1156,7 +1159,7 @@ C ------------------------------------------------------------
         ENDDO
 C
         IF ( NISKY+LSKYI_CT > SISKY) THEN
-           CALL REALLOCATE_I_SKYLINE(LSKYI_CT,3)
+           CALL REALLOCATE_I_SKYLINE(LSKYI_CT,3,GLOB_THERM%INTHEAT,GLOB_THERM%NODADT_THERM)
         ENDIF
 C
 C Reception buffer et decompactage
@@ -1237,7 +1240,8 @@ C type int20 (non edge)
      3                ICODT   ,SECFCUM,NSTRF   ,ICONTACT     ,FCONT  ,
      4                INACTI  ,IADM   ,INTTH   , FTHESKYI    ,CONDNSKYI,
      5                H3D_DATA,NIN    ,TAGNCONT,KLOADPINTER  ,LOADPINTER,
-     6                LOADP_HYD_INTER ,INTCAREA,FSAV(1,NIN)  ,INTERFACES%PARAMETERS)
+     6                LOADP_HYD_INTER ,INTCAREA,FSAV(1,NIN)  ,INTERFACES%PARAMETERS,
+     7                GLOB_THERM%NODADT_THERM)
                      L = L + NB*LEN
                     ELSE
                      CALL SPMD_FIADD_PON(
@@ -1246,7 +1250,8 @@ C type int20 (non edge)
      3                ICODT   ,SECFCUM,NSTRF   ,ICONTACT     ,FCONT  ,
      4                INACTI  ,IADM   ,INTTH   , FTHESKYI    ,CONDNSKYI,
      5                H3D_DATA,NIN    ,TAGNCONT, KLOADPINTER ,LOADPINTER,
-     6                LOADP_HYD_INTER ,INTCAREA,FSAV(1,NIN)  ,INTERFACES%PARAMETERS)
+     6                LOADP_HYD_INTER ,INTCAREA,FSAV(1,NIN)  ,INTERFACES%PARAMETERS,
+     7                GLOB_THERM%NODADT_THERM)
                       L = L + NB*LEN7T
                     ENDIF
                     ENDIF ! NSNSI
@@ -1279,7 +1284,7 @@ C type int20 (non edge)
      2                ISKY   ,IBC     ,ISECIN  ,NOINT        ,IBAG   ,
      3                ICODT  ,SECFCUM ,NSTRF   ,ICONTACT     ,FCONT  ,
      4                INTTH  ,FTHESKYI,CONDNSKYI,H3D_DATA    ,NIN    ,TAGNCONT ,
-     5                 KLOADPINTER,LOADPINTER,LOADP_HYD_INTER)
+     5                 KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,GLOB_THERM%NODADT_THERM)
                     L = L + NB*LEN11
                   ELSE
                      CALL SPMD_FIADD11_PON(
@@ -1287,7 +1292,7 @@ C type int20 (non edge)
      2                ISKY   ,IBC     ,ISECIN  ,NOINT        ,IBAG   ,
      3                ICODT  ,SECFCUM ,NSTRF   ,ICONTACT     ,FCONT  ,
      4                INTTH  ,FTHESKYI,CONDNSKYI,H3D_DATA    ,NIN    ,TAGNCONT,
-     5                KLOADPINTER,LOADPINTER,LOADP_HYD_INTER)
+     5                KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,GLOB_THERM%NODADT_THERM)
                     L = L + NB*LEN11T
                   ENDIF
                 ELSEIF(NTY==17)THEN

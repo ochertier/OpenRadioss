@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat108           ../starter/source/materials/mat/mat108/hm_read_mat108.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
@@ -423,7 +423,7 @@ C----
 C     for interface stifness
       PM(192) = XK       
       !!
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
         UPARAM(4) = 6
       ENDIF
@@ -567,7 +567,7 @@ C----
 C     for interface stifness
       PM(193) = XK       
       !!
-C--   If H=6 - addditional internal variables must be stored in UVAR 
+C--   If H=6 - additional internal variables must be stored in UVAR 
       IF (IECROU == 6) THEN
        UPARAM(4) = 6
       ENDIF
@@ -711,7 +711,7 @@ C
       UPARAM(I11 + 4)  = XK
       UPARAM(I12 + 4)  = XC
       UPARAM(I13 + 4)  = IECROU+PUN
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
         UPARAM(4) = 6
       ENDIF
@@ -851,7 +851,7 @@ C----
       UPARAM(I11 + 5)  = XK
       UPARAM(I12 + 5)  = XC
       UPARAM(I13 + 5)  = IECROU+PUN  
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
          UPARAM(4) = 6
       ENDIF
@@ -993,7 +993,7 @@ C---
       UPARAM(I13 + 6)  = IECROU+PUN  
 !!      
       NUPARAM = NUPARAM + 6*14
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
         UPARAM(4) = 6
       ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,7 +70,7 @@ C
       !||--- called by ------------------------------------------------------
       !||    mat25_crasurv_c   ../engine/source/materials/mat/mat025/mat25_crasurv_c.F90
       !||    mat25_tsaiwu_c    ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
-      !||    mulawc            ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc            ../engine/source/materials/mat_share/mulawc.F90
       !||    usermat_shell     ../engine/source/materials/mat_share/usermat_shell.F
       !||====================================================================
       SUBROUTINE ROTOV(JFT,JLT,SIG,DIR,NEL)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -53,29 +53,32 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    cupdt3              ../engine/source/elements/shell/coque/cupdt3.F
       !||    cupdt3f             ../engine/source/elements/shell/coque/cupdt3.F
       !||    cupdt3p             ../engine/source/elements/shell/coque/cupdt3.F
-      !||    dttherm             ../engine/source/elements/sh3n/coquedk/dttherm.F
+      !||    dttherm             ../engine/source/time_step/dttherm.F90
       !||    mhvis3              ../engine/source/airbag/mhvis3.F
       !||    precrklay           ../engine/source/elements/xfem/precrklay.F
       !||    set_failwave_nod4   ../engine/source/materials/fail/failwave/set_failwave_nod4.F
       !||    set_failwave_sh4n   ../engine/source/materials/fail/failwave/upd_failwave_sh4n.F
-      !||    startime            ../engine/source/system/timer.F
-      !||    stoptime            ../engine/source/system/timer.F
+      !||    startime            ../engine/source/system/timer_mod.F90
+      !||    stoptime            ../engine/source/system/timer_mod.F90
       !||    tempcg              ../engine/source/materials/mat_share/tempcg.F
       !||    thermc              ../engine/source/materials/mat_share/thermc.F
       !||--- uses       -----------------------------------------------------
       !||    crackxfem_mod       ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod           ../engine/share/modules/drape_mod.F
       !||    dt_mod              ../engine/source/modules/dt_mod.F
+      !||    dttherm_mod         ../engine/source/time_step/dttherm.F90
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod        ../common_source/modules/failwave_mod.F
+      !||    glob_therm_mod      ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
       !||    output_mod          ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    stack_mod           ../engine/share/modules/stack_mod.F
       !||    table_mod           ../engine/share/modules/table_mod.F
+      !||    timer_mod           ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE CFORC3(
+      SUBROUTINE CFORC3(TIMERS,
      1   ELBUF_STR,   JFT,         JLT,         PM,
      2   IXC,         X,           F,           M,
      3   V,           VR,          FAILWAVE,    NVC,
@@ -104,10 +107,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Q   CONDN,       CONDNSKY,    STACK,       ISUBSTACK,
      R   XFEM_STR,    CRKEDGE,     DRAPE_SH4N,  IPRI,
      S   NLOC_DMG,    INDX_DRAPE,  IGRE,        JTUR,
-     T   OUTPUT,      DT        )
+     T   OUTPUT,      DT,          SNPC,        STF  ,
+     T   GLOB_THERM,  USERL_AVAIL, MAXFUNC,     SBUFMAT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD
       USE CRACKXFEM_MOD
@@ -119,6 +124,8 @@ C-----------------------------------------------
       USE OUTPUT_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
+      use dttherm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -142,6 +149,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(IN) :: TIMERS
+      INTEGER, INTENT(IN) :: USERL_AVAIL ! Flag for User libraries availability
+      INTEGER,INTENT(IN)    :: MAXFUNC   ! Maximum number of functions
+      INTEGER, INTENT(IN) :: SBUFMAT     ! size of Bufmat
+      INTEGER, INTENT(IN) :: STF         ! size of STF
+      INTEGER, INTENT(IN) :: SNPC        ! size of SNPC
       INTEGER, INTENT(IN) :: JTUR
       INTEGER, INTENT(IN) :: IGRE
       INTEGER JFT,JLT,NVC,MTN,NELTST,ITYPTST,OFFSET,
@@ -160,7 +173,7 @@ C-----------------------------------------------
      .   M11(MVSIZ),M12(MVSIZ),M13(MVSIZ),M14(MVSIZ),
      .   M21(MVSIZ),M22(MVSIZ),M23(MVSIZ),M24(MVSIZ),
      .   M31(MVSIZ),M32(MVSIZ),M33(MVSIZ),M34(MVSIZ),
-     .   PM(*),X(*),F(*),M(*),V(*),VR(*),
+     .   PM(NPROPM,*),X(*),F(*),M(*),V(*),VR(*),
      .   GEO(NPROPG,*),TF(*), BUFMAT(*),PARTSAV(*),STIFN(*),STIFR(*),
      .   FSKY(*),D(*),DR(*),TANI(6,*),EANI(*), THKE(*),DT2T,
      .   FZERO(3,4,*),TEMP(*), FTHE(*),FTHESKY(*),GRESAV(*),
@@ -174,10 +187,11 @@ C
       TYPE (NLOCAL_STR_), TARGET :: NLOC_DMG
       TYPE (DRAPE_) , DIMENSION(NUMELC_DRAPE) :: DRAPE_SH4N
       TYPE (OUTPUT_)     ,INTENT(INOUT) :: OUTPUT !< output structure
-      TYPE (SENSORS_)    ,INTENT(IN)    :: SENSORS
+      TYPE (SENSORS_)    ,INTENT(INOUT) :: SENSORS
       TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (GROUP_PARAM_),INTENT(IN)    :: GROUP_PARAM
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -250,6 +264,8 @@ C-----
       TYPE(L_BUFEL_) ,POINTER :: LBUF
       TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR
       TYPE (STACK_PLY) :: STACK
+      INTEGER SDIR_A    ! Size of DIR_A
+      INTEGER SDIR_B    ! Size of DIR_B
 C=======================================================================
       GBUF => ELBUF_STR%GBUF
       IDRAPE = ELBUF_STR%IDRAPE
@@ -324,9 +340,13 @@ c-------------------------------------
               NPTTOT = NPTTOT + NPTT
             ENDDO 
         ENDIF
+        SDIR_A=NPTTOT*NEL*L_DIRA
+        SDIR_B=NPTTOT*NEL*L_DIRB
         DIR_A => DIRA(1:NPTTOT*NEL*L_DIRA)
         DIR_B => DIRB(1:NPTTOT*NEL*L_DIRB)
       ELSE ! idrape
+        SDIR_A=NLAY*NEL*L_DIRA
+        SDIR_B=NLAY*NEL*L_DIRB
         ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
         ALLOCATE(DIRB(NLAY*NEL*L_DIRB))
         DIRA=ZERO
@@ -340,6 +360,8 @@ c-------------------------------------
               DIRA(J1:J2) = ELBUF_STR%BUFLY(J)%DIRA(1:NEL*L_DIRA)
            ENDDO
          ENDIF
+         SDIR_A=NLAY*NEL*L_DIRA
+         SDIR_B=NLAY*NEL*L_DIRB
          DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
          DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
       ENDIF ! IDRAPE    
@@ -427,7 +449,7 @@ C
      9            A11R    ,ISUBSTACK      ,STACK%PM )
 C
       IF ((ISMSTR /= 3 .AND. IDT1SH == 0) .OR.
-     .     IDTMIN(3) /= 0 .OR. IGTYP == 16.OR.IDT_THERM == 1) THEN
+     .     IDTMIN(3) /= 0 .OR. IGTYP == 16 .OR. GLOB_THERM%IDT_THERM == 1) THEN
 C      CDTLEN must be always called for tissue property/law for time step correction
        CALL CDLEN3(JFT     ,JLT     ,PM      ,OFF     ,AREA,
      2             X2      ,X3      ,X4      ,Y2      ,Y3  ,
@@ -499,9 +521,9 @@ c-------------------------------------------
         ENDDO
       ENDIF     
 C
-      IF ((IMON_MAT==1).AND. ITASK == 0)CALL STARTIME(35,1)
+      IF ((IMON_MAT==1).AND. ITASK == 0)CALL STARTIME(TIMERS,35)
 C-----------------------------
-        CALL CMAIN3(
+        CALL CMAIN3(TIMERS,
      1  ELBUF_STR   ,JFT         ,JLT         ,NFT        ,IPARG      ,
      2  NEL         ,MTN         ,IPLA        ,ITHK       ,GROUP_PARAM,
      3  PM          ,GEO         ,NPF         ,TF         ,BUFMAT     ,
@@ -522,14 +544,17 @@ C-----------------------------
      I  BID         ,BID         ,BID         ,E1X        ,E1Y        ,
      J  E1Z         ,E2X         ,E2Y         ,E2Z        ,E3X        ,
      K  E3Y         ,E3Z         ,NG          ,TABLE      ,IXFEM      ,
-     L  BID         ,SENSORS     ,BID        ,ELCRKINI   ,
-     M  DIR1_CRK    ,DIR2_CRK    ,ALDT        ,
+     L  BID         ,SENSORS     ,BID         ,ELCRKINI   ,
+     M  DIR1_CRK    ,DIR2_CRK    ,ALDT        ,GLOB_THERM%IDT_THERM ,GLOB_THERM%THEACCFACT,
      N  ISMSTR      ,IR          ,IS          ,NLAY       ,NPT        ,
      O  IXLAY       ,IXEL        ,ISUBSTACK   ,STACK      ,
      P  F_DEF       ,ITASK       ,DRAPE_SH4N  ,VAR_REG    ,NLOC_DMG   ,
-     R  INDX_DRAPE  ,THKE        ,SEDRAPE     ,NUMEL_DRAPE,DT         )
+     R  INDX_DRAPE  ,THKE        ,SEDRAPE     ,NUMEL_DRAPE  ,DT        ,
+     Q  NCYCLE      ,SNPC        ,STF         ,NXLAYMAX    ,IDEL7NOK   , 
+     S  USERL_AVAIL ,MAXFUNC    ,NPTTOT       ,SBUFMAT     ,SDIR_A     ,
+     T  SDIR_B    )
 C-----------------------------
-      IF ((IMON_MAT==1).AND. ITASK == 0)CALL STOPTIME(35,1)
+      IF ((IMON_MAT==1).AND. ITASK == 0)CALL STOPTIME(TIMERS,35)
 C-----------------------------
 C     FORCES ANTI-SABLIER
 C-----------------------------
@@ -603,7 +628,7 @@ c      IFLAG=MOD(NCYCLE,NCPRI)
      A   Y2G,        Y3G,        Y4G,        Z1G,
      B   Z2G,        Z3G,        Z4G,        IBID,
      C   IEXPAN,     GBUF%EINTTH,ITASK,      GBUF%VOL,
-     D   ACTIFXFEM,  IGRE)
+     D   ACTIFXFEM,  IGRE,SENSORS)
        ENDIF
 C--------------------------
 C     PAS DE TEMPS
@@ -639,22 +664,20 @@ C
          IF (MAT_ELEM%MAT_PARAM(MAT(1))%HEAT_FLAG == 1) THEN
            CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
      .                 PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
-     .                 TEMP  ,TEMPEL,FHEAT  , THEM    ) 
+     .                 TEMP  ,TEMPEL,FHEAT  , THEM   ,GLOB_THERM%THEACCFACT) 
          ELSE
            CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
      .                 PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
-     .                 TEMP  ,TEMPEL,DIE   , THEM    ) 
+     .                 TEMP  ,TEMPEL,DIE   , THEM    ,GLOB_THERM%THEACCFACT) 
          END IF
        ENDIF
 C--------------------------
 C     THERMAL TIME STEP
 C--------------------------
-      IF (JTHE /= 0 .AND. IDT_THERM == 1) THEN
-        CALL DTTHERM(
-     1   JFT,     JLT,     PM,      TEMPEL,
-     2   GBUF%RE, RHO,     GBUF%RK, VOL0,
-     3   ALDT,    MAT,     DT_THERM,OFF,
-     4   CONDE,   JTUR)
+      IF (JTHE /= 0 .AND. GLOB_THERM%IDT_THERM == 1) THEN
+           call dttherm(nel     ,pm(1,mat(1))  ,npropm  ,glob_therm   ,
+     .                  jtur    ,tempel  ,vol0    ,rho       ,
+     .                  aldt    ,off     ,conde   ,gbuf%re   ,gbuf%rk )
       ENDIF 
 c-------------------------
 c     Virtual internal forces of regularized non local ddl 
@@ -679,7 +702,7 @@ C--------------------------
      6              F33     ,F34  ,M11    ,M12  ,M13      ,
      7              M14     ,M21  ,M22    ,M23  ,M24      ,
      8              M31     ,M32  ,M33    ,M34  ,GBUF%EINT,
-     9              PARTSAV ,MAT  ,IPARTC )
+     9              PARTSAV ,MAT  ,IPARTC ,GLOB_THERM%NODADT_THERM)
       ELSEIF (IPARIT == 0) THEN
        CALL CUPDT3(JFT     ,JLT   ,F     ,M    ,NVC      , 
      2             GBUF%OFF,OFF   ,STI   ,STIR ,STIFN    ,
@@ -690,7 +713,7 @@ C--------------------------
      7             M14     ,M21   ,M22   ,M23  ,M24      ,
      8             M31     ,M32   ,M33   ,M34  ,GBUF%EINT,
      9             PARTSAV ,MAT   ,IPARTC,JTHE ,THEM     ,
-     A             FTHE    ,CONDN ,CONDE )
+     A             FTHE    ,CONDN ,CONDE ,GLOB_THERM%NODADT_THERM)
       ELSE
         CALL CUPDT3P(JFT      ,JLT     ,GBUF%OFF,OFF   ,STI    ,
      2               STIR     ,FSKY    ,FSKY    ,IADC  ,IXC    ,
@@ -701,7 +724,7 @@ C--------------------------
      7               M31      ,M32     ,M33     ,M34   ,
      8               GBUF%EINT,PARTSAV ,MAT     ,IPARTC,PM     ,
      9               AREA     ,GBUF%THK,JTHE    ,THEM  ,FTHESKY,
-     A               CONDNSKY ,CONDE   )
+     A               CONDNSKY ,CONDE   ,GLOB_THERM%NODADT_THERM)
       ENDIF
 c
       IF (ICSEN > 0)

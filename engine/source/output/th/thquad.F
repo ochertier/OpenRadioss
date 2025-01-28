@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,13 +32,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alefvm_mod      ../common_source/modules/ale/alefvm_mod.F
       !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod     ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
       SUBROUTINE THQUAD(ELBUF_TAB,NTHGRP2 , ITHGRP , 
      1                  IPARG    ,ITHBUF   ,WA     ,
      2                  IPM      ,IXQ      ,IXTG   ,
      3                  X        ,MULTI_FVM,V      ,
-     4                  W        ,
+     4                  W        ,ITHERM   ,
      .                  NUMELQ   ,NUMMAT   ,NUMNOD ,SITHBUF, NUMELTG)
 
 C-----------------------------------------------
@@ -118,6 +118,7 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: NUMELQ, NUMMAT, NUMNOD ,SITHBUF, NUMELTG
       INTEGER,INTENT(IN) :: IPARG(NPARG,NGROUP),ITHBUF(SITHBUF),IXQ(NIXQ,NUMELQ),IPM(NPROPMI,NUMMAT),IXTG(NIXTG,NUMELTG)
       INTEGER, INTENT(IN) :: NTHGRP2
+      INTEGER, INTENT(IN) :: ITHERM
       INTEGER, DIMENSION(NITHGR,*), INTENT(IN) :: ITHGRP
       my_real,INTENT(INOUT) :: WA(*)
       my_real,INTENT(IN) :: X(3,NUMNOD), V(3,NUMNOD), W(3,NUMNOD)
@@ -446,7 +447,7 @@ C               Temperature
               ENDIF
 C
 C------------------------------------------------------------------------------
-C       TH tab filling with stain in element and per intergation point
+C       TH tab filling with stain in element and per integration point
 C              EPSXIJK,EPSYIJK,EPSZIJK,EPSXYIJK,EPSXZIJK,EPSYZIIJK => WWA(239060)
 C              EPSXX,EPSYY,EPSZZ,EPSXY,EPSXZ,EPSYZ  =>  WWA(1618)
 C              L_EPSXX,L_EPSYY,L_EPSZZ,L_EPSXY,LEPSXZ,LEPSYZ  => WWA(239030)

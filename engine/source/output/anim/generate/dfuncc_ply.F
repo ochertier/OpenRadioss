@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod        ../engine/share/resol/initbuf.F
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
       !||    plyxfem_mod        ../engine/share/modules/plyxfem_mod.F
       !||    stack_mod          ../engine/share/modules/stack_mod.F
       !||====================================================================
@@ -40,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                      IXC  , IXTG , MASS ,PM   ,EL2FA,
      .                      NBF  , IADP , NBF_L,EHOUR,ANIM ,
      .                      NBPART,IADG , IPM  ,IGEO ,THKE ,
-     .                      ERR_THK_SH4,ERR_THK_SH3,
+     .                      ERR_THK_SH4,ERR_THK_SH3,MAT_PARAM,
      .                      NBF_PXFEMG ,X, STACK)
 C-----------------------------------------------
 C   M o d u l e s
@@ -49,6 +51,8 @@ C-----------------------------------------------
       USE PLYXFEM_MOD
       USE ELBUFDEF_MOD     
       USE STACK_MOD       
+      USE MATPARAM_DEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -75,8 +79,8 @@ C     REAL
      .   FUNC(*), MASS(*) , GEO(NPROPG,*),
      .   EHOUR(*),ANIM(*),PM(NPROPM,*),THKE(*),
      .   ERR_THK_SH4(*), ERR_THK_SH3(*), X(3,*)
-      REAL WAL(NBF_L)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
       TYPE (STACK_PLY) :: STACK
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -111,7 +115,9 @@ C     REAL
       TYPE(BUF_FAIL_)   ,POINTER :: FBUF
       my_real,
      .  DIMENSION(:), POINTER  :: UVAR 
+      REAL,DIMENSION(:),ALLOCATABLE:: WAL
 C-----------------------------------------------
+      CALL MY_ALLOC(WAL,NBF_L)
 !
       LL = 0
 C      
@@ -343,7 +349,7 @@ C +
                      IADR = (N-1)*NEL                       
                       DO I=1,NEL                          
                         MATL   = STACK%IGEO(IPMAT+N,ISUBSTACK)
-                        IF(IPM(222,MATL) > 0 ) IVISC = 1
+                        IF (MAT_PARAM(MATL)%IVISC > 0 ) IVISC = 1
                       END DO                                
                   END DO                                       
                END IF  
@@ -428,7 +434,7 @@ c
                      IADR = (N-1)*NEL                       
                       DO I=1,NEL                          
                         MATL   = STACK%IGEO(IPMAT+N,ISUBSTACK)
-                        IF(IPM(222,MATL) > 0 ) IVISC = 1
+                        IF (MAT_PARAM(MATL)%IVISC > 0 ) IVISC = 1
                       END DO                                
                   END DO                                       
                 END IF  
@@ -949,6 +955,6 @@ C
           CALL SPMD_R4GET_PARTN(1,NBF_L,NBPART,IADG,WAL,BUF)
       ENDIF
 
- 
+      DEALLOCATE(WAL)
       RETURN
       END

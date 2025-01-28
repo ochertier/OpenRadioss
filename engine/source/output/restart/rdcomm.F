@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,21 +33,23 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    anim_mod         ../common_source/modules/output/anim_mod.F
       !||    damp_mod         ../engine/share/modules/damp_mod.F
       !||    drape_mod        ../engine/share/modules/drape_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod          ../engine/share/modules/h3d_mod.F
-      !||    loads_mod        ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F90
       !||    outmax_mod       ../common_source/modules/outmax_mod.F
       !||    outputs_mod      ../common_source/modules/outputs_mod.F
       !||    parameters_mod   ../common_source/modules/interfaces/parameters_mod.F
       !||    pinchtype_mod    ../common_source/modules/pinchtype_mod.F
       !||    pload_cyl_mod    ../common_source/modules/loads/pload_cyl_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    rbe3_mod         ../common_source/modules/constraints/rbe3_mod.F90
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||    skew_mod         ../common_source/modules/skew_mod.F90
       !||    state_mod        ../common_source/modules/state_mod.F
       !||====================================================================
       SUBROUTINE RDCOMI(TABVINT,MULTI_FVM,H3D_DATA,DYNAIN_DATA,
-     .                  INTER_PARAMETERS,SENSORS,LOADS ,MAT_ELEM,SKEWS)
+     .                  INTER_PARAMETERS,SENSORS,LOADS ,MAT_ELEM,SKEWS,
+     .                  GLOB_THERM,PBLAST,RBE3 )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -70,6 +72,9 @@ C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE DAMP_MOD
       USE SKEW_MOD
+      USE glob_therm_mod
+      USE PBLAST_MOD
+      USE RBE3_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -83,6 +88,9 @@ C-----------------------------------------------
       TYPE (LOADS_)         ,INTENT(INOUT) :: LOADS
       TYPE (MAT_ELEM_)      ,INTENT(INOUT) :: MAT_ELEM
       TYPE (SKEW_)          ,INTENT(INOUT) :: SKEWS
+      TYPE (GLOB_THERM_)    ,INTENT(INOUT) :: GLOB_THERM
+      TYPE (PBLAST_)        ,INTENT(INOUT) :: PBLAST
+      TYPE (RBE3_)          ,INTENT(INOUT) :: RBE3
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -131,7 +139,6 @@ C-----------------------------------------------
 #include      "inter22.inc"
 #include      "drape_c.inc"
 #include      "ige3d_c.inc"
-#include      "thermal_c.inc"
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -151,7 +158,7 @@ C-----------------------------------------------
       LBUFEL  =TABVINT(9)
       IRODDL  =TABVINT(10)
       IEULER  =TABVINT(11)
-      ITHERM  =TABVINT(12)
+      GLOB_THERM%ITHERM  =TABVINT(12)
       IHSH    =TABVINT(13)
       ITESTV  =TABVINT(14)
       ITURB   =TABVINT(15)
@@ -295,7 +302,7 @@ C Empty field           = TABVINT(47)
       SNODGLOB  = TABVINT(147)
       SNBRCVOIS = TABVINT(148)
       SNBSDVOIS = TABVINT(149)
-      SLNRCVOIS = TABVINT(150)
+      SLNRCVOIS = TABVINT(150) ! NRCVOIS
       SLNSDVOIS = TABVINT(151)
       SNERCVOIS = TABVINT(152)
       SNESDVOIS = TABVINT(153)
@@ -310,6 +317,16 @@ C Empty field           = TABVINT(47)
 C-----
 C   siz of real arrays
 C
+C     TABVINT(162) = 3*(NUMNOD_L+NRCVVOIS_L)
+C     TABVINT(163) = 3*(NUMNOD_L+NRCVVOIS_L)
+C     TABVINT(164) = 3*(NUMNOD_L+NRCVVOIS_L)
+C     TABVINT(165) = 3*NUMNOD_L*IRODDL
+c     IF(ISECUT > 0 .OR. IISROT > 0 .OR. IMPOSE_DR /= 0 .OR. IDROT > 0)THEN
+c       TABVINT(166) = 3*NUMNOD_L*IRODDL
+c     ELSE
+c       TABVINT(166) = 0
+c     ENDIF
+
       SX        = TABVINT(162)
       SD        = TABVINT(163)
       SV        = TABVINT(164)
@@ -318,8 +335,8 @@ C
       STHKE     = TABVINT(167)
       SDAMPR    = TABVINT(168)
       SDAMP     = TABVINT(169)
-      SMS       = TABVINT(170)
-      SIN       = TABVINT(171)
+      SMS       = TABVINT(170) ! NUMNOD
+      SIN       = TABVINT(171) ! NUMNOD * IRODDL
       STF       = TABVINT(172)
       SPM       = TABVINT(173)
       SSKEW     = TABVINT(174)
@@ -331,13 +348,13 @@ C
       SBUFSF    = TABVINT(180)
       SRBMPC    = TABVINT(181)
       SGJBUFR   = TABVINT(182)
-      SW        = TABVINT(183)
+      SW        = TABVINT(183) ! IALE > 0 => 3 * NUMNOD
       SVEUL     = TABVINT(184)
       SFILL     = TABVINT(185)
       SDFILL    = TABVINT(186)
       SALPH     = TABVINT(187)
-      SWB       = TABVINT(188)
-      SDSAVE    = TABVINT(189)
+      SWB       = TABVINT(188) !  0 or 3 * NUMNOD or 4 * NUMNOD
+      SDSAVE    = TABVINT(189) !  0 or 3 * NUMNOD 
       !         = TABVINT(190)
       SASAVE    = TABVINT(191)
       !         = TABVINT(192)
@@ -351,7 +368,7 @@ C
       SFORC     = TABVINT(203)
       SVEL      = TABVINT(204)
       SFSAV     = TABVINT(205)
-      SFZERO    = TABVINT(206)
+      SFZERO    = TABVINT(206) !3*NUMNOD or 12 *(NUMELC+NUMELTG/)
       SXLAS     = TABVINT(207)
       SREBCS    = TABVINT(208)
       SACCELM   = TABVINT(209)
@@ -385,7 +402,7 @@ C
 C-----1
       NUMMAT =TABVINT(238)
       MAT_ELEM%NUMMAT = NUMMAT
-      NUMNOD =TABVINT(239)
+      NUMNOD =TABVINT(239) ! NUMNOD
       NUMSKW =TABVINT(240)
       NUMBCS =TABVINT(241)
       NANALY =TABVINT(242)
@@ -1013,7 +1030,7 @@ C .dyain files
       DYNAIN_DATA%DYNAIN_CHECK = TABVINT(NEXT)
 C  heat transfer + int7
       NEXT=NEXT+1
-      INTHEAT = TABVINT(NEXT)
+      GLOB_THERM%INTHEAT = TABVINT(NEXT)
 C  xfem
       NEXT=NEXT+1
       NUMELCRK=TABVINT(NEXT)
@@ -1022,7 +1039,7 @@ C  xfem
 C---------------------------------------
 C heat transfer
       NEXT=NEXT+1
-      ITHERM_FE=TABVINT(NEXT)
+      GLOB_THERM%ITHERM_FE=TABVINT(NEXT)
 C Static condensation
       NEXT=NEXT+1
       ISTATCND=TABVINT(NEXT)
@@ -1072,15 +1089,15 @@ c
       NSKYRBMK0 = TABVINT(NEXT)
 C-----------
       NEXT = NEXT + 1
-      NIFT = TABVINT(NEXT)
+      GLOB_THERM%NIFT = TABVINT(NEXT)
       NEXT = NEXT + 1
-      NICONV = TABVINT(NEXT)
+      GLOB_THERM%NICONV = TABVINT(NEXT)
       NEXT   = NEXT + 1
-      LFACTHER = TABVINT(NEXT)
+      GLOB_THERM%LFACTHER = TABVINT(NEXT)
       NEXT   = NEXT + 1
-      NUMCONV = TABVINT(NEXT)
+      GLOB_THERM%NUMCONV = TABVINT(NEXT)
       NEXT   = NEXT + 1
-      NFXTEMP = TABVINT(NEXT)
+      GLOB_THERM%NFXTEMP = TABVINT(NEXT)
 C--------------------------------------
 C stapming : modification of warning messages in engine
       NEXT = NEXT + 1
@@ -1088,16 +1105,21 @@ C stapming : modification of warning messages in engine
 C-----RBE3
       NEXT   = NEXT + 1
       NRBE3 = TABVINT(NEXT)
+      RBE3%NRBE3 = NRBE3      ! Number of RBE3 on domain
       NEXT   = NEXT + 1
-      SIRBE3 = TABVINT(NEXT)
+      SIRBE3 = TABVINT(NEXT)  ! zize of irbe3 = nrbe3 * irbe3_variables (10)
       NEXT   = NEXT + 1
       SLRBE3 = TABVINT(NEXT)
+      RBE3%lrbe3_sz = SLRBE3  ! Size of lrbe3
       NEXT   = NEXT + 1
       SFRBE3 = TABVINT(NEXT)
+      RBE3%frbe3_sz = SFRBE3  ! Size  of frbe3
       NEXT   = NEXT + 1
       SIAD_RBE3M = TABVINT(NEXT)
+      ! = nspmd+1
       NEXT   = NEXT + 1
       SFR_RBE3M = TABVINT(NEXT)
+      RBE3%mpi%fr_rbe3_sz = SFR_RBE3M
 C-------------------------------------------------------------------
 C    spmd rigid material
       NEXT = NEXT + 1
@@ -1161,14 +1183,14 @@ C--------------------------------------
       NEXT    = NEXT + 1
       IDROT   = TABVINT(NEXT)
       NEXT = NEXT + 1
-      NIRADIA = TABVINT(NEXT)
+      GLOB_THERM%NIRADIA = TABVINT(NEXT)
       NEXT   = NEXT + 1
-      NUMRADIA = TABVINT(NEXT)
+      GLOB_THERM%NUMRADIA = TABVINT(NEXT)
 C--------------------------------------
       NEXT    = NEXT+1
-      NITFLUX = TABVINT(NEXT) 
+      GLOB_THERM%NITFLUX = TABVINT(NEXT) 
       NEXT    = NEXT+1
-      NFXFLUX = TABVINT(NEXT)  
+      GLOB_THERM%NFXFLUX = TABVINT(NEXT)  
 C--------------------------------------
       NEXT = NEXT + 1
       IF(MCHECK/=0)NSMSPCG = TABVINT(NEXT)
@@ -1434,7 +1456,7 @@ C /LOAD/PBLAST
       NEXT       = NEXT + 1
       NLOADP_F   = TABVINT(NEXT)
       NEXT       = NEXT + 1
-      NLOADP_B   = TABVINT(NEXT)      
+      PBLAST%NLOADP_B   = TABVINT(NEXT)
       NEXT       = NEXT + 1
       LOADS%NLOAD_CYL  = TABVINT(NEXT)      
 C
@@ -1808,6 +1830,7 @@ C--------------------------------------
       !||--- uses       -----------------------------------------------------
       !||    ale_mod              ../common_source/modules/ale/ale_mod.F
       !||    anim_mod             ../common_source/modules/output/anim_mod.F
+      !||    glob_therm_mod       ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    multimat_param_mod   ../common_source/modules/multimat_param_mod.F90
       !||    output_mod           ../common_source/modules/output/output_mod.F90
       !||    outputs_mod          ../common_source/modules/outputs_mod.F
@@ -1815,7 +1838,7 @@ C--------------------------------------
       !||    state_mod            ../common_source/modules/state_mod.F
       !||====================================================================
       SUBROUTINE RDCOMR(LMXVREA,TABVREA,DYNAIN_DATA,INTER_PARAMETERS,
-     .                  OUTPUT)
+     .                  OUTPUT,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1826,6 +1849,7 @@ C-----------------------------------------------
        USE PARAMETERS_MOD
        USE OUTPUT_MOD
        USE MULTIMAT_PARAM_MOD , ONLY : M51_IFLG6
+       USE glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1838,6 +1862,7 @@ C-----------------------------------------------
       TYPE (DYNAIN_DATABASE), INTENT(INOUT) :: DYNAIN_DATA
       TYPE (PARAMETERS_) ,INTENT(INOUT):: INTER_PARAMETERS
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      TYPE (glob_therm_) , INTENT(INOUT) :: GLOB_THERM
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -1858,7 +1883,6 @@ C-----------------------------------------------
 #include      "sysunit.inc"
 #include      "statr_c.inc"
 #include      "inter22.inc"
-#include      "thermal_c.inc"
 #include      "itet2_c.inc"
 C-----------------------------------------------
 #include      "ddspmd_c.inc"
@@ -1882,7 +1906,7 @@ C-----
       DTFAC  =TABVREA(11)
       DTMIN  =TABVREA(12)
       VOLMIN =TABVREA(13)
-      TFEXT  =TABVREA(14)
+      OUTPUT%WFEXT  =TABVREA(14)
       REINT  =TABVREA(15)
       !TABVREA(16) no longer used
       !TABVREA(17) no longer used
@@ -1964,15 +1988,15 @@ c noise
       TPSREF = TABVREA(RVARINT)
 C THERMAL ANALYSIS
       RVARINT = RVARINT + 1
-      HEAT_STORED = TABVREA(RVARINT)
+      GLOB_THERM%HEAT_STORED = TABVREA(RVARINT)
       RVARINT = RVARINT + 1
-      HEAT_MECA   = TABVREA(RVARINT)
+      GLOB_THERM%HEAT_MECA   = TABVREA(RVARINT)
       RVARINT = RVARINT + 1
-      HEAT_CONV   = TABVREA(RVARINT)
+      GLOB_THERM%HEAT_CONV   = TABVREA(RVARINT)
       RVARINT = RVARINT + 1
-      HEAT_RADIA  = TABVREA(RVARINT)
+      GLOB_THERM%HEAT_RADIA  = TABVREA(RVARINT)
       RVARINT = RVARINT + 1
-      HEAT_FFLUX  = TABVREA(RVARINT)
+      GLOB_THERM%HEAT_FFLUX  = TABVREA(RVARINT)
 C   SOL1TNL array
       DO I=0, MAXLAW
         RVARINT = RVARINT + 1
@@ -2162,6 +2186,11 @@ C  INITIAL COORDS OF SPH RESERVE
 C
       RVARINT = RVARINT + 1
       INTER_PARAMETERS%DT_STIFINT = TABVREA(RVARINT)
+C     KINETIC ENERGY
+      RVARINT = RVARINT + 1
+      ENCIN = TABVREA(RVARINT)
+      RVARINT = RVARINT + 1
+      ENROT = TABVREA(RVARINT)
            
       RETURN
       END

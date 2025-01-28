@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,10 @@
       !||--- called by ------------------------------------------------------
       !||    s10forc3          ../engine/source/elements/solid/solide10/s10forc3.F
       !||    s4forc3           ../engine/source/elements/solid/solide4/s4forc3.F
+      !||    s6cforc3          ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+      !||    s8cforc3          ../engine/source/elements/thickshell/solide8c/s8cforc3.F
       !||    s8eforc3          ../engine/source/elements/solid/solide8e/s8eforc3.F
+      !||    scforc3           ../engine/source/elements/thickshell/solidec/scforc3.F
       !||    sforc3            ../engine/source/elements/solid/solide/sforc3.F
       !||    szforc3           ../engine/source/elements/solid/solidez/szforc3.F
       !||====================================================================
@@ -39,7 +42,10 @@
       !||--- called by ------------------------------------------------------
       !||    s10forc3       ../engine/source/elements/solid/solide10/s10forc3.F
       !||    s4forc3        ../engine/source/elements/solid/solide4/s4forc3.F
+      !||    s6cforc3       ../engine/source/elements/thickshell/solide6c/s6cforc3.F
+      !||    s8cforc3       ../engine/source/elements/thickshell/solide8c/s8cforc3.F
       !||    s8eforc3       ../engine/source/elements/solid/solide8e/s8eforc3.F
+      !||    scforc3        ../engine/source/elements/thickshell/solidec/scforc3.F
       !||    sforc3         ../engine/source/elements/solid/solide/sforc3.F
       !||    szforc3        ../engine/source/elements/solid/solidez/szforc3.F
       !||--- calls      -----------------------------------------------------
@@ -95,11 +101,10 @@
          mu=zep05
          mx = imat(1)
          nu =pm(21,mx)
+         fqmax = ep02
          if (nu > 0.48999) then 
-             fqmax = ep02
              f_nu = em02
          else 
-             fqmax = ep03
              f_nu = one
          end if
          c1 = pm(107,mx)+onep333*pm(22,mx)

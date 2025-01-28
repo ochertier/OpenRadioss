@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -94,7 +94,7 @@ C-----
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
       TYPE(BUF_MAT_) ,POINTER :: MBUF  
 C=======================================================================
-      IF (MTN >= 28 .AND. MTN /= 49) THEN
+      IF (MTN >= 28 .AND. MTN /= 49.OR.MTN ==1) THEN
         GBUF  => ELBUF_STR%GBUF
         LBUF  => ELBUF_STR%BUFLY(1)%LBUF(1,1,1)
         MBUF  => ELBUF_STR%BUFLY(1)%MAT(1,1,1)

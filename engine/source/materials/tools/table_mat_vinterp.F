@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    no_asso_lplas76c        ../engine/source/materials/mat/mat076/no_asso_lplas76c.F
       !||    no_asso_plas76          ../engine/source/materials/mat/mat076/no_asso_plas76.F
       !||    no_asso_qplas76c        ../engine/source/materials/mat/mat076/no_asso_qplas76c.F
-      !||    sigeps50                ../engine/source/materials/mat/mat050/sigeps50.F
+      !||    sigeps128c              ../engine/source/materials/mat/mat128/sigeps128c.F90
+      !||    sigeps128s              ../engine/source/materials/mat/mat128/sigeps128s.F90
+      !||    sigeps50s               ../engine/source/materials/mat/mat050/sigeps50s.F90
+      !||    sigeps57c               ../engine/source/materials/mat/mat057/sigeps57c.F90
       !||    sigeps70                ../engine/source/materials/mat/mat070/sigeps70.F
       !||====================================================================
       MODULE TABLE_MAT_VINTERP_MOD
@@ -45,7 +48,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    no_asso_lplas76c    ../engine/source/materials/mat/mat076/no_asso_lplas76c.F
       !||    no_asso_plas76      ../engine/source/materials/mat/mat076/no_asso_plas76.F
       !||    no_asso_qplas76c    ../engine/source/materials/mat/mat076/no_asso_qplas76c.F
-      !||    sigeps50            ../engine/source/materials/mat/mat050/sigeps50.F
+      !||    sigeps128c          ../engine/source/materials/mat/mat128/sigeps128c.F90
+      !||    sigeps128s          ../engine/source/materials/mat/mat128/sigeps128s.F90
+      !||    sigeps50s           ../engine/source/materials/mat/mat050/sigeps50s.F90
+      !||    sigeps57c           ../engine/source/materials/mat/mat057/sigeps57c.F90
       !||    sigeps70            ../engine/source/materials/mat/mat070/sigeps70.F
       !||--- calls      -----------------------------------------------------
       !||    ancmsg              ../engine/source/output/message/message.F

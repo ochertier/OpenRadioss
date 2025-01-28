@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,8 +49,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    update_slipring         ../engine/source/tools/seatbelts/update_slipring.F
       !||    w_seatbelts             ../starter/source/restart/ddsplit/w_seatbelts.F
       !||    wrrestp                 ../engine/source/output/restart/wrrestp.F
+      !||--- uses       -----------------------------------------------------
+      !||    table_mod               ../engine/share/modules/table_mod.F
       !||====================================================================
       MODULE SEATBELT_MOD
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE TABLE_MOD
 C----------------------------------------------------------------------- 
 #include "my_real.inc"
 
@@ -70,7 +76,8 @@ c
         INTEGER  N_REMOTE_PROC
         my_real  VECTOR(6)
         my_real  ORIENTATION_ANGLE
-        my_real  MATERIAL_FLOW
+        my_real  MATERIAL_FLOW 
+        my_real  MATERIAL_FLOW_OLD        
         my_real  DFS
         my_real  RESIDUAL_LENGTH(2)
         my_real  CURRENT_LENGTH(2)
@@ -123,6 +130,8 @@ c
         INTEGER  INACTI_NNOD
         INTEGER  INACTI_NNOD_MAX
         INTEGER, DIMENSION(:)   , ALLOCATABLE :: INACTI_NODE
+        INTEGER  S_TABLE(2)
+        TYPE(TTABLE), DIMENSION(2) :: TABLE
         INTEGER  N_REMOTE_PROC
         my_real  VECTOR(3)
         my_real  ELEMENT_SIZE
@@ -160,6 +169,8 @@ c
       END TYPE SEATBELT_STRUCT
 
       TYPE(SEATBELT_STRUCT),ALLOCATABLE,DIMENSION(:) :: SEATBELT_TAB
+      INTEGER  N_COMN_1D2D
+      INTEGER, DIMENSION(:)   , ALLOCATABLE :: COMN_1D2D
 
 c======================================================================= 
 C define structure for remote anchor node

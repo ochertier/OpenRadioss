@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -533,9 +533,9 @@ C
       MUMPS_PAR%JOB = -1
       MUMPS_PAR%SYM = SYM
       MUMPS_PAR%PAR = 1
-c     CALL STARTIME(96,1)
+c     CALL STARTIME(TIMERS,96)
       CALL DMUMPS(MUMPS_PAR)
-c     CALL STOPTIME(96,1)
+c     CALL STOPTIME(TIMERS,96)
 
 C
       RETURN
@@ -709,6 +709,7 @@ C
       !||    lag_mult_sdp      ../engine/source/tools/lagmul/lag_mult_solv.F
       !||--- calls      -----------------------------------------------------
       !||    imp_errmumps      ../engine/source/implicit/imp_solv.F
+      !||    tmpenvf           ../engine/source/system/tmpenv_c.c
       !||====================================================================
       SUBROUTINE SPMD_MUMPS_EXEC(MUMPS_PAR, ITASK)
 C-----------------------------------------------
@@ -742,7 +743,11 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER AVAIL_MEM,ESTIM_MEM
       INTEGER ORDERING_METHOD,METIS,PORD,AUTOMATIC 
+      INTEGER :: TLEN
+      LOGICAL :: IS_OOC_AUTORIZED
 
+      IS_OOC_AUTORIZED = .FALSE.   
+      IF(M_OCORE == -1) IS_OOC_AUTORIZED = .TRUE.
 ! Only the testing here, initializations are removed into IMP_MUMPS1
 
       IF (ITASK==1) THEN
@@ -751,11 +756,11 @@ C-----------------------------------------------
 
 C Analyse
          MUMPS_PAR%JOB=1
-C        CALL STARTIME(97,1)
+C        CALL STARTIME(TIMERS,97)
 
 
          CALL DMUMPS(MUMPS_PAR)
-C        CALL STOPTIME(97,1)
+C        CALL STOPTIME(TIMERS,97)
          ORDERING_METHOD =  MUMPS_PAR%INFOG(7)
          IF(MUMPS_PAR%INFOG(1) < 0) THEN
            IF(ISPMD ==0 ) THEN
@@ -770,9 +775,9 @@ C Another ordering method
            ENDIF
            MUMPS_PAR%JOB=1
            MUMPS_PAR%ICNTL(7) = ORDERING_METHOD 
-C          CALL STARTIME(97,1)
+C          CALL STARTIME(TIMERS,97)
            CALL DMUMPS(MUMPS_PAR)
-C          CALL STOPTIME(97,1)
+C          CALL STOPTIME(TIMERS,97)
          ENDIF
 
          IF( NSPMD == 1) NSPMD_PER_NODE = 1
@@ -787,13 +792,21 @@ C We increase again by 20pc
 C Out-of-core
            ESTIM_MEM = INT(MUMPS_PAR%INFOG(26) * 1.2d0)
          ENDIF
-         MUMPS_PAR%ICNTL(23) = MIN(AVAIL_MEM,ESTIM_MEM)
+
+
+         IF(IS_OOC_AUTORIZED .AND. ESTIM_MEM > AVAIL_MEM) THEN
+           MUMPS_PAR%ICNTL(22) = 1
+           MUMPS_PAR%ICNTL(23) = ESTIM_MEM
+           CALL TMPENVF(MUMPS_PAR%OOC_TMPDIR,TLEN)
+         ELSE
+           MUMPS_PAR%ICNTL(23) = MIN(AVAIL_MEM,ESTIM_MEM)
+         ENDIF
 
 C Factorisation
          MUMPS_PAR%JOB=2
-C        CALL STARTIME(98,1)
+C        CALL STARTIME(TIMERS,98)
          CALL DMUMPS(MUMPS_PAR)
-C        CALL STOPTIME(98,1)
+C        CALL STOPTIME(TIMERS,98)
                                                             
 C In-Core:Trying to recover from error 
          IF(MUMPS_PAR%INFOG(1) == -8) THEN
@@ -803,9 +816,9 @@ C if internal workspace is too small (IS)
            ENDIF
            MUMPS_PAR%ICNTL(14) = MUMPS_PAR%ICNTL(14) * 2
            MUMPS_PAR%JOB=2
-C          CALL STARTIME(98,1)
+C          CALL STARTIME(TIMERS,98)
            CALL DMUMPS(MUMPS_PAR)
-C          CALL STOPTIME(98,1)
+C          CALL STOPTIME(TIMERS,98)
 
          ELSEIF(MUMPS_PAR%INFOG(1)==-9 .OR. MUMPS_PAR%INFOG(1)==-11 
      .    .OR.  MUMPS_PAR%INFOG(1)== -19 ) THEN
@@ -818,9 +831,9 @@ C if internal workspace is too small (S)
            ESTIM_MEM = AVAIL_MEM
            MUMPS_PAR%ICNTL(23) = AVAIL_MEM
            MUMPS_PAR%JOB=2
-c          CALL STARTIME(98,1)
+c          CALL STARTIME(TIMERS,98)
            CALL DMUMPS(MUMPS_PAR)
-c          CALL STOPTIME(98,1)
+c          CALL STOPTIME(TIMERS,98)
 
          ELSEIF(MUMPS_PAR%INFOG(1) == -13) THEN
 C if internal workspace is too big: an allocation failed
@@ -831,9 +844,9 @@ C if internal workspace is too big: an allocation failed
            ESTIM_MEM = INT(ESTIM_MEM * 8.0d0 / 10.0d0)
            MUMPS_PAR%ICNTL(23) = MIN(AVAIL_MEM,ESTIM_MEM)
            MUMPS_PAR%JOB=2
-c          CALL STARTIME(98,1)
+c          CALL STARTIME(TIMERS,98)
            CALL DMUMPS(MUMPS_PAR)
-c          CALL STOPTIME(98,1)
+c          CALL STOPTIME(TIMERS,98)
 
          ELSEIF(MUMPS_PAR%INFOG(1)<0) THEN
 C Try to deal with other errors                                      
@@ -853,10 +866,12 @@ C Try to deal with other errors
            MUMPS_PAR%JOB=1
            CALL DMUMPS(MUMPS_PAR)
            MUMPS_PAR%JOB=2
-c          CALL STARTIME(98,1)
+c          CALL STARTIME(TIMERS,98)
            CALL DMUMPS(MUMPS_PAR)
-c          CALL STOPTIME(98,1)
+c          CALL STOPTIME(TIMERS,98)
          ENDIF ! Recovering from error
+
+
 
        IF (MUMPS_PAR%INFOG(1)<0) THEN
 c         WRITE(IOUT,*) 'Warning: failed to solve linear system '
@@ -870,9 +885,9 @@ c        WRITE(IOUT,*) 'MUMPS error code :',MUMPS_PAR%INFOG(1)
       ELSEIF (ITASK==2) THEN
 C Resolution
          MUMPS_PAR%JOB=3
-c        CALL STARTIME(99,1)
+c        CALL STARTIME(TIMERS,99)
          CALL DMUMPS(MUMPS_PAR) 
-c        CALL STOPTIME(99,1)
+c        CALL STOPTIME(TIMERS,99)
 
       ENDIF
 C
@@ -1025,7 +1040,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real S
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1101,7 +1116,7 @@ C-----------------------------------------------
       INTEGER LEN 
       my_real
      .        S(LEN)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI) 
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1181,7 +1196,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real S
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1258,7 +1273,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real S
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1346,7 +1361,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  N
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1419,7 +1434,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  N
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1503,7 +1518,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDDL,NDDL0,NZZK,NZZK0,NNMAX,
      .        NDDLP(*),NDDL0P(*),NZZKP(*),NZZK0P(*),NNMAXP(*)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1757,7 +1772,7 @@ C-----------------------------------------------
       INTEGER LCOM, INDEX(LCOM)
       my_real
      .        VGAT(LCOM), VSCA(LCOM)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1852,7 +1867,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       my_real
      .        DIAG_K(*),L_K(*)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -1985,7 +2000,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IAD_R(*),IAD_S(*)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI) 
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -2876,7 +2891,7 @@ C-----------------------------------------------
       INTEGER FR_ELEM(*),IAD_ELEM(2,*),SIZE,LR
       my_real
      .     A(3,*),AR(3,*)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3020,7 +3035,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NDOF(*),FR_ELEM(*),IAD_ELEM(2,*),TSIZE
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -3254,7 +3269,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IV(*), NV, NVG, NBLOC, NDDL, IS, ISUM
       my_real V(*), VG(*)
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4754,7 +4769,6 @@ C
       !||====================================================================
       !||    spmd_max_ii      ../engine/source/mpi/implicit/imp_spmd.F
       !||--- called by ------------------------------------------------------
-      !||    rbe3t1           ../engine/source/constraints/general/rbe3/rbe3f.F
       !||    sms_rbe3_nodxi   ../engine/source/ams/sms_rbe3.F
       !||--- calls      -----------------------------------------------------
       !||====================================================================
@@ -4778,7 +4792,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NMAX,IAD_ELEM(*),TSIZE
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -4875,7 +4889,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITAB, K
       my_real F
-#if defined(MPI) && defined(MUMPS5)
+#if defined(MPI)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------

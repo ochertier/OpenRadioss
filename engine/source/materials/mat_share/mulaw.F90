@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,7 @@
       !||    mstrain_rate           ../engine/source/materials/mat_share/mstrain_rate.F
       !||    nsvisul                ../engine/source/materials/mat_share/nsvisul.F
       !||    nvar                   ../engine/source/input/nvar.F
-      !||    sigeps100              ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps100              ../engine/source/materials/mat/mat100/sigeps100.F90
       !||    sigeps101              ../engine/source/materials/mat/mat101/sigeps101.F
       !||    sigeps102              ../engine/source/materials/mat/mat102/sigeps102.F
       !||    sigeps103              ../engine/source/materials/mat/mat103/sigeps103.F
@@ -96,6 +96,8 @@
       !||    sigeps124              ../engine/source/materials/mat/mat124/sigeps124.F
       !||    sigeps125              ../engine/source/materials/mat/mat125/sigeps125.F90
       !||    sigeps126              ../engine/source/materials/mat/mat126/sigeps126.F90
+      !||    sigeps127              ../engine/source/materials/mat/mat127/sigeps127.F90
+      !||    sigeps128s             ../engine/source/materials/mat/mat128/sigeps128s.F90
       !||    sigeps187              ../engine/source/materials/mat/mat187/sigeps187.F
       !||    sigeps190              ../engine/source/materials/mat/mat190/sigeps190.F
       !||    sigeps28               ../engine/source/materials/mat/mat028/sigeps28.F
@@ -111,8 +113,8 @@
       !||    sigeps44               ../engine/source/materials/mat/mat044/sigeps44.F
       !||    sigeps45               ../engine/source/materials/mat/mat045/sigeps45.F
       !||    sigeps48               ../engine/source/materials/mat/mat048/sigeps48.F
-      !||    sigeps50               ../engine/source/materials/mat/mat050/sigeps50.F
-      !||    sigeps51               ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps50s              ../engine/source/materials/mat/mat050/sigeps50s.F90
+      !||    sigeps51               ../engine/source/materials/mat/mat051/sigeps51.F90
       !||    sigeps52               ../engine/source/materials/mat/mat052/sigeps52.F
       !||    sigeps53               ../engine/source/materials/mat/mat053/sigeps53.F
       !||    sigeps56               ../engine/source/materials/mat/mat056/sigeps56.F
@@ -133,7 +135,7 @@
       !||    sigeps78               ../engine/source/materials/mat/mat078/sigeps78.F
       !||    sigeps79               ../engine/source/materials/mat/mat079/sigeps79.F
       !||    sigeps80               ../engine/source/materials/mat/mat080/sigeps80.F
-      !||    sigeps81               ../engine/source/materials/mat/mat081/sigeps81.F
+      !||    sigeps81               ../engine/source/materials/mat/mat081/sigeps81.F90
       !||    sigeps82               ../engine/source/materials/mat/mat082/sigeps82.F
       !||    sigeps84               ../engine/source/materials/mat/mat084/sigeps84.F
       !||    sigeps88               ../engine/source/materials/mat/mat088/sigeps88.F
@@ -145,23 +147,31 @@
       !||    sigeps96               ../engine/source/materials/mat/mat096/sigeps96.F
       !||    sigeps97               ../engine/source/materials/mat/mat097/sigeps97.F
       !||    sreploc3               ../engine/source/elements/solid/solide/sreploc3.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||    viscmain               ../engine/source/materials/visc/viscmain.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    constant_mod           ../common_source/modules/constant_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    output_mod             ../common_source/modules/output/output_mod.F90
       !||    prop_param_mod         ../common_source/modules/mat_elem/prop_param_mod.F90
-      !||    sigeps100_mod          ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps100_mod          ../engine/source/materials/mat/mat100/sigeps100.F90
       !||    sigeps125_mod          ../engine/source/materials/mat/mat125/sigeps125.F90
       !||    sigeps126_mod          ../engine/source/materials/mat/mat126/sigeps126.F90
+      !||    sigeps127_mod          ../engine/source/materials/mat/mat127/sigeps127.F90
+      !||    sigeps128s_mod         ../engine/source/materials/mat/mat128/sigeps128s.F90
+      !||    sigeps50s_mod          ../engine/source/materials/mat/mat050/sigeps50s.F90
+      !||    sigeps51_mod           ../engine/source/materials/mat/mat051/sigeps51.F90
+      !||    sigeps81_mod           ../engine/source/materials/mat/mat081/sigeps81.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-        subroutine mulaw(&
+        subroutine mulaw(timers,&
         &nft,         mtn,         jcvt,        pm,&
         &off,         sig,         eint,        rho,&
         &qold,        vol,         strain,      sigl,&
@@ -204,24 +214,32 @@
         &sbufmat,     svis,        n2d,         ngroup,&
         &imon_mat,    numnod,      numels,      ntable,&
         &numgeo,      nummat,      numelq,      idtmin,&
-        &dt1,         tt,          &
+        &dt1,         tt,          glob_therm,         &
         &impl_s,&
         &idyna,       userl_avail, nixs,        nixq,&
         &dt)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
+      use timer_mod
       use constant_mod
       use table_mod
       use mat_elem_mod
       use ale_connectivity_mod
       use message_mod
       use nlocal_reg_mod
+      use sigeps50s_mod
+      use sigeps81_mod
       use sigeps100_mod
       use sigeps125_mod
       use sigeps126_mod
+      use sigeps127_mod
+      use sigeps128s_mod
       use prop_param_mod
       use dt_mod
+      use glob_therm_mod
+      use sigeps51_mod , only : sigeps51
+      use output_mod , only : wfext
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -231,6 +249,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
+          type(timer_),intent(inout) :: timers
           type (buf_fail_),intent(inout), target                        :: fbuf
           type (buf_visc_),intent(inout)                                :: vbuf
           type (ttable), dimension(ntable) ,intent(in)                  :: table
@@ -239,6 +258,7 @@
           type (mat_elem_) ,intent(inout) ,target                       :: mat_elem
           type (nlocal_str_),intent(inout)                              :: nloc_dmg
           type (dt_), intent(in)                                        :: dt
+          type (glob_therm_) ,intent(inout)                             :: glob_therm
 
           integer,intent(in) :: nixs
           integer,intent(in) :: nixq
@@ -308,7 +328,7 @@
           my_real, dimension(sz_bufvois),intent(inout) :: bufvois
           my_real, dimension(n_var_geo,numgeo), intent(inout) :: geo
           my_real, dimension(n_var_pm,nummat), intent(inout) :: pm
-          my_real, dimension(3,numnod), intent(in) :: v
+          my_real, dimension(3,numnod), intent(inout) :: v
           my_real, dimension(3,numnod), intent(in) :: x
           my_real, dimension(3,numnod), intent(in) :: w
           my_real, dimension(numels),intent(inout) :: mssa
@@ -427,13 +447,13 @@
           integer :: nuvarr
 
           integer nv46, numel, inloc
-          integer i,npar,nuparam,niparam,nparf,iadbuf,iadvis,nfunc,numtabl,israte,ipg,nptr,npts,&
+          integer i,npar,nuparam,niparam,nparf,iadbuf,nfunc,numtabl,israte,ipg,nptr,npts,&
           &ibid,ibidon1,ibidon2,ibidon3,ibidon4 ,n48,nix,ilaw_user,igtyp,&
           &nvarf,ir,irupt,imat,isvis,ivisc,nuvarv,nuparv,iseq,idev,ntabl_fail,&
           &l_planl,l_epsdnl,l_dmg
 
           my_real e1,e2,e3,e4,e5,e6,bid1,bid3,q1,q2,q3,ss1,ss2,ss3,ss4,ss5,&
-          &ss6,wxxf,wyyf,wzzf,p2,epsp,dav,asrate,c1(mvsiz),&
+          &ss6,wxxf,wyyf,wzzf,p2,epsp,dav,asrate,     &
           &ep1(mvsiz),ep2(mvsiz),ep3(mvsiz),e7(mvsiz),&
           &ep4(2*mvsiz),ep5(2*mvsiz),ep6(2*mvsiz),einc(mvsiz),&
           &s1(mvsiz) ,s2(mvsiz) ,s3(mvsiz) ,&
@@ -448,7 +468,7 @@
           &r11(mvsiz),r12(mvsiz),r13(mvsiz),r21(mvsiz),r22(mvsiz),r23(mvsiz),&
           &r31(mvsiz),r32(mvsiz),r33(mvsiz),epsp1(mvsiz),dpla(mvsiz),&
           &pair(mvsiz),defp0(mvsiz)
-          my_real  facq0
+          my_real  facq0,bulk
           my_real fpsxx(mvsiz),fpsyy(mvsiz),fpszz(mvsiz),fpsxy(mvsiz),&
           &fpsyz(mvsiz),fpszx(mvsiz),fpsyx(mvsiz),fpszy(mvsiz),&
           &fpsxz(mvsiz),&
@@ -475,6 +495,7 @@
           character option*256
           integer size,nvareos,nvarvis
           integer :: nrate,nodadt
+          integer :: k1,k2,k3,k4,k5,k6
           my_real :: fisokin
           my_real, dimension(nel), target :: vecnul
           my_real, dimension(:), pointer  :: sigbxx,sigbyy,sigbzz,sigbxy,sigbyz,sigbzx
@@ -554,6 +575,14 @@
           ibidon2 = 0
           ibidon3 = 0
           ibidon4 = 0
+          ! strain/stress table indexes
+          k1 = 1
+          k2 = nel+1
+          k3 = nel*2+1
+          k4 = nel*3+1
+          k5 = nel*4+1
+          k6 = nel*5+1
+
           ilaw_user = ipm(217, imat)
           isvis = igeo(35,pid(1))
           if (impl_s >0.and.idyna == 0) isvis = 0
@@ -586,8 +615,7 @@
           endif
 
           do i=1,nel
-            c1(i)  = pm(32,imat)
-            rho0(i)= pm( 1,imat)
+            rho0(i)= matparam%rho  ! reference rho is used instead of initial one !?
             vis(i) = zero
             ep1(i) = d1(i)*off(i)
             ep2(i) = d2(i)*off(i)
@@ -633,7 +661,7 @@
               wyy(i)=zero
               wzz(i)=zero
             enddo
-!
+!             
           elseif ( mtn==68 ) then
 !---------------------------
 ! global nonsymmetric orthotropic tensor
@@ -1165,17 +1193,17 @@
             &ssp ,vis ,uvar,off  ,ngl  ,0   ,&
             &ipm ,mat ,epsd,sigy ,defp ,dpla,&
             &amu )
+!
           elseif (mtn == 50) then
-            call sigeps50(nel ,npar,nuvar,nfunc,ifunc,&
-            &npf ,tf  ,tt,dt1,uparam0,&
-            &rho0,rho ,voln,eint,nvartmp ,vartmp  ,&
-            &ep1 ,ep2 ,ep3 ,ep4  ,ep5  ,ep6 ,&
-            &de1 ,de2 ,de3 ,de4  ,de5  ,de6 ,&
-            &es1 ,es2 ,es3 ,es4  ,es5  ,es6 ,&
-            &so1 ,so2 ,so3 ,so4  ,so5  ,so6 ,&
-            &s1  ,s2  ,s3  ,s4   ,s5   ,s6  ,&
-            &sv1 ,sv2 ,sv3 ,sv4  ,sv5  ,sv6 ,&
-            &ssp ,vis ,uvar,off  ,amu  ,matparam)
+            call sigeps50s(mat_elem%mat_param(imat),                  &
+                 nel    ,dt1    ,nuvar  ,nvartmp,uvar  ,vartmp,       &
+                 rho    ,ssp    ,off    ,amu    ,defp  ,              &
+                 ep1    ,ep2    ,ep3    ,ep4    ,ep5   ,ep6   ,       &
+                 de1    ,de2    ,de3    ,de4    ,de5   ,de6   ,       &
+                 es1    ,es2    ,es3    ,es4    ,es5   ,es6   ,       &
+                 so1    ,so2    ,so3    ,so4    ,so5   ,so6   ,       &
+                 s1     ,s2     ,s3     ,s4     ,s5    ,s6    )
+!
           elseif (mtn == 51) then
             if (n2d == 0) then
               n48 = 8
@@ -1191,19 +1219,20 @@
             !numerical viscosity is managed inside sigeps51.f
             !facq0 = zero
             call sigeps51(nel       ,npar        ,nuvar   ,nfunc ,ifunc     ,&
-            &npf       ,tf          ,tt      ,dt1   ,uparam0    ,numel     ,&
-            &rho       ,vol         ,eint    ,vk    ,&
-            &ep1       ,ep2         ,ep3     ,ep4   ,ep5       ,ep6       ,&
-            &de1       ,de2         ,de3     ,de4   ,de5       ,de6       ,&
-            &so1       ,so2         ,so3     ,so4   ,so5       ,so6       ,&
-            &s1        ,s2          ,s3      ,s4    ,s5        ,s6        ,&
-            &sv1       ,sv2         ,sv3     ,sv4   ,sv5       ,sv6       ,&
-            &ssp       ,vis         ,uvar    ,off   ,nft       ,v         ,&
-            &w         ,x           ,ix      ,n48   ,nix       ,jthe      ,&
-            &geo       ,pid         ,ilay    ,ng    ,elbuf_tab , pm       ,&
-            &iparg     ,ale_connect ,bufvois ,ipm   ,bufmat    ,stifn     ,&
-            &vd2       ,vdx         ,vdy     ,vdz   ,&
-            &gbuf%qvis ,dvol        ,qold    ,nv46  )
+            &             npf       ,tf          ,tt      ,dt1   ,uparam0   ,numel     ,&
+            &             rho       ,vol         ,eint    ,vk    ,wfext     ,&
+            &             ep1       ,ep2         ,ep3     ,ep4   ,ep5       ,ep6       ,&
+            &             de1       ,de2         ,de3     ,de4   ,de5       ,de6       ,&
+            &             so1       ,so2         ,so3     ,so4   ,so5       ,so6       ,&
+            &             s1        ,s2          ,s3      ,s4    ,s5        ,s6        ,&
+            &             sv1       ,sv2         ,sv3     ,sv4   ,sv5       ,sv6       ,&
+            &             ssp       ,vis         ,uvar    ,off   ,nft       ,v         ,&
+            &             w         ,x           ,ix      ,n48   ,nix       ,jthe      ,&
+            &             geo       ,pid         ,ilay    ,ng    ,elbuf_tab , pm       ,&
+            &             iparg     ,ale_connect ,bufvois ,ipm   ,bufmat    ,stifn     ,&
+            &             vd2       ,vdx         ,vdy     ,vdz   ,&
+            &             gbuf%qvis ,dvol        ,qold    ,nv46  ,numgeo    ,n2d       , &
+            &             numnod    ,ngroup      ,nummat     )
           elseif (mtn == 52) then
             idev = 1
             call mstrain_rate(nel    ,israte ,asrate ,epsd   ,idev   ,&
@@ -1351,20 +1380,10 @@
             &ipm ,mat ,amu   )
 !
           elseif (mtn == 69) then
-            ivisc  = ipm(222,imat)
-            nuparv = ipm(224,imat)
-            nuvarv = ipm(225,imat)
-            iadvis = ipm(223,imat)
-            if (ivisc > 0) then
-              uparvis => bufmat(iadvis:iadvis+nuparv)
-            else
-              allocate (bufzero(0))
-              uparvis => bufzero
-            end if
 
             call sigeps69(nel  ,npar,nuvar,nfunc,ifunc,npf  ,&
             &tf   ,tt,dt1,uparam0,rho0 ,rho  ,&
-            &voln ,eint,ivisc,nuparv,uparvis ,&
+            &voln ,eint,                      &
             &ep1  ,ep2 ,ep3 ,ep4  ,ep5  ,ep6 ,&
             &de1  ,de2 ,de3 ,de4  ,de5  ,de6 ,&
             &es1  ,es2 ,es3 ,es4  ,es5  ,es6 ,&
@@ -1523,26 +1542,25 @@
             &ngl,     ipm,     mat,     epsd,&
             &sigy,    defp,    table,   tempel,&
             &nvartmp, vartmp,  trepsth, eintth,&
-            &jthe)
+            &jthe,    glob_therm%idt_therm,glob_therm%theaccfact)
             do i=1,nel
               d1(i) = ep1(i)
               d2(i) = ep2(i)
               d3(i) = ep3(i)
               dvol(i) = dvol(i)-trepsth(i)*vol_avg(i)
             enddo
-
+!
           elseif (mtn == 81) then
-            call sigeps81(nel   ,npar ,nuvar,nfunc ,ifunc ,ngl   ,&
-            &npf   ,tf   ,tt   ,uparam0,rho0  ,rho   ,&
-            &voln  ,amu  ,defp ,ssp   ,vis   ,uvar  ,&
-            &ep1   ,ep2  ,ep3  ,ep4   ,ep5   ,ep6   ,&
-            &de1   ,de2  ,de3  ,de4   ,de5   ,de6   ,&
-            &es1   ,es2  ,es3  ,es4   ,es5   ,es6   ,&
-            &so1   ,so2  ,so3  ,so4   ,so5   ,so6   ,&
-            &s1    ,s2   ,s3   ,s4    ,s5    ,s6    ,&
-            &sv1   ,sv2  ,sv3  )
-
-
+            call sigeps81(&
+            &nel     ,nuvar   ,uvar    ,matparam,nfunc   ,ifunc   ,&
+            &npf     ,tf      ,snpc    ,stf     ,rho0    ,rho     ,&
+            &voln    ,amu     ,defp    ,ssp     ,vis     ,dt1     ,&
+            &de1     ,de2     ,de3     ,de4     ,de5     ,de6     ,&
+            &so1     ,so2     ,so3     ,so4     ,so5     ,so6     ,&
+            &s1      ,s2      ,s3      ,s4      ,s5      ,s6      ,&
+            &sv1     ,sv2     ,sv3     ,nvartmp ,vartmp  ,lbuf%seq,&
+            &et      )
+!
           elseif (mtn == 82) then
             call sigeps82(nel ,npar,nuvar,nfunc,ifunc,&
             &npf ,tf  ,tt,dt1,uparam0,&
@@ -1613,6 +1631,18 @@
             &sv1 ,sv2 ,sv3 ,sv4  ,sv5  ,sv6 ,&
             &ssp ,vis ,uvar,off  ,ismstr,et ,&
             &ihet,gbuf%off ,epsth3,iexpan, lbuf%epsa)
+!
+          elseif (mtn == 93) then
+            call sigeps93(nel    ,npar   ,nuvar  ,nfunc  ,ifunc  ,&
+            &npf    ,tf     ,tt     ,dt1    ,uparam0 ,&
+            &ep1    ,ep2    ,ep3    ,ep4    ,ep5    ,ep6    ,&
+            &de1    ,de2    ,de3    ,de4    ,de5    ,de6    ,&
+            &so1    ,so2    ,so3    ,so4    ,so5    ,so6    ,&
+            &s1     ,s2     ,s3     ,s4     ,s5     ,s6     ,&
+            &ssp    ,defp   ,uvar   ,rho0   ,off    ,&
+            &et     ,sigy   ,lbuf%seq,epsd  ,asrate ,&
+            &nvartmp,vartmp ,dpla   )
+!
           elseif (mtn == 94) then
             call sigeps94(nel ,npar,nuvar,nfunc,ifunc,&
             &npf ,tf  ,tt,dt1,uparam0,&
@@ -1625,16 +1655,7 @@
             &sv1 ,sv2 ,sv3 ,sv4  ,sv5  ,sv6 ,&
             &ssp ,vis ,uvar,off  ,ismstr,et ,&
             &ihet,gbuf%off,epsth3,iexpan )
-          elseif (mtn == 93) then
-            call sigeps93(nel    ,npar   ,nuvar  ,nfunc  ,ifunc  ,&
-            &npf    ,tf     ,tt     ,dt1    ,uparam0 ,&
-            &ep1    ,ep2    ,ep3    ,ep4    ,ep5    ,ep6    ,&
-            &de1    ,de2    ,de3    ,de4    ,de5    ,de6    ,&
-            &so1    ,so2    ,so3    ,so4    ,so5    ,so6    ,&
-            &s1     ,s2     ,s3     ,s4     ,s5     ,s6     ,&
-            &ssp    ,defp   ,uvar   ,rho0   ,off    ,&
-            &et     ,sigy   ,lbuf%seq,epsd  ,asrate ,&
-            &nvartmp,vartmp ,dpla   )
+!
           elseif (mtn == 95) then
             ir = int (bufmat(iadbuf+20))
             if (ir > zero) then
@@ -1712,20 +1733,19 @@
               uparf => vec0
             endif
 !
-            call sigeps100(nel ,npar,nuvar,nfunc,ifunc,&
-            &npf ,tf  ,tt,dt1,uparam0,&
-            &rho0,rho ,voln,eint,ngl,&
-            &de1 ,de2 ,de3 ,de4  ,de5  ,de6 ,&
-            &es1 ,es2 ,es3 ,es4  ,es5  ,es6 ,&
-            &so1 ,so2 ,so3 ,so4  ,so5  ,so6 ,&
-            &s1  ,s2  ,s3  ,s4   ,s5   ,s6  ,&
-            &sv1 ,sv2 ,sv3 ,sv4  ,sv5  ,sv6 ,&
-            &mfxx,mfxy,mfxz,mfyx ,mfyy ,mfyz,&
-            &mfzx ,mfzy,mfzz,tempel,&
-            &ssp ,vis ,uvar,off  ,ismstr,et ,&
-            &ihet,gbuf%off ,epsth,iexpan ,nparf,&
-            &uparf,uvarf, nvarf,&
-            &jcvt , gbuf%gama_r)   !gama_r is for the corotational formulation
+            call sigeps100(nel ,npar,nuvar,nfunc,ifunc,        &
+            &              npf ,tf  ,tt,dt1,uparam0,           &
+            &              rho ,                               &
+            &              de1 ,de2 ,de3 ,de4  ,de5  ,de6 ,    &
+            &              so1 ,so2 ,so3 ,so4  ,so5  ,so6 ,    &
+            &              s1  ,s2  ,s3  ,s4   ,s5   ,s6  ,    &
+            &              mfxx,mfxy,mfxz,mfyx ,mfyy ,mfyz,    &
+            &              mfzx ,mfzy,mfzz,tempel,             &
+            &              ssp ,vis ,uvar,et ,                 &
+            &              ihet,epsth,iexpan ,nparf,           &
+            &              uparf,uvarf, nvarf,                 &
+            &              jcvt , gbuf%gama_r,                 &
+            &              snpc ,stf,impl_s)   !gama_r is for the corotational formulation
 
           elseif (mtn == 101) then
 ! structure loading
@@ -1993,6 +2013,25 @@
             &epsd     ,lbuf%dmg ,ssp      ,off      ,inloc    ,&
             &varnl    ,l_planl  ,lbuf%planl)
 !
+          elseif (mtn == 127) then 
+            call sigeps127(&
+            &nel      ,nuvar    ,uvar     ,matparam ,rho0 , tt          ,&
+            &nfunc    ,ifunc    ,snpc     ,npf      ,stf      ,tf       ,&
+            &de1      ,de2      ,de3      ,de4      ,de5      ,de6      ,&
+            &es1      ,es2      ,es3      ,es4      ,es5      ,es6      ,&
+            &so1      ,so2      ,so3      ,so4      ,so5      ,so6      ,&
+            &s1       ,s2       ,s3       ,s4       ,s5       ,s6       ,&
+            &epsd     ,off      ,ssp      ,lbuf%dmg ,ngl )
+!            
+          elseif (mtn == 128) then
+            call sigeps128s(mat_elem%mat_param(imat)    ,                      &
+                 nel      ,nuvar    ,nvartmp  ,uvar     ,vartmp   ,dt1      ,  &
+                 de1      ,de2      ,de3      ,de4      ,de5      ,de6      ,  &
+                 so1      ,so2      ,so3      ,so4      ,so5      ,so6      ,  &
+                 s1       ,s2       ,s3       ,s4       ,s5       ,s6       ,  &
+                 lbuf%seq ,sigy     ,et       ,defp     ,dpla     ,epsd     ,  &
+                 ssp      ,off      )
+!
           elseif (mtn == 187) then !barlat 2000
             call sigeps187(nel   ,npar  ,nuvar ,nfunc ,ifunc ,&
             &npf   ,tf    ,tt    ,dt1   ,uparam0,&
@@ -2020,7 +2059,7 @@
 !=======================================================================
 !                  failure model
 !=======================================================================
-          if ((itask==0).and.(imon_mat==1))call startime(121,1)
+          if ((itask==0).and.(imon_mat==1))call startime(timers,121)
           if (nfail > 0) then
 !
             ! failure criterion parameters scaling
@@ -2363,7 +2402,8 @@
                 &ngl      ,el_len   ,dpla     ,epsp1    ,uvarf    ,&
                 &s1       ,s2       ,s3       ,s4       ,s5       ,s6       ,&
                 &el_temp  ,off      ,dfmax    ,tdel     ,lbuf%dmgscl,&
-                &gbuf%uelr,ipg      ,npg      ,lbuf%off ,ntabl_fail,itabl_fail)
+                &gbuf%uelr,ipg      ,npg      ,lbuf%off ,ntabl_fail,itabl_fail,&
+                &gbuf%noff,voln     )
 !
               elseif (irupt == 42) then
 !---- inievo failure model
@@ -2428,7 +2468,7 @@
               endif
             enddo ! ir = 1,nfail
           endif   ! nfail
-          if ((itask==0).and.(imon_mat==1))call stoptime(121,1)
+          if ((itask==0).and.(imon_mat==1))call stoptime(timers,121)
 !----------------------------------
 !     viscous stress (/visc models)
 !----------------------------------
@@ -2557,7 +2597,7 @@
             endif
           elseif (isorth /= 0) then
             if (jcvt == 0) then
-              do 30 i=1,nel
+              do i=1,nel
                 sigl(i,1) = s1(i)*off(i)
                 sigl(i,2) = s2(i)*off(i)
                 sigl(i,3) = s3(i)*off(i)
@@ -2570,7 +2610,8 @@
                 sv4(i)= sv4(i)*off(i)
                 sv5(i)= sv5(i)*off(i)
                 sv6(i)= sv6(i)*off(i)
-30            continue
+              end do
+!
               call mrotens(1,nel,&
               &s1 ,s2 ,s3 ,&
               &s4 ,s5 ,s6 ,&
@@ -2652,7 +2693,7 @@
 !     define dynamic viscosity (for viscous law)
 !-----------------------
           do i=1,nel
-            if (ssp(i) == zero) ssp(i)=sqrt(c1(i)/rho0(i))
+            if (ssp(i) == zero) ssp(i) = sqrt(matparam%bulk/matparam%rho) ! rho reference !
           enddo
 !-------------------------------------------
 !   bulk viscosity and time step computation
@@ -2672,7 +2713,7 @@
             &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
             &ipm,      rhoref,   rhosp,    nel,&
             &ity,      ismstr,   jtur,     jthe,&
-            &jsms,     npg )
+            &jsms,     npg   ,   glob_therm)
 !------------------------------------------------
           else
             call mdtsph(&

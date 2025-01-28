@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,8 +29,6 @@ C
       !||    ancmsg          ../engine/source/output/message/message.F
       !||    arret           ../engine/source/system/arret.F
       !||    conversion7     ../engine/source/mpi/interfaces/spmd_i7tool.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod     ../engine/share/message_module/message_mod.F
       !||    tri7box         ../engine/share/modules/tri7box.F
@@ -114,7 +112,6 @@ C   boite minmax pour le tri provenant de i20buce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
-      IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
       BMINMA(3,LOC_PROC) = BMINMAL(3)
@@ -1429,8 +1426,6 @@ C
           ENDIF
         ENDDO
       ENDIF
-C
-      IF (IMONM > 0) CALL STOPTIME(25,1)
 C
 #endif
       RETURN

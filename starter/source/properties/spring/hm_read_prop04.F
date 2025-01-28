@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -262,16 +262,16 @@ C------------------------
       GEO(16) = DX                          
       GEO(80) = IFL                         
       GEO(93) = ILENG
-C--   If H=6 - addditional internal variables must be stored in UVAR -  - GEO(25) = NUVAR
+C--   If H=6 - additional internal variables must be stored in UVAR -  - GEO(25) = NUVAR
       IF (IECROU == 6) THEN
         GEO(25) = 1
       ENDIF
 C                       
       IGEO(3)   = ISENS
-      IGEO(101) = IFUNC                     
-      IGEO(102) = IFV                       
-      IGEO(103) = IFUNC2
-      IGEO(119) = IFUNC3
+      IGEO(101) = IFUNC ! FUN_A1                     
+      IGEO(102) = IFV    ! FUN_B1                   
+      IGEO(103) = IFUNC2 ! FUN_C1
+      IGEO(119) = IFUNC3 ! FUN_D1
 
 C----------------------
 C FROM LECGEO - GENERAL

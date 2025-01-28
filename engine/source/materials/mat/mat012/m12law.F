@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,16 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    m12law    ../engine/source/materials/mat/mat012/m12law.F
+      !||    m12law             ../engine/source/materials/mat/mat012/m12law.F
       !||--- called by ------------------------------------------------------
-      !||    mmain     ../engine/source/materials/mat_share/mmain.F90
+      !||    mmain              ../engine/source/materials/mat_share/mmain.F90
       !||--- calls      -----------------------------------------------------
-      !||    eosmain   ../common_source/eos/eosmain.F
-      !||    m14ama    ../engine/source/materials/mat/mat014/m14ama.F
-      !||    m14ftg    ../engine/source/materials/mat/mat014/m14ftg.F
-      !||    m14gtf    ../engine/source/materials/mat/mat014/m14gtf.F
+      !||    eosmain            ../common_source/eos/eosmain.F
+      !||    m14ama             ../engine/source/materials/mat/mat014/m14ama.F
+      !||    m14ftg             ../engine/source/materials/mat/mat014/m14ftg.F
+      !||    m14gtf             ../engine/source/materials/mat/mat014/m14gtf.F
+      !||--- uses       -----------------------------------------------------
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||====================================================================
       SUBROUTINE M12LAW(
      1   PM,        OFF,       SIG,       EINT,
@@ -45,7 +47,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      C   DF,        PSH,       PNEW,      DPDM,
      D   DPDE,      RHO,       TEMP,      ECOLD,
      E   BUFMAT,    NPC,       TF,        TSAIWU,
-     F   VAREOS,    NVAREOS,   JCVT,      JSPH)
+     F   VAREOS,    NVAREOS,   JCVT,      JSPH,
+     G   MAT_PARAM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -68,6 +75,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(MATPARAM_STRUCT_), INTENT(IN) :: MAT_PARAM !material data structure
       INTEGER, INTENT(IN) :: JCVT
       INTEGER, INTENT(IN) :: JSPH
       INTEGER MAT(MVSIZ),NGL(MVSIZ),NEL,EOSTYP
@@ -93,7 +101,7 @@ C-----------------------------------------------
       INTEGER KD1(MVSIZ), KD2(MVSIZ), KD3(MVSIZ), 
      .   KD4(MVSIZ),ICC(MVSIZ),
      .   I, IDAM, KDX, MX, NINDX, INDEX(MVSIZ), J, ICC_1
-C     REAL
+      INTEGER IBID(1) !bfrac argument not used in this context
       my_real
      .   AX(MVSIZ), AY(MVSIZ), AZ(MVSIZ), BX(MVSIZ), BY(MVSIZ), 
      .   BZ(MVSIZ), CX(MVSIZ), CY(MVSIZ),CZ(MVSIZ),
@@ -365,13 +373,13 @@ C
      3               DVOL    ,DF      ,VNEW   ,MAT   ,PSH  ,
      4               PNEW    ,DPDM    ,DPDE   ,TEMP  ,ECOLD,
      5               BUFMAT  ,SIG     ,MUOLD  ,12    ,POLD,
-     6               NPC     ,TF      ,VAREOS ,NVAREOS)
+     6               NPC     ,TF      ,VAREOS ,NVAREOS, MAT_PARAM, IBID)
         CALL EOSMAIN(1       ,NEL     ,EOSTYP ,PM    ,OFF  , ENER ,
      2               RHO     ,RHO0    ,AMU    ,AMU2  ,ESPE ,
      3               DVOL    ,DF      ,VNEW   ,MAT   ,PSH  ,
      4               PNEW    ,DPDM    ,DPDE   ,TEMP  ,ECOLD,
      5               BUFMAT  ,SIG     ,MUOLD  ,12    ,POLD,
-     6               NPC     ,TF      ,VAREOS ,NVAREOS)
+     6               NPC     ,TF      ,VAREOS ,NVAREOS, MAT_PARAM, IBID)
         DO  I=1,NEL
           T1(I)=T1(I)-PNEW(I)
           T2(I)=T2(I)-PNEW(I)

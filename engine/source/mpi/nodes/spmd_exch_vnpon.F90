@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,8 +62,8 @@
           integer, intent (in   )                           :: lenr             !< toal number of front node
           integer, intent (in   )                           :: ndim1            !< 1er dim of vn6
           integer, intent (in   )                           :: ndim2            !< 2nd dim of vn6
-          integer, intent (in   ) ,dimension(2,nspmd+1)     :: iad_offset         !< index array for comm
-          integer, intent (in   ) ,dimension(lenr)          :: fr_offset          !< front node arry
+          integer, intent (in   ) ,dimension(2,nspmd+1)     :: iad_offset       !< index array for comm
+          integer, intent (in   ) ,dimension(lenr)          :: fr_offset        !< front node array
       double precision,intent (inout),dimension(ndim1,ndim2):: vn6              !< exchange nodal array
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables

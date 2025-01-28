@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6   F24,     F34,     F15,     F25,
      7   F35,     F16,     F26,     F36,
      8   NEL,    JTHE,    FTHE,    THEM,
-     9   CONDN, CONDE,   IFTHE,  ICONDN)
+     9   CONDN, CONDE,   IFTHE,  ICONDN,
+     .   NODADT_THERM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -52,6 +53,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: NEL,JTHE,IFTHE,ICONDN
+      INTEGER, INTENT(IN) :: NODADT_THERM
       INTEGER NC1(*), NC2(*), NC3(*), NC4(*), NC5(*), NC6(*)
 C     REAL
       my_real

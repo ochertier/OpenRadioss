@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_c_c         ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    my_alloc_mod      ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE ANIOFFC(ELBUF_TAB,IPARG ,IOFF   ,EL2FA,NBF    ,
      .                   IADD ,NBF_L ,NBPART ,IADG ,NODGLOB,
@@ -36,7 +37,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD        
+      USE my_alloc_mod    
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,10 +71,12 @@ C     REAL
      .        N1,N2,N3,N4,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,
      .        N_FA, IHBE, SH_IH, ISTRAIN, IEXPAN, ISEATBELT
-      INTEGER IOFFBUF(NBF_L),RBUF,ISROT
+      INTEGER RBUF,ISROT
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IOFFBUF
       REAL R4
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
+      CALL MY_ALLOC(IOFFBUF,NBF_L)
       NN1 = 1
       NN2 = 1
       NN3 = 1
@@ -186,5 +190,6 @@ C-----------------------------------------------
         END IF
       ENDIF
 C-----------
+      DEALLOCATE(IOFFBUF)
       RETURN
       END

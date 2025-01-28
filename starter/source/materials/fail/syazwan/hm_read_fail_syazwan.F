@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -215,7 +215,7 @@ C--------------------------------------------------
       IF (MAX_DAM == ZERO) MAX_DAM = ONE
       MAX_DAM = MIN(MAX_DAM,ONE)
       MAX_DAM = MAX(MAX_DAM,ZERO)
-      ! Plastic strain at instability valye (N_VAL)
+      ! Plastic strain at instability value (N_VAL)
       IF(INST==1 .AND. N_VAL==ZERO) THEN
         N_VAL = FOURTH
       ENDIF

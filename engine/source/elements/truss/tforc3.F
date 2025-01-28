@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,6 +41,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_mod             ../engine/share/modules/h3d_mod.F
       !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE TFORC3(
      1   ELBUF_STR,JFT,      JLT,      PM,
@@ -54,7 +55,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9   IOUTPRT,  IPM,      NPF,      TF,
      A   ITASK,    H3D_DATA, NFT,      MTN,
      B   JSMS,     IGRE,     PRELD1,   STF_F,
-     C   DT )
+     C   DT , SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -62,6 +63,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE PRELOAD_AXIAL_MOD
       USE DT_MOD
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -95,6 +97,8 @@ C
       TYPE (ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (DT_), INTENT(IN) :: DT
+      type (sensors_),INTENT(INOUT) :: SENSORS
+
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -193,7 +197,7 @@ C--------------------------
      5   VY2,      VZ1,      VZ2,      X1,
      6   X2,       Y1,       Y2,       Z1,
      7   Z2,       ITASK,    H3D_DATA, NEL,
-     8   IGRE)
+     8   IGRE,     SENSORS)
       END IF !(IOUTPRT>0) THEN
 C-------------------------
 C     /PRELOAD/AXIAL

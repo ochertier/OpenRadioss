@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -47,11 +47,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    intbuf_fric_mod          ../common_source/modules/interfaces/intbuf_fric_mod.F90
       !||    intstamp_mod             ../engine/share/modules/intstamp_mod.F
       !||    metric_mod               ../common_source/modules/interfaces/metric_mod.F
-      !||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F90
       !||    outputs_mod              ../common_source/modules/outputs_mod.F
-      !||    sensor_mod               ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
+      !||    timer_mod                ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE INTFOP2(
+      SUBROUTINE INTFOP2(TIMERS,
      1       IPARI     ,X          ,A          ,IGROUPS   ,ALE_CONNECTIVITY,
      2       ICODT     ,FSAV       ,V          ,MS        ,DT2T            ,
      3       NELTST    ,ITYPTST    ,ITAB       ,STIFN     ,TF              ,
@@ -70,7 +71,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      H       WA        ,SENSOR_TAB ,QFRICINT   ,NCONT     ,INDEXCONT       ,
      I       TAGCONT   ,INOD_PXFEM ,MS_PLY     ,WAGAP     ,ELBUF_TAB       ,
      J       CONDN     ,CONDNSKYI  ,NV46      ,
-     K       SFBSAV6   ,FBSAV6     ,
+     K       SFBSAV6   ,FBSAV6     ,NODADT_THERM,THEACCFACT,
      L       ISENSINT  ,NISUBMAX   ,NB25_CANDT,NB25_IMPCT      ,
      M       NB25_DST1 ,NB25_DST2  ,IXIG3D     ,KXIG3D    ,WIGE     ,
      N       KNOT      ,IGEO       ,MULTI_FVM  ,H3D_DATA  ,
@@ -81,6 +82,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE ELBUFDEF_MOD 
       USE INTSTAMP_MOD
       USE INTBUFDEF_MOD
@@ -116,6 +118,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------     
+      INTEGER, INTENT(INOUT) :: TIMERS
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NELTST,ITYPTST,NEWFRONT(*),NSTRF(*),
      .        IRLEN20, ISLEN20, IRLEN20T, ISLEN20T,
@@ -139,7 +142,9 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: S_LOADPINTER
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
-      my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
+      INTEGER ,INTENT(IN) :: NODADT_THERM
+      my_real ,intent(in) :: theaccfact
+      my_real ,INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real 
      .        EMINX(*)
       my_real DT2T,
@@ -289,7 +294,7 @@ C
           IF(IMPL_S/=1)THEN
            NULLIFY(ptr_FR_I18)
            IF(NI18>0) ptr_FR_I18 => FR_I18(1,NI18) 
-           CALL I7MAINF(
+           CALL I7MAINF(TIMERS,
      1  IPARI          ,PTR_X          ,A                ,ALE_CONNECTIVITY,XCELL       ,
      2  ICODT          ,FSAV(1,NTH)    ,PTR_V            ,PTR_MS          ,DT2T        ,
      3  NELTST         ,ITYPTST        ,ITAB             ,STIFN           ,FSKYI       ,
@@ -304,7 +309,7 @@ C
      D  PCONTACT       ,TEMP           ,FTHE             ,FTHESKYI        ,
      E  PM             ,IPARG          ,IAD17            ,MSKYI_SMS       ,ISKYI_SMS   ,
      F  NODNX_SMS      ,MS0            ,QFRICINT         ,NPC             ,TF          ,
-     G  CONDN          ,CONDNSKYI      ,INTERFACES%INTBUF_TAB(N)    ,
+     G  CONDN          ,CONDNSKYI      ,INTERFACES%INTBUF_TAB(N),NODADT_THERM ,THEACCFACT ,
      H  FBSAV6         ,ISENSINT(1,N)  ,SFBSAV6            ,IXIG3D          ,
      I  KXIG3D         ,WIGE           ,KNOT             ,IGEO            ,MULTI_FVM   , 
      J  H3D_DATA       ,INTERFACES%INTBUF_FRIC_TAB,KNOTLOCPC      ,KNOTLOCEL        ,JTASK        ,
@@ -313,7 +318,7 @@ C
           ELSE
            NULLIFY(ptr_FR_I18)
            IF(NI18>0) ptr_FR_I18 => FR_I18(1,NI18)           
-           CALL I7MAINF(
+           CALL I7MAINF(TIMERS,
      1  IPARI      ,PTR_X         ,A                ,ALE_CONNECTIVITY,XCELL       ,                                            
      2  ICODT      ,FSAV(1,NTH)   ,PTR_V            ,PTR_MS          ,DT2T        ,              
      3  NELTST    ,ITYPTST        ,ITAB             ,STIFN           ,FSKYI       ,
@@ -328,7 +333,7 @@ C
      D  PCONTACT  ,TEMP           ,FTHE             ,FTHESKYI        ,
      E  PM        ,IPARG          ,IAD17            ,MSKYI_SMS       ,ISKYI_SMS   ,
      F  NODNX_SMS ,MS0            ,QFRICINT         ,NPC             ,TF          ,
-     G  CONDN      ,CONDNSKYI     ,INTERFACES%INTBUF_TAB(N)    ,
+     G  CONDN      ,CONDNSKYI     ,INTERFACES%INTBUF_TAB(N),NODADT_THERM,THEACCFACT ,
      H  FBSAV6     ,ISENSINT(1,N) ,SFBSAV6            ,IXIG3D          ,              
      I  KXIG3D     ,WIGE          ,KNOT             ,IGEO            ,MULTI_FVM,     
      J  H3D_DATA   ,INTERFACES%INTBUF_FRIC_TAB,KNOTLOCPC       ,KNOTLOCEL       ,JTASK       ,
@@ -358,12 +363,11 @@ C
      4      ISKY      ,FCONT        ,LINDMAX      ,
      5      JTASK,NB_JLT(JTASK),NB_JLT_NEW(JTASK),NB_STOK_N(JTASK),
      6      NISKYFI(N),NSTRF        , SECFCUM     ,VISCN        ,N         ,
-     .  FSAV(1,NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG
-     .                                                     +NFXBODY)  ,
+     .      FSAV(1,NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG+NFXBODY)  ,
      9      IDUM      ,IDUM         ,IDUM         ,IDUM      ,FNCONT  ,
      A      FTCONT    ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS ,
      B      ICONTACT  ,INTERFACES%INTBUF_TAB(N),FBSAV6,ISENSINT(1,N),SFBSAV6       ,
-     C      H3D_DATA  )
+     C      H3D_DATA  ,NODADT_THERM)
           ELSE
            CALL I10MAINF(
      1      IPARI(1,N),X         ,A       ,
@@ -372,12 +376,12 @@ C
      4      ISKY      ,FCONT        ,LINDMAX      ,
      5      JTASK,NB_JLT(JTASK),NB_JLT_NEW(JTASK),NB_STOK_N(JTASK),
      6      NISKYFI(N),NSTRF        , SECFCUM     ,VISCN        ,N         ,
-     .  FSAV(1,NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG
-     .                                                     +NFXBODY)  ,
-     9     NUM_IMP(N),NS_IMP(IAD)  ,NE_IMP(IAD)  ,IND_IMP(IAD),FNCONT  ,
+     .      FSAV(1,NINTER+NRWALL+NRBODY+NSECT+NJOINT+NVOLU+NRBAG+NFXBODY)  ,
+     9      NUM_IMP(N),NS_IMP(IAD)  ,NE_IMP(IAD)  ,IND_IMP(IAD),FNCONT  ,
      A      FTCONT   ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS   ,
      B      ICONTACT ,INTERFACES%INTBUF_TAB(N),FBSAV6,ISENSINT(1,N),SFBSAV6       ,
-     C      H3D_DATA )
+     C      H3D_DATA ,NODADT_THERM)
+
            IAD=IAD+NUM_IMP(N)
           ENDIF
 C-----------------------------------------------------------------------
@@ -388,7 +392,7 @@ C
      .         +NVOLU+NRBAG+NFXBODY+1
 C
           IF(IMPL_S/=1)THEN
-           CALL I11MAINF(
+           CALL I11MAINF(TIMERS,
      1  IPARI(1,N) ,X            ,A          ,
      2  ICODT      ,FSAV(1,NTH)  ,V            ,MS        ,DT2T       ,
      3  NELTST     ,ITYPTST      ,ITAB         ,STIFN     ,FSKYI      ,
@@ -400,9 +404,9 @@ C
      9  NPC        , TF          ,CONDN        ,CONDNSKYI ,FBSAV6     ,
      A  ISENSINT(1,N),SFBSAV6      ,FSAV(1,NN1)  ,H3D_DATA  ,INTERFACES%INTBUF_FRIC_TAB,
      B  JTASK      ,TAGNCONT      ,KLOADPINTER ,LOADPINTER,LOADP_HYD_INTER,
-     C  DGAPLOADINT,S_LOADPINTER )
+     C  DGAPLOADINT,S_LOADPINTER ,NODADT_THERM)
           ELSE
-           CALL I11MAINF(
+           CALL I11MAINF(TIMERS,
      1  IPARI(1,N) ,X            ,A          ,
      2  ICODT      ,FSAV(1,NTH)  ,V            ,MS        ,DT2T       ,
      3  NELTST     ,ITYPTST      ,ITAB         ,STIFN     ,FSKYI      ,
@@ -414,7 +418,7 @@ C
      9  NPC        , TF          ,CONDN        ,CONDNSKYI ,FBSAV6     ,
      A  ISENSINT(1,N),SFBSAV6      ,FSAV(1,NN1)  ,H3D_DATA  ,INTERFACES%INTBUF_FRIC_TAB,
      B  JTASK      ,TAGNCONT      ,KLOADPINTER ,LOADPINTER,LOADP_HYD_INTER,
-     C  DGAPLOADINT,S_LOADPINTER )
+     C  DGAPLOADINT,S_LOADPINTER ,NODADT_THERM)
           ENDIF
 C-----------------------------------------------------------------------
         ELSEIF(NTY == 20) THEN
@@ -434,7 +438,7 @@ C
 
           IF(IMPL_S == 0) IAD=1
 
-          CALL I20MAINF(
+          CALL I20MAINF(TIMERS,
      1  IPARI(1,N),X          ,A           ,
      2  ICODT     ,FSAV(1,N)    ,V            ,MS         ,DT2T        ,
      3  NELTST    ,ITYPTST      ,ITAB         ,STIFN      ,FSKYI       ,
@@ -451,7 +455,7 @@ C
      F  IRLEN20   ,ISLEN20      ,IRLEN20T     ,ISLEN20T   ,IRLEN20E    ,
      G  ISLEN20E  ,MSKYI_SMS    ,ISKYI_SMS    ,NODNX_SMS  ,NPC         ,
      H  TF        ,INTERFACES%INTBUF_TAB(N),FBSAV6,ISENSINT(1,N)     ,SFBSAV6       ,
-     I  H3D_DATA  )
+     I  H3D_DATA  ,theaccfact)
 
           IF(IMPL_S == 1) IAD=IAD+NUM_IMP(N)
 
@@ -465,7 +469,7 @@ C-----------------------------------------------------------------------
           END IF
 C
           ISTAMP=IPARI(43,N)
-          CALL I21MAINF(
+          CALL I21MAINF(TIMERS,
      1  IPARI     ,INTERFACES%INTBUF_TAB(N)              ,X          ,A           ,
      2  ICODT     ,FSAV(1,N)    ,V            ,MS         ,ITAB        ,
      3  STIFN     ,FSKYI        ,ISKY         ,FCONTG     ,N           ,
@@ -480,7 +484,7 @@ C
      B  CONDNSKYI ,DT2T         ,NELTST     ,ITYPTST      ,KINET       ,
      C  FBSAV6    ,ISENSINT(1,N),SFBSAV6      ,NISKYFI(N)   ,H3D_DATA    ,
      D  PSKIDS    ,TAGNCONT     ,KLOADPINTER,LOADPINTER   ,LOADP_HYD_INTER,
-     E  DGAPLOADINT,S_LOADPINTER,INTEREFRIC )
+     E  DGAPLOADINT,S_LOADPINTER,INTEREFRIC ,NODADT_THERM,THEACCFACT)
 C-----------------------------------------------------------------------
 C
 C-----------------------------------------------------------------------
@@ -491,7 +495,7 @@ C
           NN1 = NINTER+NRWALL+NRBODY+NSECT+NJOINT
      .         +NVOLU+NRBAG+NFXBODY+1
           NN2 = NINTER+NRWALL+NRBODY+NSECT+NJOINT+1
-           CALL I22MAINF(
+           CALL I22MAINF(TIMERS,
      1  IPARI       ,INTERFACES%INTBUF_TAB(N) ,X                 ,A                ,
      2  ICODT       ,FSAV(1,N)     ,V                 ,MS               ,DT2T        ,
      3  NELTST      ,ITYPTST       ,ITAB              ,STIFN            ,FSKYI       ,
@@ -517,7 +521,7 @@ C-----------------------------------------------------------------------
             NRTMDIM=0
           END IF
 C
-          CALL I23MAINF(
+          CALL I23MAINF(TIMERS,
      1  IPARI     ,INTERFACES%INTBUF_TAB(N)              ,X          ,A           ,
      2  ICODT     ,FSAV(1,N)    ,V            ,MS         ,ITAB        ,
      3  STIFN     ,FSKYI        ,ISKY         ,FCONT      ,N           ,
@@ -542,7 +546,7 @@ C
      .         +NVOLU+NRBAG+NFXBODY+1
           NN2 = NINTER+NRWALL+NRBODY+NSECT+NJOINT+1
           IF(IMPL_S/=1)THEN
-           CALL I24MAINF(
+           CALL I24MAINF(TIMERS,
      1  IPARI     ,INTERFACES%INTBUF_TAB(N),X            ,A          ,
      2  ICODT     ,FSAV(1,N)    ,V            ,MS         ,DT2T        ,
      3  NELTST    ,ITYPTST      ,ITAB         ,STIFN      ,FSKYI       ,
@@ -564,7 +568,7 @@ C
      K  INTERFACES,NISUBMAX)
 
           ELSE
-           CALL I24MAINF(
+           CALL I24MAINF(TIMERS,
      1  IPARI     ,INTERFACES%INTBUF_TAB(N),X            ,A          ,
      2  ICODT     ,FSAV(1,N)    ,V            ,MS         ,DT2T        ,
      3  NELTST    ,ITYPTST      ,ITAB         ,STIFN      ,FSKYI       ,
@@ -602,7 +606,7 @@ C
           LINDMAX = INTERFACES%INTBUF_TAB(N)%I_STOK(2)
           IF(IPARI(58,N)/=0) LINDMAX=MAX(LINDMAX,
      .                                   INTERFACES%INTBUF_TAB(N)%I_STOK_E(1),INTERFACES%INTBUF_TAB(N)%I_STOK_E(2))
-          CALL I25MAINF(
+          CALL I25MAINF(TIMERS,
      1  IPARI     ,INTERFACES%INTBUF_TAB(N),X            ,A          ,
      2  ICODT     ,FSAV(1,N)    ,V            ,MS         ,DT2T        ,
      3  NELTST    ,ITYPTST      ,ITAB         ,STIFN      ,FSKYI       ,
@@ -617,7 +621,7 @@ C
      D  PCONTACT  ,TEMP        ,FTHE        ,FTHESKYI    ,
      E  PM         ,IPARG       ,IAD17       ,MSKYI_SMS   ,ISKYI_SMS   ,
      F  NODNX_SMS  ,MS0         ,INOD_PXFEM  ,MS_PLY      ,WAGAP       ,
-     G  FBSAV6     ,ISENSINT(1,N),
+     G  FBSAV6     ,ISENSINT(1,N),NODADT_THERM,THEACCFACT ,
      H  SFBSAV6    ,H3D_DATA    ,INTERFACES%INTBUF_FRIC_TAB,NISKYFIE(N),
      I  APINCH     ,STIFPINCH   ,NPC         ,TF         , CONDN      ,
      J  CONDNSKYI  ,QFRICINT    ,TAGNCONT    ,KLOADPINTER,LOADPINTER  ,

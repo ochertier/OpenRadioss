@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,12 +55,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE Q4FORC2(PM    ,GEO    ,IC     ,X     ,A      ,
+      SUBROUTINE Q4FORC2(TIMERS, PM    ,GEO    ,IC     ,X     ,A      ,
      2                   V     ,MS     ,W      ,FLUX  ,FLU1  ,
      3                   VEUL   ,FV     ,ALE_CONNECT ,IPARG  ,NLOC_DMG,
      4                   ELBUF_TAB,TF  ,NPF    ,BUFMAT,PARTSAV,
@@ -72,11 +75,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A                   MS_2D ,FSKYM  ,IOUTPRT,MAT_ELEM,H3D_STRAIN,SZ_BUFVOIS,SNPC,
      B                   STF,SBUFMAT,SVIS,NSVOIS,IDTMINS,IRESP,TT,DT1,      
      .                   IDEL7NG,     IDEL7NOK,    IDTMIN,      MAXFUNC,IMON_MAT,
-     V                   USERL_AVAIL, heat_meca,  impl_s,     idyna,
-     .                   DT         )
+     V                   USERL_AVAIL, impl_s,     idyna,
+     .                   DT         , GLOB_THERM,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -84,6 +88,8 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -103,6 +109,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       my_real, INTENT(IN) :: DT1
       my_real, INTENT(IN) :: TT
       INTEGER, INTENT(IN) :: SNPC
@@ -119,7 +126,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IC(*), IPARG(NPARG,*), NPF(*), IPARTQ(*), 
      +  IPM(*), GRTH(*), IGRTH(*), IGEO(*), IADQ(4,*),ITASK,IOUTPRT
       INTEGER OFFSET, NEL, NELTST, ITYPTST, ICP, NG, IEXPAN,H3D_STRAIN
@@ -137,6 +143,8 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 c FUNCTION: Internal force computation of fully-integrated 2D Quad4 element
 c ARGUMENTS:  (I: input, O: output, IO: input & output, W: workspace)
@@ -542,7 +550,7 @@ C       COPY OLD STRESS AND DO NECESSARY TREATMENT
      3   NEL,     JCVT)
 C
 C       UPDATE STRESS
-        CALL MMAIN(
+        CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -570,14 +578,14 @@ C       UPDATE STRESS
      P   BID,         IPARG(1,NG), IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
-     S                SNPC,        STF,         SBUFMAT,
+     S   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
      T   SVIS,        SZ_IX,       IRESP,
-     *   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     *   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna,       DT         ,    BID   )
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
+     .   idyna,       DT         ,  BID   )
 C
 C       COMPUTE NODAL INTERNAL FORCE
         CALL Q4FINT2(
@@ -601,7 +609,7 @@ C       COMPUTE ELEMENT AVERAGE & SUMMERY DATA
      5   STI,        STIM,       ICPG,       OFF,
      6   LBUF%VOL,   GBUF%VOL,   GBUF%G_PLA, GBUF%G_EPSD,
      7   LBUF%EINTTH,GBUF%EINTTH,IEXPAN,     NEL,
-     8   BID,        BID,SVIS)
+     8   BID,        BID,SVIS,GLOB_THERM%NODADT_THERM)
 C
          DO I=LFT,LLT
            OFFG(I)=MIN(OFFG(I),OFF(I))
@@ -671,7 +679,7 @@ c
      5   EHOU,       R22,        R23,        R32,
      6   R33,        GRESAV,     GRTH,       IGRTH,
      7   IBIDON(1),  GBUF%EINTTH,ITASK,      NEL,
-     8   JTUR,       JCVT,       IGRE)
+     8   JTUR,       JCVT,       IGRE,       SENSORS)
       ENDIF
 C
 C     PROJECT NODAL INTERNAL FORCE INTO GLOBAL SYSTEM FOR CO-ROTATIONAL CASE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -576,8 +576,6 @@ C-----------spmd----------solves [L][D][L]^t{z}={v}--DIAG_M(deja inverse)-----
       !||    prec2h_solv    ../engine/source/implicit/prec_solv.F
       !||    prec5hc_solv   ../engine/source/implicit/prec_solv.F
       !||    spmd_sumf_v    ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    dsgraph_mod    ../engine/share/modules/dsgraph_mod.F
       !||====================================================================
@@ -691,9 +689,7 @@ C
 C----------------------
       CALL MY_BARRIER
        IF (ITASK==0.AND.NSPMD>1) THEN
-         IF(IMONM > 0) CALL STARTIME(66,1)
          CALL SPMD_SUMF_V(Z)
-         IF(IMONM > 0) CALL STOPTIME(66,1)
        END IF
       ENDIF
 C--------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -84,9 +84,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fill_surf_ellipse                  ../starter/source/model/sets/fill_gr_surf_ellipse.F
       !||    fill_surf_plane                    ../starter/source/model/sets/fill_gr_surf_plane.F90
       !||    fractal_element_neighbor           ../starter/source/materials/fail/fractal/fractal_element_neighbor.F90
-      !||    hm_read_inivol                     ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                     ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_set                             ../starter/source/model/sets/hm_set.F
-      !||    inivol_interf_mod                  ../starter/share/modules1/inivol_mod.F
       !||    insert_clause_in_set               ../starter/source/model/sets/insert_clause_in_set.F
       !||    lectur                             ../engine/source/input/lectur.F
       !||    line_buffer                        ../starter/source/model/sets/line_buffer.F
@@ -100,6 +99,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    st_qaprint_driver                  ../starter/source/output/qaprint/st_qaprint_driver.F
       !||    st_qaprint_set                     ../starter/source/output/qaprint/st_qaprint_set.F
       !||    surface_buffer                     ../starter/source/model/sets/surface_buffer.F
+      !||    surface_type                       ../starter/source/model/sets/surface_type.F90
       !||    tag_node_from_part_sphcel          ../starter/source/model/sets/tag_node_from_part_sphcel.F90
       !||--- uses       -----------------------------------------------------
       !||    names_and_titles_mod               ../common_source/modules/names_and_titles_mod.F
@@ -132,6 +132,7 @@ C-----------------------------------------------------------------------
         INTEGER   :: LINE_SET_FLAG    ! SET line activation flag
         INTEGER   :: NSEG             ! SET surface segments
         INTEGER   :: NSEG_1D          ! SET line/edge segments
+        INTEGER   :: EXT_ALL          ! type of the surface : /EXT or /ALL
 !==============================================================
 !        INTEGER   :: LEVEL ! Hierarchy level
 !                             (FLAG 'SUBLEVEL DONE' FOR SET OF SET)

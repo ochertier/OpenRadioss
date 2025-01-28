@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,7 +34,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      2                    YY     ,ZZ    ,VX   ,VY    ,VZ  ,
      3                    NC     ,NGL   ,MXT  ,NGEO  ,MASS,
      4                    DTELEM ,STI   ,SIGG ,EINTG ,RHOG,
-     5                    QG     ,TEMP0 ,TEMP ,NEL   )
+     5                    QG     ,TEMP0 ,TEMP ,NEL   ,NINTEMP)
 C-----------------------------------------------
       USE MESSAGE_MOD
 C-----------------------------------------------
@@ -54,6 +54,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NEL
+      INTEGER ,INTENT(IN) :: NINTEMP
       INTEGER NC(MVSIZ,16),MXT(*),NGL(*),NGEO(*),IXS(NIXS,*),IXS16(8,*)
 C     REAL
       my_real

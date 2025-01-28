@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -110,7 +110,7 @@ C----
                      ENDIF
                      IF(IE > 0) THEN
                         IPORTH = PFRICORTH(IP)
-C---1st Case : orthotropic directions are defined in /FRITION/ORIENTATION for part IP
+C---1st Case : orthotropic directions are defined in /FRICTION/ORIENTATION for part IP
 
                         IF(IPORTH >0) THEN 
 c

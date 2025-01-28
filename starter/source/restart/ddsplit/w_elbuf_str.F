@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -144,7 +144,7 @@ c---------------------------------------------------
               NPTTOT = NPTTOT + NPG*ELBUF%BUFLY(IL)%NPTT
             ENDDO
             IF (NPT == 0) NPTTOT = NPT
-          ELSEIF (ITY == 4 .OR. ITY == 5 .OR. ITY == 6 .OR. ITY == 100) THEN
+          ELSE
             NPG = 0
             NPTTOT = 0
           ENDIF

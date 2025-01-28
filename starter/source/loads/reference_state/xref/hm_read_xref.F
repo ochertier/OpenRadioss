@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -217,7 +217,7 @@ C
               MAT_ID = IPM(1,IMID)
               MTN = IPM(2, IMID)
               IF(MTN /= 35 .AND.MTN /= 38 .AND. MTN /= 42 .AND.
-     .             MTN /= 70 .AND. MTN /= 90)THEN
+     .             MTN /= 70 .AND. MTN /= 90 .AND. MTN /= 1)THEN
                    CALL FRETITL2(TITR1,IPM(NPROPMI-LTITR+1,IMID),LTITR)
                    CALL ANCMSG(MSGID=2014, MSGTYPE=MSGERROR, ANMODE=ANSTOP, I1=MAT_ID, C1=TITR1, I2=MTN )
                END IF
@@ -263,9 +263,10 @@ C
 C
             IF(SUB_ID /= 0)
      .        CALL SUBROTPOINT(XX(J),YY(J),ZZ(J),RTRANS,SUB_ID,LSUBMODEL)
-            IF (NSUBDOM==0) NN = USR2SYS(ID(J),ITABM1,MESS,PARTID)
             IF (NSUBDOM>0) THEN
               NN = R2R_SYS(ID(J),ITABM1,MESS)
+            ELSE
+              NN = USR2SYS(ID(J),ITABM1,MESS,PARTID)
             ENDIF     
             IF(IDDLEVEL == 0.AND.IPRI >= 5) WRITE(IOUT,'(5X,I10,5X,1P3G20.13)') ID(J),XX(J),YY(J),ZZ(J)
             TAGNOD(NN) = 1

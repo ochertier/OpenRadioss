@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,14 +35,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ngr2usr                ../starter/source/system/nintrr.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE11(
      1        IPARI      ,STFAC      ,FRIGAP     ,NOINT       ,NI             ,
      2        IGRSLIN    ,SENSORS    ,DEF_INTER  ,TITR        ,
      3        NOM_OPT    ,UNITAB     ,LSUBMODEL  ,NOM_OPTFRIC ,INTBUF_FRIC_TAB,
-     4        ID_TYPE19  ,NPARI      ,NPARIR     ,LNOPT1)
+     4        ID_TYPE19  ,NPARI      ,NPARIR     ,LNOPT1      ,ITHERM_FE  ,INTHEAT)
 C============================================================================
 C     
 C-----------------------------------------------
@@ -73,6 +72,8 @@ C-----------------------------------------------
       INTEGER NOM_OPT(LNOPT1,*), NOM_OPTFRIC(LNOPT1,*)
       INTEGER NI,NOINT
       INTEGER IPARI(NPARI),DEF_INTER(100),ID_TYPE19
+      INTEGER,INTENT(IN)    :: ITHERM_FE
+      INTEGER,INTENT(INOUT) :: INTHEAT
       my_real STFAC
       my_real FRIGAP(NPARIR)
       CHARACTER(LEN=NCHARTITLE) :: TITR

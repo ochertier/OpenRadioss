@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    m1law8    ../engine/source/materials/mat/mat001/m1law8.F
       !||    m2law8    ../engine/source/materials/mat/mat002/m2law8.F
       !||    meos8     ../engine/source/materials/mat_share/meos8.F
-      !||    mulaw8    ../engine/source/materials/mat_share/mulaw8.F
+      !||    mulaw8    ../engine/source/materials/mat_share/mulaw8.F90
       !||====================================================================
       SUBROUTINE MQVISC8(
      1   PM,      OFF,     RHO,     RK,

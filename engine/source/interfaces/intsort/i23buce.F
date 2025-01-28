@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      8   ICURV    ,NUM_IMP ,ITASK    ,
      9   I_MEM    ,MSR     ,GAP_M    ,NSNR     ,CURV_MAX,
      A   RENUM    ,NSNROLD ,IFPEN   ,MWAG     ,BMINMA   ,
-     B   NMN      ,IRECTG  ,BGAPSMX)
+     B   NMN      ,IRECTG  ,BGAPSMX ,INTHEAT,IDT_THERM,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -67,6 +67,9 @@ C-----------------------------------------------
       INTEGER CAND_E(*),CAND_N(*),MSR(*),MWAG(*),RENUM(*),IFPEN(*)
       INTEGER NCONTACT,ESHIFT,ILD,NB_N_B, I_MEM,IGAP,ICURV,NCONT,
      .        WEIGHT(*),II_STOK
+      INTEGER, INTENT(IN) :: INTHEAT
+      INTEGER, INTENT(IN) :: IDT_THERM
+      INTEGER, INTENT(IN) :: NODADT_THERM
 C     REAL
       my_real
      .   GAP,TZINF,MAXBOX,MINBOX,
@@ -218,7 +221,7 @@ C (en // SMP il y a possibilite de redondance de traitement mais no pb)
      6   INACTI  ,MWAG(IP0),CAND_P   ,IFPEN   ,
      7   NRTM    ,NSNROLD  ,IGAP     ,GAP      ,GAP_S   ,
      8   GAP_M   ,GAPMIN   ,GAPMAX   ,MARGE    ,CURV_MAX,
-     9   NIN     ,ITASK    ,BGAPSMX  )
+     9   NIN     ,ITASK    ,BGAPSMX  ,INTHEAT,IDT_THERM,NODADT_THERM)
  234  continue
 
 C

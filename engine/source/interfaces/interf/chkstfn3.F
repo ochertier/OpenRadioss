@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -542,6 +542,7 @@ C
       !||--- calls      -----------------------------------------------------
       !||    exch_tagel_c         ../engine/source/coupling/rad2rad/rad2rad_c.c
       !||    get_ibuf_c           ../engine/source/coupling/rad2rad/rad2rad_c.c
+      !||    get_local_node_id    ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    get_shmbuf_c         ../engine/source/coupling/rad2rad/rad2rad_c.c
       !||    my_barrier           ../engine/source/system/machine.F
       !||    r2r_exch_itag        ../engine/source/coupling/rad2rad/r2r_exchange.F
@@ -553,19 +554,19 @@ C
       !||    spmd_exch_r2r_itag   ../engine/source/mpi/r2r/spmd_r2r.F
       !||    spmd_ibcast          ../engine/source/mpi/generic/spmd_ibcast.F
       !||    spmd_r2r_tagel       ../engine/source/mpi/r2r/spmd_r2r.F
-      !||    sysfus2              ../engine/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
+      !||    nodal_arrays_mod     ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    rad2r_mod            ../engine/share/modules/rad2r.F
       !||    remesh_mod           ../engine/share/modules/remesh_mod.F
       !||    shooting_node_mod    ../engine/share/modules/shooting_node_mod.F
       !||====================================================================
-      SUBROUTINE TAGOFF3N(
+      SUBROUTINE TAGOFF3N(NODES,
      1    GEO     ,IXS   ,IXS10   ,IXS20   ,IXS16  ,IXQ    ,
      2    IXC     ,IXT    ,IXP    ,IXR     ,IXTG   ,
      3    ITAG    ,NODFT  ,NODLT  ,IPARG   ,EV     ,ITASK  ,
-     4    ITAGL   ,IXTG1  ,IAD_ELEM,FR_ELEM,ITAB   ,ITABM1 ,
+     4    ITAGL   ,IXTG1  ,IAD_ELEM,FR_ELEM,ITAB   ,
      5    ADDCNEL ,CNEL   ,KXSP   ,ELBUF_TAB,TAGEL ,IEXLNK ,
      6    IGRNOD  ,DD_R2R,DD_R2R_ELEM,SDD_R2R_ELEM,IDEL7NOK_SAV,
      7    IDEL7NOK_R2R,TAGTRIMC,TAGTRIMTG,S_ELEM_STATE,ELEM_STATE,
@@ -573,6 +574,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE nodal_arrays_mod
       USE ELBUFDEF_MOD
       USE RAD2R_MOD     
       USE REMESH_MOD
@@ -597,13 +599,14 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(nodal_arrays_) :: NODES
       INTEGER 
      .   LINDIDEL, LBUFIDEL,
      .   IXS(NIXS,*),IXS10(6,*),IXS20(12,*),IXS16(8,*),
      .   IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
      .   IXR(NIXR,*), IXTG(NIXTG,*),IXTG1(4,*),ITAG(*),
      .   IPARG(NPARG,*), NODFT,NODLT,ITASK, ITAGL (*),
-     .   IAD_ELEM(2,*),FR_ELEM(*),ITAB(*),ITABM1(*),
+     .   IAD_ELEM(2,*),FR_ELEM(*),ITAB(*),
      .   ADDCNEL(0:*),CNEL(0:*),KXSP(NISP,*),
      .   TAGEL(*),
      .   IEXLNK(NR2R,NR2RLNK),DD_R2R(NSPMD+1,*), 
@@ -634,10 +637,6 @@ C-----------------------------------------------
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       INTEGER, DIMENSION(:), ALLOCATABLE :: LOCAL_ELEM_INDEX
       INTEGER :: SHIFT
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-      INTEGER SYSFUS2      
 C-----------------------------------------------
       ! allocation of local list of deactivated element
       ALLOCATE( LOCAL_ELEM_INDEX(S_ELEM_STATE) )
@@ -1189,7 +1188,7 @@ C-----------------------------------------------------------------
             CALL EXCH_TAGEL_C(NTAGEL_R2R_RECV,TAGEL_R2R_RECV,1)
           ENDIF
           DO I=1,NTAGEL_R2R_RECV
-            N1 = SYSFUS2(TAGEL_R2R_RECV((I-1)*3+2),ITABM1,NUMNOD)          
+            N1 = GET_LOCAL_NODE_ID(NODES,TAGEL_R2R_RECV((I-1)*3+2)) 
             IF (N1 > 0) THEN
               ITY = TAGEL_R2R_RECV((I-1)*3+3)
               DO J = ADDCNEL(N1),ADDCNEL(N1+1)-1            
@@ -1262,11 +1261,11 @@ C
       !||    setmsr3             ../engine/source/interfaces/interf/chkstfn3.F
       !||    spmd_exchmsr_idel   ../engine/source/mpi/interfaces/spmd_exchmsr_idel.F
       !||    spmd_init_idel      ../engine/source/mpi/interfaces/spmd_init_idel.F
-      !||    sysfus2             ../engine/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    nodal_arrays_mod    ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||====================================================================
-      SUBROUTINE CHKSTFN3N(
+      SUBROUTINE CHKSTFN3N(NODES,
      1    IPARI   ,GEO     ,IXS    ,IXQ       ,IXC      ,IXT     ,
      2    IXP     ,IXR     ,IXTG   ,ITAG      ,IPARG    ,ITASK   ,
      3    NEWFRONT,ITAGL   ,MS     ,IN        ,ADM      ,ITAB    ,
@@ -1276,6 +1275,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE nodal_arrays_mod
       USE ELBUFDEF_MOD
       USE INTBUFDEF_MOD    
 C----6---------------------------------------------------------------7---------8
@@ -1293,6 +1293,7 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(nodal_arrays_), intent(inout) :: NODES
       INTEGER 
      .   IPARI(NPARI,*), LINDIDEL, LBUFIDEL,
      .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
@@ -1321,11 +1322,6 @@ C-----------------------------------------------
      .        TAGEL_SIZE,LEVEL
       INTEGER, DIMENSION(:),ALLOCATABLE ::IBUFSEGLO_SAV,INDSEGLO_sav
       TYPE(G_BUFEL_) ,POINTER :: GBUF
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-      INTEGER SYSFUS2      
-C-----------------------------------------------
 C
       OFQ=NUMELS
       OFC=OFQ+NUMELQ
@@ -1796,7 +1792,7 @@ C Partie non parallele
        CALL SPMD_INIT_IDEL(IDBS-1, IRSIZE, IRECV,IAD_ELEM)
        CALL SPMD_EXCHMSR_IDEL(
      1         IBUFS  ,IDBS-1 ,IXS    ,IXC    ,IXTG   , 
-     2         IXQ    ,IPARG  ,ITAGL  ,ITABM1 ,
+     2         IXQ    ,IPARG  ,ITAGL  ,NODES,
      3         IRSIZE ,IRECV  ,CNEL   ,ADDCNEL,OFC    ,
      4         OFT    ,OFTG   ,OFUR   ,OFR    ,OFP    ,
      5         IDB-1  ,IXP    ,IXR    ,IXT    ,GEO    ,
@@ -1917,6 +1913,8 @@ C
       !||    i24_remove_global_segment   ../engine/source/interfaces/interf/chkstfn3.F
       !||    i25_remove_global_segment   ../engine/source/interfaces/interf/chkstfn3.F
       !||    my_barrier                  ../engine/source/system/machine.F
+      !||--- uses       -----------------------------------------------------
+      !||    my_alloc_mod                ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE CHKMSR3N(
      1    NMN  ,MSR   ,ITAG  ,ITASK,IRECT   ,
@@ -1927,6 +1925,8 @@ C
      6    BUFS ,NINDEX,TAGEL ,NG,
      7    MSEGLO,MVOISIN,
      8    INDSEGLO ,IBUFSEGLO)
+C-----------------------------------------------
+       USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1956,9 +1956,14 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, NMNF, NMNL, NRTF, NRTL, N1, N2, N3, N4, 
-     .        NN, II, IX, K, NIND, N, NIND2, NINDL(NRTM*2),MA_SURF,IND_SEGLO(NRTM*2),NIND_SEGLO
+     .        NN, II, IX, K, NIND, N, NIND2, MA_SURF,NIND_SEGLO
+      INTEGER,DIMENSION(:),ALLOCATABLE :: NINDL
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IND_SEGLO
 C     REAL
 C-----------------------------------------------
+      CALL MY_ALLOC(NINDL,NRTM*2)
+      CALL MY_ALLOC(IND_SEGLO,NRTM*2)
+
       NMNF = 1 + ITASK*NMN / NTHREAD
       NMNL = (ITASK+1)*NMN / NTHREAD
 C
@@ -2095,6 +2100,9 @@ C
       NINDG = ICOMP
 C
       CALL MY_BARRIER()
+
+      DEALLOCATE(NINDL)
+      DEALLOCATE(IND_SEGLO)
 C
       RETURN
       END

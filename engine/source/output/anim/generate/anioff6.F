@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,13 +29,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_c_c         ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    my_alloc_mod      ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE ANIOFFS(ELBUF_TAB,IPARG   ,IOFF    ,EL2FA   ,NBF      ,
      .                   NBPART  ,IADG    ,ISPH3D  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD         
+      USE ELBUFDEF_MOD
+      USE my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,9 +66,11 @@ C     REAL
       INTEGER I, NG, NEL, NFT, IAD, ITY, LFT, NPT,
      .        N, J, LLT, MLW, K1, K2,MT,JALE, IMID, 
      .        N1,N2,N3,N4,ISOLNOD,NN1,NN2,NN3,NN4,NN5
-      INTEGER IOFFBUF(NBF),RBUF
+      INTEGER RBUF
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IOFFBUF
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C=======================================================================
+      CALL MY_ALLOC(IOFFBUF,NBF)
       NN1 = 1
       NN2 = 1
       NN3 = NN2 + NUMELS
@@ -175,5 +179,6 @@ C-----------------------------------------------
         CALL SPMD_IGET_PARTN(1,NBF,IOFFBUF,NBPART,IADG,RBUF,2)
       ENDIF
 C
+      DEALLOCATE(IOFFBUF)
       RETURN
       END

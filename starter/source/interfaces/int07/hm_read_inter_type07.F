@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ngr2usr                ../starter/source/system/nintrr.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE07(
@@ -45,7 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      3        DEF_INTER  ,NPC1       ,SENSORS    ,UNITAB    ,LSUBMODEL  ,
      4        TITR       ,NOM_OPTFRIC,INTBUF_FRIC_TAB,NPC   ,TF         ,
      4        ID_TYPE19  ,NPARI      ,NPARIR     ,SNPC      ,SNPC1      ,
-     5        LNOPT1     ,NPTS)
+     5        LNOPT1     ,NPTS       ,ITHERM_FE  ,INTHEAT    )
 C============================================================================
 C
 C-----------------------------------------------
@@ -79,6 +78,8 @@ C-----------------------------------------------
       INTEGER NOM_OPT(LNOPT1,*), NOM_OPTFRIC(LNOPT1,*)
       INTEGER NI,NOINT,ID_TYPE19
       INTEGER IPARI(NPARI),DEF_INTER(100),NPC1(SNPC1),NPC(SNPC)
+      INTEGER,INTENT(IN   ) :: ITHERM_FE
+      INTEGER,INTENT(INOUT) :: INTHEAT
       my_real STFAC,XFILTR
       my_real FRIGAP(NPARIR),FRIC_P(10),TF(NPTS)
       CHARACTER(LEN=NCHARTITLE) :: TITR
@@ -396,7 +397,7 @@ C
           IS1 =2
         ENDIF
 
-        IF(INTTH > 0 ) INTHEAT = 1
+        IF (INTTH > 0 ) INTHEAT = 1
         IPARI(47) = INTTH
 C Ibag
         IF (IBAG/=0.AND.NVOLU==0.AND.IALELAG==0.AND.NSPHSOL==0) THEN
@@ -696,7 +697,7 @@ C
           XTHE = ONE * XTHE_UNIT
         ENDIF
 C
-        IF(ITHERM_FE == 0 .AND. INTTH > 0 ) THEN
+        IF (ITHERM_FE == 0 .AND. INTTH > 0 ) THEN
            INTHEAT = 0
            IPARI(47) = 0
            CALL ANCMSG(MSGID=702,

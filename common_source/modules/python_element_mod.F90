@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,7 +50,7 @@
           subroutine python_get_elemental_entity(nb,name,uid) bind(c,name="cpp_python_get_elemental_entity")
             use iso_c_binding
             integer(kind=c_int), value, intent(in) :: nb
-            integer(kind=c_int), intent(inout) :: uid !< retuns the user id of the nth variable found in the python code
+            integer(kind=c_int), intent(inout) :: uid !< returns the user id of the nth variable found in the python code
             character(kind=c_char), dimension(100), intent(inout) :: name !< variable name, as defined in H3D keyword
           end subroutine
         end interface
@@ -164,6 +164,7 @@
 !                                                      Body
 ! ----------------------------------------------------------------------------------------------------------------------
           element%n = buffer(1)
+          pos = 1
           ! allocate the arrays
           if(allocated(element%keyword)) deallocate(element%keyword)
           if(allocated(element%user_ids)) deallocate(element%user_ids)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    i22main_tri               ../engine/source/interfaces/intsort/i22main_tri.F
       !||--- calls      -----------------------------------------------------
-      !||    startime                  ../engine/source/system/timer.F
-      !||    stoptime                  ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod               ../engine/share/message_module/message_mod.F
       !||====================================================================
@@ -95,7 +93,6 @@ C=======================================================================
       !-------------------------------------------!
       !    Domain Bounds from i22xsave            !
       !-------------------------------------------!
-      IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
       BMINMA(3,LOC_PROC) = BMINMAL(3)
@@ -114,7 +111,7 @@ C=======================================================================
         ENDIF
       ENDDO
       !-------------------------------------------!
-      ! Remote Lagrangian Domain Bounds Recieving !
+      ! Remote Lagrangian Domain Bounds Receiving !
       !-------------------------------------------!
       NBIRECV=0
       DO P = 1, NSPMD
@@ -138,7 +135,6 @@ C=======================================================================
       !-------------------------------------------!
       ! Returning complete bounds data
       BMINMAL_SPMD = BMINMA
-      IF (IMONM > 0) CALL STOPTIME(25,1)
 #endif
       RETURN
       END

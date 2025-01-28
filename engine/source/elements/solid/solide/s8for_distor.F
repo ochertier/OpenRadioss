@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    s8for_distor   ../engine/source/elements/solid/solide/s8for_distor.F
       !||--- called by ------------------------------------------------------
+      !||    s8cforc3       ../engine/source/elements/thickshell/solide8c/s8cforc3.F
       !||    s8eforc3       ../engine/source/elements/solid/solide8e/s8eforc3.F
+      !||    scforc3        ../engine/source/elements/thickshell/solidec/scforc3.F
       !||    sforc3         ../engine/source/elements/solid/solide/sforc3.F
       !||    szforc3        ../engine/source/elements/solid/solidez/szforc3.F
       !||--- calls      -----------------------------------------------------
@@ -163,7 +165,7 @@ C---- element center
          PENMIN(1:NEL) = GAP_MIN*LL(1:NEL)
          PENREF(1:NEL) = GAP_MAX*LL(1:NEL)
          MARGE(1:NEL) = TWO*GAP_MAX*LL(1:NEL)
-C---- seg 1 : 2,1,4, 3 normal towords to outside like tetra
+C---- seg 1 : 2,1,4, 3 normal towards outside like tetra
          CALL SFOR_N2S4(   XC,      YC,     ZC,   STIF,     
      .                     X2,     X1,     X4,     X3,
      .                     Y2,     Y1,     Y4,     Y3,
@@ -247,7 +249,7 @@ C---- seg 6 : 5,6,7,8
      .                  STI_C,   NEL ,    VC ,E_DISTOR,
      .                    DT1)
          NCTL = NCTL + IFCTL
-C---- force assembalge and STI update (dt)
+C---- force assemblage and STI update (dt)
           DO I=1,NEL
              FCX = ONE_OVER_8*FORC_N(I,1)
              FCY = ONE_OVER_8*FORC_N(I,2)

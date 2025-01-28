@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -243,6 +243,7 @@ C
       EXTERNAL BITGET
 C-----------------------------------------------
       DTMINI=ZERO
+      FAC = ZERO
       IF (IRESP==1) THEN
         PREC = FIVEEM4
         TINY = EM15

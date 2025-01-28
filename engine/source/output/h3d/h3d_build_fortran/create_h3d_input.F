@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -24,6 +24,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    create_h3d_input       ../engine/source/output/h3d/h3d_build_fortran/create_h3d_input.F
       !||--- called by ------------------------------------------------------
       !||    h3d_read               ../engine/source/output/h3d/h3d_build_fortran/h3d_read.F
+      !||    lech3d                 ../engine/source/output/h3d/h3d_build_fortran/lech3d.F
       !||--- calls      -----------------------------------------------------
       !||    arret                  ../engine/source/system/arret.F
       !||    nvar                   ../engine/source/input/nvar.F
@@ -107,7 +108,7 @@ c        print *,'ds la construct du read_input',H3D_DATA%INPUT_LIST(H3D_DATA%N_
 c      ENDDO
 c
 C-------------------------------------------------- 
-C SEARCH Keywords for Actication of some output computation
+C SEARCH Keywords for Activation of some output computation
 C-------------------------------------------------- 
       IS_CHAR_KEY3 = 1
       IS_EMPTY_KEY3 = 1

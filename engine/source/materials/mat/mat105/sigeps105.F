@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,7 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A     SOUNDSP,VISCMAX,UVAR    ,OFF     ,NFT      ,V      ,
      B     W      ,X      ,IX      ,N48     ,NIX      ,JTHE   ,
      C     GEO    ,PID    ,ILAY    ,NG      ,ELBUF_TAB,PM     , 
-     D     IPARG  ,BUFVOIS ,IPM     ,BUFMAT   ,STIFN  ,
+     D     IPARG  ,BUFVOIS ,IPM    ,BUFMAT  ,STIFN    ,
      E     VD2    ,VDX    ,VDY     ,VDZ     ,MAT      ,VOLN   ,
      F     QNEW   ,DDVOL  ,QOLD    )  
 C-----------------------------------------------
@@ -53,7 +53,7 @@ C-----------------------------------------------
 C This subroutine computes Powder Burn EOS and is based on (Atwood,Friis,Moxnes) publication.
 C ELEMENT BUFFER
 C   %BFRAC  : is ignition fraction (depends on flamme position regarding the cell)
-C   UVAR(6) : is burn fracttion (depends on F(t) function and also on gas pressure and grains shape)
+C   UVAR(6) : is burn fraction (depends on F(t) function and also on gas pressure and grains shape)
 C EOS
 C   GAS    : Exponantial EOS
 C   POWDER : Linear EOS
@@ -61,6 +61,7 @@ C MATERIAL BUFFER
 C   UPARAM(1:NUPARAM) : material parameters
 C   UVAR  (1:NUVAR)   : cell buffer specific for this material law : Pgas, etc...
 C
+C An Alternative implementation is to use /EOS option : see ./common_source/eos/powder_burn.F
 C
 C-----------------------------------------------
 C   M o d u l e s
@@ -141,7 +142,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real :: P,Qa,QB,QAL,QBL, POLD,VOLD,EINC,PNEW
       my_real :: BULK, D, EG, Gr, C, ALPHA,BETA, C1, C2,FSCALE_G,FSCALE_B,FSCALE_P,FSCALE_RHO
-      my_real :: P0,XL, DD, TFEXTT, PSH, VOLO, ESPE, E0, TOTAL_BFRAC, DELTA_BF, BRATE
+      my_real :: P0,XL, DD, PSH, VOLO, ESPE, E0, TOTAL_BFRAC, DELTA_BF, BRATE
       my_real :: PG,PG_,PS, MU_G, MU_P, MU, RHO_G,RHO_G_, RHO_S, RHOG, RHO_Si
       INTEGER :: funcb, funcg
       INTEGER :: IBID, IBFRAC, I , K     
@@ -155,7 +156,6 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
-      TFEXTT =  ZERO
       GBUF   => ELBUF_TAB(NG)%GBUF           
       LBUF   => ELBUF_TAB(NG)%BUFLY(ILAY)%LBUF(1,1,1)
       BUFLY  => ELBUF_TAB(NG)%BUFLY(ILAY)      
@@ -211,18 +211,17 @@ C-----------------------------------------------
       ENDIF
 
       DO I=1,NEL
-    
         !--------------------------------!
         ! INIT.                          !
         !--------------------------------!
-        MASS = RHO(I)*VOLUME(I)      
-        XL   = DELTAX(I)
-        ESPE = EINT(I)/MASS 
-        PS   =UVAR(I,1)          
-        PG   =UVAR(I,2)          
-        RHO_S=UVAR(I,3)
-        RHO_G=UVAR(I,4)
-        POLD =UVAR(I,5)  
+        MASS  = RHO(I)*VOLUME(I)
+        XL    = DELTAX(I)
+        ESPE  = EINT(I)/MASS
+        PS    = UVAR(I,1)
+        PG    = UVAR(I,2)
+        RHO_S = UVAR(I,3)
+        RHO_G = UVAR(I,4)
+        POLD  = UVAR(I,5)
                         
         !--------------------------------!
         ! IGNITION FRACTION              !
@@ -239,8 +238,6 @@ C-----------------------------------------------
          ENDIF
         ENDIF
 
-
-                
         !------------------------------------------------!
         ! BURN FRACTION                                  !
         !  BFRAC  : ignition fraction (flamme evolution) !
@@ -261,7 +258,6 @@ C-----------------------------------------------
             ! avoid LOG(0)
             TOTAL_BFRAC = BFRAC(I)*UVAR(I,6)
         ENDIF       
-        
 
         !--------------------------------!
         ! EOS SOLVING                    !
@@ -274,19 +270,13 @@ C-----------------------------------------------
         
         !in case of compressible solid (linear EOS)
         RHO_Si=RHO0(I)/compac*((UVAR(I,2)-P0)/BULK+ONE)
-        
         !in case of constant solid density
         !rho_si=rho0(I)/compac
         
-        
-       IF(MASS_G>ZERO)RHO_G=MASS_G/(VOLN(I)-MASS_S/ max(EM10,RHO_Si)) 
-
-         
-        PG   = RHO_G*EG*EXP(RHO_G/D)
-        
-        PS   = BULK*(RHO_Si/RHO0(I))
-        SSP_S= SQRT(BULK/RHO0(I))
-        
+        IF(MASS_G>ZERO)RHO_G=MASS_G/(VOLN(I)-MASS_S/ max(EM10,RHO_Si))
+        PG    = RHO_G*EG*EXP(RHO_G/D)
+        PS    = BULK*(RHO_Si/RHO0(I))
+        SSP_S = SQRT(BULK/RHO0(I))
         IF(RHO_G>ZERO)THEN
           SSP_G = RHO0(I)/D*Pg + EXP(RHO_G/D)* Pg / (RHO_G/RHO0(I))**2
           SSP_G = SQRT(ONE/RHO_G * SSP_G)
@@ -294,7 +284,6 @@ C-----------------------------------------------
           SSP_G = ZERO
         ENDIF
 
-   
         !--------------------------------!
         ! Global Pressure & SoundSpeed   !
         !--------------------------------! 
@@ -326,7 +315,7 @@ C-----------------------------------------------
        !UVAR(I,6) -> F(t)
        !UVAR(I,7) -> Mass0  
        
-          
+        ! --- verification output
         if(time==ZERO)then
         OPEN(UNIT=1,FILE='F.txt'    )
         OPEN(UNIT=2,FILE='Pg.txt'   )
@@ -347,12 +336,8 @@ C-----------------------------------------------
         CLOSE(1)
         CLOSE(2)
         CLOSE(3)
-         
 
       ENDDO! next I   
-
-
-
 
 C-----------------------------------------------
       RETURN

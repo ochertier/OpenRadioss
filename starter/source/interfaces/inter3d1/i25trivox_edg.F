@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -59,7 +59,6 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "comlock.inc"
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -692,7 +691,7 @@ C=======================================================================
           IMS2 = BITGET(MBINFLG(NE),1)
         END IF
 
-        IF(FLAG_REMOVED_NODE)THEN
+        IF(FLAG_REMOVED_NODE .AND. S_REMNODE_E2S > 0)THEN
           K = KREMNODE_E2S(2*(NE-1)+1)
           L = KREMNODE_E2S(2*(NE-1)+2)-1
           DO M=K,L
@@ -793,7 +792,7 @@ C       Reset TAGEDG
          ENDDO    !NEXT IY
         ENDDO     !NEXT IZ 
 
-        IF(FLAG_REMOVED_NODE)THEN
+        IF(FLAG_REMOVED_NODE.AND.S_REMNODE_E2S>0)THEN
           K = KREMNODE_E2S(2*(NE-1)+1)
           L = KREMNODE_E2S(2*(NE-1)+2)-1
           DO M=K,L

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,9 +23,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    sigeps19c    ../engine/source/materials/mat/mat019/sigeps19c.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc       ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc       ../engine/source/materials/mat_share/mulawc.F90
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE SIGEPS19C(
      .            NEL    ,NUPARAM,NIPARAM,FLAG_ZCFAC,ZCFAC  ,SHF    ,

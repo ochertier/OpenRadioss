@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -31,16 +31,36 @@
 #include <array>
 #include <set>
 #include <array>
+#include <set>
+#include <utility>
+#include <vector> 
+#include <limits>
+#include <cmath>
+
+
+#include <stdio.h>
+
+#if defined(_WIN64)
+#include <BaseTsd.h>
+typedef SSIZE_T My_ssize_t;
+#else
+#include <stddef.h>
+typedef ssize_t My_ssize_t;
+#endif
+
 #define max_line_length 500
 // the maximum number of lines of python function
 #define max_num_lines 1000
 #define max_code_length max_line_length *max_num_lines
 #define max_variable_length 100
 
+constexpr int sensor_result_size  = 2;
+
 typedef void *PyObject;
-typedef PyObject (*T_PyDict_GetItemString)(PyObject *, const char *);
+// Corrected typedefs for Python C API function pointers
+typedef PyObject *(*T_PyDict_GetItemString)(PyObject *, const char *);
 typedef int (*T_PyCallable_Check)(PyObject *);
-typedef PyObject *(*T_PyTuple_New)(int);
+typedef PyObject *(*T_PyTuple_New)(My_ssize_t);  // Use Py_ssize_t for size
 typedef PyObject *(*T_PyFloat_FromDouble)(double);
 typedef PyObject *(*T_PyObject_CallObject)(PyObject *, PyObject *);
 typedef void (*T_Py_Initialize)();
@@ -48,7 +68,7 @@ typedef void (*T_Py_Finalize)();
 typedef PyObject *(*T_PyImport_AddModule)(const char *);
 typedef PyObject *(*T_PyModule_GetDict)(PyObject *);
 typedef int (*T_PyRun_SimpleString)(const char *);
-typedef int (*T_PyTuple_SetItem)(PyObject *, int, PyObject *);
+typedef int (*T_PyTuple_SetItem)(PyObject *, My_ssize_t, PyObject *);  // Use Py_ssize_t for index
 typedef void (*T_Py_DecRef)(PyObject *);
 typedef double (*T_PyFloat_AsDouble)(PyObject *);
 typedef int (*T_PyDict_SetItemString)(PyObject *, const char *, PyObject *);
@@ -56,6 +76,13 @@ typedef void (*T_PyErr_Fetch)(PyObject **, PyObject **, PyObject **);
 typedef void (*T_PyErr_Display)(PyObject *, PyObject *, PyObject *);
 typedef PyObject *(*T_PyErr_Occurred)();
 typedef int (*T_Py_IsInitialized)();
+typedef PyObject *(*T_PyObject_Str)(PyObject *);
+typedef const char *(*T_PyUnicode_AsUTF8)(PyObject *);
+typedef PyObject *(*T_PyDict_New)();
+typedef PyObject *(*T_PyList_New)(My_ssize_t);  // Use Py_ssize_t for size
+typedef int (*T_PyList_SetItem)(PyObject *, My_ssize_t, PyObject *);
+
+
 
 // Python library handle
 #ifdef _WIN32
@@ -103,6 +130,11 @@ T_PyErr_Fetch MyErr_Fetch;
 T_PyErr_Display MyErr_Display;
 T_PyErr_Occurred MyErr_Occurred;
 T_Py_IsInitialized My_IsInitialized;
+T_PyObject_Str MyObject_Str;
+T_PyUnicode_AsUTF8 MyUnicode_AsUTF8;
+T_PyDict_New MyDict_New;
+T_PyList_New MyList_New;
+T_PyList_SetItem MyList_SetItem;
 
 
 constexpr std::array<const char*, 89> ELEMENT_KEYWORDS = {
@@ -209,7 +241,7 @@ struct ComparePairs {
 };
 using KeywordPairs = std::set<std::pair<int, const char*>, ComparePairs>;
 
-// Get a pair of keyword, id from an index: is ineficient but called only at initialization
+// Get a pair of keyword, id from an index: is inefficient but called only at initialization
 KeywordPair get_keyword_pair(const KeywordPairs& keywordPairs, size_t n) {
     if (n >= keywordPairs.size()) {
         std::cout<<"ERROR: Out of range access in elemental value for Python function."<<std::endl;

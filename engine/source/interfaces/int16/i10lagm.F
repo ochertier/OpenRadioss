@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -159,7 +159,7 @@ c
           DO K=1,6
             III(LLT,K+8)=IXS10(K,I10)
           ENDDO
-          DO K=1,10
+          DO K=1,7
             I = III(LLT,K)
             XX(LLT,K)=X(1,I)
             YY(LLT,K)=X(2,I)

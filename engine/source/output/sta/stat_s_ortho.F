@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -118,6 +118,7 @@ c
 C          JHBE   = IGEO(10,PID)
 c
           IF (JHBE==17.AND.IINT==2) JHBE = 18
+          IF (JHBE==1.AND.IINT==3) JHBE = 5
           GBUF => ELBUF_TAB(NG)%GBUF
           LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
           IF(IGTYP == 22) THEN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -102,23 +102,25 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
       !||    srrotadp               ../engine/source/elements/solid/solide/srrotadp.F
       !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    startime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
       !||    stherm                 ../engine/source/elements/solid/solide/stherm.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||    voln22                 ../engine/source/interfaces/int22/voln22.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SFORC3(
+      SUBROUTINE SFORC3(TIMERS,
      1   ELBUF_TAB,  NG,         PM,         GEO,
      2   IXS,        X,          NV46,       A,
      3   V,          MS,         W,          FLUX,
@@ -148,11 +150,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      R   NALE,       D,          IOUTPRT,    NLOC_DMG,
      S   MAT_ELEM,   H3D_STRAIN, DT,         IDEL7NOK,NSVOIS,
      T   SZ_BUFVOIS, SNPC,STF,SBUFMAT,SVIS,IDTMINS,IRESP,
-     U   IDEL7NG,    MAXFUNC,    USERL_AVAIL, heat_meca, 
-     V   impl_s,     idyna)
+     U   IDEL7NG,    MAXFUNC,    USERL_AVAIL, GLOB_THERM, 
+     V   impl_s,     idyna,      WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD         
@@ -163,6 +166,7 @@ C-----------------------------------------------
       USE DT_MOD
       USE ELBUFDEF_MOD
       USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -189,6 +193,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) ,INTENT(INOUT) :: TIMERS
       INTEGER, INTENT(IN) :: SNPC
       INTEGER, INTENT(IN) :: SZ_BUFVOIS
       INTEGER, INTENT(IN) :: NSVOIS
@@ -202,7 +207,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IMPL_S
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER, DIMENSION(*), INTENT(IN) :: IPARG,IPARTS,NPF,NALE
       INTEGER,INTENT(IN) :: NG,NEL
       INTEGER IXS(NIXS,NUMELS), IADS(8,*),IPM(NPROPMI,NUMMAT),
@@ -210,9 +214,9 @@ C-----------------------------------------------
      .        ICONTACT(*),ISKY(*),ITAB(*)
       INTEGER NELTST,ITYPTST,OFFSET,NVC,ITASK,
      .        ISTRAIN, IEXPAN, NV46,IOUTPRT,H3D_STRAIN
-C
+
       DOUBLE PRECISION :: XDP(3,*)
-C
+
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
       my_real :: DT2T
       my_real
@@ -232,41 +236,42 @@ C
      .   PHI1(*),PHI2(*),VF(3,*) ,D(3,*),
      .   AF(3,*), FFSKY(3,*),DF(3,*),WF(3,*),MSF(*),AFGLOB(3,*),
      .   POR(*),VOLN(MVSIZ), CONDN(*),CONDNSKY(*)
-C
+
       my_real :: BUFVOIS(6,*) ! Neighbour element numbers (ALE/CFD)
       my_real :: MSNF(*),AR(*),VR(3,*),IN(*),FR_WAVE(*),DR(3,*),QMV(12,*)
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
-C
+
       my_real :: P(MVSIZ),FSKYI(LSKYI,NFSKYI)
-C
+
       INTEGER :: IGRV(*), LGRAV(*)
       my_real :: AGRAV(*),SKEW(LSKEW,*)
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
-      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
       TYPE (DT_),   INTENT(INOUT) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,NF1,NUVAR,IBID,IPTR,IPTS,IPTT,ILAY,ITET,IFVM_SKIP,NNOD
       INTEGER NBF1,NBF2,NBF3, IALEFVM_MAT
-C
       INTEGER MXT(MVSIZ),NGL(MVSIZ),NGEO(MVSIZ),INOD(8)
-      my_real
-     . VD2(MVSIZ) , DVOL(MVSIZ),DELTAX(MVSIZ),
-     . VIS(MVSIZ) , QVIS(MVSIZ), CXX(MVSIZ) ,
-     . S1(MVSIZ)  , S2(MVSIZ)  , S3(MVSIZ)  ,
-     . S4(MVSIZ)  , S5(MVSIZ)  , S6(MVSIZ)  ,
-     . B1(MVSIZ)  , B2(MVSIZ)  , B3(MVSIZ)  ,
-     . B4(MVSIZ)  , B5(MVSIZ)  , B6(MVSIZ)  ,
-     . DXX(MVSIZ) , DYY(MVSIZ) , DZZ(MVSIZ) ,
-     . D4(MVSIZ)  , D5(MVSIZ)  , D6(MVSIZ)  , 
-     . JAC1(MVSIZ), JAC2(MVSIZ), JAC3(MVSIZ),
-     . JAC4(MVSIZ), JAC5(MVSIZ), JAC6(MVSIZ),
-     . VDX(MVSIZ) , VDY(MVSIZ) , VDZ(MVSIZ),SSP_EQ(MVSIZ),
-     . AIRE(MVSIZ),FQVIS(MVSIZ), FCXX(MVSIZ)
+      my_real VD2(MVSIZ) , DVOL(MVSIZ),DELTAX(MVSIZ),
+     .        VIS(MVSIZ) , QVIS(MVSIZ), CXX(MVSIZ) ,
+     .        S1(MVSIZ)  , S2(MVSIZ)  , S3(MVSIZ)  ,
+     .        S4(MVSIZ)  , S5(MVSIZ)  , S6(MVSIZ)  ,
+     .        B1(MVSIZ)  , B2(MVSIZ)  , B3(MVSIZ)  ,
+     .        B4(MVSIZ)  , B5(MVSIZ)  , B6(MVSIZ)  ,
+     .        DXX(MVSIZ) , DYY(MVSIZ) , DZZ(MVSIZ) ,
+     .        D4(MVSIZ)  , D5(MVSIZ)  , D6(MVSIZ)  ,
+     .        JAC1(MVSIZ), JAC2(MVSIZ), JAC3(MVSIZ),
+     .        JAC4(MVSIZ), JAC5(MVSIZ), JAC6(MVSIZ),
+     .        VDX(MVSIZ) , VDY(MVSIZ) , VDZ(MVSIZ),SSP_EQ(MVSIZ),
+     .        AIRE(MVSIZ),FQVIS(MVSIZ), FCXX(MVSIZ)
       my_real, dimension(mvsiz) :: fheat
 C
       my_real :: STI(MVSIZ), WXX(MVSIZ) , WYY(MVSIZ) , WZZ(MVSIZ)
@@ -958,7 +963,7 @@ C ALEFVM strain rates
      8   NEL)
       ENDIF
 C
-      IF ((IMON_MAT==1).AND. ITASK == 0) CALL STARTIME(35,1)
+      IF ((IMON_MAT==1).AND. ITASK == 0) CALL STARTIME(TIMERS,35)
 C
       ILAY = 1                                                
       IPTR = 1                                                
@@ -979,7 +984,7 @@ C
 C
 C Stress computation according to material laws 
 C
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -1007,13 +1012,14 @@ C
      P   FQVIS,       IPARG1,      IGEO,        CONDE,
      Q   ITASK,       NLOC_DMG,    VAR_REG,     MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
-     T   SNPC,        STF,         SBUFMAT,     SVIS,SZ_IX,
-     U   IRESP,       N2D,         TH_STRAIN,   NGROUP,TT, 
+     T   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
+     .   SVIS,        SZ_IX,       IRESP,       
+     .   N2D,         th_strain,   NGROUP,TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
-     .   idyna,       DT         ,    fheat      )
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
+     .   idyna,       DT         , fheat     )
 C
       IF (ISMSTR == 12.AND.IDTMIN(1)==3) THEN
         IF (ISM12_11==0.AND.JCVT==0) THEN
@@ -1036,7 +1042,7 @@ C Compute Strains for output
      3   WYY,      WZZ,      OFF,      NEL,
      4   JCVT)
       ENDIF
-      IF ((IMON_MAT==1).AND. ITASK == 0) CALL STOPTIME(35,1)
+      IF ((IMON_MAT==1).AND. ITASK == 0) CALL STOPTIME(TIMERS,35)
 C
       IF (NN_DEL >0) THEN
         CALL SDLENMAX(L_MAX, 
@@ -1092,13 +1098,13 @@ C
      .                  X1, X2, X3, X4, X5, X6, X7, X8,
      .                  Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
      .                  Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .                  ITASK,IPARG1)
+     .                  ITASK,IPARG1,SENSORS)
           ELSE
             CALL SRBILAN(PARTSAV,EINT,GBUF%RHO,GBUF%RK,GBUF%VOL, 
      .                   VGXA, VGYA, VGZA, VGA2, VOLN,IPARTS,
      .                   GRESAV,GRTH,IGRTH,GBUF%OFF,IEXPAN,GBUF%EINTTH,
      .                   GBUF%FILL,XGXA, XGYA, XGZA,
-     .                   XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG1)
+     .                   XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG1,SENSORS)
           ENDIF
         ENDIF
         RETURN
@@ -1200,7 +1206,7 @@ C Anti hourglass forces
      I   GBUF%HOURG,PARTSAV,IPARTS, NFT,
      J   MTN,     JLAG,    EANI   , NGEO ,
      K   IVECTOR ,DT1 ,    MXT,     GEO,
-     L   NEL,     ISCTL )
+     L   NEL,     ISCTL,   STI,   CXX  )
       ELSE
         CALL SHVIS3(
      1   PM,       GBUF%RHO, OFF,      VX1,
@@ -1403,13 +1409,13 @@ C Energy, momentum, mass balance by part in case of print-out
      .                  X1, X2, X3, X4, X5, X6, X7, X8,
      .                  Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
      .                  Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .                  ITASK,IPARG1)
+     .                  ITASK,IPARG1,SENSORS)
            ELSE
             CALL SRBILAN(PARTSAV,EINT    ,GBUF%RHO,GBUF%RK,GBUF%VOL ,
      .                   VGXA   ,VGYA    ,VGZA    ,VGA2    ,VOLN     ,
      .                   IPARTS ,GRESAV  ,GRTH    ,IGRTH   ,GBUF%OFF ,
      .                   IEXPAN ,GBUF%EINTTH,GBUF%FILL,XGXA, XGYA, XGZA,
-     .                   XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG1)
+     .                   XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG1,SENSORS)
            ENDIF
       ENDIF
 C
@@ -1508,7 +1514,7 @@ C External forces work
      6   N3Z,        N4Z,        N5Z,        N6Z,
      7   DXX,        DYY,        DZZ,        X,
      8   IPM,        NALE,       W,          P,
-     9   VEUL,       NEL)
+     9   VEUL,       NEL,        WFEXT)
 C
 C Initial forces
           CALL ALEFVM_FRESET(
@@ -1577,7 +1583,7 @@ C Finite element heat transfert forces
      6         PZ2,     PZ3,     PZ4,     DT1,
      7         TEMP,    TEMPEL,  FHEAT,   THEM,
      8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
-     9         GBUF%VOL,NEL     ,NUMNOD )
+     9         GBUF%VOL,NEL     ,NUMNOD ,GLOB_THERM%THEACCFACT)
         ELSE
           CALL STHERM(
      1         PM,      IMAT,    VOLN,    NC1,
@@ -1588,7 +1594,7 @@ C Finite element heat transfert forces
      6         PZ2,     PZ3,     PZ4,     DT1,
      7         TEMP,    TEMPEL,  DIE,     THEM,
      8         GBUF%OFF,LBUF%OFF,PARTSAV, IPARTS,
-     9         GBUF%VOL,NEL     ,NUMNOD )
+     9         GBUF%VOL,NEL     ,NUMNOD ,GLOB_THERM%THEACCFACT)
         END IF
       ENDIF
 C
@@ -1618,7 +1624,7 @@ C Transform forces from convected frame to global frame
         ENDIF 
       ENDIF
 C----------------------------
-C     distorsion control  
+C     distortion control  
 C----------------------------
       IF (ISCTL > 0) THEN
          CALL SDISTOR_INI(                                      
@@ -1721,7 +1727,7 @@ C Assemble internal forces
      F   MY6,     MZ6,     MX7,     MY7,
      G   MZ7,     MX8,     MY8,     MZ8,
      H   THEM,    FTHE,    CONDN,   CONDE,
-     I   NEL,     JTHE,    ISROT,   IPARTSPH)
+     I   NEL,     JTHE,    ISROT,   IPARTSPH,GLOB_THERM%NODADT_THERM)
       ELSE
           CALL SCUMU3P(
      1   GBUF%OFF,STI,     FSKY,    FSKY,
@@ -1742,7 +1748,7 @@ C Assemble internal forces
      G   MZ7,     MX8,     MY8,     MZ8,
      H   THEM,    FTHESKY, CONDNSKY,CONDE,
      I   NEL,     NFT,     JTHE,    ISROT,
-     J   IPARTSPH)
+     J   IPARTSPH,GLOB_THERM%NODADT_THERM)
       ENDIF
 C
       IF(JALE  == 3) THEN   

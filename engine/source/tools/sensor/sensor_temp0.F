@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,9 +29,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sum_6_float         ../engine/source/system/parit.F
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod        ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE SENSOR_TEMP0(NSENSOR,SENSOR_TAB,IGRNOD,TEMP,WEIGHT)
+      SUBROUTINE SENSOR_TEMP0(NSENSOR,SENSOR_TAB,IGRNOD,TEMP,WEIGHT,COMM_SENS17,SENSOR_STRUCT)
 c-----------------------------------------------------------------------
 !$COMMENT
 !       SENSOR_TEMP description :
@@ -65,6 +65,8 @@ C-----------------------------------------------
       my_real :: TEMP(NUMNOD)
       TYPE(GROUP_)  ,DIMENSION(NGRNOD) ,INTENT(IN) :: IGRNOD
       TYPE (SENSOR_STR_),DIMENSION(NSENSOR), INTENT(INOUT) :: SENSOR_TAB
+      TYPE (sensor_comm),INTENT(INOUT) :: COMM_SENS17
+      TYPE (SENSOR_TYPE),INTENT(INOUT),DIMENSION(NSENSOR) :: SENSOR_STRUCT
       INTEGER, DIMENSION(NUMNOD), INTENT(in) :: WEIGHT
 C----------------------------------------------------------
 C Local Variables

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ngr2usr                ../starter/source/system/nintrr.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE25(
@@ -45,7 +44,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      3        SENSORS     ,NOM_OPT         ,UNITAB    ,LSUBMODEL  ,TITR       ,
      4        NOM_OPTFRIC ,INTBUF_FRIC_TAB ,NPC       ,NPC1       ,TF         ,
      5        PARAMETERS  ,NPARI           ,NPARIR    ,SNPC       ,SNPC1      ,
-     6        NPTS)
+     6        NPTS        ,ITHERM_FE       ,INTHEAT   )
 C============================================================================
 C     
 C-----------------------------------------------
@@ -94,6 +93,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
+      INTEGER,INTENT(IN)    :: ITHERM_FE
+      INTEGER,INTENT(INOUT) :: INTHEAT
       INTEGER I,IBC1, IBC2, IBC3, IBUC, NOINT, NTYP,INACTI,
      .    IBC1M, IBC2M, IBC3M, IGSTI, IVIS2,IS1, IS2,ILEV,
      .    IGAP,MULTIMP,MFROT,IFQ,IBAG,MODFR,ISYM,IEDGE,NOD1,
@@ -536,9 +537,8 @@ c        IF (BCFLAGM(LFIELD-1:LFIELD-1)== '1') IBC2M = 1
 c        IF (BCFLAGM(LFIELD  :LFIELD  )== '1') IBC3M = 1
 
         IF (IIMPLICIT>0.AND.INACTI==0) INACTI=-1
-        IF (INACTI/=0.AND.INACTI/=1.AND.INACTI/=-1.AND.INACTI/=3
-     .      .AND.INACTI/=5) THEN
-             IF(INACTI==6)THEN
+        IF (INACTI/=0.AND.INACTI/=-1.AND.INACTI/=5) THEN
+             IF(INACTI>0)THEN
                CALL ANCMSG(MSGID=1559,
      .                  MSGTYPE=MSGWARNING,
      .                  ANMODE=ANINFO_BLIND_1,

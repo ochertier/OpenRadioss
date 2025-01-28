@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_friction_orientations   ../starter/source/interfaces/friction/reader/hm_read_friction_orientations.F
       !||    hm_read_gauge                   ../starter/source/output/gauge/hm_read_gauge.F
       !||    hm_read_gjoint                  ../starter/source/constraints/general/gjoint/hm_read_gjoint.F
-      !||    hm_read_inivol                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_interfaces              ../starter/source/interfaces/reader/hm_read_interfaces.F
       !||    hm_read_intsub                  ../starter/source/output/subinterface/hm_read_intsub.F
       !||    hm_read_link                    ../starter/source/constraints/rigidlink/hm_read_rlink.F

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    read_sensor_user    ../starter/source/tools/sensor/read_sensor_user.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod          ../starter/share/modules1/sensor_mod.F
       !||====================================================================
-        SUBROUTINE SENSOR_USER_ALLOC(ALREADY_DONE)
+        SUBROUTINE SENSOR_USER_ALLOC(ALREADY_DONE,SENSOR_USER_STRUCT)
 !$COMMENT
 !       SENSOR_USER_ALLOC description
 !       allocation of array for user sensor
@@ -50,6 +49,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         LOGICAL, INTENT(inout) :: ALREADY_DONE
+        TYPE(sensor_user_struct_), INTENT(inout) :: SENSOR_USER_STRUCT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

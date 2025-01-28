@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -251,7 +251,7 @@ C-----------------------------------------------
          ENDDO
        ENDDO
 
-       !SPLINE LENGTHES
+       !SPLINE LENGTHS
        DO I=1,NSEG
          LOCAL_PT(1,1:3)=PTR(1+I-1,1:3)
          LOCAL_PT(2,1:3)=PTR(1+I+0,1:3)

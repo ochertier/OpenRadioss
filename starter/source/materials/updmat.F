@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    lectur                 ../starter/source/starter/lectur.F
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                 ../starter/source/output/message/message.F
+      !||    eosfun_usr2sys         ../starter/source/materials/tools/eosfun_usr2sys.F90
       !||    fretitl2               ../starter/source/starter/freform.F
       !||    law100_upd_ab          ../starter/source/materials/mat/mat100/law100_upd.F
       !||    law100_upd_nht         ../starter/source/materials/mat/mat100/law100_upd.F
@@ -38,18 +39,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    law119_upd             ../starter/source/materials/mat/mat119/law119_upd.F
       !||    law120_upd             ../starter/source/materials/mat/mat120/law120_upd.F
       !||    law158_upd             ../starter/source/materials/mat/mat158/law158_upd.F
-      !||    law190_upd             ../starter/source/materials/mat/mat190/law190_upd.F
+      !||    law190_upd             ../starter/source/materials/mat/mat190/law190_upd.F90
       !||    law19_upd              ../starter/source/materials/mat/mat019/law19_upd.F90
       !||    law36_upd              ../starter/source/materials/mat/mat036/law36_upd.F
       !||    law42_upd              ../starter/source/materials/mat/mat042/law42_upd.F
-      !||    law50_upd              ../starter/source/materials/mat/mat050/law50_upd.F90
       !||    law58_upd              ../starter/source/materials/mat/mat058/law58_upd.F
       !||    law62_upd              ../starter/source/materials/mat/mat062/law62_upd.F
       !||    law69_upd              ../starter/source/materials/mat/mat069/law69_upd.F
       !||    law70_upd              ../starter/source/materials/mat/mat070/law70_upd.F
       !||    law76_upd              ../starter/source/materials/mat/mat076/law76_upd.F
       !||    law77_upd              ../starter/source/materials/mat/mat077/law77_upd.F
-      !||    law87_upd              ../starter/source/materials/mat/mat087/law87_upd.F
+      !||    law81_upd              ../starter/source/materials/mat/mat081/law81_upd.F90
+      !||    law87_upd              ../starter/source/materials/mat/mat087/law87_upd.F90
       !||    law88_upd              ../starter/source/materials/mat/mat088/law88_upd.F
       !||    law90_upd              ../starter/source/materials/mat/mat090/law90_upd.F
       !||    law92_upd              ../starter/source/materials/mat/mat092/law92_upd.F
@@ -57,11 +58,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mattab_usr2sys         ../starter/source/materials/tools/mattab_usr2sys.F
       !||--- uses       -----------------------------------------------------
       !||    elbuftag_mod           ../starter/share/modules1/elbuftag_mod.F
-      !||    law190_upd_mod         ../starter/source/materials/mat/mat190/law190_upd.F
+      !||    eosfun_usr2sys_mod     ../starter/source/materials/tools/eosfun_usr2sys.F90
+      !||    law190_upd_mod         ../starter/source/materials/mat/mat190/law190_upd.F90
       !||    law19_upd_mod          ../starter/source/materials/mat/mat019/law19_upd.F90
-      !||    law50_upd_mod          ../starter/source/materials/mat/mat050/law50_upd.F90
+      !||    law81_upd_mod          ../starter/source/materials/mat/mat081/law81_upd.F90
+      !||    law87_upd_mod          ../starter/source/materials/mat/mat087/law87_upd.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    table_mod              ../starter/share/modules1/table_mod.F
       !||====================================================================
       SUBROUTINE UPDMAT(BUFMAT   ,PM    ,IPM       ,TABLE    ,FUNC_ID  ,
@@ -76,11 +78,13 @@ C-----------------------------------------------
       USE MESSAGE_MOD   
       USE MATPARAM_DEF_MOD
       USE SENSOR_MOD
-      USE LAW50_UPD_MOD  
       USE LAW19_UPD_MOD  
+      USE LAW81_UPD_MOD
+      USE LAW87_UPD_MOD
       USE LAW190_UPD_MOD  
       USE VISC_PARAM_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      USE EOSFUN_USR2SYS_MOD , ONLY : EOSFUN_USR2SYS
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -105,22 +109,24 @@ C-----------------------------------------------
       TYPE(TTABLE), DIMENSION(NTABLE) ,INTENT(INOUT) ::  TABLE
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
-      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(INOUT), TARGET :: MAT_PARAM
+      TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT), INTENT(INOUT) ,TARGET :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER II,IMAT,ILAW,IRUP,MAT_ID,IADD,IFC,FLAG_HE,NFUNC,NFUNCL,NUMTABL,
      .        NPARAM,NUPARF,NFAIL,IR,FLAG_FIT,IFAILG,NORDRE,IALGO,
      .        IADD_VISC , NPARAM_VISC,IVISC,NPRONY,J,ITYPE_VISC,FORM
+      INTEGER :: KK !< loop
       my_real :: GAMA_INF,EMAX
       INTEGER, DIMENSION(NUMMAT)     :: MULLINS,GURSON
       INTEGER, DIMENSION(MAXTAB)     :: TABLE_ID
       INTEGER, DIMENSION(:), POINTER :: IFUNC,ITABLE
       my_real, DIMENSION(:), POINTER :: UPARAM,UPARF,UPARAM_VISC
       TYPE(MLAW_TAG_), POINTER :: MTAG
-      CHARACTER(LEN=NCHARTITLE)::TITR
+      CHARACTER(LEN=NCHARTITLE)::TITR, TITLE
       TYPE(MATPARAM_STRUCT_) , POINTER :: MATPARAM
       TYPE (VISC_PARAM_)     , POINTER :: VISC
+      INTEGER :: NFUNC_EOS,FUNC_EOS_ID
 C=======================================================================
 c     TRAITEMENT OF MATERIAL PARAMETERS AND FUNCTIONS
 c-----------------------------------------------------------------------
@@ -173,6 +179,14 @@ c-----------------------------------------------------------------------
 C
         MAT_ID  = MAT_PARAM(IMAT)%MAT_ID
         ILAW    = MAT_PARAM(IMAT)%ILAW
+
+        !EoS
+        NFUNC_EOS = MAT_PARAM(IMAT)%EOS%NFUNC
+        IF(NFUNC_EOS > 0)THEN
+          title = MAT_PARAM(IMAT)%EOS%title
+          CALL EOSFUN_USR2SYS(title,MAT_ID,NFUNC_EOS,MAT_PARAM(IMAT)%EOS%FUNC,FUNC_ID, NFUNCT  )
+        ENDIF
+
 c
         IF (ILAW < 29.and.ILAW/=19.or.ILAW==32.or.ILAW==43.or.ILAW==49.or.ILAW==52.or.
      .      ILAW==57.or.ILAW==59.or.ILAW==60.or.ILAW==65.or.ILAW==75.or.
@@ -182,13 +196,12 @@ c
 c
         IADD     = MAX(1,IPM(7,IMAT))
         NPARAM   = MIN(IPM(9,IMAT),SBUFMAT)
-        UPARAM   => BUFMAT(IADD:IADD+NPARAM-1) 
-        MATPARAM => MAT_PARAM(IMAT)
+        UPARAM   => BUFMAT(IADD:IADD+NPARAM-1)
         !/visc/prony
-        ITYPE_VISC = MATPARAM%IVISC
+        ITYPE_VISC = MAT_PARAM(IMAT)%IVISC
         GAMA_INF = ONE
-        IF(ITYPE_VISC == 2) THEN
-          VISC  => MATPARAM%VISC  
+        IF (ITYPE_VISC == 2) THEN
+          VISC  => MAT_PARAM(IMAT)%VISC
           NPRONY = VISC%IPARAM(1)
           FORM   = VISC%IPARAM(2)
           IF(FORM == 1) THEN
@@ -213,13 +226,14 @@ c
         IF (NFUNC > 0) THEN 
           CALL MATFUN_USR2SYS(TITR,MAT_ID,NFUNC,IFUNC,FUNC_ID  )
         ENDIF
+
         IF (ILAW /= 73 .and. ILAW /= 74 .and. ILAW /= 80) THEN
           IF (NUMTABL > 0 ) THEN
             TABLE_ID(1:NUMTABL) = IPM(226+1:226+NUMTABL,IMAT)
             CALL MATTAB_USR2SYS(TITR,MAT_ID,NTABLE,TABLE,NUMTABL,ITABLE)
           ENDIF 
-        ENDIF 
-c
+        ENDIF
+
 c-----------------------------------------------------------------------
         SELECT CASE (ILAW)
 c-------------------------
@@ -234,9 +248,6 @@ c-------------------------
 c-------------------------
           CASE (42) 
             CALL LAW42_UPD(MAT_PARAM(IMAT),IOUT,TITR,MAT_ID,PM(1,IMAT),GAMA_INF)        
-c-------------------------
-          CASE (50) 
-            CALL LAW50_UPD(MATPARAM,NPARAM,UPARAM,NFUNC,IFUNC,SNPC,STF,NPC,PLD)        
 c-------------------------
           CASE (58) 
             NFUNCL =  IPM(6,IMAT)
@@ -256,28 +267,34 @@ c
 c------------------
           CASE (70) 
 c------------------
-            CALL LAW70_UPD(MATPARAM ,TITR     ,MAT_ID   ,NPARAM   ,UPARAM   ,
+            CALL LAW70_UPD(MAT_PARAM(IMAT)    ,TITR     ,MAT_ID   ,NPARAM   ,UPARAM   ,
      .                     NFUNC    ,IFUNC    ,NPC      ,PLD      ,IOUT     ,
      .                     NFUNCT   ,FUNC_ID  ,NPROPM   ,PM(1,IMAT))       
 c------------------
           CASE (76) 
-            CALL LAW76_UPD(IOUT   ,TITR    ,MAT_ID   ,NPARAM ,MATPARAM ,
+            CALL LAW76_UPD(IOUT   ,TITR    ,MAT_ID   ,NPARAM ,MAT_PARAM(IMAT) ,
      .                     UPARAM ,NUMTABL ,ITABLE   ,TABLE   ,NFUNC    ,
      .                     IFUNC  ,NPC     ,PLD      )       
 c
 c------------------
           CASE (77) 
-            CALL LAW77_UPD(TITR    ,MAT_ID   ,NPARAM ,MATPARAM ,
-     .                     UPARAM  ,NFUNC    ,IFUNC  ,NPC      ,PLD      )       
+            CALL LAW77_UPD(TITR    ,MAT_ID   ,NPARAM ,MAT_PARAM(IMAT) ,
+     .                     UPARAM  ,NFUNC    ,IFUNC  ,NPC      ,PLD      )
 c
+c------------------
+          CASE (81) 
+            CALL LAW81_UPD(MAT_PARAM(IMAT)   ,NFUNC    ,IFUNC  ,NPC      ,SNPC     ,
+     .                     PLD     ,STF      ,PM(1,IMAT),NPROPM,IOUT     ,
+     .                     MAT_ID  ,TITR     )
 c          
 c------------------
           CASE (87) !BARLAT 2D
-            NFUNC = UPARAM(25)
-            FLAG_FIT = NINT ( UPARAM(25+2*NFUNC+9) )
+            FLAG_FIT = MAT_PARAM(IMAT)%IPARAM(4)
+            NFUNC    = MAT_PARAM(IMAT)%IPARAM(5)
             IF (FLAG_FIT == 1) THEN 
-              CALL LAW87_UPD(IOUT,TITR,MAT_ID   ,UPARAM,NFUNC  ,NFUNCT,
-     .                       IFUNC,FUNC_ID,NPC,PLD,PM(1,IMAT))
+              CALL LAW87_UPD(IOUT   ,TITR    ,MAT_ID ,MAT_PARAM(IMAT)     ,
+     .                       NFUNC  ,IFUNC   ,SNPC   ,NPC      ,STF       ,
+     .                       PLD    )
             ENDIF
 c-------------------------
           CASE (88) 
@@ -330,7 +347,7 @@ c
 c
               CALL LAW104_UPD(IFAILG  ,NPARAM,NUPARF,UPARAM,UPARF   ,
      .                        NLOC_DMG,IMAT   ,MLAW_TAG(IMAT),IPM    ,
-     .                        MATPARAM)
+     .                        MAT_PARAM(IMAT))
             ENDIF 
 c------------------
           CASE (108)    ! Spring material------------------
@@ -382,7 +399,8 @@ c-------------------------
      .                      PM(1,IMAT),SENSORS)
 c------------------
           CASE (190) !PAth dependent foam (dubois)
-            CALL LAW190_UPD(MATPARAM ,NUMTABL ,ITABLE   ,TABLE   ,PM(1,IMAT))       
+            CALL LAW190_UPD(MAT_PARAM(IMAT) ,NUMTABL ,ITABLE   ,TABLE   ,PM(1,IMAT),
+     .                      NPROPM, NTABLE)
 c------------------
 c
         END SELECT ! (ILAW)  

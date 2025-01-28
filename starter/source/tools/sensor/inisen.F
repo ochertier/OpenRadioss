@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sort_logical_sensors   ../starter/source/tools/sensor/sort_logical_sensors.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||====================================================================
       SUBROUTINE INISEN(SENSORS , IPARI ,NOM_OPT ,PTR_NOPT_RWALL,
      .                  PTR_NOPT_SECT ,PTR_NOPT_INTER  ,IXR    ,R_SKEW   ,NUMELR,
@@ -280,10 +279,10 @@ c---
       ENDDO
 c
 c----------------------------------------------------------------------
-c     Logical sensors : AND, OR, NOT, SENS - create a dependancy order
+c     Logical sensors : AND, OR, NOT, SENS - create a dependency order
 c----------------------------------------------------------------------
 
-      CALL SORT_LOGICAL_SENSORS(SENSOR_TAB,NSENSOR)
+      CALL SORT_LOGICAL_SENSORS(SENSORS)
 
 c----------------------------------------------------------------------
 c     Allocate sensor arrays for PARITH_ON/SMPD exchange

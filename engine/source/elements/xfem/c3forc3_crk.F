@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,8 +46,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    c3updt3_crk      ../engine/source/elements/xfem/xfemfsky.F
       !||    cmain3           ../engine/source/materials/mat_share/cmain3.F
       !||    csens3           ../engine/source/elements/shell/coque/csens3.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
+      !||    startime         ../engine/source/system/timer_mod.F90
+      !||    stoptime         ../engine/source/system/timer_mod.F90
       !||    temp3cg          ../engine/source/elements/sh3n/coque3n/temp3cg.F
       !||    therm3c          ../engine/source/elements/sh3n/coque3n/therm3c.F
       !||--- uses       -----------------------------------------------------
@@ -56,13 +56,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    dt_mod           ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod     ../common_source/modules/failwave_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||    stack_mod        ../engine/share/modules/stack_mod.F
       !||    table_mod        ../engine/share/modules/table_mod.F
+      !||    timer_mod        ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE C3FORC3_CRK(
+      SUBROUTINE C3FORC3_CRK(TIMERS,
      1   XFEM_STR,    JFT,         JLT,         PM,
      2   IXTG,        X,           F,           M,
      3   V,           R,           FAILWAVE,    NVC,
@@ -87,8 +89,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      M   IXEL,        STACK,       ISUBSTACK,   UXINT_MEAN,
      N   UYINT_MEAN,  UZINT_MEAN,  NLEVXF,      NODEDGE,
      O   CRKEDGE,     DRAPE_SH3N,  IPRI,        NLOC_DMG,
-     P   INDX_DRAPE,  IGRE,        DT  )
+     P   INDX_DRAPE,  IGRE,        DT,          NCYCLE ,
+     R   SNPC,        STF,         GLOB_THERM,  IDEL7NOK,
+     Q   USERL_AVAIL, MAXFUNC,     SBUFMAT)
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE CRACKXFEM_MOD
       USE STACK_MOD
@@ -99,6 +104,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,7 +124,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: IGRE
+      TYPE(TIMER_) :: TIMERS
+      INTEGER,INTENT(IN)    :: USERL_AVAIL ! Flag for User libraries availability
+      INTEGER,INTENT(IN)    :: MAXFUNC     ! Maximum number of functions
+      INTEGER,INTENT(INOUT) :: IDEL7NOK    ! Element deletion flag for IDEL flag in contact interfaces
+      INTEGER,INTENT(IN)    :: SBUFMAT     ! size of bufmat
+      INTEGER,INTENT(IN)    :: STF         ! size of TF
+      INTEGER,INTENT(IN)    :: SNPC        ! size of NPC
+      INTEGER, INTENT(IN) :: IGRE, NCYCLE
       INTEGER JFT,JLT,NVC,MTN,NELTST,ITYPTST,OFFSET,
      .        NEL,ISTRAIN,ISH3N,ICSEN,
      .        ITHK,IOFC,IPLA,NFT,ISMSTR,KFTS,IFAILURE,
@@ -128,7 +141,7 @@ C-----------------------------------------------
      .   IXFEM,INOD_CRK(*),IEL_CRK(*),IADTG_CRK(3,*),
      .   ELCUTC(2,*),NODEDGE(2,*),INDX_DRAPE(STDRAPE)
       my_real 
-     .   PM(*),F(*),M(*),V(*),R(*),
+     .   PM(NPROPM,*),F(*),M(*),V(*),R(*),
      .   GEO(NPROPG,*),TF(*),BUFMAT(*),PMSAV(*),STIFN(*),
      .   STIFR(*),FSKY(*),EPSDOT(6,*),THKE(*),DT2T,
      .   F11(MVSIZ),F12(MVSIZ),F13(MVSIZ),
@@ -153,8 +166,9 @@ C-----------------------------------------------
       TYPE (DRAPE_) :: DRAPE_SH3N(NUMELTG_DRAPE)
       TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
-      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -192,6 +206,7 @@ c     indx utilise localement contrairement aux coques 4n
      .   RLZ(MVSIZ,3),WXY(MVSIZ),MLZ(MVSIZ,3),KRZ(MVSIZ),
      .   B0RZ(MVSIZ,3),BKRZ(MVSIZ,2),BERZ(MVSIZ,2),BM0RZ(MVSIZ,3,2),
      .   ECOS(MVSIZ),ESIN(MVSIZ),A11R(MVSIZ),THKE0(MVSIZ),ALDT(MVSIZ)
+      my_real :: DTIME
       my_real   , DIMENSIOn(NEL) :: ZOFFSET
       my_real 
      .   BID,THKR,F_DEF(MVSIZ,8),WKXY(MVSIZ)
@@ -221,6 +236,9 @@ C
      .  DIMENSION(:) ,POINTER  ::  SMSTRG
       my_real,
      .  DIMENSION(:,:), ALLOCATABLE :: VARNL 
+      INTEGER NPTTOT
+      INTEGER SDIR_A    ! Size of DIR_A
+      INTEGER SDIR_B    ! Size of DIR_B
 C---------------------------
 c     Attention : Coque3N + ISMSTR=10 pas compatible avec XFEM !!!
 C=======================================================================
@@ -234,8 +252,10 @@ C=======================================================================
       NG   = 1
       SEDRAPE = STDRAPE
       NUMEL_DRAPE = NUMELTG_DRAPE
+      NPTTOT = 1
       ALLOCATE(VARNL(NEL,1))
       VARNL = ZERO
+      DTIME = DT1C(1)
 C -----will put it in starter     
       IF (ISMSTR>=10) ISMSTR=4
 c
@@ -276,6 +296,8 @@ C
       ALLOCATE(DIRB(NXLAY*NEL*L_DIRB))
       DIRA=ZERO
       DIRB=ZERO
+      SDIR_A=NXLAY*NEL*L_DIRA
+      SDIR_B=NXLAY*NEL*L_DIRB
       DIR_A => DIRA(1:NXLAY*NEL*L_DIRA)
       DIR_B => DIRB(1:NXLAY*NEL*L_DIRB)
 C
@@ -425,9 +447,9 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
         IF (JTHE > 0 ) CALL TEMP3CG(JFT  ,JLT   ,PM     ,MAT   ,IXTG,   
      .                              TEMP ,TEMPEL)
 C--------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
 C--------------------------
-        CALL CMAIN3(
+        CALL CMAIN3(TIMERS,
      1   XFEM_STR  ,JFT       ,JLT       ,NFT       ,IPARG     ,
      2   NEL       ,MTN       ,IPLA      ,ITHK      ,GROUP_PARAM,
      3   PM        ,GEO       ,NPF       ,TF        ,BUFMAT    ,
@@ -449,14 +471,17 @@ C--------------------------
      J   E1Z       ,E2X       ,E2Y       ,E2Z       ,E3X       ,
      K   E3Y       ,E3Z       ,NG        ,TABLE     ,IXFEM     ,
      L   BID       ,SENSORS   ,BID       ,ELCRKINI  ,
-     M   DIR1_CRK  ,DIR2_CRK  ,ALDT      ,
+     M   DIR1_CRK  ,DIR2_CRK  ,ALDT      ,GLOB_THERM%IDT_THERM ,GLOB_THERM%THEACCFACT,
      P   ISMSTR    ,IR        ,IS        ,NLAYER    ,NPTT      ,
      Q   IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P   BID    ,ITASK        ,DRAPE_SH3N  ,VARNL     ,NLOC_DMG ,
-     R   INDX_DRAPE , THKE    ,SEDRAPE ,NUMEL_DRAPE, DT  )
+     R   INDX_DRAPE , THKE    ,SEDRAPE   ,NUMEL_DRAPE,     DT  ,
+     Q   NCYCLE     ,SNPC      ,  STF    ,NXLAYMAX   ,IDEL7NOK ,
+     S   USERL_AVAIL, MAXFUNC,      NPTTOT,BUFMAT     ,SDIR_A   ,
+     T   SDIR_B     )
 
 C--------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C--------------------------
 C       PAS DE TEMPS
 C--------------------------
@@ -483,7 +508,7 @@ c        IFLAG = MOD(NCYCLE,NCPRI)
      5   GRTH,     IGRTH,    OFF,      IXFEM2,
      6   ILEV,     IEL_CRK,  IADTG_CRK,NFT,
      7   IEXPAN,   EINTTH,   ITASK,    MAT,
-     8   GBUF%VOL, ACTIFXFEM,IGRE)
+     8   GBUF%VOL, ACTIFXFEM,IGRE,SENSORS)
 C----------------------------
 C     FORCES INTERNES
 C----------------------------
@@ -506,13 +531,13 @@ c     Thermique des coques
 C--------------------------
         IF (JTHE > 0) THEN
           IF (MAT_ELEM%MAT_PARAM(IMAT)%HEAT_FLAG == 1) THEN
-            CALL THERM3C(JFT   ,JLT   ,PM   ,MAT  ,THK0 ,IXTG,
-     .                   PX1   ,PY1   ,PY2  ,AREA ,DT1C ,
-     .                   TEMP  ,TEMPEL,FHEAT ,THEM )
+            CALL THERM3C(NEL   ,PM(1,IMAT)  ,THK0 ,IXTG,
+     .                   PX1   ,PY1   ,PY2  ,AREA ,DTIME ,
+     .                   TEMP  ,TEMPEL,FHEAT ,THEM ,GLOB_THERM%THEACCFACT)
           ELSE
-            CALL THERM3C(JFT   ,JLT   ,PM   ,MAT  ,THK0 ,IXTG,
-     .                   PX1   ,PY1   ,PY2  ,AREA ,DT1C ,
-     .                   TEMP  ,TEMPEL,DIE ,THEM )
+            CALL THERM3C(NEL   ,PM (1,IMAT)  ,THK0 ,IXTG,
+     .                   PX1   ,PY1   ,PY2  ,AREA  ,DTIME ,
+     .                   TEMP  ,TEMPEL,DIE  ,THEM  ,GLOB_THERM%THEACCFACT)
           END IF
         ENDIF
 C--------------------------

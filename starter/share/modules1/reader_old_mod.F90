@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
  !! \brief Direct Reader (old reader) parameters
-!! \details current Reader is based on librairy. Direct Reader (Fortran READ statment) is only related to limited specific cases
+!! \details current Reader is based on library. Direct Reader (Fortran READ statement) is only related to limited specific cases
       !||====================================================================
       !||    reader_old_mod             ../starter/share/modules1/reader_old_mod.F90
       !||--- called by ------------------------------------------------------
@@ -47,7 +47,7 @@
       !||    hm_read_grav               ../starter/source/loads/general/grav/hm_read_grav.F
       !||    hm_read_inter_type24       ../starter/source/interfaces/int24/hm_read_inter_type24.F
       !||    hm_read_lines              ../starter/source/groups/hm_read_lines.F
-      !||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                ../starter/source/materials/mat/hm_read_mat.F90
       !||    hm_read_mat10              ../starter/source/materials/mat/mat010/hm_read_mat10.F
       !||    hm_read_mat29_31           ../starter/source/materials/mat/matuser/hm_read_mat_user29_31.F
       !||    hm_read_mat_99             ../starter/source/materials/mat/matuser/hm_read_mat_user_99.F

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,12 +29,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    my_barrier     ../engine/source/system/machine.F
       !||    sms_mam_nm     ../engine/source/ams/sms_proj.F
       !||    sms_mav_lt2    ../engine/source/ams/sms_pcg.F
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
+      !||    startime       ../engine/source/system/timer_mod.F90
+      !||    stoptime       ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    sms_pcg_proj   ../engine/share/modules/sms_mod.F
+      !||    timer_mod      ../engine/source/system/timer_mod.F90
       !||====================================================================
-       SUBROUTINE SMS_INIST( 
+       SUBROUTINE SMS_INIST(TIMERS, 
      1           IADK  ,JDIK  ,DIAG_K ,LT_K  ,ITASK ,
      2           NODFT1_SMS,NODLT1_SMS,INDX1_SMS,NODNX_SMS,IAD_ELEM ,
      3           FR_ELEM   ,WEIGHT    ,JADI_SMS ,JDII_SMS ,LTI_SMS  ,
@@ -44,6 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+         USE TIMER_MOD
          USE SMS_PCG_PROJ
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -60,6 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER  NODFT, NODLT, ITASK, IADK(*)  ,JDIK(*),
      .         NODFT1_SMS,NODLT1_SMS,INDX1_SMS(*), NODNX_SMS(*),
      .         IAD_ELEM(2,NSPMD+1) ,FR_ELEM(*),WEIGHT(*),
@@ -101,9 +104,9 @@ C---------------------
 C----------------------
       CALL MY_BARRIER
 C---------------------
-      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(71,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,71)
       DO M = 1,M_VS1
-        CALL SMS_MAV_LT2(
+        CALL SMS_MAV_LT2(TIMERS,
      1          NODFT   ,NODLT  ,NUMNOD ,IADK  ,JDIK  ,
      2          ITASK   ,DIAG_K ,LT_K   ,PROJ_S(1,M),PROJ_T(1,M),
      3          NODFT1_SMS,NODLT1_SMS,INDX1_SMS,NODNX_SMS,IAD_ELEM ,
@@ -115,14 +118,14 @@ C----------------------
         CALL MY_BARRIER
 C---------------------
       END DO !M = 1,M_VS1
-      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(71,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(TIMERS,71)
 C---------------------- 
 C        [k0]=[S]^t[T]
 C---------------------
-      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(72,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,72)
       CALL SMS_MAM_NM(NODFT  ,NODLT  ,NUMNOD,M_VS1,PROJ_S ,
      .             PROJ_T ,PROJ_K ,WEIGHT ,ITASK   )
-      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(72,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(TIMERS,72)
 C----------------------
       CALL MY_BARRIER
 C---------------------
@@ -170,16 +173,18 @@ C
       !||    my_barrier     ../engine/source/system/machine.F
       !||    sms_mav_mn     ../engine/source/ams/sms_proj.F
       !||    sms_mav_nm     ../engine/source/ams/sms_proj.F
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
+      !||    startime       ../engine/source/system/timer_mod.F90
+      !||    stoptime       ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    sms_pcg_proj   ../engine/share/modules/sms_mod.F
+      !||    timer_mod      ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SMS_INIX(NODFT,NODLT,NUMNOD,X  ,R ,WEIGHT,ITASK ,
+      SUBROUTINE SMS_INIX(TIMERS, NODFT,NODLT,NUMNOD,X  ,R ,WEIGHT,ITASK ,
      .                    DIAG_SMS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+         USE TIMER_MOD
          USE SMS_PCG_PROJ
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -193,6 +198,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), intent(inout) :: TIMERS
       INTEGER  NODFT,NODLT,NUMNOD,ITASK,WEIGHT(*)
       my_real X(3,*), R(3,*), DIAG_SMS(*)
 C-----------------------------------------------
@@ -231,10 +237,10 @@ C----------------------
 C----------------------
 C        {W}=[S]^t{R}
 C---------------------
-      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(72,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,72)
       CALL SMS_MAV_NM(NODFT,NODLT,NUMNOD ,NPV   ,PROJ_S ,
      .                R    ,PROJ_W,WEIGHT,ITASK )
-      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(72,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(TIMERS,72)
 C----------------------
       CALL MY_BARRIER
 C----------------------
@@ -253,9 +259,9 @@ C---------------------
 C---------------------
 C       {X0}=[S]{W}
 C---------------------
-       IF(IMONM>0.AND.ITASK==0)CALL STARTIME(73,1)
+       IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,73)
        CALL SMS_MAV_MN(NUMNOD ,NPV   ,PROJ_S ,PROJ_W ,X  ,ITASK )
-       IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(73,1)
+       IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(TIMERS,73)
 C----------------------
       END IF !(ITASK ==0) THEN
 C----------------------
@@ -285,16 +291,18 @@ C----------------------
       !||    my_barrier     ../engine/source/system/machine.F
       !||    sms_mav_mn     ../engine/source/ams/sms_proj.F
       !||    sms_mav_nm     ../engine/source/ams/sms_proj.F
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
+      !||    startime       ../engine/source/system/timer_mod.F90
+      !||    stoptime       ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    sms_pcg_proj   ../engine/share/modules/sms_mod.F
+      !||    timer_mod      ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SMS_PRO_P(NODFT ,NODLT ,NUMNOD ,P  ,WEIGHT,ITASK ,
+      SUBROUTINE SMS_PRO_P(TIMERS, NODFT ,NODLT ,NUMNOD ,P  ,WEIGHT,ITASK ,
      .                     PJ    ,DIAG_SMS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+         USE TIMER_MOD
          USE SMS_PCG_PROJ
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -308,6 +316,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(inout) :: TIMERS
       INTEGER  NODFT ,NODLT ,NUMNOD ,ITASK,WEIGHT(*)
       my_real P(3,*) ,PJ(3,*), DIAG_SMS(*)
 C-----------------------------------------------
@@ -342,10 +351,10 @@ C----------------------
 C----------------------
 C        {W}=[T]^t{p}
 C---------------------
-      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(73,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,73)
       CALL SMS_MAV_NM(NODFT,NODLT,NUMNOD ,NPV  ,PROJ_T ,
      .                P   ,PROJ_W ,WEIGHT,ITASK )
-      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(73,1)
+      IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(TIMERS,73)
 C----------------------
       CALL MY_BARRIER
 C---------------------
@@ -363,9 +372,9 @@ C---------------------
 C----------------------
 C       {p}=[S]{W}
 C---------------------
-        IF(IMONM>0.AND.ITASK==0)CALL STARTIME(73,1)
+        IF(IMONM>0.AND.ITASK==0)CALL STARTIME(TIMERS,73)
         CALL SMS_MAV_MN(NUMNOD,NPV   ,PROJ_S ,PROJ_W  ,PJ  ,ITASK )
-        IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(73,1)
+        IF(IMONM>0.AND.ITASK==0)CALL STOPTIME(TIMERS,73)
       END IF
 C----------------------
       CALL MY_BARRIER

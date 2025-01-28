@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,13 +41,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    output_mod             ../common_source/modules/output/output_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SPSTRES(ELBUF_TAB,NG     , 
+      SUBROUTINE SPSTRES(TIMERS, ELBUF_TAB,NG     , 
      1    PM        ,GEO       ,X         ,V         ,MS        ,
      2    W         ,SPBUF     ,WA        ,NLOC_DMG  ,
      3    ITAB      ,PLD       ,BUFMAT    ,BUFGEO    ,PARTSAV   ,
@@ -59,11 +61,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9    MAT_ELEM  ,H3D_STRAIN,OUTPUT    ,SNPC      ,STF,
      A    SBUFMAT   ,SVIS,NSVOIS,IDTMINS, IRESP,      
      .    IDEL7NG,   IDEL7NOK,    IDTMIN,     MAXFUNC,LIPART1,
-     .    IMON_MAT,  USERL_AVAIL, heat_meca, impl_s,
-     V    idyna,     DT         )
+     .    IMON_MAT,  USERL_AVAIL, impl_s,
+     V    idyna,     DT         , GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -72,6 +75,7 @@ C-----------------------------------------------
       USE OUTPUT_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,6 +98,7 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) ,INTENT(INOUT) :: TIMERS
       INTEGER, INTENT(IN) :: SNPC
       INTEGER, INTENT(IN) :: STF
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -109,7 +114,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),ITAB(*),
      .   IPART(LIPART1,*) ,IPARTSP(*), NPC(*), IPARG(NPARG,*),NG,
      .   NELTST,ITYPTST,NEL,GRTH(*),IGRTH(*) , ISTRAIN,
@@ -126,6 +130,7 @@ C-----------------------------------------------
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (DT_) ,INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -239,7 +244,7 @@ C------------------------------------------------------
 C     LAW 11 uses IELVS=IBIDON and IXS=IBIDON should not be used.
       IBIDON(1)=0
       OFFSET=0
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IBIDON,      IPARG,
      3   V,           PLD,         NPC,         BUFMAT,
@@ -267,13 +272,13 @@ C     LAW 11 uses IELVS=IBIDON and IXS=IBIDON should not be used.
      P   BID,         IPARG(1,NG), IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAt_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_R1_FREE,
-     S                SNPC,        STF,         SBUFMAT,
+     S   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
      *   SVIS,        SZ_IX,       IRESP,
-     T   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     T   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT         , BID   )
 C-----------------------------
       IF(ISTRAIN==1)THEN 

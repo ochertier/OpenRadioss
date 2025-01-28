@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,8 +40,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                   PTG   ,IGEO    ,IMAT  ,IPROP   ,AREA    ,
      .                   ETNOD ,NSHNOD ,STTG   ,SH3TREE ,MCP     ,
      .                   MCPTG  , TEMP ,SH3TRIM,ISUBSTACK,NLAY   ,
-     .                   ELBUF_STR, STACK,THKI ,RNOISE   ,DRAPE ,
-     .                   PERTURB,IX1   ,IX2    ,IX3    ,
+     .                   ELBUF_STR, STACK,THKI ,RNOISE   ,DRAPE  ,
+     .                   PERTURB,IX1   ,IX2    ,IX3      ,NINTEMP,
      .                   X2     ,X3     ,Y3    ,IDRAPE   ,INDX)
 C-----------------------------------------------
 C   M o d u l e s
@@ -82,6 +82,7 @@ C-----------------------------------------------
      .        PERTURB(NPERTURB)
       INTEGER IX1(MVSIZ), IX2(MVSIZ), IX3(MVSIZ)
       INTEGER, DIMENSION (STDRAPE)  :: INDX
+      INTEGER ,INTENT(IN) :: NINTEMP
       my_real
      .   X(3,*), GEO(NPROPG,*), PM(NPROPM,*), MS(*), TINER(*),THKE(*),
      .   V(3,*),PARTSAV(20,*),MSTG(*),INTG(*),PTG(3,*),

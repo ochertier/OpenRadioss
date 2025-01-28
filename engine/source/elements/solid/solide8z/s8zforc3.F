@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,8 +76,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    srrota3                ../engine/source/elements/solid/solide/srrota3.F
       !||    srrotadp               ../engine/source/elements/solid/solide/srrotadp.F
       !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||    storth3                ../engine/source/elements/solid/solidez/storth3.F
       !||    szordef3               ../engine/source/elements/solid/solidez/szordef3.F
       !||    sztorth3               ../engine/source/elements/solid/solidez/sztorth3.F
@@ -85,14 +85,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE S8ZFORC3(ELBUF_TAB,NG     ,
+      SUBROUTINE S8ZFORC3(TIMERS, ELBUF_TAB,NG     ,
      1                    PM       ,GEO    ,IXS    ,X       ,
      2                    A        ,V      ,MS     ,W       ,FLUX    ,
      3                    FLU1     ,VEUL   ,FV     ,ALE_CONNECT   ,IPARG   ,
@@ -113,11 +115,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      L                    XDP      ,VOLN   ,CONDN  ,CONDNSKY  ,JFAC,
      M                    D        ,SENSORS,IOUTPRT,MAT_ELEM,H3D_STRAIN,
      N                    DT       ,SNPC ,STF,SBUFMAT,SVIS,NSVOIS,IDTMINS,
-     O                    IRESP    ,MAXFUNC ,    USERL_AVAIL, heat_meca, 
-     V                    impl_s,     idyna)
+     O                    IRESP    ,MAXFUNC ,    USERL_AVAIL, GLOB_THERM, 
+     V                    impl_s,   idyna)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -127,6 +130,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE DT_MOD
       USE ELBUFDEF_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -151,6 +155,7 @@ C-----------------------------------------------
 C-C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER, INTENT(IN) ::SNPC
       INTEGER, INTENT(IN) :: STF
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -161,7 +166,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IMPL_S
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IXS(NIXS,*), IPARG(NPARG,NGROUP),NPF(*),
      .        IPARTS(*), IPM(NPROPMI,*),IGEO(NPROPGI,*),GRTH(*),
      .        IGRTH(*),IADS(8,*),IOUTPRT
@@ -201,8 +205,9 @@ C
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
-      TYPE (SENSORS_) , INTENT(IN) :: SENSORS
+      TYPE (SENSORS_) , INTENT(INOUT) :: SENSORS
       TYPE(DT_),     INTENT(INOUT) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------      
@@ -1161,13 +1166,13 @@ C------------------------------------------------------
 C     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
 C     TIME STEP EST CALCULE ICI DT2T
 C------------------------------------------------------
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
 C
       IF (IBOLTP /= 0) 
      .      CALL BOLTST(IP    ,BPRELD   ,LBUF%SIG ,TT  ,NEL   ,        
      .                  NPT   ,SENSORS%NSENSOR,SENSORS%SENSOR_TAB)
 C
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,    NG,           PM,           GEO,
      2                 ALE_CONNECT,  IXS,          IPARG,
      3   V,            TF,           NPF,          BUFMAT,
@@ -1195,13 +1200,13 @@ C
      P   BID,          IPARG(1,NG),  IGEO,         CONDE,
      Q   ITASK,        NLOC_DMG,     VAR_REG(1,IP),MAT_ELEM,
      R   H3D_STRAIN,   JPLASOL,      JSPH,         SZ_R1_FREE,
-     T                 SNPC,         STF,          SBUFMAT,
+     T   SNPC,         STF,          SBUFMAT,      GLOB_THERM,
      U   SVIS,         SZ_IX,        IRESP,
-     V   N2D,          TH_STRAIN,    NGROUP,       TT, 
+     V   N2D,          th_strain,    NGROUP,       TT, 
      .   DT1,          NTABLE,       NUMELQ,       nummat,
      .   numgeo,       numnod,       numels,
      .   IDEL7NOK,     IDTMIN,       MAXFUNC,
-     .   IMON_MAT,     USERL_AVAIL,  heat_meca,    impl_s,
+     .   IMON_MAT,     USERL_AVAIL,  impl_s,
      .   idyna,        DT,     fheat      )
 C    
         IF (ISTRAIN == 1) THEN 
@@ -1212,7 +1217,7 @@ C
      4   JCVT)
       ENDIF
 C
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C
         IF (JCVT == 2) THEN
           CALL SROTO3(LFT,LLT,LBUF%SIG,SIGN,
@@ -1262,7 +1267,7 @@ C
      7   OFF,        LBUF%VOL,   GBUF%VOL,   GBUF%G_PLA,
      8   GBUF%G_EPSD,JFAC(1,IP), LBUF%EINTTH,GBUF%EINTTH,
      9   IEXPAN,     NEL,        IDEG,       CONDE,
-     A   CONDEN,     MTN,        ISMSTR,SVIS)
+     A   CONDEN,     MTN,        ISMSTR,SVIS,GLOB_THERM%NODADT_THERM)
        ELSE
 C----------------------------
 C     INTERNAL FORCES
@@ -1312,7 +1317,7 @@ C----------------------------
      7   OFF,        LBUF%VOL,   GBUF%VOL,   GBUF%G_PLA,
      8   GBUF%G_EPSD,JFAC(1,IP), LBUF%EINTTH,GBUF%EINTTH,
      9   IEXPAN,     NEL,        IDEG,       CONDE,
-     A   CONDEN,     MTN,        ISMSTR,     SVIS)
+     A   CONDEN,     MTN,        ISMSTR,     SVIS,GLOB_THERM%NODADT_THERM)
       ENDIF
 c-------------------------
 c     Virtual internal forces of regularized non local ddl 
@@ -1360,7 +1365,7 @@ c-------------------------
      9            PZ5,     PZ6,     PZ7,     PZ8,
      A            DT1,     TEMP,    TEMPEL,  FHEAT  ,
      B            THEM,    GBUF%OFF,LBUF%OFF,PARTSAV,
-     C            IPARTS,  LBUF%VOL,NEL)
+     C            IPARTS,  LBUF%VOL,NEL,GLOB_THERM%THEACCFACT)
            ELSE
              CALL S8ETHERM(
      1            PM,     IMAT,     VOLN,    NI,
@@ -1374,7 +1379,7 @@ c-------------------------
      9            PZ5,     PZ6,     PZ7,     PZ8,
      A            DT1,     TEMP,    TEMPEL,  DIE  ,
      B            THEM,    GBUF%OFF,LBUF%OFF,PARTSAV,
-     C            IPARTS,  LBUF%VOL,NEL)
+     C            IPARTS,  LBUF%VOL,NEL,GLOB_THERM%THEACCFACT)
            END IF
           ENDIF 
 !
@@ -1493,13 +1498,13 @@ C--------------------------
      .                  X1, X2, X3, X4, X5, X6, X7, X8,
      .                  Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8,
      .                  Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8,
-     .                  ITASK,IPARG(1,NG)) 
+     .                  ITASK,IPARG(1,NG),SENSORS) 
            ELSE
             CALL SRBILAN(PARTSAV,GBUF%EINT,GBUF%RHO,GBUF%RK,GBUF%VOL,
      .       VGXA, VGYA, VGZA, VGA2, VOLG,IPARTS,
      .       GRESAV,GRTH,IGRTH,GBUF%OFF,IEXPAN,GBUF%EINTTH,
      .       GBUF%FILL,XGXA, XGYA, XGZA,
-     .       XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG))
+     .       XGXA2,XGYA2,XGZA2,XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),SENSORS)
            ENDIF
       ENDIF
 C----------------------------
@@ -1546,7 +1551,7 @@ C----------------------------
      F   BID,     BID,     BID,     BID,
      G   BID,     BID,     BID,     BID,
      H   THEM,    FTHE,    CONDN,   CONDEN,
-     I   NEL,     JTHE,    ISROT,   IPARTSPH)
+     I   NEL,     JTHE,    ISROT,   IPARTSPH,GLOB_THERM%NODADT_THERM)
       ELSE
           CALL SCUMU3P(
      1   GBUF%OFF,STIN,    FSKY,    FSKY,
@@ -1567,7 +1572,7 @@ C----------------------------
      G   BID,     BID,     BID,     BID,
      H   THEM,    FTHESKY, CONDNSKY,CONDEN,
      I   NEL,     NFT,     JTHE,    ISROT,
-     J   IPARTSPH)
+     J   IPARTSPH,GLOB_THERM%NODADT_THERM)
       ENDIF
 C-----------
       IF (ALLOCATED(VAR_REG)) DEALLOCATE(VAR_REG)

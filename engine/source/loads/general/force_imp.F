@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,17 +36,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    force_mod       ../engine/source/loads/general/force.F90
       !||    h3d_mod         ../engine/share/modules/h3d_mod.F
       !||    pinchtype_mod   ../common_source/modules/pinchtype_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||    skew_mod        ../common_source/modules/skew_mod.F90
       !||    th_surf_mod     ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE FORCE_IMP(IB      ,FAC     ,SNPC    ,NPC        ,TF         ,
      2                     A       ,V       ,X       ,SKEWS      ,
-     3                     AR      ,VR      ,NSENSOR ,SENSOR_TAB ,TFEXC      ,
+     3                     AR      ,VR      ,NSENSOR ,SENSOR_TAB ,WFEXC      ,
      4                     IADC    ,FSKY    ,FEXT    ,H3D_DATA   ,CPTREAC    ,
      5                     FTHREAC ,NODREAC ,TH_SURF ,
      6                     DPL0CLD ,VEL0CLD ,D       ,DR         ,NCONLD     ,
-     7                     NUMNOD  ,NFUNCT  ,STF)
+     7                     NUMNOD  ,NFUNCT  ,STF     ,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -83,23 +83,24 @@ C-----------------------------------------------
       INTEGER NPC(SNPC),CPTREAC,NODREAC(*)
       INTEGER IB(NIBCLD,*)
       INTEGER IADC(4,*)
-      my_real FAC(LFACCLD,*),TF(*),A(3,*),V(3,*),AR(3,*),VR(3,*),X(3,*),TFEXC,FSKY(8,LSKY),FEXT(3,*),FTHREAC(6,*)
+      my_real FAC(LFACCLD,*),TF(*),A(3,*),V(3,*),AR(3,*),VR(3,*),X(3,*),WFEXC,FSKY(8,LSKY),FEXT(3,*),FTHREAC(6,*)
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
       TYPE(SKEW_),INTENT(INOUT) :: SKEWS
       TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
       my_real, INTENT(IN) ::  DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD)
       my_real, INTENT(IN) ::  D(3,NUMNOD), DR(3,NUMNOD)
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
       call FORCE( NIBCLD  ,IB      ,LFACCLD    ,FAC      ,SNPC      ,
      2            NPC     ,STF     ,TF         ,A        ,V         ,
      3            X       ,SKEWS   ,AR         ,
-     4            VR      ,NSENSOR ,SENSOR_TAB ,TFEXC    ,IADC      ,
+     4            VR      ,NSENSOR ,SENSOR_TAB ,WFEXC    ,IADC      ,
      5            LSKY    ,FSKY    ,FEXT       ,H3D_DATA ,CPTREAC   ,
      6            FTHREAC ,NODREAC ,TH_SURF    ,
      7            DPL0CLD ,VEL0CLD ,D          ,DR       ,NCONLD    ,
      8            NUMNOD  ,NFUNCT  , ANIM_V    ,OUTP_V   ,
-     9            IPARIT  ,TT      ,DT1        ,N2D      ,TFEXT     ,
+     9            IPARIT  ,TT      ,DT1        ,N2D      ,WFEXT     ,
      A            IMPL_S) 
 
       END SUBROUTINE

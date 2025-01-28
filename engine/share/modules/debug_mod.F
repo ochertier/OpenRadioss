@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    debug_mod                ../engine/share/modules/debug_mod.F
       !||--- called by ------------------------------------------------------
-      !||    check_nan_acc            ../engine/source/output/outfile/check_nan_acc.F
       !||    i24ass2                  ../engine/source/interfaces/int24/i24for3.F
       !||    i24cor3                  ../engine/source/interfaces/int24/i24cor3.F
       !||    i24ispt2_ini_opttri      ../engine/source/interfaces/int24/i24cor3.F
@@ -212,25 +211,20 @@ C     (s2 << 16) | s1
       !||====================================================================
       !||    prepare_debug   ../engine/share/modules/debug_mod.F
       !||--- called by ------------------------------------------------------
-      !||    check_nan_acc   ../engine/source/output/outfile/check_nan_acc.F
       !||    resol           ../engine/source/engine/resol.F
       !||--- uses       -----------------------------------------------------
       !||    debug_mod       ../engine/share/modules/debug_mod.F
-      !||    restmod         ../engine/share/modules/restart_mod.F
       !||====================================================================
-      SUBROUTINE PREPARE_DEBUG()
-
-        USE RESTMOD
+      SUBROUTINE PREPARE_DEBUG(ITAB,NUMNOD)
         USE DEBUG_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "com04_c.inc"
-C-----------------------------------------------
+            INTEGER, INTENT(IN) :: NUMNOD
+            INTEGER, DIMENSION(:), INTENT(IN) :: ITAB(NUMNOD)
+
 
        ALLOCATE  (ITAB_DEBUG(NUMNOD))
        ITAB_DEBUG(1:NUMNOD)=ITAB(1:NUMNOD)

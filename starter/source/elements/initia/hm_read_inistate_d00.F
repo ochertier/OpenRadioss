@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -4940,7 +4940,7 @@ C---------
                 CALL HM_GET_INT_ARRAY_INDEX('nvarsph',NUVAR,J,IS_AVAILABLE,LSUBMODEL)
                 CALL HM_GET_FLOAT_ARRAY_INDEX('Eint',ENER,J,IS_AVAILABLE,LSUBMODEL,UNITAB)
                 CALL HM_GET_FLOAT_ARRAY_INDEX('Rho',RHO,J,IS_AVAILABLE,LSUBMODEL,UNITAB)
-                CALL HM_GET_FLOAT_ARRAY_INDEX('Slen',SLEN,J,IS_AVAILABLE,LSUBMODEL,UNITAB)
+                CALL HM_GET_FLOAT_ARRAY_INDEX('h',SLEN,J,IS_AVAILABLE,LSUBMODEL,UNITAB)
                 CALL HM_GET_FLOAT_ARRAY_INDEX('Sigma1',S(1),J,IS_AVAILABLE,LSUBMODEL,UNITAB)
                 CALL HM_GET_FLOAT_ARRAY_INDEX('Sigma2',S(2),J,IS_AVAILABLE,LSUBMODEL,UNITAB)
                 CALL HM_GET_FLOAT_ARRAY_INDEX('Sigma3',S(3),J,IS_AVAILABLE,LSUBMODEL,UNITAB)

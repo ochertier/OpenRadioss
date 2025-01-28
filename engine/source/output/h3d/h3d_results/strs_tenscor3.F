@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -136,6 +136,11 @@ C-----Nj : KSI,ETA,ZETA
      6 -1               , 1               , 1               /
 C======================================================================= 
 C------not available w/ S16,S20
+      IR = 0 
+      IS = 0
+      IT = 0
+      N1 = ZERO
+      ILAY = -HUGE(ILAY)
       ALPHA = ZEP1381966
       BETA  = ZEP5854102
       EVAR(1:6,1:20,1:MVSIZ)=ZERO

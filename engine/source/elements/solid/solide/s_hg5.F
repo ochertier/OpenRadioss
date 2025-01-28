@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      I   FHOUR,PARTSAV,    IPARTS,  NFT,
      J   MTN,     JLAG,    EANI  ,  PID,
      K   IVECTOR ,DT1 ,    MAT,     GEO,
-     L   NEL     ,ISCTL)
+     L   NEL     ,ISCTL,   STI   ,CXX )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -88,12 +88,12 @@ C-----------------------------------------------
      .   PX1H1, PX1H2, PX1H3,  
      .   PX2H1, PX2H2, PX2H3,  
      .   PX3H1, PX3H2, PX3H3,  
-     .   PX4H1, PX4H2, PX4H3
+     .   PX4H1, PX4H2, PX4H3,CXX
       my_real, DIMENSION(MVSIZ) ,INTENT(INOUT):: 
      .   F11,F21,F31,F12,F22,F32,
      .   F13,F23,F33,F14,F24,F34,
      .   F15,F25,F35,F16,F26,F36,
-     .   F17,F27,F37,F18,F28,F38
+     .   F17,F27,F37,F18,F28,F38,STI
       my_real, INTENT(IN):: DT1
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -120,7 +120,7 @@ C     REAL
      .   G52(MVSIZ),G62(MVSIZ),G72(MVSIZ),G82(MVSIZ),
      .   G13(MVSIZ),G23(MVSIZ),G33(MVSIZ),G43(MVSIZ),
      .   G53(MVSIZ),G63(MVSIZ),G73(MVSIZ),G83(MVSIZ),
-     .   E0,G0,C1,NU,EHOURT ,QH,LAMG ,SFAC  
+     .   E0,G0,C1,NU,EHOURT ,QH,LAMG ,SFAC,FDAMP,DT05  
 C----------------------------------------------- 
 C------recompute modulus for law42,88,90
       MX = MAT(1)
@@ -138,17 +138,25 @@ C------recompute modulus for law42,88,90
           C1 = THIRD*E0/(1-TWO*NU)
           G0 = HALF*G0
           LAMG = C1+FOUR_OVER_3*G0
+        CASE (1,62)
+          LAMG = C1+FOUR_OVER_3*G0
         CASE (88)
           C1 = THIRD*E0/(1-TWO*NU)
           LAMG = C1+FOUR_OVER_3*G0
         CASE DEFAULT
+          IF (ISCTL>0) QH = FOURTH*QH ! 2.5 for default
           LAMG = C1+FOUR_OVER_3*G0
       END SELECT
+      IF (QH>ONE) STI(1:NEL) = QH*STI(1:NEL)
       SFAC = 0.038*QH*LAMG
       DO I=1,NEL
          CAQ(I)=SFAC*DT1*OFF(I)
          FCL(I)=CAQ(I)*VOL(I)**THIRD
-       ENDDO
+      ENDDO
+      DO I=1,NEL
+         FDAMP=EM02*RHO(I)*CXX(I)*VOL(I)**TWO_THIRD
+         FCL(I)=FCL(I)+FDAMP
+      ENDDO
        DO I=1,NEL
 C 1 -1 1 -1 1 -1 1 -1
         G11(I)= ONE-PX1H1(I)
@@ -217,6 +225,33 @@ C 1 -1 1 -1 -1 1 -1 1
          HGY4(I)=VY1(I)-VY2(I)+VY3(I)-VY4(I)-VY5(I)+VY6(I)-VY7(I)+VY8(I)
          HGZ4(I)=VZ1(I)-VZ2(I)+VZ3(I)-VZ4(I)-VZ5(I)+VZ6(I)-VZ7(I)+VZ8(I)
        ENDDO
+! hourglass energy
+       DT05 = HALF*DT1
+       DO I=1,NEL
+        HX1(I)=FHOUR(I,1,1)
+        HX2(I)=FHOUR(I,1,2)
+        HX3(I)=FHOUR(I,1,3)
+        HX4(I)=FHOUR(I,1,4)
+C              
+        HY1(I)=FHOUR(I,2,1)
+        HY2(I)=FHOUR(I,2,2)
+        HY3(I)=FHOUR(I,2,3)
+        HY4(I)=FHOUR(I,2,4)
+C
+        HZ1(I)=FHOUR(I,3,1)
+        HZ2(I)=FHOUR(I,3,2)
+        HZ3(I)=FHOUR(I,3,3)
+        HZ4(I)=FHOUR(I,3,4)
+       ENDDO
+      DO I=1,NEL
+        EHOU(I)= DT05*(
+     &   HZ1(I)*HGZ1(I) + HZ2(I)*HGZ2(I) + 
+     &   HZ3(I)*HGZ3(I) + HZ4(I)*HGZ4(I) + 
+     &   HX1(I)*HGX1(I) + HX2(I)*HGX2(I) + 
+     &   HX3(I)*HGX3(I) + HX4(I)*HGX4(I) + 
+     &   HY1(I)*HGY1(I) + HY2(I)*HGY2(I) + 
+     &   HY3(I)*HGY3(I) + HY4(I)*HGY4(I) ) 
+      ENDDO   
 C
       DO I=1,NEL
 C
@@ -280,7 +315,7 @@ C
        ENDDO
 c 
       DO I=1,NEL
-        EHOU(I)= DT1*(
+        EHOU(I)= EHOU(I) +DT05*(
      &   HZ1(I)*HGZ1(I) + HZ2(I)*HGZ2(I) + 
      &   HZ3(I)*HGZ3(I) + HZ4(I)*HGZ4(I) + 
      &   HX1(I)*HGX1(I) + HX2(I)*HGX2(I) + 

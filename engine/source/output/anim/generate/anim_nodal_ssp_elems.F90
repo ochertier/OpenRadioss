@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,9 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 ! ======================================================================================================================
+module anim_nodal_ssp_elems_mod
+  contains
+! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \brief This subroutine is setting nodal sound speed requested by Engine keyword /ANIM/NODA/SSP & /H3D/NODA/SSP
@@ -33,7 +36,7 @@
       !||    constant_mod           ../common_source/modules/constant_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
       subroutine anim_nodal_ssp_elems( wa4, swa4, iparg, elbuf_tab, ix, nix, numel, is_written_node, &
         multi_fvm, nparg, ngroup, numnod)
@@ -129,3 +132,4 @@
 
         return
       end subroutine anim_nodal_ssp_elems
+end module anim_nodal_ssp_elems_mod

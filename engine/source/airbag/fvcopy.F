@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -68,6 +68,7 @@ C     than the size of FVDATA, since FVDATA is build before switches to
 C     UP
       K1 = 1
       NFVBAG_MAX=0
+      I = -HUGE(I)
       DO N=1,NVOLU
          ITYP=MONVOL(K1-1+2)
          IF (ITYP==6.OR.ITYP==8) THEN

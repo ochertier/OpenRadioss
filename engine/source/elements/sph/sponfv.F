@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,18 +30,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    weight0        ../engine/source/elements/sph/weight.F
       !||    weight1        ../engine/source/elements/sph/weight.F
       !||--- uses       -----------------------------------------------------
-      !||    mod_splissv    ../engine/source/elements/sph/splissv.F
+      !||    sph_work_mod   ../common_source/modules/mat_elem/sph_work.F90
       !||    sphbox         ../engine/share/modules/sphbox.F
       !||====================================================================
       SUBROUTINE SPONFV(X ,V        ,A       ,D       ,MS      ,
      2             SPBUF   ,ITAB    ,KXSP    ,IXSP    ,NOD2SP  ,
      3             NPC     ,PLD     ,ISPHIO  ,VSPHIO  ,IPART   ,
-     4             IPARTSP ,WASPACT ,WA      ,VNORMAL   )
+     4             IPARTSP ,WASPACT ,WA      ,VNORMAL ,SPH_WORK,
+     5             WFEXT  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE SPHBOX    
-      USE MOD_SPLISSV
+      USE SPH_WORK_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,10 +62,8 @@ C-----------------------------------------------
       INTEGER KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),ITAB(*),NPC(*),
      .        ISPHIO(NISPHIO,*),IPART(LIPART1,*),IPARTSP(*),
      .        WASPACT(*)
-C     REAL
-      my_real
-     .   X(3,*) ,V(3,*) ,A(3,*) ,D(3,*) ,MS(*) ,SPBUF(NSPBUF,*) ,
-     .   PLD(*) ,VSPHIO(*), WA(*), VNORMAL(3,*)
+      my_real  X(3,*) ,V(3,*) ,A(3,*) ,D(3,*) ,MS(*) ,SPBUF(NSPBUF,*) ,PLD(*) ,VSPHIO(*), WA(*), VNORMAL(3,*)
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -73,9 +72,8 @@ C-----------------------------------------------
      .        NS,N,INOD,IACTIVE,
      .        IPPV,J,M,JNOD,IMPOSE,JMPOSE,
      .        NVOIS,IJ,NP,K,JMPOSE2,NN
-C     REAL
       my_real
-     .       TFEXTT,T05,
+     .       WFEXTT,T05,
      .       PENTV,VX,VY,VZ,VN,VT,UX,UY,UZ,UN1,NX,NY,NZ,
      .       PS,
      .       XI,YI,ZI,XJ,YJ,ZJ,DMIN,DD,DTINV,
@@ -90,7 +88,7 @@ C     REAL
       LOGICAL lBOOL
 
       my_real       ,DIMENSION(:,:), ALLOCATABLE :: DSPHR
-
+      TYPE(SPH_WORK_) :: SPH_WORK
 C-----------------------------------------------
 C     inlets.
 C-----------------------------------------------
@@ -98,7 +96,6 @@ C-----------------------------------------------
       XP = 0
       YP = 0
       ZP = 0
-
 
       DO I=1,NSPHIO
        ITYPE=ISPHIO(1,I)
@@ -133,7 +130,7 @@ C------
       ENDDO
 
 C-----
-      TFEXTT=ZERO
+      WFEXTT=ZERO
       DTINV =ONE/DT12
 C
       DO NS=1,NSPHACT
@@ -156,7 +153,7 @@ C------
           VX=UX+(VN-UN1)*NX
           VY=UY+(VN-UN1)*NY
           VZ=UZ+(VN-UN1)*NZ
-          TFEXTT=TFEXTT+HALF*MS(INOD)*
+          WFEXTT=WFEXTT+HALF*MS(INOD)*
      .     ((VX*VX+VY*VY+VZ*VZ)-(UX*UX+UY*UY+UZ*UZ))
           A(1,INOD)=(VX-V(1,INOD))*DTINV
           A(2,INOD)=(VY-V(2,INOD))*DTINV
@@ -169,11 +166,11 @@ C-----------------------------------------------
 C Comm D et A sur cellules remotes
 C-----------------------------------------------
       IF(NSPMD>1)THEN
-          ALLOCATE(ASPHR(3,NSPHR))
+          ALLOCATE(SPH_WORK%ASPHR(3,NSPHR))
           ALLOCATE(DSPHR(12,NSPHR))
-          CALL SPMD_SPHGETA(KXSP,SPBUF,A,ASPHR)
+          CALL SPMD_SPHGETA(KXSP,SPBUF,A,SPH_WORK%ASPHR)
           CALL SPMD_SPHGETD(KXSP,IXSP,ISPHIO,X,WASPACT,NOD2SP,
-     .                      SPBUF,V,A,ASPHR,DSPHR)
+     .                      SPBUF,V,A,SPH_WORK%ASPHR,DSPHR)
       END IF
 C-------------------------------------------
 C     general outlet & silent boundary.
@@ -385,9 +382,9 @@ C------
                WGRDY=WGRAD(2)*ALPHAI+WGHT*ALPHAYI
                WGRDZ=WGRAD(3)*ALPHAI+WGHT*ALPHAZI
                VJ=XSPHR(8,NN)/MAX(EM20,RHOJ)
-               VXJ =XSPHR(9,NN)+DT12*ASPHR(1,NN)
-               VYJ =XSPHR(10,NN)+DT12*ASPHR(2,NN)
-               VZJ =XSPHR(11,NN)+DT12*ASPHR(3,NN)
+               VXJ =XSPHR(9,NN)+DT12*SPH_WORK%ASPHR(1,NN)
+               VYJ =XSPHR(10,NN)+DT12*SPH_WORK%ASPHR(2,NN)
+               VZJ =XSPHR(11,NN)+DT12*SPH_WORK%ASPHR(3,NN)
                VJX=VJ*(VXJ-VX)
                VJY=VJ*(VYJ-VY)
                VJZ=VJ*(VZJ-VZ)
@@ -442,7 +439,7 @@ C          impose une vitesse sortante uniquement.
           UZ=V(3,INOD)+A(3,INOD)*DT12
 
           VT=VX*VX+VY*VY+VZ*VZ
-          TFEXTT=TFEXTT+HALF*MS(INOD)*(VT-(UX*UX+UY*UY+UZ*UZ))
+          WFEXTT=WFEXTT+HALF*MS(INOD)*(VT-(UX*UX+UY*UY+UZ*UZ))
           A(1,INOD)=(VX-V(1,INOD))*DTINV
           A(2,INOD)=(VY-V(2,INOD))*DTINV
           A(3,INOD)=(VZ-V(3,INOD))*DTINV
@@ -450,11 +447,11 @@ C          impose une vitesse sortante uniquement.
       ENDDO
 C-------------------------------------------
 #include "atomic.inc"
-       TFEXT=TFEXT+TFEXTT
+       WFEXT=WFEXT+WFEXTT
 #include "atomend.inc"
 C-------------------------------------------
       IF(NSPMD>1)THEN
-          DEALLOCATE(ASPHR,DSPHR)
+          DEALLOCATE(SPH_WORK%ASPHR,DSPHR)
       END IF
 C-------------------------------------------
       RETURN

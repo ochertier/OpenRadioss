@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,41 +21,46 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    hm_read_eos                 ../starter/source/materials/eos/hm_read_eos.F
+      !||    hm_read_eos                   ../starter/source/materials/eos/hm_read_eos.F
       !||--- called by ------------------------------------------------------
-      !||    read_material_models        ../starter/source/materials/read_material_models.F
+      !||    read_material_models          ../starter/source/materials/read_material_models.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg                      ../starter/source/output/message/message.F
-      !||    hm_get_string               ../starter/source/devtools/hm_reader/hm_get_string.F
-      !||    hm_option_count             ../starter/source/devtools/hm_reader/hm_option_count.F
-      !||    hm_option_read_key          ../starter/source/devtools/hm_reader/hm_option_read_key.F
-      !||    hm_option_start             ../starter/source/devtools/hm_reader/hm_option_start.F
-      !||    hm_read_eos_compaction      ../starter/source/materials/eos/hm_read_eos_compaction.F
-      !||    hm_read_eos_exponential     ../starter/source/materials/eos/hm_read_eos_exponential.F90
-      !||    hm_read_eos_gruneisen       ../starter/source/materials/eos/hm_read_eos_gruneisen.F
-      !||    hm_read_eos_ideal_gas       ../starter/source/materials/eos/hm_read_eos_ideal_gas.F
-      !||    hm_read_eos_ideal_gas_vt    ../starter/source/materials/eos/hm_read_eos_ideal_gas_vt.F
-      !||    hm_read_eos_linear          ../starter/source/materials/eos/hm_read_eos_linear.F
-      !||    hm_read_eos_lszk            ../starter/source/materials/eos/hm_read_eos_lszk.F
-      !||    hm_read_eos_murnaghan       ../starter/source/materials/eos/hm_read_eos_murnaghan.F
-      !||    hm_read_eos_nasg            ../starter/source/materials/eos/hm_read_eos_nasg.F
-      !||    hm_read_eos_noble_abel      ../starter/source/materials/eos/hm_read_eos_noble_abel.F
-      !||    hm_read_eos_osborne         ../starter/source/materials/eos/hm_read_eos_osborne.F
-      !||    hm_read_eos_polynomial      ../starter/source/materials/eos/hm_read_eos_polynomial.F
-      !||    hm_read_eos_puff            ../starter/source/materials/eos/hm_read_eos_puff.F
-      !||    hm_read_eos_sesame          ../starter/source/materials/eos/hm_read_eos_sesame.F
-      !||    hm_read_eos_stiffened_gas   ../starter/source/materials/eos/hm_read_eos_stiffened_gas.F
-      !||    hm_read_eos_tabulated       ../starter/source/materials/eos/hm_read_eos_tabulated.F
-      !||    hm_read_eos_tillotson       ../starter/source/materials/eos/hm_read_eos_tillotson.F
+      !||    ancmsg                        ../starter/source/output/message/message.F
+      !||    hm_get_string                 ../starter/source/devtools/hm_reader/hm_get_string.F
+      !||    hm_option_count               ../starter/source/devtools/hm_reader/hm_option_count.F
+      !||    hm_option_read_key            ../starter/source/devtools/hm_reader/hm_option_read_key.F
+      !||    hm_option_start               ../starter/source/devtools/hm_reader/hm_option_start.F
+      !||    hm_read_eos_compaction        ../starter/source/materials/eos/hm_read_eos_compaction.F90
+      !||    hm_read_eos_compaction2       ../starter/source/materials/eos/hm_read_eos_compaction2.F90
+      !||    hm_read_eos_exponential       ../starter/source/materials/eos/hm_read_eos_exponential.F90
+      !||    hm_read_eos_gruneisen         ../starter/source/materials/eos/hm_read_eos_gruneisen.F
+      !||    hm_read_eos_ideal_gas         ../starter/source/materials/eos/hm_read_eos_ideal_gas.F
+      !||    hm_read_eos_ideal_gas_vt      ../starter/source/materials/eos/hm_read_eos_ideal_gas_vt.F
+      !||    hm_read_eos_linear            ../starter/source/materials/eos/hm_read_eos_linear.F
+      !||    hm_read_eos_lszk              ../starter/source/materials/eos/hm_read_eos_lszk.F
+      !||    hm_read_eos_murnaghan         ../starter/source/materials/eos/hm_read_eos_murnaghan.F
+      !||    hm_read_eos_nasg              ../starter/source/materials/eos/hm_read_eos_nasg.F
+      !||    hm_read_eos_noble_abel        ../starter/source/materials/eos/hm_read_eos_noble_abel.F
+      !||    hm_read_eos_osborne           ../starter/source/materials/eos/hm_read_eos_osborne.F
+      !||    hm_read_eos_polynomial        ../starter/source/materials/eos/hm_read_eos_polynomial.F
+      !||    hm_read_eos_powderburn        ../starter/source/materials/eos/hm_read_eos_powderburn.F90
+      !||    hm_read_eos_puff              ../starter/source/materials/eos/hm_read_eos_puff.F
+      !||    hm_read_eos_sesame            ../starter/source/materials/eos/hm_read_eos_sesame.F
+      !||    hm_read_eos_stiffened_gas     ../starter/source/materials/eos/hm_read_eos_stiffened_gas.F
+      !||    hm_read_eos_tabulated         ../starter/source/materials/eos/hm_read_eos_tabulated.F
+      !||    hm_read_eos_tillotson         ../starter/source/materials/eos/hm_read_eos_tillotson.F
       !||--- uses       -----------------------------------------------------
-      !||    elbuftag_mod                ../starter/share/modules1/elbuftag_mod.F
-      !||    hm_option_read_mod          ../starter/share/modules1/hm_option_read_mod.F
-      !||    message_mod                 ../starter/share/message_module/message_mod.F
-      !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
+      !||    elbuftag_mod                  ../starter/share/modules1/elbuftag_mod.F
+      !||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
+      !||    hm_read_eos_compaction2_mod   ../starter/source/materials/eos/hm_read_eos_compaction2.F90
+      !||    hm_read_eos_compaction_mod    ../starter/source/materials/eos/hm_read_eos_compaction.F90
+      !||    message_mod                   ../starter/share/message_module/message_mod.F
+      !||    submodel_mod                  ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_EOS(
      .           MAT_PARAM   ,IPM      ,PM       ,BUFMAT   ,
-     .           BUFLEN      ,IADBUF   ,EOS_TAG  ,UNITAB   ,LSUBMODEL)
+     .           BUFLEN      ,IADBUF   ,EOS_TAG  ,UNITAB   ,LSUBMODEL,
+     .           MLAW_TAG    )
 C-----------------------------------------------
 C   A n a l y s e   M o d u l e
 C-----------------------------------------------
@@ -63,9 +68,11 @@ C-----------------------------------------------
       USE UNITAB_MOD
       USE MESSAGE_MOD
       USE ELBUFTAG_MOD            
-      USE SUBMODEL_MOD
+      USE SUBMODEL_MOD , ONLY : SUBMODEL_DATA, NSUBMOD
       USE HM_OPTION_READ_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARKEY
+      USE HM_READ_EOS_COMPACTION_MOD , ONLY : HM_READ_EOS_COMPACTION
+      USE HM_READ_EOS_COMPACTION2_MOD , ONLY : HM_READ_EOS_COMPACTION2
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -79,6 +86,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(MLAW_TAG_) , DIMENSION(NUMMAT),INTENT(INOUT) :: MLAW_TAG
       TYPE (UNIT_TYPE_),INTENT(IN) ::UNITAB 
       INTEGER  :: BUFLEN,IADBUF
       INTEGER ,DIMENSION(NPROPMI,NUMMAT) ,INTENT(INOUT) :: IPM
@@ -86,7 +94,7 @@ C-----------------------------------------------
       my_real ,DIMENSION(*)              ,INTENT(INOUT) :: BUFMAT
       TYPE(MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
       TYPE(EOS_TAG_),DIMENSION(0:MAXEOS) ,INTENT(INOUT) :: EOS_TAG
-      TYPE(SUBMODEL_DATA) ,DIMENSION(*)  ,INTENT(IN)    :: LSUBMODEL
+      TYPE(SUBMODEL_DATA) ,DIMENSION(NSUBMOD)  ,INTENT(IN)    :: LSUBMODEL
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -120,6 +128,7 @@ c     Routine reading EOS models :
       !  17       !     TABULATED          ! 2022.2
       !  18       !     LINEAR             ! 2019.0
       !  19       !     EXPONENTIAL        ! 2024.1
+      !  20       !     COMPACTION2        !
       !------------------------------------!                      
 c======================================================================-       
 c     COUNT EOS MODELS USING CFG FILES
@@ -162,6 +171,13 @@ c
           CALL ANCMSG(MSGID=659,ANMODE=ANINFO,MSGTYPE=MSGERROR,I1=IMIDEOS,I2=UID,C1='MATERIAL',C2='EOS MODEL',C3=TITR)
         ENDIF
 
+         !initialize %EOS member for current material
+        MAT_PARAM(IMAT)%EOS%TITLE = TITR
+        MAT_PARAM(IMAT)%EOS%NUPARAM = 0
+        MAT_PARAM(IMAT)%EOS%NIPARAM = 0
+        MAT_PARAM(IMAT)%EOS%NUVAR = 0
+        MAT_PARAM(IMAT)%EOS%NFUNC = 0
+        MAT_PARAM(IMAT)%EOS%NTABLE = 0
 
         WRITE(IOUT,1000) TRIM(TITR),IMIDEOS
         ! READ EOS
@@ -194,7 +210,7 @@ c---
 c---
           CASE ('IDEAL-GAS','IDEAL-GAS-VE')
             IEOS = 7      
-            CALL HM_READ_EOS_IDEAL_GAS(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS)                                
+            CALL HM_READ_EOS_IDEAL_GAS(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS,MAT_PARAM(IMAT))
 c---
           CASE ('MURNAGHAN')
             IEOS = 8                          
@@ -213,12 +229,13 @@ c---
             CALL HM_READ_EOS_LSZK(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS)                                    
 c---
           CASE ('POWDER-BURN')
-            IEOS = 12 
-            !none                        
+            IEOS = 12
+            CALL HM_READ_EOS_POWDERBURN(IOUT,PM(1,IMAT),IPM(1,IMAT),UNITAB,LSUBMODEL,IMIDEOS, MAT_PARAM(IMAT),
+     .                                  NPROPM, NPROPMI, MLAW_TAG(IMAT), EOS_TAG, IEOS  )
 c---
           CASE ('COMPACTION')
             IEOS = 13                          
-            CALL HM_READ_EOS_COMPACTION(IOUT,PM(1,IMAT),UNITAB,IUNIT,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS)
+            CALL HM_READ_EOS_COMPACTION(IOUT,PM(1,IMAT),UNITAB,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS,NPROPM,MAXEOS)
 c---
           CASE ('NASG')
             IEOS = 14                          
@@ -239,6 +256,11 @@ c---
           CASE ('EXPONENTIAL')
             IEOS = 19
             CALL HM_READ_EOS_EXPONENTIAL(IOUT,PM(1,IMAT),UNITAB,LSUBMODEL,NPROPM)
+c---
+          CASE ('COMPACTION2')
+            IEOS = 20
+            CALL HM_READ_EOS_COMPACTION2(IOUT,PM(1,IMAT),UNITAB,LSUBMODEL,IMIDEOS,EOS_TAG,IEOS,NPROPM,MAXEOS,
+     .                                   MAT_PARAM(IMAT)%EOS )
 c---
           CASE DEFAULT
             IEOS = -1 

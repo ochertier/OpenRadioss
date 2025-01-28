@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE SPMD_OLDNUMCD(RENUM,OLDNUM,NSNR,NSNROLD) 
+      SUBROUTINE SPMD_OLDNUMCD(RENUM,OLDNUM,NSNR,NSNROLD,
+     .           INTHEAT,IDT_THERM,NODADT_THERM) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -45,8 +46,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER OLDNUM(*), RENUM(*),
-     .        NSNR, NSNROLD
+      INTEGER ,INTENT(IN) :: INTHEAT
+      INTEGER ,INTENT(IN) :: IDT_THERM
+      INTEGER ,INTENT(IN) :: NODADT_THERM 
+      INTEGER :: NSNR, NSNROLD
+      INTEGER :: OLDNUM(*), RENUM(*)
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -466,7 +470,7 @@ C
       !||--- uses       -----------------------------------------------------
       !||    anim_mod           ../common_source/modules/output/anim_mod.F
       !||    h3d_mod            ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
       !||    parameters_mod     ../common_source/modules/interfaces/parameters_mod.F
       !||====================================================================
       SUBROUTINE SPMD_FIADD_POFF(
@@ -476,7 +480,7 @@ C
      4       FCONT ,INACTI  ,IADM   ,INTTH  ,FTHE    ,
      5       CONDN ,H3D_DATA, MULTI_FVM,NIN ,TAGNCONT,
      6       KLOADPINTER,LOADPINTER,LOADP_HYD_INTER  ,
-     .                     INTCAREA,FSAV  ,PARAMETERS)       
+     .       INTCAREA,FSAV  ,PARAMETERS,NODADT_THERM)       
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -509,6 +513,7 @@ C-----------------------------------------------
      .        LOADP_HYD_INTER(*),
      .        IADM,INTTH
       INTEGER, INTENT(in) :: NIN, INTCAREA
+      INTEGER, INTENT(IN) :: NODADT_THERM
       my_real
      .        BUFR(LEN,*), A(3,*), STIFN(*), VISCN(*),
      .        SECFCUM(7,NUMNOD,NSECT),
@@ -684,7 +689,7 @@ C
      2       STIFN ,VISCN   ,IBC    ,ISECIN ,NOINT   ,
      3       IBAG  ,ICODT   ,SECFCUM,NSTRF  ,ICONTACT,
      4       FCONT ,INTTH   ,FTHE   ,CONDN  ,H3D_DATA,
-     5       TAGNCONT,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER)
+     5       TAGNCONT,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -713,6 +718,7 @@ C-----------------------------------------------
      .        IRECTS(2,*), ICODT(*), NSTRF(*),ICONTACT(*),
      .        TAGNCONT(NLOADP_HYD_INTER,*),
      .        KLOADPINTER(*),LOADPINTER(*),LOADP_HYD_INTER(*)
+      INTEGER, INTENT(IN) :: NODADT_THERM
       my_real
      .        BUFR(LEN,*), A(3,*), STIFN(*), VISCN(*),
      .        SECFCUM(7,NUMNOD,NSECT),
@@ -1793,7 +1799,7 @@ C
      3       ICODT  ,SECFCUM,NSTRF  ,ICONTACT,FCONT,
      4       INACTI ,IADM   ,INTTH  ,FTHESKYI,CONDNSKYI,
      5       H3D_DATA,NIN   ,TAGNCONT,KLOADPINTER,LOADPINTER  ,
-     6       LOADP_HYD_INTER,INTCAREA,FSAV   ,PARAMETERS)
+     6       LOADP_HYD_INTER,INTCAREA,FSAV   ,PARAMETERS,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -1826,6 +1832,7 @@ C-----------------------------------------------
      .        LOADP_HYD_INTER(*),
      .        IADM,INTTH
       INTEGER ,INTENT(IN):: INTCAREA
+      INTEGER, INTENT(IN) :: NODADT_THERM
       my_real
      .        BUFR(LEN,*),
      .        FSKYI(LSKYI,NFSKYI), SECFCUM(7,NUMNOD,NSECT),
@@ -2197,7 +2204,7 @@ C
      3       ICODT  ,SECFCUM,NSTRF ,ICONTACT,FCONT,
      4       INTTH  ,FTHESKYI,CONDNSKYI,H3D_DATA,
      5       NIN    ,TAGNCONT,KLOADPINTER,LOADPINTER,
-     7       LOADP_HYD_INTER)
+     7       LOADP_HYD_INTER,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -2228,6 +2235,7 @@ C-----------------------------------------------
      .        ICONTACT(*), 
      .        TAGNCONT(NLOADP_HYD_INTER,*),KLOADPINTER(*),LOADPINTER(*),
      .        LOADP_HYD_INTER(*)
+      INTEGER, INTENT(IN) :: NODADT_THERM
       my_real
      .        BUFR(LEN,*),
      .        FSKYI(LSKYI,NFSKYI), SECFCUM(7,NUMNOD,NSECT),
@@ -2807,7 +2815,7 @@ C-----------------------------------------------
         END DO
       END DO
 C
-C followin i11for3 process on secondary nodes
+C following i11for3 process on secondary nodes
 C
       IF((ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0.AND.
      .   ((TT>=TANIM .AND. TT<=TANIM_STOP).OR.TT>=TOUTP.OR.(TT>=H3D_DATA%TH3D.AND.TT<=H3D_DATA%TH3D_STOP).OR.
@@ -2850,7 +2858,7 @@ C
       !||    inter_sorting_mod            ../engine/share/modules/inter_sorting_mod.F
       !||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    sensor_mod                   ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
       !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
@@ -3369,7 +3377,7 @@ C
       !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE SPMD_INITFI(IPARI,IFLAG,H3D_DATA,PARAMETERS)
+      SUBROUTINE SPMD_INITFI(IPARI,IFLAG,H3D_DATA,PARAMETERS,IDT_THERM,INTHEAT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -3402,6 +3410,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(NPARI,*), IFLAG
+      INTEGER, INTENT(IN) :: IDT_THERM
+      INTEGER, INTENT(IN) :: INTHEAT
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE (PARAMETERS_) ,INTENT(IN):: PARAMETERS
 C-----------------------------------------------
@@ -3409,7 +3419,7 @@ C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, P, NSN, NMN, ITYP, IGAP, IERROR, IERROR1, LENS, LENR,
      .        LSKYFI, INACTI, NBINTC, LENI, J,INTTH, K, L,IEDGE4 ,INTFRIC ,
-     .        FLAGREMN ,SIZREMNORFI, IVIS2 ,INTNITSCHE,ITIED
+     .        FLAGREMN ,SIZREMNORFI, IVIS2 ,INTNITSCHE,ITIED,IPSTIF
       INTEGER :: LENR_EDGE,LENS_EDGE
 C-----------------------------------------------
 C   S o u r c e  L i n e s
@@ -3636,7 +3646,11 @@ C INT 25
         IERROR = IERROR + IERROR1
         ALLOCATE (ISKEW_FI(NINTER),STAT=IERROR1)
         IERROR = IERROR + IERROR1
-        IF(PARAMETERS%ISTIF_DT > 0) THEN
+        IPSTIF = 0
+        DO I = 1,NINTER
+          IF(IPARI(97,I) > 0) IPSTIF = IPSTIF + IPARI(97,I)
+        END DO
+        IF(PARAMETERS%ISTIF_DT > 0 .OR. IPSTIF>0 ) THEN
            ALLOCATE(STIF_MSDT_FI(NINTER))
            ALLOCATE(STIFE_MSDT_FI(NINTER))
         ENDIF
@@ -3849,7 +3863,7 @@ C INT25
           NULLIFY(CANDF_SI(I)%P)
           NULLIFY(ISKEW_FI(I)%P)
           NULLIFY(ICODT_FI(I)%P)
-          IF(PARAMETERS%ISTIF_DT > 0) THEN
+          IF(PARAMETERS%ISTIF_DT > 0 .OR. IPARI(97,I)>0 ) THEN
              NULLIFY(STIF_MSDT_FI(I)%P)
              NULLIFY(STIFE_MSDT_FI(I)%P)
           ENDIF
@@ -5050,23 +5064,7 @@ C
                 CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
                 CALL ARRET(2)
               ENDIF
-C
             ENDIF
-          ENDIF
-C
-          IF(H3D_DATA%N_SCAL_CSE_FRICINT >0)THEN
-            IF(H3D_DATA%N_CSE_FRIC_INTER (I) >0)THEN
-              IERROR = 0
-              ALLOCATE(EFRICFI(I)%P(LENR),STAT=IERROR)
-              IF(IERROR/=0) THEN
-                CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-                CALL ARRET(2)
-c              ELSEIF(S_EFRICINT >0) THEN ! to be corrected if inters
-c                CALL READ_DB(EFRICFI(I)%P(1),LENR)  
-              ELSE
-                  EFRICFI(I)%P(1:LENR)=ZERO            
-              END IF                   
-            END IF
           ENDIF
 C
           IF(H3D_DATA%N_SCAL_CSE_FRIC >0)THEN
@@ -5100,7 +5098,7 @@ C
       !||    interface_modification_mod   ../engine/share/modules/interface_modification_mod.F
       !||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
       !||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
-      !||    sensor_mod                   ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
       !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
@@ -7218,7 +7216,7 @@ C
       !||    tri25ebox         ../engine/share/modules/tri25ebox.F
       !||    tri7box           ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE UPGRADE_REM_2RY(IPARI,COUNT_REMSLV,COUNT_REMSLVE)
+      SUBROUTINE UPGRADE_REM_2RY(IPARI,COUNT_REMSLV,COUNT_REMSLVE,NODADT_THERM)
       USE TRI7BOX
       USE TRI25EBOX
       USE MESSAGE_MOD
@@ -7236,6 +7234,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARI(NPARI,*),COUNT_REMSLV(*),COUNT_REMSLVE(*)
+      INTEGER, INTENT(IN) :: NODADT_THERM 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

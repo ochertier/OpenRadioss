@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,13 +31,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    crackxfem_mod          ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod              ../engine/share/modules/drape_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    genani_mod             ../engine/source/output/anim/generate/genani.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
       !||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    stack_mod              ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE EIG(K_DIAG    , K_LT     , IADK        , JDIK        , MS        ,
@@ -67,11 +67,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      P               NESDVOIS  , LERCVOIS , LESDVOIS    ,CRKEDGE      ,INDX_CRK   ,
      Q               XEDGE4N   ,XEDGE3N   ,STACK        ,SPH2SOL      ,STIFN      ,
      R               STIFR     ,DRAPE_Q4  ,DRAPE_T3     ,H3D_DATA     ,SUBSET     ,
-     S               IGRNOD    ,FCONT_MAX ,FNCONTP2     ,FTCONTP2, ALE_CONNECTIVITY)
+     S               IGRNOD    ,FCONT_MAX ,FNCONTP2     ,FTCONTP2, ALE_CONNECTIVITY,
+     .               GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE GENANI_MOD
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD         
       USE CLUSTER_MOD
@@ -85,6 +85,7 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -152,6 +153,7 @@ C-----------------------------------------------
       TYPE(DRAPE_) :: DRAPE_Q4  ,DRAPE_T3
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
+      type (glob_therm_) ,intent(inout)       :: glob_therm
 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -63,7 +63,7 @@
               key = array(ii)
               temp_index = index(ii)
               jj = ii - 1
-              ! move (+1) elems from array(1:j) which are greather than key
+              ! move (+1) elems from array(1:j) which are greater than key
               do while (array(jj) > key)
                 array(jj + 1) = array(jj)
                 index(jj + 1) = index(jj)
@@ -108,7 +108,7 @@
               key = array(ii)
               temp_index = index(ii)
               jj = ii - 1
-              ! move (+1) elems from array(1:j) which are greather than key
+              ! move (+1) elems from array(1:j) which are greater than key
               do while (array(jj) > key)
                 array(jj + 1) = array(jj)
                 index(jj + 1) = index(jj)

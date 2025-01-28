@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -1592,7 +1592,7 @@ C
       !||    intstamp_glob_mod   ../engine/share/modules/intstamp_glob_mod.F
       !||    intstamp_mod        ../engine/share/modules/intstamp_mod.F
       !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    spmd_mod            ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
       SUBROUTINE SPMD_IFRONT_STAMP(
@@ -1982,7 +1982,7 @@ C
       !||    intstamp_glob_mod   ../engine/share/modules/intstamp_glob_mod.F
       !||    intstamp_mod        ../engine/share/modules/intstamp_mod.F
       !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    spmd_mod            ../engine/source/mpi/spmd_mod.F90
       !||====================================================================
       SUBROUTINE SPMD_I21TEMPCOM(IPARI,TEMP,INTBUF_TAB,NSENSOR,SENSOR_TAB)
@@ -2179,12 +2179,13 @@ C
       !||    intstamp_glob_mod   ../engine/share/modules/intstamp_glob_mod.F
       !||    intstamp_mod        ../engine/share/modules/intstamp_mod.F
       !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    spmd_mod            ../engine/source/mpi/spmd_mod.F90
       !||    tri7box             ../engine/share/modules/tri7box.F
       !||====================================================================
       SUBROUTINE SPMD_I21FTHECOM(IPARI    ,FTHE  ,INTBUF_TAB,SENSOR_TAB,NISKYFI ,
-     .                           FTHESKYI ,ISKY  ,FSKYI     ,CONDNSKYI ,NSENSOR )
+     .                           FTHESKYI ,ISKY  ,FSKYI     ,CONDNSKYI ,NSENSOR,
+     .                           NODADT_THERM )
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
@@ -2214,6 +2215,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         INTEGER  ,INTENT(IN) :: NSENSOR
+        INTEGER  ,INTENT(IN) :: NODADT_THERM 
         INTEGER  IPARI(NPARI,NINTER), ISKY(*), NISKYFI(*)
 C     REAL
         my_real :: FTHE(*),FTHESKYI(*),FSKYI(LSKYI,*),CONDNSKYI(*)

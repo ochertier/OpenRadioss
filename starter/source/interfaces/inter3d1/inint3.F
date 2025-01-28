@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -402,13 +402,15 @@ C-----------------------------------------------------------------------
      2    INTBUF_TAB(NIN)%NSV  ,INSCR(L16)              ,NSN         ,NMN         ,NRTM               ,INTBUF_TAB(NIN)%S_IRECTM,
      3    SINSCR-L23+1 )
 
-       CALL I1CHK3(
+       IF (IPARI(13,NIN)>0) THEN ! check for s/s input is done before
+         CALL I1CHK3(
      1    X               ,INTBUF_TAB(NIN)%IRECTM   ,IXS                   ,NRTM                ,IXC           ,
      2    -NIN            ,NMN                      ,INTBUF_TAB(NIN)%MSR   ,NOINT               ,IXTG          ,
      3    GEO             ,PM                       ,KNOD2ELS              ,KNOD2ELC            ,KNOD2ELTG     ,
      4    NOD2ELS         ,NOD2ELC                  ,NOD2ELTG              ,IGRSURF(ISU2)       ,
      5    THK             ,NTY                      ,IXS10                 ,IXS16               ,IXS20         ,
      6    ID              ,TITR                     ,IGEO                  ,PM_STACK            ,IWORKSH      )
+       END IF 
        CALL INVOI3(
      1    X               ,INTBUF_TAB(NIN)%IRECTM   ,INSCR(L23)            ,INTBUF_TAB(NIN)%MSR ,INTBUF_TAB(NIN)%NSV,
      2    INSCR(L16)      ,INTBUF_TAB(NIN)%IRTLM    ,INSCR(L21)            ,NSN                 ,NMN           ,
@@ -473,7 +475,8 @@ C-----------------------------------------------------------------------
        TZINF=INTBUF_TAB(NIN)%VARIABLES(4)
 C j21 has a temporary usage in i2chk3, i2buc3 and i2tied3
 C
-       CALL I2CHK3(
+       IF (IPARI(13,NIN)>0) THEN ! check for s/s input is done before
+         CALL I2CHK3(
      1   X                 ,INTBUF_TAB(NIN)%IRECTM ,IXS                ,NRTM                   ,IXC             ,
      2   -NIN           ,NSN               ,INTBUF_TAB(NIN)%MSR     ,NOINT                  ,
      3   IXTG              ,INTBUF_TAB(NIN)%IRTLM  ,INTBUF_TAB(NIN)%CSTS    ,INTBUF_TAB(NIN)%DPARA       ,GEO             ,
@@ -481,6 +484,7 @@ C
      5   NOD2ELC           ,NOD2ELTG          ,IGRSURF(ISU2)      ,THK                    ,
      6   NTY               ,IXS10             ,IXS16              ,IXS20                  ,IGEO            ,
      7   PM_STACK          ,IWORKSH )
+       END IF 
 C
 C      STILL ONE BUCKET SORT
 C
@@ -709,7 +713,7 @@ C
      3 INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML,IGAP,INTBUF_TAB(NIN)%VARIABLES(2),DRAD  ,
      4 IPARI(62,NIN) ,NTY       ,IPARI(1,NIN)   ,I_MEM_REM ,GAPM_MX            ,
      5 GAPS_MX   ,GAPM_L_MX ,GAPS_L_MX ,ILEV      ,INTBUF_TAB(NIN)%NBINFLG ,
-     6 INTBUF_TAB(NIN)%MBINFLG,INTBUF_TAB(NIN)%VARIABLES(46))  
+     6 INTBUF_TAB(NIN)%MBINFLG,INTBUF_TAB(NIN)%VARIABLES(46),npari)
 C
        END IF
 C----------------
@@ -717,26 +721,16 @@ C      VOXEL SORT
 C----------------
       CALL I7BUC_VOX1(
      1 PTR_X    ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%VARIABLES(4),NSEG  ,
-     2 NMN      ,NRTM      ,MWA     ,NSN        ,INTBUF_TAB(NIN)%CAND_E  ,
-     3 INTBUF_TAB(NIN)%CAND_N  ,INTBUF_TAB(NIN)%VARIABLES(2),RWA  ,NOINT    ,INTBUF_TAB(NIN)%I_STOK(1) ,
+     2 NMN      ,NRTM      ,MWA     ,NSN        ,
+     3 INTBUF_TAB(NIN)%VARIABLES(2),RWA  ,NOINT    ,INTBUF_TAB(NIN)%I_STOK(1) ,
      4 INTBUF_TAB(NIN)%VARIABLES(5),INTBUF_TAB(NIN)%VARIABLES(8), INTBUF_TAB(NIN)%MSR ,
      5 INTBUF_TAB(NIN)%STFM ,INTBUF_TAB(NIN)%STFNS  ,MULTIMP   ,1 ,IDDLEVEL    ,
      6 ITAB      ,INTBUF_TAB(NIN)%GAP_S  ,INTBUF_TAB(NIN)%GAP_M, IGAP,INTBUF_TAB(NIN)%VARIABLES(13),
      7 INTBUF_TAB(NIN)%VARIABLES(16) ,INACTI  ,INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML ,I_MEM ,
      8 NCONT     ,ICURV ,INTBUF_TAB(NIN)%VARIABLES(7), ID           ,  TITR    ,
-     9 DRAD      ,INTERCEP, NIN,PROV_N,PROV_E,
-     1 IX1   ,IX2     ,IX3   ,IX4   ,NSVG   ,
-     2 X1    ,X2      ,X3    ,X4    ,Y1    ,
-     3 Y2    ,Y3      ,Y4    ,Z1    ,Z2    ,
-     4 Z3    ,Z4      ,XI    ,YI    ,ZI    ,
-     5 X0    ,Y0      ,Z0    ,XN1   ,YN1   ,
-     6 ZN1   ,XN2     ,YN2   ,ZN2   ,XN3   ,
-     7 YN3   ,ZN3     ,XN4   ,YN4   ,ZN4   ,
-     8 P1    ,P2      ,P3    ,P4    ,LB1   ,
-     9 LB2   ,LB3     ,LB4   ,LC1   ,LC2   ,
-     1 LC3   ,LC4     ,N11   ,N21   ,N31   ,
-     2 STIF  ,PENE    ,IREMNODE  ,IPARI(63,NIN),
-     3 INTBUF_TAB(NIN)%KREMNODE,INTBUF_TAB(NIN)%REMNODE,INTBUF_TAB(NIN)%VARIABLES(46))
+     9 DRAD      ,INTERCEP, NIN,
+     1 IREMNODE  ,IPARI(63,NIN),INTBUF_TAB(NIN)%KREMNODE,INTBUF_TAB(NIN)%REMNODE,
+     2 INTBUF_TAB(NIN)%VARIABLES(46),npari,ipari(1,nin),intbuf_tab(nin))
 C I_STOK updated for searching optimization
          I_STOK=INTBUF_TAB(NIN)%I_STOK(1)
          
@@ -793,7 +787,8 @@ C
      5  IX3    ,IX4    ,NSVG,X1      ,X2    ,
      6  X3     ,X4     ,Y1  ,Y2      ,Y3    ,
      7  Y4     ,Z1     ,Z2  ,Z3      ,Z4    ,
-     8  XI     ,YI     ,ZI  ,STIF    ,ZERO  )
+     8  XI     ,YI     ,ZI  ,STIF    ,ZERO  ,
+     9  LLT)
          CALL I7DST3(IX3,IX4,X1 ,X2 ,X3 ,
      1               X4 ,Y1 ,Y2 ,Y3 ,Y4 ,
      2               Z1 ,Z2 ,Z3 ,Z4 ,XI ,
@@ -802,12 +797,12 @@ C
      5               ZN2,XN3,YN3,ZN3,XN4,
      6               YN4,ZN4,P1 ,P2 ,P3 ,
      7               P4 ,LB1,LB2,LB3,LB4,
-     8               LC1,LC2,LC3,LC4)
+     8               LC1,LC2,LC3,LC4,LLT)
          CALL I7PEN3(ZERO,GAPV,N11,N21,N31 ,
      1                  PENE ,XN1 ,YN1,ZN1,XN2,
      2                  YN2  ,ZN2 ,XN3,YN3,ZN3,
      3                  XN4  ,YN4 ,ZN4,P1 ,P2 ,
-     4                  P3   ,P4)
+     4                  P3   ,P4,LLT)
          IF(INACTI==7)THEN
           CALL I18PWR3(ITAB  ,INACTI,INTBUF_TAB(NIN)%CAND_E(1+NFT),INTBUF_TAB(NIN)%CAND_N(1+NFT),INTBUF_TAB(NIN)%STFNS,
      1      INTBUF_TAB(NIN)%STFM,PTR_X ,INTBUF_TAB(NIN)%NSV,IWPENE    ,INTBUF_TAB(NIN)%CAND_P,
@@ -915,8 +910,7 @@ C-----------------------------------------------------------------------
      2    INTBUF_TAB(NIN)%IRTLS,INTBUF_TAB(NIN)%CSTM,INTBUF_TAB(NIN)%IRTLOS,INTBUF_TAB(NIN)%VARIABLES(2),NMN,
      3    ITAB      ,IWPENE    ,ID,TITR)
        ENDIF
-       CALL I9BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB(NIN)%NSV, SITAB, ITAB, NOINT, TITR, NTY,
-     .                  INTBUF_TAB(NIN)%S_ILOCS, INTBUF_TAB(NIN)%ILOCS )
+       CALL I9BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB(NIN)%NSV, INTBUF_TAB(NIN)%S_ILOCS, INTBUF_TAB(NIN)%ILOCS )
 C-----------------------------------------------------------------------
       ELSEIF(NTY==10) THEN
 C-----------------------------------------------------------------------
@@ -993,7 +987,8 @@ C
      5  IX3    ,IX4    ,NSVG,X1      ,X2    ,
      6  X3     ,X4     ,Y1  ,Y2      ,Y3    ,
      7  Y4     ,Z1     ,Z2  ,Z3      ,Z4    ,
-     8  XI     ,YI     ,ZI  ,STIF    ,INTBUF_TAB(NIN)%VARIABLES(46))
+     8  XI     ,YI     ,ZI  ,STIF    ,INTBUF_TAB(NIN)%VARIABLES(46),
+     9  LLT)
         CALL I7DST3(IX3,IX4,X1 ,X2 ,X3 ,
      1               X4 ,Y1 ,Y2 ,Y3 ,Y4 ,
      2               Z1 ,Z2 ,Z3 ,Z4 ,XI ,
@@ -1002,12 +997,12 @@ C
      5               ZN2,XN3,YN3,ZN3,XN4,
      6               YN4,ZN4,P1 ,P2 ,P3 ,
      7               P4 ,LB1,LB2,LB3,LB4,
-     8               LC1,LC2,LC3,LC4)
+     8               LC1,LC2,LC3,LC4,LLT)
         CALL I7PEN3(ZERO,GAPV,N11,N21,N31,
      1                  PENE ,XN1 ,YN1,ZN1,XN2,
      2                  YN2  ,ZN2 ,XN3,YN3,ZN3,
      3                  XN4  ,YN4 ,ZN4,P1 ,P2 ,
-     4                  P3   ,P4)
+     4                  P3   ,P4,LLT)
         INACTI = 0
         FPENMAX   = INTBUF_TAB(NIN)%VARIABLES(27)
           CALL I7PWR3(ITAB  ,INACTI,INTBUF_TAB(NIN)%CAND_E(1+NFT),INTBUF_TAB(NIN)%CAND_N(1+NFT),INTBUF_TAB(NIN)%STFNS,
@@ -1925,7 +1920,7 @@ C
      3 INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML,IGAP,INTBUF_TAB(NIN)%VARIABLES(2),DRAD  ,
      4 IPARI(62,NIN) ,NTY       ,IPARI(1,NIN)     ,I_MEM_REM ,GAPM_MX            ,
      5 GAPS_MX   ,GAPM_L_MX ,GAPS_L_MX ,ILEV      ,INTBUF_TAB(NIN)%NBINFLG ,
-     6 INTBUF_TAB(NIN)%MBINFLG,INTBUF_TAB(NIN)%VARIABLES(46))
+     6 INTBUF_TAB(NIN)%MBINFLG,INTBUF_TAB(NIN)%VARIABLES(46),npari)
 C
        END IF
        IF (NSPMD>1.AND.IDDLEVEL==0.AND.FLAG_REMOVED_NODE) THEN   
@@ -1943,23 +1938,23 @@ C
        PENMAX = INTBUF_TAB(NIN)%VARIABLES(37) 
        LOCAL_FLAG_REMOVED_NODE = FLAG_REMOVED_NODE
        IF(IDDLEVEL==0.AND.FLAG_REMOVED_NODE) LOCAL_FLAG_REMOVED_NODE = .FALSE.
+       I_MEM = 0
        CALL I25BUC_VOX1(
-     1 X        ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%VARIABLES(4),NSEG  ,
-     2 NMN      ,NRTM0             ,MWA     ,NSN        ,INTBUF_TAB(NIN)%CAND_E  ,
-     3 INTBUF_TAB(NIN)%CAND_N  ,INTBUF_TAB(NIN)%VARIABLES(2),NOINT       ,I_STOK ,
+     1 X        ,INTBUF_TAB(NIN)%IRECTM  ,INTBUF_TAB(NIN)%NSV,INTBUF_TAB(NIN)%VARIABLES(4),
+     2 NMN      ,NRTM0             ,NSN        ,intbuf_tab(nin)  ,
+     3 INTBUF_TAB(NIN)%VARIABLES(2),I_STOK ,
      4 INTBUF_TAB(NIN)%VARIABLES(5),INTBUF_TAB(NIN)%VARIABLES(8),MAXBOX  ,MINBOX,INTBUF_TAB(NIN)%MSR,
-     5 INTBUF_TAB(NIN)%STFM  ,INTBUF_TAB(NIN)%STFNS  ,MULTIMP   ,1       ,IDDLEVEL    ,
-     6 ITAB     ,INTBUF_TAB(NIN)%GAP_S,INTBUF_TAB(NIN)%GAP_M,IGAP,INTBUF_TAB(NIN)%VARIABLES(13),
-     7 INTBUF_TAB(NIN)%VARIABLES(16),INACTI   ,INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML,I_MEM  ,
+     5 INTBUF_TAB(NIN)%STFM  ,INTBUF_TAB(NIN)%STFNS  ,IDDLEVEL    ,
+     6 INTBUF_TAB(NIN)%GAP_S,INTBUF_TAB(NIN)%GAP_M,IGAP,INTBUF_TAB(NIN)%VARIABLES(13),
+     7 INTBUF_TAB(NIN)%VARIABLES(16),INACTI   ,INTBUF_TAB(NIN)%GAP_SL,INTBUF_TAB(NIN)%GAP_ML,
      8 INTBUF_TAB(NIN)%VARIABLES(25),ID  ,TITR ,INTBUF_TAB(NIN)%NBINFLG ,INTBUF_TAB(NIN)%MBINFLG,
      9 ILEV ,INTBUF_TAB(NIN)%MSEGTYP24,INTBUF_TAB(NIN)%GAP_NM,INTBUF_TAB(NIN)%VARIABLES(7),
      A IPARTS  ,KNOD2ELS ,NOD2ELS ,
-     B IREMNODE,IPARI(63,NIN),INTBUF_TAB(NIN)%KREMNODE,INTBUF_TAB(NIN)%REMNODE,
+     B INTBUF_TAB(NIN)%KREMNODE,INTBUF_TAB(NIN)%REMNODE,
      C IXS, IXS10, IXS16, IXS20,ICODE,ISKEW, 
-     D DRAD,INTBUF_TAB(NIN)%PENE_OLD,INTBUF_TAB(NIN)%VARIABLES(46),NRTM,LOCAL_FLAG_REMOVED_NODE,
-     E INTBUF_TAB(NIN)%IELEM_M )
+     D DRAD,INTBUF_TAB(NIN)%VARIABLES(46),NRTM,LOCAL_FLAG_REMOVED_NODE,
+     E INTBUF_TAB(NIN)%IELEM_M,nin,npari,ipari(1,nin) )
 
-       IF (I_MEM == 2) RETURN
 C
        IF(IEDGE/=0)THEN
 

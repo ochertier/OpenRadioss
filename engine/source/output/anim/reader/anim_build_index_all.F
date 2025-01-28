@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    arret                  ../engine/source/system/arret.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    stack_mod              ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE ANIM_BUILD_INDEX_ALL(ISPMD   ,MCHECK ,SENSORS ,IGEO    ,GEO    )
@@ -65,6 +65,12 @@ C-----------------------------------------------
      .   IUS,IPT,IGTYP,NPT,NPTS,NPTR,NPTT,NPTT_PLY,CPtPLY,NMAX,IGTYP15,
      .   IDX,NIPMAX_BEAM, NIPMAX_SOL,ICSTR,N14R,N14S,N14T
 C-------------------------------------------
+      NIPMAX = 0
+      NIPMAX_BEAM = 0
+      NIPMAX_SOL = 0
+      NPTS = 1
+      NPTT = 0
+      NPTT_PLY = 0
       IF (MCHECK == 0) THEN
         ALLOCATE (SENSORS%ANIM(SENSORS%NANIM))
         SENSORS%ANIM(:) = 0
@@ -716,6 +722,12 @@ C              IGTYP15 = 1
             END SELECT
           ENDIF
         ENDDO
+!----special case for tet10  :
+        IF (NUMELS10>0) THEN
+           NPTR= MAX(NPTR,2)
+           NPTS= MAX(NPTS,2)
+           NPTT= MAX(NPTT,2)
+        END IF 
       ENDIF !---
 C       
        NPTT_PLY = 0

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,15 +23,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat78            ../starter/source/materials/mat/mat078/hm_read_mat78.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
-      !||    calculp2                 ../starter/source/materials/mat/mat057/hm_read_mat57.F
+      !||    calculp2                 ../starter/source/materials/mat/mat057/calculp2.F90
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
       !||    hm_get_intv              ../starter/source/devtools/hm_reader/hm_get_intv.F
       !||    hm_option_is_encrypted   ../starter/source/devtools/hm_reader/hm_option_is_encrypted.F
       !||    init_mat_keyword         ../starter/source/materials/mat/init_mat_keyword.F
       !||--- uses       -----------------------------------------------------
+      !||    calculp2_mod             ../starter/source/materials/mat/mat057/calculp2.F90
       !||    elbuftag_mod             ../starter/share/modules1/elbuftag_mod.F
       !||    message_mod              ../starter/share/message_module/message_mod.F
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
@@ -52,6 +53,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD      
       USE SUBMODEL_MOD
       USE MATPARAM_DEF_MOD
+      USE CALCULP2_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -243,6 +245,10 @@ c------------------------------
       MTAG%L_SEQ  = 1
 c------------------------------        
       ! MATPARAM keywords     
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"INCREMENTAL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"LARGE_STRAIN") 
+!
       CALL INIT_MAT_KEYWORD(MATPARAM,"HOOK")
       CALL INIT_MAT_KEYWORD(MATPARAM,"ORTHOTROPIC")
 C

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,7 +51,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mapping_option_mod     ../starter/share/modules1/dichotomy_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||    monvol_struct_mod      ../starter/share/modules1/monvol_struct_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||    th_titles_mod          ../starter/source/output/th/th_titles.F90
       !||    write_thnms1_mod       ../starter/source/output/th/write_thnms1.F90
@@ -71,7 +70,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      C      IPARTS        ,IPARTQ        ,IPARTC           ,IPARTT            ,IPARTP        ,IPARTR ,
      D      IPARTG        ,IPARTX        ,IPARTSP          ,IPARTIG3D         ,LITHBUFMX     ,
      E      MAP_TABLES    ,IFLAG         ,PTR_NOPT_SLIPRING,PTR_NOPT_RETRACTOR,SENSORS       ,
-     F      INTERFACES    ,IPARI         ,DUMP_THNMS1_FILE  )
+     F      INTERFACES    ,IPARI         ,DUMP_THNMS1_FILE ,ITHERM_FE)
 C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE MESSAGE_MOD
@@ -105,6 +104,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: LITHBUFMX
+      INTEGER,INTENT(IN) :: ITHERM_FE
       INTEGER ITAB(NUMNOD),ITABM1(*), IFLAG,
      .        IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),IXC(NIXC,NUMELC),IXT(NIXT,NUMELT),
      .        IXP(NIXP,NUMELP),IXR(NIXR,NUMELR),IXTG(NIXTG,NUMELTG),KXX(NIXX,*),
@@ -2408,8 +2408,9 @@ C
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXP    ,
      3      NIXP  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,
      4      NVARP ,VARP  ,NUMELP,VARPG ,NVARPG   ,
-     5      IVARPG,NSELP,NVALL,IMERGE,ITHVAR   ,
+     5      IVARPG,NSELP,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%IBEAMM, NUMELP)
+
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS)) 
         ENDDO
       ENDIF  
@@ -2433,7 +2434,7 @@ C
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXT    ,
      3      NIXT  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,    
      4      NVART ,VART  ,NUMELT,VARTG ,NVARTG   ,         
-     5      IVARTG,NSELT,NVALL,IMERGE,ITHVAR   ,           
+     5      IVARTG,NSELT,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,           
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ITRUSSM, NUMELT)                          
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS)) 
         ENDDO
@@ -2458,7 +2459,7 @@ C
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXR    ,
      3      NIXR  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,    
      4      NVARR ,VARR  ,NUMELR,VARRG ,NVARRG   ,         
-     5      IVARRG,NSELR,NVALL,IMERGE,ITHVAR   ,           
+     5      IVARRG,NSELR,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,           
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ISPRINGM, NUMELR)                           
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS)) 
         ENDDO
@@ -2483,7 +2484,7 @@ C
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXS    ,
      3      NIXS  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,
      4      NVARS ,VARS  ,NUMELS,VARSG ,NVARSG   ,
-     5      IVARSG,NSELS,NVALL,IMERGE,ITHVAR   ,
+     5      IVARSG,NSELS,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ISOLM, NUMELS)
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS)) 
         ENDDO
@@ -2508,7 +2509,7 @@ C
      1      ITYP  ,KEY   ,ITAB  ,ITABM1  ,IXS    ,         
      3      NIXS  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,    
      4      NVARN ,VARN  ,0     ,VARNG   ,NVARNG   ,       
-     5      IVARNG,NSNOD ,NVALL ,IMERGE  ,ITHVAR   ,       
+     5      IVARNG,NSNOD ,NVALL ,IMERGE  ,ITHVAR   ,ITHERM_FE,       
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,IBID,IBID)                          
 C         decode les numeros de skews.                               
           NNE =ITHGRP(4,IGS)                                         
@@ -2562,7 +2563,7 @@ C          decode les numeros de frames.
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXC    ,
      3      NIXC  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,
      4      NVARC ,VARC  ,NUMELC,VARCG ,NVARCG   ,
-     5      IVARCG,NSELC,NVALL,IMERGE,ITHVAR   ,
+     5      IVARCG,NSELC,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ISH4NM, NUMELC)                           
 C         decode les numeros de skews.                                  
           NNE =ITHGRP(4,IGS)                                            
@@ -2616,7 +2617,7 @@ C          frame numbers user -> internal
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXTG   ,
      3      NIXTG ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,    
      4      NVARC ,VARC  ,NUMELTG,VARCG ,NVARCG ,          
-     5      IVARCG,NSELTG,NVALL,IMERGE,ITHVAR   ,          
+     5      IVARCG,NSELTG,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,          
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ISH3NM, NUMELTG)                              
 C          skew numbers user -> internal          
           NNE =ITHGRP(4,IGS)                                                   
@@ -2718,6 +2719,7 @@ C          frame numbers user -> internal
       !-------------------------------------------
       ! /TH/PART
       !-------------------------------------------
+      !HM_NTHPART: total number of /TH/PART in 0000.rad
       CALL HM_OPTION_COUNT(TRIM(THFILE)//'/PART' ,HM_NTHPART)  
       IF (HM_NTHPART > 0) THEN 
         CALL HM_OPTION_START(TRIM(THFILE)//'/PART') 
@@ -2734,11 +2736,14 @@ C          frame numbers user -> internal
       !-------------------------------------------
       ! /TH/SUBS
       !-------------------------------------------
+      !HM_NTHSUBS: total number of /TH/SUBS in 0000.rad
       CALL HM_OPTION_COUNT(TRIM(THFILE)//'/SUBS' ,HM_NTHSUBS)
       IF (HM_NTHSUBS > 0) THEN 
         CALL HM_OPTION_START(TRIM(THFILE)//'/SUBS') 
         HM_NTHGRP = HM_NTHGRP + HM_NTHSUBS
+        ! HM_NTHGRP: Number of /TH/ Group in 0000.rad   
         DO I = 1, HM_NTHSUBS
+        ! TAGS: Total number of SUBS for the TIME history output   
           CALL HM_READ_THGRPA_SUB(
      .         IAD      ,IFI      ,ITHBUF   ,NVARPA   ,VARPA    ,
      .         VARPAG   ,NVARPAG  ,IVARPAG  ,PATHID   ,
@@ -2765,7 +2770,7 @@ C          frame numbers user -> internal
      1        2     ,KEY   ,ITAB  ,ITABM1,IXQ    ,
      3        NIXQ  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,
      4        NVARS ,VARS  ,NUMELQ,VARSG ,NVARSG   ,
-     5        IVARSG,NSELQ,NVALL,IMERGE,ITHVAR   ,
+     5        IVARSG,NSELQ,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,
      6        FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%IQUADM, NUMELQ) 
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS))    
         ENDDO
@@ -2789,7 +2794,7 @@ C          frame numbers user -> internal
      1       51   ,KEY   ,ITAB  ,ITABM1,KXSP    ,
      2       NISP  ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,
      4       NVARSPH,VARSPH,NUMSPH,VARSPG,NVARSPG ,
-     5       IVARSPG,NSELSP,NVALL,IMERGE,ITHVAR   ,
+     5       IVARSPG,NSELSP,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,
      6       FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ISPHM,NUMSPH) 
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS))    
         ENDDO
@@ -2869,9 +2874,11 @@ C          frame numbers user -> internal
       !-------------------------------------------
       ! /TH/GAUGE
       !-------------------------------------------
+      !HM_NTHGAUGE: total number of /TH/GAUGE in 0000.rad
       CALL HM_OPTION_COUNT(TRIM(THFILE)//'/GAUGE' ,HM_NTHGAUGE)
       IF (HM_NTHGAUGE > 0) THEN 
         CALL HM_OPTION_START(TRIM(THFILE)//'/GAUGE')
+        ! HM_NTHGRP: Number of /TH/ Group in 0000.rad   
         HM_NTHGRP = HM_NTHGRP + HM_NTHGAUGE
         DO I = 1, HM_NTHGAUGE
           TITR = ''   
@@ -2998,7 +3005,7 @@ C             error message if type of inout is not correct
      1      ITYP  ,KEY   ,ITAB  ,ITABM1,IXTG   ,
      3      NIXTG ,IAD   ,IFI   ,ITHGRP(1,IGS),ITHBUF ,    
      4      NVARS ,VARS  ,NUMELTG,VARSG ,NVARSG ,          
-     5      IVARSG,NSELTG,NVALL,IMERGE,ITHVAR   ,          
+     5      IVARSG,NSELTG,NVALL,IMERGE,ITHVAR   ,ITHERM_FE,         
      6      FLAGABF,NVARABF,RFI,LSUBMODEL,MAP_TABLES%ITRIAM, NUMELTG)        
           IF(IGS/=0) NTHWA=MAX(NTHWA,ITHGRP(4,IGS)*ITHGRP(6,IGS)) 
         ENDDO

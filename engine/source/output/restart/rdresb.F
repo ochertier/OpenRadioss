@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -45,6 +45,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fxtemprrest            ../engine/source/output/restart/rdresb.F
       !||    group_ini              ../engine/source/groups/group_ini.F
       !||    imprrest               ../engine/source/output/restart/rdresb.F
+      !||    init_global_node_id    ../engine/source/engine/node_spliting/nodal_arrays.F90
+      !||    init_global_shell_id   ../common_source/modules/connectivity.F90
       !||    intbuf_ini             ../common_source/interf/intbuf_ini.F
       !||    intfric_rresti         ../common_source/modules/interfaces/intbuf_fric_mod.F90
       !||    intfric_rrestr         ../common_source/modules/interfaces/intbuf_fric_mod.F90
@@ -57,8 +59,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    loadprest              ../engine/source/output/restart/rdresb.F
       !||    nfrrest                ../engine/source/output/restart/rdresb.F
       !||    nitscherrest           ../engine/source/output/restart/rdresb.F
-      !||    pblast_init_tables     ../common_source/modules/loads/pblast_mod.F
-      !||    pblast_load            ../common_source/modules/loads/pblast_mod.F
       !||    ply_info_rest          ../engine/source/output/restart/rdresb.F
       !||    plyxfem_ravuply        ../engine/source/output/restart/rdresb.F
       !||    plyxfem_rrest          ../engine/source/output/restart/rdresb.F
@@ -102,29 +102,31 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alefvm_mod             ../common_source/modules/ale/alefvm_mod.F
       !||    bcs_mod                ../common_source/modules/boundary_conditions/bcs_mod.F90
       !||    cluster_mod            ../engine/share/modules/cluster_mod.F
+      !||    connectivity_mod       ../common_source/modules/connectivity.F90
       !||    damp_mod               ../engine/share/modules/damp_mod.F
       !||    drape_mod              ../engine/share/modules/drape_mod.F
-      !||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||    ecnd_mod               ../engine/share/modules/ecdn_mod.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    intstamp_glob_mod      ../engine/share/modules/intstamp_glob_mod.F
-      !||    loads_mod              ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    monvol_struct_mod      ../engine/share/modules/monvol_struct_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    nodal_arrays_mod       ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    outmax_mod             ../common_source/modules/outmax_mod.F
       !||    output_mod             ../common_source/modules/output/output_mod.F90
       !||    outputs_mod            ../common_source/modules/outputs_mod.F
-      !||    pblast_mod             ../common_source/modules/loads/pblast_mod.F
       !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
       !||    pload_cyl_mod          ../common_source/modules/loads/pload_cyl_mod.F
       !||    python_funct_mod       ../common_source/modules/python_mod.F90
+      !||    rbe3_mod               ../common_source/modules/constraints/rbe3_mod.F90
       !||    read_inivel_mod        ../engine/source/output/restart/read_inivel.F90
       !||    restmod                ../engine/share/modules/restart_mod.F
       !||    seatbelt_mod           ../common_source/modules/seatbelt_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    skew_mod               ../common_source/modules/skew_mod.F90
       !||    sph_mod                ../engine/share/modules/sph_mod.F
       !||    stack_mod              ../engine/share/modules/stack_mod.F
@@ -139,11 +141,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                   SENSORS          ,EBCS_TAB   ,DYNAIN_DATA  ,USER_WINDOWS     ,OUTPUT     ,
      .                   INTERFACES       ,LOADS      ,MAT_ELEM     ,PYTHON           ,IFLOW      ,
      .                   SKEWS            ,RFLOW      ,LIFLOW       ,LRFLOW           ,IMPL_S0    ,
-     .                   MCP              ,TEMP       ,FORNEQS      ,UNITAB           ,NFXFLUX    ,
-     .                   STACK            ,DRAPE_SH4N ,DRAPE_SH3N   ,DRAPEG           ,NDRAPE )
+     .                   MCP              ,TEMP       ,FORNEQS      ,UNITAB           ,
+     .                   STACK            ,DRAPE_SH4N ,DRAPE_SH3N   ,DRAPEG           ,NDRAPE     ,
+     .                   GLOB_THERM       ,PBLAST     ,ELEMENT      ,NODES            ,RBE3)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE connectivity_mod
+      USE nodal_arrays_mod
       USE PYTHON_FUNCT_MOD
       USE RESTMOD
       USE INTSTAMP_GLOB_MOD
@@ -182,6 +187,10 @@ C-----------------------------------------------
       USE DRAPE_MOD
       USE TIME_MOD
       use read_inivel_mod, only : read_inivel
+      use glob_therm_mod
+      use read_ale_grid_mod, only : read_ale_grid
+      use read_bcs_wall_mod, only : read_bcs_wall
+      use rbe3_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -242,9 +251,11 @@ C-----------------------------------------------
       TYPE (STACK_PLY)      ,INTENT(INOUT)                 :: STACK
       TYPE(DRAPE_)          ,INTENT(INOUT)                 :: DRAPE_SH3N(NUMELTG_DRAPE),DRAPE_SH4N(NUMELC_DRAPE)
       TYPE(DRAPEG_)         ,INTENT(INOUT)                 :: DRAPEG
-C-----------------------------------------------
-C   L o c a l   V a r i a b l e s
-C-----------------------------------------------
+      TYPE(GLOB_THERM_)     ,INTENT(INOUT)                 :: GLOB_THERM
+      TYPE(PBLAST_)         ,INTENT(INOUT)                 :: PBLAST
+      TYPE(connectivity_)   ,INTENT(INOUT)                 :: ELEMENT
+      TYPE(nodal_arrays_)   ,INTENT(INOUT)                 :: NODES
+      TYPE(RBE3_)           ,INTENT(INOUT)                 :: RBE3
       INTEGER, INTENT(IN) :: LIFLOW
       INTEGER, INTENT(IN) :: LRFLOW
       my_real, INTENT(INOUT) :: FORNEQS(3,NUMNOD)
@@ -253,8 +264,10 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IMPL_S0
       my_real, INTENT(INOUT) :: MCP(NUMNOD)
       my_real, INTENT(INOUT) :: TEMP(NUMNOD)
-      INTEGER, INTENT(INOUT) :: NFXFLUX
       INTEGER, INTENT(IN) :: NDRAPE
+C-----------------------------------------------
+C   L o c a l   V a r i a b l e s
+C-----------------------------------------------
       INTEGER  IDUMM(MVSIZ)
       INTEGER  I,J,LMXVREA, LEN,MY_ILEN,MY_RLEN,ISTAT,II,NS_DIFF
       PARAMETER (LMXVREA=1000+30*MAXLAW+30)
@@ -269,6 +282,8 @@ C-----------------------------------------------
       INTEGER :: PYTHON_LEN
       INTEGER, DIMENSION(:), ALLOCATABLE :: BUFFER
       INTEGER :: SKEW_LEN
+      LOGICAL :: IS_EBCS_PARALLEL
+      INTEGER :: NPT
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -292,11 +307,11 @@ C
 
         CALL READ_I_C(MAIN_PROC,SWEIGHT)
 
-        CALL READ_I_C(WEIGHT,SWEIGHT)
+        CALL READ_I_C(NODES%WEIGHT,SWEIGHT)
 
-        CALL READ_I_C(ICODE,SICODE)
+        CALL READ_I_C(NODES%ICODE,SICODE)
 
-        CALL READ_I_C(ISKEW,SISKEW)
+        CALL READ_I_C(NODES%ISKEW,SISKEW)
 
         CALL READ_I_C(ISKWN,SISKWN)
 
@@ -329,7 +344,14 @@ C
 
         CALL READ_I_C(IXQ,SIXQ)
 
-        CALL READ_I_C(IXC,SIXC)
+        CALL READ_I_C(ELEMENT%shell%ixc,SIXC)
+        DO I = 1, SIXC / NIXC ! loop over the number of shell
+          element%shell%nodes(1:4,I) = ELEMENT%shell%ixc(2:5, I)
+          element%shell%pid(I) = ELEMENT%shell%ixc(6, I)
+          element%shell%matid(I) = ELEMENT%shell%ixc(1, I)
+          element%shell%user_id(I) = ELEMENT%shell%ixc(7, I)
+        ENDDO
+        CALL INIT_GLOBAL_SHELL_ID(ELEMENT%SHELL)
 
         CALL READ_I_C(IXT,SIXT)
 
@@ -337,15 +359,17 @@ C
 
         CALL READ_I_C(IXR,SIXR)
 
-        CALL READ_I_C(ITAB,SITAB)
-C       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
-        CALL READ_I_C(ITABM1,SITABM1)
+        CALL READ_I_C(NODES%ITAB,SITAB)
+        ! Create the map from global to local ids
+        CALL INIT_GLOBAL_NODE_ID(NODES,NUMNOD)
+
+        CALL READ_I_C(NODES%ITABM1,SITABM1)
 
         CALL READ_I_C(GJBUFI,SGJBUFI)
 
         CALL READ_I_C(ALE_CONNECTIVITY%NALE,ALE%GLOBAL%SNALE)
 
-        IF (IALE + IEULER + IALELAG + ITHERM /= 0) THEN
+        IF (IALE + IEULER + IALELAG + GLOB_THERM%ITHERM /= 0) THEN
            CALL READ_I_C(ITMP, 1)
            ALLOCATE(ALE_CONNECTIVITY%ee_connect%iad_connect(ITMP))
            CALL READ_I_C(ALE_CONNECTIVITY%ee_connect%iad_connect, ITMP)
@@ -479,12 +503,12 @@ C       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
         ! EBCS option
         CALL READ_I_C(INT0, 1) ! total number of EBCS
         CALL READ_I_C(INT1, 1) ! number of multifluid ebcs
-        CALL READ_I_C(INT2, 1) ! number of /NRF ebcs
+        CALL READ_I_C(INT2, 1) ! number of parallel ebcs
         CALL READ_I_C(INT3, 1) ! number of other ebcs
 
-        EBCS_TAB%nebcs = INT0
+        EBCS_TAB%nebcs = INT0  !(INT0=INT1+INT2+INT3)
         EBCS_TAB%nebcs_fvm = INT1
-        EBCS_TAB%nebcs_nrf = INT2
+        EBCS_TAB%nebcs_parallel = INT2
         EBCS_TAB%nebcs_loc = INT3
 
         IF (INT0 > 0) THEN
@@ -492,26 +516,28 @@ C       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
            CALL EBCS_TAB%read_type_data(INT0, INTEGER_DATA)
            ALLOCATE(EBCS_TAB%my_typ(INT0))
            ALLOCATE(EBCS_TAB%need_to_compute(INT0))
-           ! save the type of /EBCS ( /EBCS/NRF --> typ = 10)
+           ! save the type of /EBCS ( /EBCS/NRF --> typ = 10) ( /EBCS/PROPERGOL --> typ = 11)
            EBCS_TAB%my_typ(1:INT0) = INTEGER_DATA(1:INT0)
            ! -------------
            ! check if the current proc needs to compute an /EBCS
-           ! multifluid /EBCS and /EBCS/NRF are parallelized, can be computed by several proc
+           ! multifluid /EBCS, /EBCS/NRF, and /EBCS/PROPERGOL are parallelized, can be computed by several proc
            ! the others are sequential, only the main proc (ispmd=0) computes the other /EBCS
            DO II=1,INT0
                 EBCS_TAB%need_to_compute(II) = .FALSE.
-                IF(ISPMD/=0) THEN
-                    IF(EBCS_TAB%my_typ(II)==10)EBCS_TAB%need_to_compute(II) = .TRUE. ! /EBCS/NRF are //
+                IF(ISPMD /= 0) THEN
+                    IS_EBCS_PARALLEL = .FALSE.
+                    IF(EBCS_TAB%my_typ(II) == 10 .or. EBCS_TAB%my_typ(II) == 11)IS_EBCS_PARALLEL = .TRUE.
+                    IF(IS_EBCS_PARALLEL) EBCS_TAB%need_to_compute(II) = .TRUE. ! /EBCS/NRF and /EBCS/PROPERGOL are //
                 ELSE
                     EBCS_TAB%need_to_compute(II) = .TRUE.   ! other /EBCS sequential
                 ENDIF
            ENDDO
            ! -------------
            ! create the data of /EBCS options
-           CALL EBCS_TAB%create_from_types(INT1 + INT2 + INT3, INTEGER_DATA(1:INT1 + INT2 + INT3))
+           CALL EBCS_TAB%create_from_types(INT1 + INT2 + INT3 , INTEGER_DATA(1:INT1 + INT2 + INT3 ))
         ENDIF
         ! read the data of /EBCS options
-        IF (INT1 + INT2 + INT3 > 0) THEN
+        IF (INT1 + INT2 + INT3  > 0) THEN
            DO II = 1, INT1 + INT2 + INT3
               CALL EBCS_TAB%tab(II)%poly%read_common_data()
               CALL EBCS_TAB%tab(II)%poly%read_data()
@@ -549,9 +575,9 @@ C       WRITE(6,*) "ITAB = ",ITAB(1:SITAB)
 
         CALL READ_I_C(LRBE2,SLRBE2)
 
-        CALL READ_I_C(IRBE3,SIRBE3)
+        CALL READ_I_C(RBE3%IRBE3,RBE3%nrbe3*irbe3_variables)
 
-        CALL READ_I_C(LRBE3,SLRBE3)
+        CALL READ_I_C(RBE3%LRBE3,RBE3%lrbe3_sz)
 
         CALL READ_I_C(IACTIV,SIACTIV)
 
@@ -650,7 +676,7 @@ c        CALL READ_I_C(INBUF,SINBUF)
 
         CALL READ_I_C(IAD_RBE2,SIAD_RBE2)
 
-        CALL READ_I_C(IAD_RBE3M,SIAD_RBE3M)
+        CALL READ_I_C(RBE3%mpi%IAD_RBE3,NSPMD+1)
 
         CALL READ_I_C(IAD_SEC,SIAD_SEC)
 
@@ -680,9 +706,9 @@ C
 
         CALL READ_I_C(FR_RBE2,SFR_RBE2)
 
-        CALL READ_I_C(FR_RBE3M,SFR_RBE3M)
+        CALL READ_I_C(RBE3%mpi%FR_RBE3,RBE3%mpi%fr_rbe3_sz)
 
-        CALL READ_I_C(FR_RBE3MP,SFR_RBE3M)
+        CALL READ_I_C(RBE3%mpi%FR_RBE3MP,RBE3%mpi%fr_rbe3_sz)
 
         CALL READ_I_C(FR_SEC,SFR_SEC)
 
@@ -763,7 +789,7 @@ C
 
         CALL READ_I_C(LLAGF,SLLAGF)
 C
-        WEIGHT_MD = WEIGHT
+        NODES%WEIGHT_MD = NODES%WEIGHT
 
 C
         IF(ICRACK3D > 0)THEN
@@ -781,7 +807,7 @@ C Partie Parith/ON lue en SPM dans tous les cas
 C
 C lecture directe de ADDCNE
         IF(IPARIT==1) THEN
-          CALL READ_I_C(ADSKY,NUMNOD+1)
+          CALL READ_I_C(ELEMENT%PON%ADSKY,NUMNOD+1)
 C lecture directe de PROCNE
           CALL READ_I_C(PROCNE,LCNE0)
 C lecture directe structure interface type2
@@ -796,7 +822,23 @@ C---Itet2 of S10
           CALL READ_I_C(PROCNCND,SPROCNCND)
 C lecture directe de IADS+IADWAL+IADRBK+IADI2+IADMV2+IADMV3+IADLL+IADRBM+IADI18+
 C  IADRBMK
-          CALL READ_I_C(IADS,SIADS)
+          CALL READ_I_C(ELEMENT%PON%IADS       ,SIZE(ELEMENT%PON%IADS))       !< 1 ; 8xNUMELS  solid indexes to FSKY
+          CALL READ_I_C(ELEMENT%PON%IADS10     ,SIZE(ELEMENT%PON%IADS10 ))    !< 6* NUMELS10 
+          CALL READ_I_C(ELEMENT%PON%IADS20     ,SIZE(ELEMENT%PON%IADS20 ))     ! 12*NUMELS20
+          CALL READ_I_C(ELEMENT%PON%IADS16     ,SIZE(ELEMENT%PON%IADS16 ))       ! 8*NUMELS16
+          CALL READ_I_C(ELEMENT%PON%IADQ       ,SIZE(ELEMENT%PON%IADQ  ))        !<i87b ; quad i87b 
+          CALL READ_I_C(ELEMENT%PON%IADC       ,SIZE(ELEMENT%PON%IADC  ))         !<i87C shell (4 nodes) indexes to FSKY
+          CALL READ_I_C(ELEMENT%PON%IAD_TRUSS  ,SIZE(ELEMENT%PON%IAD_TRUSS))        !< I87D 2xNUMELT
+          CALL READ_I_C(ELEMENT%PON%IAD_BEAM   ,SIZE(ELEMENT%PON%IAD_BEAM ))         !< I87E 2xNUMELP
+          CALL READ_I_C(ELEMENT%PON%IAD_SPRING ,SIZE(ELEMENT%PON%IAD_SPRING ))       !<F 3xNUMELR
+          CALL READ_I_C(ELEMENT%PON%IAD_TG     ,SIZE(ELEMENT%PON%IAD_TG  ))       !<G 3xNUMELTG
+          CALL READ_I_C(ELEMENT%PON%IAD_TG6    ,SIZE(ELEMENT%PON%IAD_TG6 ))        !<H 3xNUMELTG6
+          CALL READ_I_C(ELEMENT%PON%IAD_MV     ,SIZE(ELEMENT%PON%IAD_MV  ))         !I 4xNSKYMV0
+          CALL READ_I_C(ELEMENT%PON%IAD_CONLD  ,SIZE(ELEMENT%PON%IAD_CONLD))         !<J 4xNCONLD
+          CALL READ_I_C(ELEMENT%PON%IAD_CONV   ,SIZE(ELEMENT%PON%IAD_CONV))        !<K 4x glob_therm%NCONV
+          CALL READ_I_C(ELEMENT%PON%IAD_RADIA  ,SIZE(ELEMENT%PON%IAD_RADIA))          !<L 4x glob_therm%Numrada
+          CALL READ_I_C(ELEMENT%PON%IAD_LOADP  ,SIZE(ELEMENT%PON%IAD_LOADP))          !<M SLLOADP
+          CALL READ_I_C(ELEMENT%PON%IAD_FXFLUX ,SIZE(ELEMENT%PON%IAD_FXFLUX))     !<N 4x glob_therm%nfxflux
 
           CALL READ_I_C(IADWAL,SIADWAL)
 
@@ -853,9 +895,11 @@ c        ENDIF
 
         ! ---------------
         ! ebcs option : adress of FSKY array
-        IF(EBCS_TAB%nebcs_nrf>0) THEN
+        IF(EBCS_TAB%nebcs_parallel > 0) THEN
             DO I=1,EBCS_TAB%nebcs
-                IF(EBCS_TAB%my_typ(I)==10) THEN
+                IS_EBCS_PARALLEL = .FALSE.
+                IF(EBCS_TAB%my_typ(I)==10 .OR. EBCS_TAB%my_typ(I)==11)IS_EBCS_PARALLEL = .TRUE.
+                IF(IS_EBCS_PARALLEL) THEN
                     MY_SIZE = EBCS_TAB%tab(I)%poly%nb_elem
                     ALLOCATE(EBCS_PARITHON(I)%ELEM_ADRESS(4,MY_SIZE))
                     CALL READ_I_C(EBCS_PARITHON(I)%ELEM_ADRESS,4*MY_SIZE)
@@ -884,7 +928,8 @@ C--------------------------------------
 C--------------------------------------
 C allocation + lecture struture interface partie entiere
 C--------------------------------------
-        CALL SPMD_INITFI(IPARI,1,H3D_DATA,INTERFACES%PARAMETERS)
+        CALL SPMD_INITFI(IPARI,1,H3D_DATA,INTERFACES%PARAMETERS,
+     .                   GLOB_THERM%IDT_THERM,GLOB_THERM%INTHEAT)
 C
 C--------------------------------------
 C     Lecture + Init Frontiere SPMD pour SPH (partie entiere)
@@ -917,9 +962,9 @@ C--------------------------------------
         CALL READ_I_C(ILOADP,SIZLOADP*NLOADP)
         CALL READ_I_C(LLOADP,SLLOADP)
       ENDIF
-      IF (NLOADP_B>0)THEN
-        CALL PBLAST_LOAD(PBLAST_TAB)
-        CALL PBLAST_INIT_TABLES(PBLAST_DATA) !PBLAST_DATA defined in PBLAST_MOD
+      IF (PBLAST%NLOADP_B>0)THEN
+        CALL PBLAST_LOAD(PBLAST)
+        CALL PBLAST_INIT_TABLES(PBLAST%PBLAST_DATA) !PBLAST_DATA defined in PBLAST_MOD
       ENDIF
 c
       IF (LOADS%NLOAD_CYL > 0) THEN
@@ -966,19 +1011,15 @@ C-----
 C
 C-----
       CALL RDCOMR(LMXVREA,TABVREA,DYNAIN_DATA,INTERFACES%PARAMETERS,
-     .            OUTPUT)
+     .            OUTPUT,GLOB_THERM)
 C--------------------------------------
 C     READING REALS
 C--------------------------------------
-        CALL READ_DB(X,SX)
-
-        CALL READ_DB(D,SD)
-
-        CALL READ_DB(V,SV)
-
-        CALL READ_DB(VR,SVR)
-
-        CALL READ_DB(DR,SDR)
+        CALL READ_DB(NODES%X,SX)
+        CALL READ_DB(NODES%D,SD)
+        CALL READ_DB(NODES%V,SV)
+        CALL READ_DB(NODES%VR,SVR)
+        CALL READ_DB(NODES%DR,SDR)
 
         CALL READ_DB(THKE,STHKE)
 
@@ -986,13 +1027,13 @@ C--------------------------------------
 
         CALL READ_DB(DAMP,SDAMP)
 
-        CALL READ_DB(MS,SMS)
+        CALL READ_DB(NODES%MS,SMS)
 
         IF (N2D >0) THEN
             CALL READ_DB(MS_2D,NUMNOD)
         ENDIF
 
-        CALL READ_DB(IN,SIN)
+        CALL READ_DB(NODES%IN,SIN)
 
         CALL READ_DB(TF,STF)
 
@@ -1078,11 +1119,11 @@ C--------------------------------------
 
         CALL READ_DB(GAUGE,LLGAUGE*NBGAUGE)
 
-        CALL READ_SENSORS(SENSORS)
+        CALL READ_SENSORS(SENSORS, PYTHON)
 
         CALL READ_DB(FBVEL,SFBVEL)
 
-        CALL READ_DB(FRBE3,SFRBE3)
+        CALL READ_DB(RBE3%FRBE3,RBE3%frbe3_sz)
 
         CALL READ_DB(FACTIV,LRACTIV*NACTIV)
 
@@ -1125,7 +1166,8 @@ C--------------------------------------
         CALL READ_DB(PCONTACT ,SRCONTACT)
 
 C lecture struture interface partie reelle si irunn > 1
-        IF(IRUNN>1.OR.MCHECK/=0)CALL SPMD_INITFI(IPARI,2,H3D_DATA,INTERFACES%PARAMETERS)
+        IF(IRUNN>1.OR.MCHECK/=0) CALL SPMD_INITFI(IPARI,2,H3D_DATA,INTERFACES%PARAMETERS,
+     .                                            GLOB_THERM%IDT_THERM,GLOB_THERM%INTHEAT)
 C--------------------------------------
 C     Lecture + Init Frontiere SPMD pour SPH (partie reelle)
 C--------------------------------------
@@ -1145,10 +1187,10 @@ c      IF(NNOISE>0.AND.IRUNN>1)THEN
 
        IF (IRESP == 1) THEN
          IF (IRXDP == 1) THEN
-              CALL READ_DPDB(XDP,3*NUMNOD)
-              CALL READ_DPDB(DDP,3*NUMNOD)
+              CALL READ_DPDB(NODES%XDP,3*NUMNOD)
+              CALL READ_DPDB(NODES%DDP,3*NUMNOD)
          ELSE
-           CALL FILLXDP(X,XDP,D,DDP)
+           CALL FILLXDP(NODES%X,NODES%XDP,NODES%D,NODES%DDP)
 C next restart, XDP will be on restart head !
            IRXDP=1
          ENDIF
@@ -1217,7 +1259,7 @@ C   ----------------------------------------------------------------------
 
       IF(NADMESH /= 0)THEN
         CALL READ_DB(PADMESH,KPADMESH*NPART)
-        IF(ITHERM_FE > 0)THEN
+        IF(GLOB_THERM%ITHERM_FE > 0)THEN
           CALL READ_DB(MCPC,NUMELC)
           CALL READ_DB(MCPTG,NUMELTG)
         END IF
@@ -1289,8 +1331,8 @@ C--------------------------------------
       END IF
 C-------------
 C     always
-      CALL READ_DB(MS0,NUMNOD)
-      CALL READ_DB(IN0,SIN)
+      CALL READ_DB(NODES%MS0,NUMNOD)
+      CALL READ_DB(NODES%IN0,SIN)
       IF(IDTMINS_OLD==1) THEN
         CALL READ_DB(ADMSMS,NUMNOD)
       ELSEIF(IDTMINS_OLD==2) THEN
@@ -1383,6 +1425,7 @@ C
           CALL READ_DB(SLIPRING(I)%FRAM(J)%VECTOR, 6)
           CALL READ_DB(SLIPRING(I)%FRAM(J)%ORIENTATION_ANGLE, 1)
           CALL READ_DB(SLIPRING(I)%FRAM(J)%MATERIAL_FLOW, 1)
+          CALL READ_DB(SLIPRING(I)%FRAM(J)%MATERIAL_FLOW_OLD, 1)
           CALL READ_DB(SLIPRING(I)%FRAM(J)%DFS, 1)
           CALL READ_DB(SLIPRING(I)%FRAM(J)%RESIDUAL_LENGTH, 2)
           CALL READ_DB(SLIPRING(I)%FRAM(J)%CURRENT_LENGTH, 2)
@@ -1416,6 +1459,7 @@ C
         ALLOCATE(RETRACTOR(I)%INACTI_NODE(RETRACTOR(I)%INACTI_NNOD_MAX))
         CALL READ_I_C(RETRACTOR(I)%INACTI_NODE, RETRACTOR(I)%INACTI_NNOD)
         CALL READ_I_C(RETRACTOR(I)%N_REMOTE_PROC, 1)
+        CALL READ_I_C(RETRACTOR(I)%S_TABLE, 2)
         CALL READ_DB(RETRACTOR(I)%VECTOR, 3)
         CALL READ_DB(RETRACTOR(I)%ELEMENT_SIZE, 1)
         CALL READ_DB(RETRACTOR(I)%FORCE, 1)
@@ -1433,6 +1477,18 @@ C
         CALL READ_DB(RETRACTOR(I)%PRETENS_PULL, 1)
         CALL READ_DB(RETRACTOR(I)%PRETENS_PULLMAX, 1)
         CALL READ_DB(RETRACTOR(I)%RET_FORCE, 1)
+        DO J=1,2
+          IF (RETRACTOR(I)%S_TABLE(J) > 0) THEN
+            NPT = RETRACTOR(I)%S_TABLE(J)
+            RETRACTOR(I)%TABLE(J)%NDIM = 1
+            ALLOCATE (RETRACTOR(I)%TABLE(J)%X(1))
+            ALLOCATE (RETRACTOR(I)%TABLE(J)%X(1)%VALUES(NPT))
+            ALLOCATE (RETRACTOR(I)%TABLE(J)%Y)
+            ALLOCATE (RETRACTOR(I)%TABLE(J)%Y%VALUES(NPT))
+            CALL READ_DB(RETRACTOR(I)%TABLE(J)%X(1)%VALUES(1:NPT),NPT)
+            CALL READ_DB(RETRACTOR(I)%TABLE(J)%Y%VALUES(1:NPT),NPT)
+          ENDIF
+        ENDDO
       ENDDO
 C
       IF (N_ANCHOR_REMOTE > 0) THEN
@@ -1501,7 +1557,7 @@ C--------------------------------------
       IF (IMPL_S0>0) CALL IMPRREST(IMPL_S0)
 
       ! heat  transfer
-      IF(ITHERM_FE > 0   ) THEN
+      IF(GLOB_THERM%ITHERM_FE > 0   ) THEN
         CALL THCRREST(MCP,TEMP)
       ENDIF
 
@@ -1517,10 +1573,10 @@ C--------------------------------------
       IF(IRIGID_MAT > 0) CALL RMATRREST(RBYM,IRBYM, LNRBYM,WEIGHT_RM)
 
       !   thermal bc
-      IF(NUMCONV > 0)  CALL CONVRREST(IBCV, FCONV)
-      IF(NUMRADIA > 0) CALL RADIARREST(IBCR, FRADIA)
-      IF(NFXFLUX > 0)  CALL FXFLUXRREST(IBFFLUX, FBFFLUX)
-      IF(NFXTEMP > 0)  CALL FXTEMPRREST(IBFTEMP, FBFTEMP)
+      IF (GLOB_THERM%NUMCONV > 0)  CALL CONVRREST(IBCV,  FCONV ,GLOB_THERM)
+      IF (GLOB_THERM%NUMRADIA > 0) CALL RADIARREST(IBCR, FRADIA,GLOB_THERM)
+      IF (GLOB_THERM%NFXFLUX > 0)  CALL FXFLUXRREST(IBFFLUX, FBFFLUX,GLOB_THERM)
+      IF (GLOB_THERM%NFXTEMP > 0)  CALL FXTEMPRREST(IBFTEMP, FBFTEMP,GLOB_THERM)
 
       ! PlyXFEM
       IF (IPLYXFEM > 0) THEN
@@ -2634,16 +2690,20 @@ C
 C
 C convection flux
       !||====================================================================
-      !||    convrrest   ../engine/source/output/restart/rdresb.F
+      !||    convrrest        ../engine/source/output/restart/rdresb.F
       !||--- called by ------------------------------------------------------
-      !||    rdresb      ../engine/source/output/restart/rdresb.F
+      !||    rdresb           ../engine/source/output/restart/rdresb.F
       !||--- calls      -----------------------------------------------------
-      !||    read_db     ../common_source/tools/input_output/read_db.F
-      !||    read_i_c    ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi      ../engine/source/output/tools/redsqi.F
-      !||    redsqr      ../engine/source/output/tools/redsqr.F
+      !||    read_db          ../common_source/tools/input_output/read_db.F
+      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
+      !||    redsqi           ../engine/source/output/tools/redsqi.F
+      !||    redsqr           ../engine/source/output/tools/redsqr.F
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
-      SUBROUTINE CONVRREST(IBCV, FCONV)
+      SUBROUTINE CONVRREST(IBCV, FCONV,GLOB_THERM)
+      
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2658,8 +2718,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBCV(*)
-      my_real
-     .        FCONV(*)
+      my_real :: FCONV(*)
+      type (glob_therm_) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2672,27 +2732,31 @@ C--------------------------------------
 C     READING REALS
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
-        CALL REDSQR (FCONV,LFACTHER*NUMCONV,IRFORM)
-        CALL REDSQI (IBCV,NICONV*NUMCONV,IRFORM)
+        CALL REDSQR (FCONV,GLOB_THERM%LFACTHER*GLOB_THERM%NUMCONV,IRFORM)
+        CALL REDSQI (IBCV,GLOB_THERM%NICONV*GLOB_THERM%NUMCONV,IRFORM)
       ELSE
-        CALL READ_DB(FCONV,LFACTHER*NUMCONV)
-        CALL READ_I_C(IBCV,NICONV*NUMCONV)
+        CALL READ_DB(FCONV,GLOB_THERM%LFACTHER*GLOB_THERM%NUMCONV)
+        CALL READ_I_C(IBCV,GLOB_THERM%NICONV*GLOB_THERM%NUMCONV)
       ENDIF
 C
       RETURN
       END
 C radiative flux
       !||====================================================================
-      !||    radiarrest   ../engine/source/output/restart/rdresb.F
+      !||    radiarrest       ../engine/source/output/restart/rdresb.F
       !||--- called by ------------------------------------------------------
-      !||    rdresb       ../engine/source/output/restart/rdresb.F
+      !||    rdresb           ../engine/source/output/restart/rdresb.F
       !||--- calls      -----------------------------------------------------
-      !||    read_db      ../common_source/tools/input_output/read_db.F
-      !||    read_i_c     ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi       ../engine/source/output/tools/redsqi.F
-      !||    redsqr       ../engine/source/output/tools/redsqr.F
+      !||    read_db          ../common_source/tools/input_output/read_db.F
+      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
+      !||    redsqi           ../engine/source/output/tools/redsqi.F
+      !||    redsqr           ../engine/source/output/tools/redsqr.F
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
-      SUBROUTINE RADIARREST(IBCR, FRADIA)
+      SUBROUTINE RADIARREST(IBCR, FRADIA, GLOB_THERM)
+      
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2707,8 +2771,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBCR(*)
-      my_real
-     .        FRADIA(*)
+      my_real :: FRADIA(*)
+      type (glob_therm_) ,intent(inout) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2721,27 +2785,31 @@ C--------------------------------------
 C     READING REALS
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
-        CALL REDSQR (FRADIA,LFACTHER*NUMRADIA,IRFORM)
-        CALL REDSQI (IBCR,NIRADIA*NUMRADIA,IRFORM)
+        CALL REDSQR (FRADIA,GLOB_THERM%LFACTHER*GLOB_THERM%NUMRADIA,IRFORM)
+        CALL REDSQI (IBCR,GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA,IRFORM)
       ELSE
-        CALL READ_DB(FRADIA,LFACTHER*NUMRADIA)
-        CALL READ_I_C(IBCR,NIRADIA*NUMRADIA)
+        CALL READ_DB(FRADIA,GLOB_THERM%LFACTHER*GLOB_THERM%NUMRADIA)
+        CALL READ_I_C(IBCR,GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA)
       ENDIF
 C
       RETURN
       END
 C imposed temperature
       !||====================================================================
-      !||    fxtemprrest   ../engine/source/output/restart/rdresb.F
+      !||    fxtemprrest      ../engine/source/output/restart/rdresb.F
       !||--- called by ------------------------------------------------------
-      !||    rdresb        ../engine/source/output/restart/rdresb.F
+      !||    rdresb           ../engine/source/output/restart/rdresb.F
       !||--- calls      -----------------------------------------------------
-      !||    read_db       ../common_source/tools/input_output/read_db.F
-      !||    read_i_c      ../common_source/tools/input_output/write_routtines.c
-      !||    redsqi        ../engine/source/output/tools/redsqi.F
-      !||    redsqr        ../engine/source/output/tools/redsqr.F
+      !||    read_db          ../common_source/tools/input_output/read_db.F
+      !||    read_i_c         ../common_source/tools/input_output/write_routtines.c
+      !||    redsqi           ../engine/source/output/tools/redsqi.F
+      !||    redsqr           ../engine/source/output/tools/redsqr.F
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
-      SUBROUTINE FXTEMPRREST(IBFTEMP, FBFTEMP)
+      SUBROUTINE FXTEMPRREST(IBFTEMP, FBFTEMP,GLOB_THERM)
+
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -2756,8 +2824,8 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IBFTEMP(*)
-      my_real
-     .        FBFTEMP(*)
+      my_real :: FBFTEMP(*)
+      type (glob_therm_) ,intent(inout) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -2770,11 +2838,11 @@ C--------------------------------------
 C     READING REALS
 C--------------------------------------
       IF (IRFORM/5<=1) THEN
-        CALL REDSQR (FBFTEMP,LFACTHER*NFXTEMP,IRFORM)
-        CALL REDSQI (IBFTEMP,NIFT*NFXTEMP,IRFORM)
+        CALL REDSQR (FBFTEMP,GLOB_THERM%LFACTHER*GLOB_THERM%NFXTEMP,IRFORM)
+        CALL REDSQI (IBFTEMP,GLOB_THERM%NIFT*GLOB_THERM%NFXTEMP,IRFORM)
       ELSE
-        CALL READ_DB(FBFTEMP,LFACTHER*NFXTEMP)
-        CALL READ_I_C(IBFTEMP,NIFT*NFXTEMP)
+        CALL READ_DB(FBFTEMP,GLOB_THERM%LFACTHER*GLOB_THERM%NFXTEMP)
+        CALL READ_I_C(IBFTEMP,GLOB_THERM%NIFT*GLOB_THERM%NFXTEMP)
       ENDIF
 C
       RETURN

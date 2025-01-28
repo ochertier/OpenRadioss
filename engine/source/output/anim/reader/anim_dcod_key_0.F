@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,8 +62,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IDX, N1, N2, N3, ITYP,IADG, J,NTITLE,IUS,ILAY,IPT
-      my_real 
-     .        X0,Y0,Z0,VNX,VNY,VNZ,V0
+      my_real X0,Y0,Z0,VNX,VNY,VNZ,V0
       LOGICAL :: LAW51_PHASE1, LAW51_PHASE2, LAW51_PHASE3, LAW51_PHASE4
 C-----------------------------------------------
 C     Output parameter for LAW51 multiphase data
@@ -1495,8 +1494,19 @@ c
              ENDIF 
            ENDIF 
         ELSEIF(KEY3(1:9) == 'TILLOTSON')THEN
-          IDX = 14596 + 4*MX_PLY_ANIM
+          IDX = 15898 + 4*MX_PLY_ANIM
           ANIM_CE(IDX) = 1           
+        ELSEIF(KEY3(1:7) == 'VSTRAIN')THEN
+          IDX = 15898 + 4*MX_PLY_ANIM
+          read(KEY4, '(I2)') ILAY
+          if(ILAY >= 1 .and. ILAY <= 21)then
+            ANIM_CE(IDX+ILAY) = 1
+          else
+            ANIM_CE(IDX) = 1
+          endif
+        !ELSEIF(KEY3(:) == '')THEN
+        !  IDX = 15022 + 4*MX_PLY_ANIM ?
+        !  ANIM_CE(IDX) = 1
         ELSE
           IXITKEY=IXITKEY+1
 c
@@ -2027,10 +2037,17 @@ C         ANIM_SE(4936) ==> !   law37 -    gas
          ENDIF   
       ELSEIF(KEY3(1:9)=='TILLOTSON')THEN
           ANIM_SE(5172) = 1 
-
+      ELSEIF(KEY3(1:7)=='VSTRAIN')THEN
+          read(KEY4, '(I2)',ERR=2206) ILAY
+2206      CONTINUE
+          if(ILAY >= 1 .and. ILAY <= 21)then
+            ANIM_SE(5173+ILAY) = 1
+          else
+            ANIM_SE(5173) = 1
+          endif
 !D YOUR NEW ANIMATION CONTOUR HERE          
       !ELSEIF(...)THEN
-      !  ANIM_SE(5173) = 1
+      !  ANIM_SE(5173+22+1) = 1
 
       ENDIF
 C
@@ -2686,10 +2703,23 @@ C--------------------------
          ANIM_CE(IDX)  = 1 
          ANIM_SE(4971) = 1 
         ELSEIF(KEY3(1:9)=='TILLOTSON')THEN
-         IDX = 14596 + 4*MX_PLY_ANIM
+         IDX = 15898 + 4*MX_PLY_ANIM
          ANIM_CE(IDX)  = 1  
          ANIM_SE(5172) = 1  
-         
+        ELSEIF(KEY3(1:7)=='VSTRAIN')THEN
+         IDX = 15899 + 4*MX_PLY_ANIM
+         ILAY = 0
+         read(KEY4, '(I2)', ERR=2205) ILAY
+2205     CONTINUE
+         if(ILAY >= 1 .and. ILAY <= 21)then
+           ANIM_CE(IDX+ILAY) = 1
+           ANIM_SE(5173+ILAY) = 1
+         else
+           ANIM_CE(IDX)  = 1
+           ANIM_SE(5173) = 1
+         endif
+        !ELSEIF()
+        !  IDX = 15899 + 4*MX_PLY_ANIM +22 + 1
        ELSE
          IXITKEY=IXITKEY+1
        ENDIF
@@ -2922,7 +2952,7 @@ C-----------------------------
          ANIM_N(15) = 1
          ANIM_N(16) = 1
        ELSEIF(KEY3(1:5)=='SCHLI')THEN
-         ANIM_N(17) = 0 !currently unpluged
+         ANIM_N(17) = 0 !currently unplugged
        ELSEIF(KEY3(1:5)=='STIFR')THEN
          ANIM_N(18) = 1  
        ELSEIF(KEY3(1:4)=='STIF')THEN

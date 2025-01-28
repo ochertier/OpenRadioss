@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,18 +62,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    fvbag_mod              ../engine/share/modules/fvbag_mod.F
       !||    fxb_mod                ../engine/share/modules/fxb_mod.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    intstamp_glob_mod      ../engine/share/modules/intstamp_glob_mod.F
-      !||    loads_mod              ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    my_alloc_mod           ../common_source/tools/memory/my_alloc.F90
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
       !||    output_mod             ../common_source/modules/output/output_mod.F90
       !||    outputs_mod            ../common_source/modules/outputs_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    stack_mod              ../engine/share/modules/stack_mod.F
       !||    state_mod              ../common_source/modules/state_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
@@ -96,7 +96,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G                  MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,
      H                  MDS_NDEPSVAR,STACK,IBCL,ILOADP,LLOADP,SENSORS,
      I                  DYNAIN_DATA,DT ,LOADS ,OUTPUT,NAMES_AND_TITLES,
-     J                  MAT_PARAM)
+     J                  MAT_PARAM,GLOB_THERM,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -124,6 +124,8 @@ C-----------------------------------------------
       USE MY_ALLOC_MOD
       USE NAMES_AND_TITLES_MOD
       USE ELBUFDEF_MOD
+      USE glob_therm_mod
+      USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -166,7 +168,6 @@ C-----------------------------------------------
 #include      "rad2r_c.inc"
 #include      "inter22.inc"
 #include      "userlib.inc"
-#include      "scr_thermal_c.inc"
 #include      "spmd_c.inc"
 #include      "intstamp_c.inc"
 #include      "couple_c.inc"
@@ -207,6 +208,8 @@ C-----------------------------------------------
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
       TYPE(NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES  !< NAMES_AND_TITLES host the input deck names and titles for outputs
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
+      type (glob_therm_) ,intent(inout)       :: glob_therm
+      type (pblast_) ,intent(inout)           :: pblast
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -696,7 +699,7 @@ C     .h3d files
 C-------------------------------------------
       CALL LECH3D(GEO,IGEO,IPM,IPART,H3D_DATA,MULTI_FVM,IPARI,IPARG,TAG_SKINS6,
      .            MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,MDS_NDEPSVAR,
-     .            ELBUF_STR,STACK,IBCL,ILOADP,LLOADP,LOADS,MAT_PARAM)
+     .            ELBUF_STR,STACK,IBCL,ILOADP,LLOADP,LOADS,MAT_PARAM,PBLAST)
 c
       IF(H3D_DATA%N_OUTP_H3D /= 0 .AND. ISPMD == 0)THEN
         WRITE(IOUT,5000)H3D_DATA%TH3D,H3D_DATA%DTH3D
@@ -779,14 +782,14 @@ C---------------------
 C---------------------
 C INITIAL MASS
 C---------------------
-       IF(ISPMD == 0 .AND. ITHERM_FE > 0 ) THEN
+       IF (ISPMD == 0 .AND. GLOB_THERM%ITHERM_FE > 0 ) THEN
          WRITE(IOUT,'(A)')' FINITE ELEMENT THERMAL ANALYSIS '
-         IF(IDT_THERM == 1) THEN
+         IF (GLOB_THERM%IDT_THERM == 1) THEN
             WRITE(IOUT,'(A)')' THERMAL ANALYSIS ONLY'
-            WRITE(IOUT,'(A,1X,G14.7)')' THERMAL TIME STEP SCALE FACTOR . . . . . . . . .', DTFACTHERM
+            WRITE(IOUT,'(A,1X,G14.7)')' THERMAL TIME STEP SCALE FACTOR . . . . . . . . .', GLOB_THERM%DTFACTHERM
          ENDIF
-         IF(THEACCFACT > ONE ) THEN
-           WRITE(IOUT,'(A,1X,G14.7/)')' FACTOR TO SPEED-UP THERMAL ANALYSIS. . . . . . .', THEACCFACT
+         IF (GLOB_THERM%THEACCFACT > ONE ) THEN
+           WRITE(IOUT,'(A,1X,G14.7/)')' FACTOR TO SPEED-UP THERMAL ANALYSIS. . . . . . .', GLOB_THERM%THEACCFACT
          ENDIF
        ENDIF
 C-------------------------------------------
@@ -1177,11 +1180,11 @@ C-------------------------------
         END IF
         IEULER = 0
       END IF
-      IF(ITHERM /= 0.AND.NTHERMOF == 1)THEN
+      IF (GLOB_THERM%ITHERM /= 0.AND.NTHERMOF == 1)THEN
         IF(ISPMD == 0.AND.MCHECK == 0)THEN
           WRITE(IOUT,*)'THERMIC FORMULATION SWITCHED OFF '
         END IF
-        ITHERM = 0
+        GLOB_THERM%ITHERM = 0
       END IF
 C-------------------------------
       IF(IDEL7 /= 0.AND.MCHECK == 0.AND.N2D == 0)THEN
@@ -1324,7 +1327,7 @@ C-----------------------
           IF(MCHECK == 0)WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
         ENDIF
         IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
           IWIOUT = 0
           IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
           CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1383,7 +1386,7 @@ C-----------------------
          IF(MCHECK == 0)WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
        ENDIF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1437,7 +1440,7 @@ C-----------------------
          IF(MCHECK == 0)WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
        ENDIF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1491,7 +1494,7 @@ C-----------------------
          IF(MCHECK == 0) WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
        ENDIF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1545,7 +1548,7 @@ C-----------------------
          IF(MCHECK == 0)WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
        ENDIF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1599,7 +1602,7 @@ C-----------------------
          IF(MCHECK == 0) WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
        ENDIF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1653,7 +1656,7 @@ C-----------------------
          IF(MCHECK == 0) WRITE (IOUT,'(5I10)') (NLEC(II),II=1,K)
        ENDIF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)
@@ -1706,7 +1709,7 @@ C           number of the related group :
          IF(MCHECK == 0)WRITE (IOUT,'(5I10)') (NLECSPH(II),II=1,K)
        END IF
        IF(NSPMD > 1) THEN
-          ! required treatments to retrieve delted elems in correct order
+          ! required treatments to retrieve deleted elems in correct order
          IWIOUT = 0
          IF (ISPMD /= 0) CALL SPMD_CHKW(IWIOUT,IOUT)
          CALL SPMD_GLOB_ISUM9(IWIOUT,1)

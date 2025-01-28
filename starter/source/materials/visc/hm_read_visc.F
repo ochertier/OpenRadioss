@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -145,7 +145,7 @@ c--------------------------------------------
             WRITE(IOUT,1000) TRIM(KEY),MAT_ID
 c
             IMATVIS = IPM(216,I)
-            CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"VISC") ! flag campatibility
+            CALL INIT_MAT_KEYWORD(MAT_PARAM(IMAT),"VISC") ! flag compatibility
 c--------------------------------------------      
             IF (KEY(1:5) == 'PRONY')THEN 
 c           -----------------------------------   
@@ -179,9 +179,9 @@ c
 c-----------------------------
 c           duplicate storage for compatibility with old code and output until cleaning
 c-----------------------------
-            IPM(216 ,I) = IMATVIS
-            IPM(222 ,I) = IVISC
-            IPM(225 ,I) = MAT_PARAM(IMAT)%VISC%NUVAR
+            IPM(216 ,I) = IMATVIS  ! hourglass treatment flag specific for viscoelastic maaterials
+!            IPM(222 ,I) = IVISC
+!            IPM(225 ,I) = MAT_PARAM(IMAT)%VISC%NUVAR
 c--------------------------------------------------
           ENDIF   !IMID == MAT_ID
 c--------------------------------------------------

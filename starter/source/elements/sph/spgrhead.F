@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,35 +21,22 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    mod_spgrhead   ../starter/source/elements/sph/spgrhead.F
-      !||--- called by ------------------------------------------------------
-      !||    spgrhead       ../starter/source/elements/sph/spgrhead.F
-      !||    spgrtails      ../starter/source/elements/sph/spgrtails.F
-      !||====================================================================
-      module MOD_SPGRHEAD
-      implicit none
-      INTEGER, DIMENSION(:,:), ALLOCATABLE :: IXSPS
-      END MODULE MOD_SPGRHEAD
-      !||====================================================================
       !||    spgrhead           ../starter/source/elements/sph/spgrhead.F
       !||--- called by ------------------------------------------------------
       !||    lectur             ../starter/source/starter/lectur.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg             ../starter/source/output/message/message.F
       !||    get_u_geo          ../starter/source/user_interface/uaccess.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod        ../starter/share/message_module/message_mod.F
-      !||    mod_spgrhead       ../starter/source/elements/sph/spgrhead.F
       !||====================================================================
       SUBROUTINE SPGRHEAD(KXSP    ,IXSP    ,IPARG     ,PM  ,IPART,
      2                    IPARTSP ,EADD    ,CEPSP     ,ND  ,IPM  ,
      3                    IGEO    ,SPBUF   ,SPH2SOL   ,
-     4                    SOL2SPH ,IRST    ,MAT_PARAM )
+     4                    SOL2SPH ,IRST    ,MAT_PARAM ,IXSPS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MY_ALLOC_MOD
-      USE MOD_SPGRHEAD
       USE MESSAGE_MOD
       USE MATPARAM_DEF_MOD
 C-----------------------------------------------
@@ -68,6 +55,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER, DIMENSION(KVOISPH,NUMSPH),INTENT(INOUT) :: IXSPS
       INTEGER KXSP(NISP,*),IPARG(NPARG,*),IXSP(KVOISPH,*),
      .        IPART(LIPART1,*),IPARTSP(*), EADD(*), CEPSP(*),
      .        IPM(NPROPMI,NUMMAT), IGEO(NPROPGI,NUMGEO),
@@ -125,10 +113,6 @@ C----------------------------------------------------------
       CALL MY_ALLOC(XEP,NUMSPH)
       CALL MY_ALLOC(RNUM,NSPBUF,NUMSPH)
       
-      ALLOCATE(IXSPS(KVOISPH,NUMSPH),STAT=stat)
-      IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
-     .                           MSGTYPE=MSGERROR,
-     .                           C1='IXSPS')
 C
       DO I=1,NUMSPH
         IF(NSPHSOL==0)THEN
@@ -343,8 +327,6 @@ C--------------------------------------------------------------
       DO N=1,ND
         NE = NE + EADD(N+1)-EADD(N)
       ENDDO
-C-----------
-      DEALLOCATE(IXSPS)
       DEALLOCATE(ITRI)
       DEALLOCATE(INDEX)
       DEALLOCATE(INUM)

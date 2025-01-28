@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       SUBROUTINE INGRBRIC(MSN,BRICS, MSV, IXS, NBRIC, PM,S_MSV ,IGEO)
 C-----------------------------------------------------------------------
 C This subroutine lists all brick in the /GRBRICK
-C (for example it is used with /inter/type22 which recquires a grbrick_id)
+C (for example it is used with /inter/type22 which requires a grbrick_id)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------

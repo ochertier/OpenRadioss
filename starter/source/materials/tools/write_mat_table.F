@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,12 +23,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    write_mat_table   ../starter/source/materials/tools/write_mat_table.F
       !||--- called by ------------------------------------------------------
+      !||    write_eosparam    ../starter/source/materials/mat/write_eosparam.F90
       !||    write_matparam    ../starter/source/materials/mat/write_matparam.F
       !||    write_viscparam   ../starter/source/materials/mat/write_viscparam.F
       !||--- calls      -----------------------------------------------------
       !||--- uses       -----------------------------------------------------
       !||====================================================================
-      SUBROUTINE WRITE_MAT_TABLE(TABLE, NUMTABL, LENI,  LENR)
+      SUBROUTINE WRITE_MAT_TABLE(TABLE, NUMTABL)
 C-----------------------------------------------
       USE TABLE4D_MOD
 C-----------------------------------------------
@@ -39,7 +40,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ,INTENT(IN)    :: NUMTABL
-      INTEGER ,INTENT(INOUT) :: LENI,LENR
       TYPE(TABLE_4D_) ,INTENT(IN) :: TABLE(NUMTABL)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -48,22 +48,16 @@ C-----------------------------------------------
       INTEGER LDIM(4)
       my_real, DIMENSION(:) ,ALLOCATABLE :: YTMP
 c===============================================
-      LENI = 0
-      LENR = 0
       LDIM = 0
       DO N=1,NUMTABL
         LEN  = 1
         CALL WRITE_I_C(TABLE(N)%NOTABLE,LEN)
-        LENI = LENI + LEN
         NDIM = TABLE(N)%NDIM
         CALL WRITE_I_C(NDIM,LEN)
-        LENI = LENI + LEN
         DO I=1,NDIM
           NPT = SIZE(TABLE(N)%X(I)%VALUES)
           CALL WRITE_I_C(NPT , LEN)
-          LENI = LENI + LEN
           CALL WRITE_DB(TABLE(N)%X(I)%VALUES,NPT)
-          LENR = LENR + NPT
           LDIM(I) = NPT 
         END DO
 c
@@ -112,7 +106,6 @@ c
           CALL WRITE_DB(YTMP, LEN)
         END IF
         IF (ALLOCATED(YTMP)) DEALLOCATE(YTMP)
-        LENR = LENR + LEN
       END DO
 c-----------
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -57,7 +57,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      K   CSRECT,NBDDNORT ,NBDDNOR_MAX,NBCCFR25 ,NBCCNOR ,
      L   NUMNOR_L,NBDDEDGT,NBDDEDG_MAX,INTERCEP,NBDDCNDM,
      M   ITABCNDM,MULTI_FVM,IGRSURF,ISKWP_L,ALE_ELM,
-     N   SIZE_ALE_ELM,NSENSOR,NLOC_DMG,constraint_struct) 
+     N   SIZE_ALE_ELM,NSENSOR,NLOC_DMG,constraint_struct,ITHERM) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -89,6 +89,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER  ,INTENT(IN) :: NSENSOR
+      INTEGER  ,INTENT(IN) :: ITHERM
       INTEGER  PROC, NBDDACC, NBDDKIN, NBDDPROC, NBDDBOUN, NUMELS_L,
      .          NUMNOD_L, NBDDNRB, LEN_IA, NBDDI2M, NBDDNCJ,NBDDNRBM,
      .          NNODT_L, NNODL_L, ISP0, NRCVVOIS, NSNDVOIS, NERVOIS,

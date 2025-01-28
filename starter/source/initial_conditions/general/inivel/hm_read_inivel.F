@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,6 @@ C
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod         ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod                ../starter/share/message_module/message_mod.F
-      !||    sensor_mod                 ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_INIVEL(V         , W      , ITAB     , ITABM1 , VR         ,
@@ -149,6 +148,10 @@ C-----------------------------------------------
       IDIR = 0
       KROT = 0
       NOD_COUNT = 0
+      IDGRBRICK_LOC = 0
+      IDGRQUAD_LOC  = 0
+      IDGRTRIA_LOC  = 0
+
       CALL HM_OPTION_COUNT('/INIVEL'    , NINIVEL_TOTAL)
       CALL HM_OPTION_COUNT('/INIVEL/FVM', NINIVEL_FVM)
 C--------------------------------------------------
@@ -245,7 +248,7 @@ C--------------------------------------------------
             INIVEL_T(NINIT)%GENERAL%VX = VL1
             INIVEL_T(NINIT)%GENERAL%VY = VL2
             INIVEL_T(NINIT)%GENERAL%VZ = VL3
-            INIVEL_T(NINIT)%GENERAL%SENSOR_ID = SENS_ID
+            INIVEL_T(NINIT)%GENERAL%SENSOR_ID = SENSID
             INIVEL_T(NINIT)%GENERAL%TSTART = TSTART
           END IF
 
@@ -281,7 +284,7 @@ C--------------------------------------------------
             INIVEL_T(NINIT)%AXIS%VY = VL2
             INIVEL_T(NINIT)%AXIS%VZ = VL3
             INIVEL_T(NINIT)%AXIS%VR = VRA
-            INIVEL_T(NINIT)%AXIS%SENSOR_ID = SENS_ID
+            INIVEL_T(NINIT)%AXIS%SENSOR_ID = SENSID
             INIVEL_T(NINIT)%AXIS%TSTART = TSTART
           END IF
 
@@ -306,7 +309,7 @@ C--------------------------------------------------
             INIVEL_T(NINIT)%FVM%VX = VL1
             INIVEL_T(NINIT)%FVM%VY = VL2
             INIVEL_T(NINIT)%FVM%VZ = VL3
-            INIVEL_T(NINIT)%FVM%SENSOR_ID = SENS_ID
+            INIVEL_T(NINIT)%FVM%SENSOR_ID = SENSID
             INIVEL_T(NINIT)%FVM%TSTART = TSTART
           END IF
          !---READER /INIVEL/NODE (6)
@@ -325,6 +328,12 @@ C--------------------------------------------------
             KROT = 1
             IF (ID_NODE > 0) THEN
               IF (ISK > 0) THEN
+                V1 = -HUGE(V1)
+                V2 = -HUGE(V2)
+                V3 = -HUGE(V3)
+                V4 = -HUGE(V4)
+                V5 = -HUGE(V5)
+                V6 = -HUGE(V6)
                 DO J=0,NUMSKW+MIN(IUN,NSPCOND)*NUMSPH+NSUBMOD
                   IF (ISK == ISKN(4,J+1)) THEN
                     ISK=J+1
@@ -402,6 +411,9 @@ C
             V3 = VL3
           ENDIF 
         ENDIF
+        IDGRBRICK_LOC = -1
+        IDGRQUAD_LOC  = -1
+        IDGRTRIA_LOC  = -1
 
         IF (ITYPE == 5) THEN
            IF (.NOT. MULTI_FVM%IS_USED) THEN

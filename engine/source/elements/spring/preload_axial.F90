@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,7 @@
       !||    finter              ../engine/source/tools/curve/finter.F
       !||--- uses       -----------------------------------------------------
       !||    constant_mod        ../common_source/modules/constant_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||====================================================================
         subroutine get_preload_axial(                                         &
           fun_id    ,    sens_id,          npc,            snpc,     &
@@ -117,7 +117,7 @@
       !||    tforc3          ../engine/source/elements/truss/tforc3.F
       !||--- uses       -----------------------------------------------------
       !||    constant_mod    ../common_source/modules/constant_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
         subroutine preload_axial(nel,preload1,bpreload,v12,stf_f,f1)
 ! ----------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,8 +22,6 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
       !||    nlocal_init_sta   ../starter/source/materials/fail/nlocal_init_sta.F
-      !||--- called by ------------------------------------------------------
-      !||    nloc_dmg_init     ../starter/source/materials/fail/nloc_dmg_init.F
       !||--- calls      -----------------------------------------------------
       !||    ancmsg            ../starter/source/output/message/message.F
       !||    c3fint_reg_ini    ../starter/source/elements/sh3n/coque3n/c3fint_reg_ini.F

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    monvol0       ../engine/source/airbag/monvol0.F
       !||--- calls      -----------------------------------------------------
       !||    finter        ../engine/source/tools/curve/finter.F
+      !||--- uses       -----------------------------------------------------
+      !||    output_mod    ../common_source/modules/output/output_mod.F90
       !||====================================================================
-      SUBROUTINE VOLP_LFLUID(IVOLU, RVOLU, VOL, FSAV, NPC, TF, PMAIN)
+      SUBROUTINE VOLP_LFLUID(IVOLU, RVOLU, VOL, FSAV, NPC, TF, PMAIN, OUTPUT)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -42,35 +48,32 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER NPC(*),IVOLU(*), PMAIN
-C
-      my_real
-     .   TF(*), RVOLU(*), FSAV(*), VOL
+      my_real TF(*), RVOLU(*), FSAV(*), VOL
+      TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER IFUNCT
-C
-      my_real
-     .   P0, VOL0, DYDX, AREA, VEPS, VINC, POLD, PEXT, VOLD, PRES,
-     .   Q,  QOLD, DV,   XFUN
+
+      my_real P0, VOL0, DYDX, AREA, VEPS, VINC, POLD, PEXT, VOLD, PRES, Q,  QOLD, DV,   XFUN
       my_real SCALEF, BULK, PMAX, GMASS, DMASS, RHOI
       my_real FINTER 
       EXTERNAL FINTER
 C-----------------------------------------------
-C
-C CALCUL DE LA PRESSION
-C
-      PEXT   =RVOLU(3)
-      VOL0   =RVOLU(4)
-      VINC   =RVOLU(5)
-      POLD   =RVOLU(12)
-      VOLD   =RVOLU(16)
-      VEPS   =RVOLU(17)
-      AREA   =RVOLU(18)
-      QOLD   =RVOLU(23)
+C   S o u r c e   L i n e s
+C-----------------------------------------------
 
-      GMASS  =RVOLU(20)
-      RHOI   =RVOLU(34)
+      !Pressure calculation
+      PEXT = RVOLU(3)
+      VOL0 = RVOLU(4)
+      VINC = RVOLU(5)
+      POLD = RVOLU(12)
+      VOLD = RVOLU(16)
+      VEPS = RVOLU(17)
+      AREA = RVOLU(18)
+      QOLD = RVOLU(23)
+      GMASS = RVOLU(20)
+      RHOI = RVOLU(34)
 
 C   BULK
       IFUNCT = IVOLU(21)
@@ -139,7 +142,7 @@ C   PMAX
 
       IF (ISPMD+1==PMAIN) THEN
         DV=VOL-VOLD
-        TFEXT=TFEXT+(HALF*(Q+QOLD+PRES+POLD))*DV
+        OUTPUT%WFEXT=OUTPUT%WFEXT+(HALF*(Q+QOLD+PRES+POLD))*DV
         FSAV(1)=GMASS
         FSAV(2)=VOL
         FSAV(3)=PRES

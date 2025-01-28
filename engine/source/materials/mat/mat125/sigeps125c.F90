@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@
       !||====================================================================
       !||    sigeps125c_mod   ../engine/source/materials/mat/mat125/sigeps125c.F90
       !||--- called by ------------------------------------------------------
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
       !||====================================================================
       module sigeps125c_mod
         contains
@@ -34,7 +34,7 @@
       !||====================================================================
       !||    sigeps125c         ../engine/source/materials/mat/mat125/sigeps125c.F90
       !||--- called by ------------------------------------------------------
-      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc             ../engine/source/materials/mat_share/mulawc.F90
       !||--- uses       -----------------------------------------------------
       !||    constant_mod       ../common_source/modules/constant_mod.F
       !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
@@ -68,8 +68,8 @@
           my_real, dimension(nel), intent(in) :: rho !< material density
           my_real, dimension(nel), intent(inout) :: sigy !< yield stress
           my_real, dimension(nel), intent(inout) :: shf !< shear factor correction 
-          my_real, dimension(nel), intent(inout) :: thk !< shell thikness 
-          my_real, dimension(nel), intent(in)    :: thkly !< ply thikness  
+          my_real, dimension(nel), intent(inout) :: thk !< shell thickness 
+          my_real, dimension(nel), intent(in)    :: thkly !< ply thickness  
           my_real, dimension(nel), intent(inout) :: etse !< ratio of rigidity  
           my_real, dimension(nel), intent(in) :: sigoxx !< old stress xx 
           my_real, dimension(nel), intent(in) :: sigoyy !< old stress yy

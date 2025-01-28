@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,14 +44,13 @@
       !||    h3d_shell_scalar_1               ../engine/source/output/h3d/h3d_results/h3d_shell_scalar_1.F
       !||    h3d_solid_scalar_1               ../engine/source/output/h3d/h3d_results/h3d_solid_scalar_1.F
       !||    h3d_sph_scalar                   ../engine/source/output/h3d/h3d_results/h3d_sph_scalar.F
-      !||    hm_read_mat                      ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                      ../starter/source/materials/mat/hm_read_mat.F90
       !||    hm_read_mat20                    ../starter/source/materials/mat/mat020/hm_read_mat20.F
       !||    hm_read_mat51                    ../starter/source/materials/mat/mat051/hm_read_mat51.F
       !||    i22datainit                      ../engine/source/interfaces/int22/i22datainit.F
       !||    i22err3                          ../starter/source/interfaces/inter3d1/i22err3.F
       !||    ini_inimap1d                     ../starter/source/initial_conditions/inimap/ini_inimap1d.F
       !||    inigrav_m51                      ../starter/source/initial_conditions/inigrav/inigrav_m51.F
-      !||    inimul                           ../starter/source/ale/bimat/inimul.F
       !||    initia                           ../starter/source/elements/initia/initia.F
       !||    inivol_set                       ../starter/source/initial_conditions/inivol/inivol_set.F
       !||    m51init                          ../starter/source/materials/mat/mat051/m51init.F
@@ -60,10 +59,12 @@
       !||    matparam_def_mod                 ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    nodalvfrac                       ../engine/source/output/anim/generate/nodalvfrac.F
       !||    nrf51ini                         ../starter/source/materials/mat/mat051/nrf51ini.F
+      !||    r2r_matparam_copy                ../starter/source/elements/elbuf_init/r2r_matparam_copy.F
       !||    r_bufbric_22                     ../engine/source/interfaces/int22/r_bufbric_22.F
       !||    rdcomr                           ../engine/source/output/restart/rdcomm.F
       !||    resol                            ../engine/source/engine/resol.F
-      !||    sigeps51                         ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51                         ../engine/source/materials/mat/mat051/sigeps51.F90
+      !||    sigeps51_boundary_material       ../engine/source/materials/mat/mat051/sigeps51_boundary_material.F90
       !||    sinit22_fvm                      ../engine/source/interfaces/int22/sinit22_fvm.F
       !||    spmd_l51vois                     ../engine/source/mpi/fluid/spmd_cfd.F
       !||    stat_inimap1d_file_spmd          ../engine/source/output/sta/stat_inimap1d_file_spmd.F
@@ -87,7 +88,7 @@
 !                                                   Included files
 ! ----------------------------------------------------------------------------------------------------------------------
 ! [ no comment on the same line as #include #define #ifdef, #endif ]
-! [ my_real.inc must be includeed, it was included in "implicit_f.inc"]
+! [ my_real.inc must be included, it was included in "implicit_f.inc"]
 #include "my_real.inc"      
         INTEGER, PARAMETER :: M51_N0PHAS = 04
         INTEGER, PARAMETER :: M51_NVPHAS = 23
@@ -99,6 +100,10 @@
           integer :: nb = 0                                  !< number of submaterial
           integer,allocatable,dimension(:) :: mid            !< material internal identifier for each submaterial
           my_real,allocatable,dimension(:) :: vfrac          !< volume fraction for each submaterial
+
+          contains
+            procedure :: destruct => destruct_multimat_param
+
         END TYPE MULTIMAT_PARAM_
      
         logical :: M20_DISCRETE_FILL = .false.               !< LAW20 global parameters
@@ -106,6 +111,18 @@
         INTEGER :: M51_IFLG6 = 0                             !< LAW51 global parameters
         INTEGER :: M51_lSET_IFLG6 = 0                        !< LAW51 global parameters
         INTEGER :: M51_ILOOP_NRF = 0                         !< LAW51 global parameters
+
+        contains
+
+      !||====================================================================
+      !||    destruct_multimat_param   ../common_source/modules/multimat_param_mod.F90
+      !||====================================================================
+          subroutine destruct_multimat_param(this)
+            implicit none
+            class(MULTIMAT_PARAM_) :: this
+            if (allocated(this%mid))   deallocate(this%mid)
+            if (allocated(this%vfrac)) deallocate(this%vfrac)
+          end subroutine destruct_multimat_param
 
       END MODULE MULTIMAT_PARAM_MOD
 

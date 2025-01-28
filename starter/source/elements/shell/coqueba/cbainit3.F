@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,43 +21,43 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    cbainit3               ../starter/source/elements/shell/coqueba/cbainit3.F
+      !||    cbainit3                  ../starter/source/elements/shell/coqueba/cbainit3.F
       !||--- called by ------------------------------------------------------
-      !||    initia                 ../starter/source/elements/initia/initia.F
+      !||    initia                    ../starter/source/elements/initia/initia.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg                 ../starter/source/output/message/message.F
-      !||    c1buf3                 ../starter/source/elements/shell/coque/c1buf3.F
-      !||    cbufxfe                ../starter/source/elements/xfem/cbufxfe.F
-      !||    ccoori                 ../starter/source/elements/shell/coque/ccoori.F
-      !||    cderii                 ../starter/source/elements/shell/coque/cderii.F
-      !||    cepschk                ../starter/source/elements/shell/coque/cepsini.F
-      !||    cfailini               ../starter/source/elements/shell/coque/cfailini.F
-      !||    cfailini4              ../starter/source/elements/shell/coque/cfailini.F
-      !||    cinmas                 ../starter/source/elements/shell/coque/cinmas.F
-      !||    cm35in3                ../starter/source/materials/mat/mat035/cm35in3.F
-      !||    cmaini3                ../starter/source/elements/sh3n/coquedk/cmaini3.F
-      !||    cmatini                ../starter/source/materials/mat_share/cmatini.F
-      !||    cmatini4               ../starter/source/materials/mat_share/cmatini4.F
-      !||    cndleni                ../starter/source/elements/shell/coqueba/cndleni.F
-      !||    cnepsini               ../starter/source/elements/shell/coqueba/cnepsini.F
-      !||    cneveci                ../starter/source/elements/shell/coqueba/cneveci.F
-      !||    corth3                 ../starter/source/elements/shell/coque/corth3.F
-      !||    csigini4               ../starter/source/elements/shell/coqueba/scigini4.F
-      !||    csms11_ini             ../starter/source/elements/shell/coque/cinit3.F
-      !||    cstraini4              ../starter/source/elements/shell/coqueba/cstraini4.F
-      !||    cuserini               ../starter/source/elements/shell/coque/cuserini.F
-      !||    cuserini4              ../starter/source/elements/shell/coqueba/cuserini4.F
-      !||    cveok3                 ../starter/source/elements/shell/coque/cveok3.F
-      !||    fail_windshield_init   ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
-      !||    fractal_dmg_init       ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    fretitl2               ../starter/source/starter/freform.F
-      !||    layini1                ../starter/source/elements/shell/coqueba/layini1.F
-      !||    thickini               ../starter/source/elements/shell/coqueba/thickini.F
+      !||    ancmsg                    ../starter/source/output/message/message.F
+      !||    c1buf3                    ../starter/source/elements/shell/coque/c1buf3.F
+      !||    cbufxfe                   ../starter/source/elements/xfem/cbufxfe.F
+      !||    ccoori                    ../starter/source/elements/shell/coque/ccoori.F
+      !||    cderii                    ../starter/source/elements/shell/coque/cderii.F
+      !||    cepschk                   ../starter/source/elements/shell/coque/cepsini.F
+      !||    cfailini                  ../starter/source/elements/shell/coque/cfailini.F
+      !||    cfailini4                 ../starter/source/elements/shell/coque/cfailini.F
+      !||    cinmas                    ../starter/source/elements/shell/coque/cinmas.F
+      !||    cm35in3                   ../starter/source/materials/mat/mat035/cm35in3.F
+      !||    cmaini3                   ../starter/source/elements/sh3n/coquedk/cmaini3.F
+      !||    cmatini                   ../starter/source/materials/mat_share/cmatini.F
+      !||    cmatini4                  ../starter/source/materials/mat_share/cmatini4.F
+      !||    cndleni                   ../starter/source/elements/shell/coqueba/cndleni.F
+      !||    cnepsini                  ../starter/source/elements/shell/coqueba/cnepsini.F
+      !||    cneveci                   ../starter/source/elements/shell/coqueba/cneveci.F
+      !||    corth3                    ../starter/source/elements/shell/coque/corth3.F
+      !||    csigini4                  ../starter/source/elements/shell/coqueba/scigini4.F
+      !||    csms11_ini                ../starter/source/elements/shell/coque/cinit3.F
+      !||    cstraini4                 ../starter/source/elements/shell/coqueba/cstraini4.F
+      !||    cuserini                  ../starter/source/elements/shell/coque/cuserini.F
+      !||    cuserini4                 ../starter/source/elements/shell/coqueba/cuserini4.F
+      !||    cveok3                    ../starter/source/elements/shell/coque/cveok3.F
+      !||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
+      !||    fractal_dmg_init          ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+      !||    fretitl2                  ../starter/source/starter/freform.F
+      !||    layini1                   ../starter/source/elements/shell/coqueba/layini1.F
+      !||    thickini                  ../starter/source/elements/shell/coqueba/thickini.F
       !||--- uses       -----------------------------------------------------
-      !||    drape_mod              ../starter/share/modules1/drape_mod.F
-      !||    fractal_dmg_init_mod   ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
-      !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    stack_mod              ../starter/share/modules1/stack_mod.F
+      !||    drape_mod                 ../starter/share/modules1/drape_mod.F
+      !||    fractal_dmg_init_mod      ../starter/source/materials/fail/fractal/fractal_dmg_init.F90
+      !||    message_mod               ../starter/share/message_module/message_mod.F
+      !||    stack_mod                 ../starter/share/modules1/stack_mod.F
       !||====================================================================
       SUBROUTINE CBAINIT3(
      1           ELBUF_STR,IXC      ,PM       ,X       ,GEO     ,
@@ -72,10 +72,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A           MS_LAYERC,ZI_LAYERC,PART_AREA,CPT_ELTENS,
      B           MSZ2C    ,ZPLY     ,ITAGN    ,ITAGE   ,IXFEM   ,
      C           NPF      ,TF       ,XFEM_STR ,ISUBSTACK,STACK  ,
-     D           RNOISE   ,DRAPE    ,SH4ANG  ,GEO_STACK,
+     D           RNOISE   ,DRAPE    ,SH4ANG   ,IDDLEVEL,GEO_STACK,
      E           IGEO_STACK,STRC    ,PERTURB  ,IYLDINI ,ELE_AREA,
      F           NLOC_DMG ,NG       ,GROUP_PARAM, IDRAPE , DRAPEG,
-     G           MAT_PARAM,FAIL_FRACTAL)
+     G           MAT_PARAM,FAIL_FRACTAL,FAIL_BROKMANN,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -90,6 +90,8 @@ C-----------------------------------------------
       USE RANDOM_WALK_DEF_MOD
       USE FRACTAL_DMG_INIT_mod
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE
+      use brokmann_random_def_mod
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,6 +120,7 @@ C-----------------------------------------------
      .        IGEO(NPROPGI,*), IPM(NPROPMI,*), NSHNOD(*),NPF(*),
      .        SH4TREE(*),IPARG(*),CPT_ELTENS,ITAGN(*),ITAGE(*),
      .        IGEO_STACK(*),PERTURB(NPERTURB)
+      INTEGER ,INTENT(IN) :: IDDLEVEL
       INTEGER *8 I8MI(6,*)
       my_real
      .   PM(NPROPM,*), X(3,*), GEO(NPROPG,*), XMAS(*), IN(*),
@@ -136,7 +139,9 @@ C-----------------------------------------------
       TYPE (DRAPE_)  ::  DRAPE(NUMELC_DRAPE + NUMELTG_DRAPE)
       TYPE (DRAPEG_) ::  DRAPEG
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
-      TYPE (FAIL_FRACTAL_) ,INTENT(IN) :: FAIL_FRACTAL
+      TYPE (FAIL_FRACTAL_)  ,INTENT(IN) :: FAIL_FRACTAL
+      TYPE (FAIL_BROKMANN_) ,INTENT(IN) :: FAIL_BROKMANN
+      TYPE(glob_therm_)     ,intent(in) :: glob_therm
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRSHEL) :: IGRSH4N
       TYPE (GROUP_)  , DIMENSION(NGRSH3N) :: IGRSH3N
@@ -287,7 +292,7 @@ C------------
      .            SH4TREE ,MCP  , MCPS(NFT+1)  ,TEMP    ,
      .            MS_LAYER, ZI_LAYER,MS_LAYERC,ZI_LAYERC,
      .            MSZ2C,ZPLY,ISUBSTACK,NLAY,ELBUF_STR,STACK,
-     .            GBUF%THK_I,RNOISE   ,DRAPE       ,
+     .            GBUF%THK_I,RNOISE   ,DRAPE       ,GLOB_THERM%NINTEMP,
      .            PERTURB,IX1     ,IX2      ,IX3     ,IX4     ,
      .            IDRAPE  ,DRAPEG%INDX)
 C-----------------------------------------------
@@ -410,10 +415,11 @@ c     set element damage initialized in /FAIL/FRACTAL_DMG
         CALL FRACTAL_DMG_INIT(ELBUF_STR,MAT_PARAM,FAIL_FRACTAL,
      .       NUMMAT ,NUMELC  ,NEL      ,NFT      ,NGL    ,ITY      )
       ENDIF
-c     tag edge elements in local UVAR for /FAIL/ALTER (XFEM)
-      IF (IFAIL > 0 .and. IHBE > 20 .AND. IHBE < 29) THEN
-        CALL FAIL_WINDSHIELD_INIT(ELBUF_STR,MAT_PARAM,
-     .       NEL      ,NFT      ,ITY      ,IGRSH4N  ,IGRSH3N  )
+c     tag edge elements in local UVAR for /FAIL/ALTER
+      IF (IFAIL > 0 .and. IDDLEVEL == 1) THEN
+        CALL FAIL_WINDSHIELD_INIT(ELBUF_STR,MAT_PARAM,FAIL_BROKMANN,
+     .       NEL      ,NFT      ,ITY      ,IGRSH4N  ,IGRSH3N  ,
+     .       ALDT     ,THKE     ,NGL      )
       ENDIF
 c
       IF (IHBE == 11) THEN

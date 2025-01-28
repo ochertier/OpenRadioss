@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    sigeps78c   ../engine/source/materials/mat/mat078/sigeps78c.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc      ../engine/source/materials/mat_share/mulawc.F90
       !||--- calls      -----------------------------------------------------
       !||    vinter      ../engine/source/tools/curve/vinter.F
       !||====================================================================
@@ -111,6 +111,10 @@ C     UVAR(I,2)     = r : RADIUS OF G_SIGMA (RNIH)
 C     UVAR(I,3)     = a = B + R - YIELD     (AYU) 
 C     UVAR(I,4)     = Yld Stress
 C=======================================================================
+      NORM_SP = -HUGE(NORM_SP)
+      NORMXX = -HUGE(NORMXX)
+      NORMYY = -HUGE(NORMYY)
+      NORMXY = -HUGE(NORMXY)
       !=======================================================================
       ! - INITIALISATION OF COMPUTATION ON TIME STEP
       !=======================================================================

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -66,6 +66,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    drape_mod         ../engine/share/modules/drape_mod.F
       !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    inoutfile_mod     ../common_source/modules/inoutfile_mod.F
+      !||    output_mod        ../common_source/modules/output/output_mod.F90
       !||    stack_mod         ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE GENOUTP(X    ,D         ,V      ,A     ,
@@ -77,7 +78,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      7                  IPM   ,KXSP      ,SPBUF  ,NODGLOB,LENG ,
      8                  FOPT  ,NOM_OPT   ,NPBY   ,FNCONT   ,FTCONT,
      9                  GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N,
-     A                  DRAPEG )
+     A                  DRAPEG,OUTPUT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -85,6 +86,7 @@ C-----------------------------------------------
       USE STACK_MOD
       USE INOUTFILE_MOD
       USE DRAPE_MOD
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,7 +96,7 @@ C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
+!#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "com09_c.inc"
 #include      "param_c.inc"
@@ -112,19 +114,20 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IPARG(*),IPART(LIPART1,*),
-     .   IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
-     .   IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),ITAB(*),
-     .   WEIGHT(*), DD_IAD(*),IPM(*),IGEO(*),KXSP(NISP,*),
-     .   LENG,NODGLOB(*), NOM_OPT(*), NPBY(*)
+     .        IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
+     .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),ITAB(*),
+     .        WEIGHT(*), DD_IAD(*),IPM(*),IGEO(*),KXSP(NISP,*),
+     .        LENG,NODGLOB(*), NOM_OPT(*), NPBY(*)
       my_real
-     .   X(*), D(*), V(*), VR(*), A(*), 
-     .   PM(NPROPM,*), MS(*),ANIN(*),
-     .   CONT(*), PARTSAV(*),FINT(*),FEXT(*),TANI(6,*),EANI(*),
-     .   SPBUF(*), FOPT(*), FNCONT(3,*), FTCONT(3,*),GEO(*),THKE(*)
+     .        X(*), D(*), V(*), VR(*), A(*),
+     .        PM(NPROPM,*), MS(*),ANIN(*),
+     .        CONT(*), PARTSAV(*),FINT(*),FEXT(*),TANI(6,*),EANI(*),
+     .        SPBUF(*), FOPT(*), FNCONT(3,*), FTCONT(3,*),GEO(*),THKE(*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
       TYPE(DRAPE_) :: DRAPE_SH4N(NUMELC_DRAPE), DRAPE_SH3N(NUMELTG_DRAPE)
       TYPE(DRAPEG_) :: DRAPEG
+      TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -141,7 +144,6 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: SIZLOC_WRITE
       INTEGER OUTPSIZE
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITABG
-
       INTEGER :: LEN_TMP_NAME
       CHARACTER(len=2148) :: TMP_NAME
 C-----------------------------------------------
@@ -189,7 +191,7 @@ C-----------------------------------------------
        WRITE(IUGEO,'(A)')'#FORMAT: (1P5E16.9)'
        WRITE(IUGEO,'(2A)')'#           TIME INTERNAL_ENERGY',
      .   '  KINETIC_ENERGY ROT_KINE_ENERGY EXTE_FORCE_WORK'
-       WRITE(IUGEO,'(1P5E16.9)') TT,ENINT,ENCIN,ENROT,TFEXT
+       WRITE(IUGEO,'(1P5E16.9)') TT,ENINT,ENCIN,ENROT,OUTPUT%WFEXT
       ENDIF
 C-----------------------------------------------
 C   MATER SCALARS 

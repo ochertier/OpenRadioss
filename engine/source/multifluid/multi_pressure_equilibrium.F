@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,7 +30,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
       SUBROUTINE MULTI_PRESSURE_EQUILIBRIUM(TIMESTEP, ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG, 
      .     PM, IPM, MULTI_FVM, CURRENT_TIME, BUFMAT, NPF, TF, NUMMAT,MATPARAM)
@@ -112,6 +112,7 @@ C-----------------------------------------------
 C     B e g i n n i n g   o f   s u b r o u t i n e
 C-----------------------------------------------
       IDBG = .FALSE.
+      NULLIFY(IX)
 
       PSHIFT = MULTI_FVM%PRES_SHIFT
 
@@ -130,7 +131,7 @@ C-----------------------------------------------
 C     QUADS
                IX => IXQ(1:NIXQ, 1 + NFT:NEL + NFT)
                NIX = NIXQ
-            ELSEIF (ITY == 7) THEN
+            ELSE !IF (ITY == 7) THEN
 C     TRIANGLES
                IX => IXTG(1:NIXTG, 1 + NFT:NEL + NFT)
                NIX = NIXTG
@@ -148,7 +149,11 @@ C     Global buffer of the current group
             IF (NBMAT == 1) THEN
                LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1, 1, 1)
                IMAT = 1
-               LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+               IF(ASSOCIATED(IX)) THEN
+                 LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+               ELSE
+                 LOCAL_MATID = 1
+               ENDIF
                MATLAW = MATPARAM(LOCAL_MATID)%ILAW
                PRES => MULTI_FVM%PRES(1 + NFT : NEL + NFT)
                SSP  => MULTI_FVM%SOUND_SPEED(1 + NFT : NEL + NFT)
@@ -158,13 +163,13 @@ C     Global buffer of the current group
                EBUF => ELBUF_TAB(NG)%BUFLY(1)%EOS(1, 1, 1)
                NVAREOS = ELBUF_TAB(NG)%BUFLY(1)%NVAR_EOS
                CALL MULTI_SUBMATLAW(
-     1   1,            MATLAW,       LOCAL_MATID,  NEL,
-     2   EINT,         PRES,         RHO,          SSP,
-     3   VOL,          GRUN(1:NEL,1),PM,           IPM,
-     4   NPROPM,       NPROPMI,      BUFMAT,       GBUF%OFF,
-     5   GBUF%TEMP,    LBUF%BFRAC,   GBUF%TB,      GBUF%DELTAX,
-     6   CURRENT_TIME, SIGOLD,       NPF,          TF,
-     7   EBUF%VAR,     NVAREOS)
+     1                              1,            MATLAW,       LOCAL_MATID,          NEL,
+     2                              EINT,         PRES,         RHO,                  SSP,
+     3                              VOL,          GRUN(1:NEL,1),PM,                   IPM,
+     4                              NPROPM,       NPROPMI,      BUFMAT,               GBUF%OFF,
+     5                              GBUF%TEMP,    LBUF%BFRAC,   GBUF%TB,              GBUF%DELTAX,
+     6                              CURRENT_TIME, SIGOLD,       NPF,                  TF,
+     7                              EBUF%VAR,     NVAREOS,      MATPARAM(LOCAL_MATID) )
                DO II = 1, NEL
                   IF (MULTI_FVM%SOUND_SPEED(II + NFT) > ZERO) THEN
                      MULTI_FVM%SOUND_SPEED(II + NFT) = SQRT(MULTI_FVM%SOUND_SPEED(II + NFT))
@@ -263,7 +268,11 @@ C     Number of elements that have not converged
                ENDDO
 C     Loop over the fluid layers
                DO IMAT = 1, NBMAT
-                  LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                  IF(ASSOCIATED(IX)) THEN 
+                    LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                  ELSE
+                    LOCAL_MATID = 1
+                  ENDIF
                   MATLAW = MATPARAM(LOCAL_MATID)%ILAW
                   PRES => PRESWT(1:NEL, IMAT)
                   SSP  => SSPWT(1:NEL, IMAT)
@@ -275,13 +284,13 @@ C     Loop over the fluid layers
                   NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS                  
 C     Compute EOS
                   CALL MULTI_SUBMATLAW(
-     1   1,               MATLAW,          LOCAL_MATID,     NEL,
-     2   EINT,            PRES,            RHO,             SSP,
-     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
-     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
-     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
-     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
-     7   EBUF%VAR,        NVAREOS)
+     1                                 1,               MATLAW,          LOCAL_MATID,          NEL,
+     2                                 EINT,            PRES,            RHO,                  SSP,
+     3                                 VOL,             GRUN(1:NEL,IMAT),PM,                   IPM,
+     4                                 NPROPM,          NPROPMI,         BUFMAT,               LBUF%OFF,
+     5                                 LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,              GBUF%DELTAX,
+     6                                 CURRENT_TIME,    SIGOLD,          NPF,                  TF,
+     7                                 EBUF%VAR,        NVAREOS,         MATPARAM(LOCAL_MATID) )
 C     Relaxed pressure initialization
                   DO II = 1, NEL
                      P0(II) = P0(II) + ALPHAWT(II, IMAT) * PRES(II)
@@ -432,7 +441,11 @@ C                           IF (ALPHAWT(II, IMAT) /= ZERO .AND. GRUN(II, IMAT) /
                   ENDIF
 C     Equation of state call
                   DO IMAT = 1, NBMAT
-                     LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                     IF(ASSOCIATED(IX)) THEN 
+                       LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                     ELSE
+                       LOCAL_MATID = 1
+                     ENDIF
                      MATLAW = MATPARAM(LOCAL_MATID)%ILAW
                      PRES => PRESWT(1:NEL, IMAT)
                      SSP  => SSPWT(1:NEL, IMAT)
@@ -444,13 +457,13 @@ C     Equation of state call
                      NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS
 C     Compute EOS
                      CALL MULTI_SUBMATLAW(
-     1   0,               MATLAW,          LOCAL_MATID,     NEL,
-     2   EINT,            PRES,            RHO,             SSP,
-     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
-     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
-     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
-     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
-     7   EBUF%VAR,        NVAREOS)
+     1                                    0,               MATLAW,          LOCAL_MATID,          NEL,
+     2                                    EINT,            PRES,            RHO,                  SSP,
+     3                                    VOL,             GRUN(1:NEL,IMAT),PM,                   IPM,
+     4                                    NPROPM,          NPROPMI,         BUFMAT,               LBUF%OFF,
+     5                                    LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,              GBUF%DELTAX,
+     6                                    CURRENT_TIME,    SIGOLD,          NPF,                  TF,
+     7                                    EBUF%VAR,        NVAREOS,         MATPARAM(LOCAL_MATID) )
                   ENDDO         ! IMAT = 1, NBMAT 
                   
                ENDDO            !ITER = 1, MAX_ITER
@@ -465,7 +478,7 @@ C     Compute EOS
                IF (REMAINING_ELTS /= 0 .AND. IDBG) THEN
                   PRINT*, "*** CV PB IN PRESSURE EQUILIBRIUM", " CYCLE", NCYCLE, "GROUPE", NG
                   DO II = 1, NEL
-                     IF (CV_INDICATOR(II) == 0) THEN
+                  IF (CV_INDICATOR(II) == 0 .AND. ASSOCIATED(IX)) THEN
                         WRITE(*, '(A,I10,A,I10)') "LOCAL_ID ", II + NFT, " GLOBAL_ID ", IX(NIX, II)
                         DO IMAT = 1, NBMAT
                            WRITE(*,*) "MAT ", IMAT, ", alph : ", ALPHAWT(II, IMAT), ", PRES : ", PRESWT(II, IMAT)
@@ -481,7 +494,11 @@ C     ----------------------------------------------
 
 C     Loop over the fluid layers
                DO IMAT = 1, NBMAT
-                  LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                  IF(ASSOCIATED(IX)) THEN 
+                    LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                  ELSE
+                    LOCAL_MATID = 1
+                  ENDIF
                   MATLAW = MATPARAM(LOCAL_MATID)%ILAW
                   PRES => PRESWT(1:NEL, IMAT)
                   SSP  => SSPWT(1:NEL, IMAT)
@@ -501,14 +518,14 @@ C     Loop over the fluid layers
                   ENDDO
 C     Compute EOS
                   CALL MULTI_SUBMATLAW(
-     1   0,               MATLAW,          LOCAL_MATID,     NEL,
-     2   EINT,            PRES,            RHO,             SSP,
-     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
-     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
-     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
-     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
-     7   EBUF%VAR,        NVAREOS)
-     
+     1                                 0,               MATLAW,          LOCAL_MATID,          NEL,
+     2                                 EINT,            PRES,            RHO,                  SSP,
+     3                                 VOL,             GRUN(1:NEL,IMAT),PM,                   IPM,
+     4                                 NPROPM,          NPROPMI,         BUFMAT,               LBUF%OFF,
+     5                                 LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,              GBUF%DELTAX,
+     6                                 CURRENT_TIME,    SIGOLD,          NPF,                  TF,
+     7                                 EBUF%VAR,        NVAREOS,         MATPARAM(LOCAL_MATID) )
+
                ENDDO            ! IMAT = 1, NBMAT                             
                
 C     Equilibrium densities have been found,
@@ -618,7 +635,11 @@ C     Compute New energies
                         ENDIF
                      ENDDO  ! II = 1, NEL
 C     Call equation of state for the submaterial
-                     LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                     IF(ASSOCIATED(IX)) THEN
+                       LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)  
+                     ELSE
+                       LOCAL_MATID = 1
+                     ENDIF
                      MATLAW = MATPARAM(LOCAL_MATID)%ILAW
                      SSP  => SSPWT(1:NEL, IMAT)
                      VOL  => VOLWT(1:NEL, IMAT)
@@ -626,13 +647,13 @@ C     Call equation of state for the submaterial
                      EBUF => ELBUF_TAB(NG)%BUFLY(IMAT)%EOS(1, 1, 1)
                      NVAREOS = ELBUF_TAB(NG)%BUFLY(IMAT)%NVAR_EOS                     
                      CALL MULTI_SUBMATLAW(
-     1   0,               MATLAW,          LOCAL_MATID,     NEL,
-     2   EINT,            PRES,            RHO,             SSP,
-     3   VOL,             GRUN(1:NEL,IMAT),PM,              IPM,
-     4   NPROPM,          NPROPMI,         BUFMAT,          LBUF%OFF,
-     5   LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,         GBUF%DELTAX,
-     6   CURRENT_TIME,    SIGOLD,          NPF,             TF,
-     7   EBUF%VAR,        NVAREOS)
+     1                                    0,               MATLAW,          LOCAL_MATID,          NEL,
+     2                                    EINT,            PRES,            RHO,                  SSP,
+     3                                    VOL,             GRUN(1:NEL,IMAT),PM,                   IPM,
+     4                                    NPROPM,          NPROPMI,         BUFMAT,               LBUF%OFF,
+     5                                    LBUF%TEMP,       LBUF%BFRAC,      GBUF%TB,              GBUF%DELTAX,
+     6                                    CURRENT_TIME,    SIGOLD,          NPF,                  TF,
+     7                                    EBUF%VAR,        NVAREOS,         MATPARAM(LOCAL_MATID) )
                   ENDDO  ! IMAT = 1, NBMAT
                   DO II = 1, NEL
                      IF (CV_INDICATOR(II) /= 1) THEN
@@ -669,7 +690,12 @@ C     Store final values
                   MULTI_FVM%PHASE_RHO(IMAT, 1 + NFT : NEL + NFT) = RHOWT(1:NEL, IMAT)
 C     Pressure
                   MULTI_FVM%PHASE_PRES(IMAT, 1 + NFT : NEL + NFT) = PRESWT(1:NEL, IMAT)
-                  LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)
+                  IF(ASSOCIATED(IX)) THEN
+                    LOCAL_MATID = MATPARAM(IX(1,1))%MULTIMAT%MID(IMAT)  
+                  ELSE
+                    LOCAL_MATID = 1
+                  ENDIF
+
                   MATLAW = MATPARAM(LOCAL_MATID)%ILAW
 C     Global Pressure: volumic fraction ponderation
                   DO II = 1, NEL

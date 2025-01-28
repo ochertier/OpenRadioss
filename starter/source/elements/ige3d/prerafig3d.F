@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -365,6 +365,21 @@ c
             IDTANG1 => IDXEL
             IDTANG2 => IDYEL
             MESHIGE => MESHIGEZ
+          CASE DEFAULT
+            IDNBCUT= -HUGE(IDNBCUT)
+            IDKNOT1=-HUGE(IDKNOT1)
+            IDKNOT2=-HUGE(IDKNOT2)
+            OFFSET_KNOT=-HUGE(OFFSET_KNOT)
+            PDIR=-HUGE(PDIR)
+            PTANG1=-HUGE(PTANG1)
+            PTANG2=-HUGE(PTANG2)
+            NELDIR=-HUGE(NELDIR)
+            NELTANG1=-HUGE(NELTANG1)
+            NELTANG2=-HUGE(NELTANG2)
+            IDDIR => NULL()
+            IDTANG1 => NULL()
+            IDTANG2 => NULL()
+            MESHIGE => NULL()
           END SELECT
 c
 c ------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -228,7 +228,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    message_mod              ../starter/share/message_module/message_mod.F
       !||    mid_pid_mod              ../starter/share/modules1/mid_pid_mod.F
       !||    monvol_struct_mod        ../starter/share/modules1/monvol_struct_mod.F
-      !||    sensor_mod               ../starter/share/modules1/sensor_mod.F
       !||    split_cfd_mod            ../starter/share/modules1/split_cfd_mod.F
       !||    stack_mod                ../starter/share/modules1/stack_mod.F
       !||    stack_var_mod            ../starter/share/modules1/stack_var_mod.F
@@ -330,7 +329,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D   KLOADPINTER  , LOADPINTER ,DGAPLOADINT     ,S_LOADPINTER, LEN_CEP ,DYNAIN_DATA,
      E   DRAPEG       ,USER_WINDOWS,OUTPUT          ,INTERFACES  ,NUMBER_LOAD_CYL,
      F   LOADS_PER_PROC, PYTHON    ,DPL0CLD         ,VEL0CLD     ,NAMES_AND_TITLES,
-     G   BCS_PER_PROC,constraint_struct)
+     G   BCS_PER_PROC,constraint_struct,glob_therm  ,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -379,11 +378,14 @@ C-----------------------------------------------
       USE INTERFACES_MOD
       USE SUBMODEL_MOD , ONLY : NSUBMOD
       USE PYTHON_FUNCT_MOD
-      USE NAMES_AND_TITLES_MOD,only: NAMES_AND_TITLES_,LTITLE
+      USE NAMES_AND_TITLES_MOD
       USE BCS_MOD , ONLY : BCS_STRUCT_
       use constraint_mod , only : constraint_
       use c_inivell_mod ,  only : c_inivell
       use w_inivel_str_mod , only : w_inivel_str
+      use glob_therm_mod
+      use write_ale_grid_mod, only : write_ale_grid
+      use PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -415,7 +417,6 @@ C-----------------------------------------------
 #include      "r2r_c.inc"
 #include      "inter22.inc"
 #include      "drape_c.inc"
-#include      "thermal_c.inc"
 #include      "debug_rst.inc"
 C-----------------------------------------------
       TYPE INTERMASURFEP
@@ -425,6 +426,7 @@ C-----------------------------------------------
       TYPE (OUTPUT_),INTENT(IN)             :: OUTPUT
       TYPE (INTERFACES_)   ,INTENT(IN)      :: INTERFACES
       TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
+      TYPE(pblast_), INTENT(INOUT) :: PBLAST
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -634,6 +636,7 @@ C-----------------------------------------------
         TYPE(NAMES_AND_TITLES_),INTENT(IN) :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
         type(constraint_), intent(inout) :: constraint_struct !< constraint structure for the splitting
         TYPE(INTERSURFP) :: INTERCEP(3,NINTER)
+        TYPE(glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -787,10 +790,11 @@ C
       INTEGER, DIMENSION(:), ALLOCATABLE :: NE_LERCVOIS  !(NE_NERVOIS)
       INTEGER, DIMENSION(:), ALLOCATABLE :: NE_LESDVOIS  !(NE_NESVOIS)
       INTEGER :: II, JJ, NEBCS_FVM, IPT, ITMP
-      INTEGER :: NEBCS_NRF,OTHER_NEBCS
-      INTEGER, DIMENSION(NEBCS) :: LIST_EBCS_NRF,LIST_OTHER_EBCS
+      INTEGER :: NEBCS_PARALLEL,OTHER_NEBCS
+      INTEGER, DIMENSION(NEBCS) :: LIST_EBCS_PARALLEL,LIST_OTHER_EBCS
       TYPE(t_ebcs_tab) :: EBCS_TAB_LOC,EBCS_TAB_LOC_2
       TYPE(t_connectivity_ext1) :: ee_connect_l
+      LOGICAL :: IS_EBCS_PARALLEL
 C-----------------------------------------------
       TYPE(SEATBELT_REMOTE_NODES_STRUCT) ANCHOR_REMOTE_L,ANCHOR_REMOTE_SEND_L
 C-----------------------------------------------
@@ -917,7 +921,7 @@ C--------------------------------------------
       NESVOIS  = 0
       NE_NERVOIS  = 0
       NE_NESVOIS  = 0
-      IF(IALE+IEULER+ITHERM+IALELAG/=0)THEN
+      IF (IALE + IEULER + GLOB_THERM%ITHERM + IALELAG > 0) THEN
         NUMEL = MAX(NUMELS,NUMELQ)
         NUMEL_L = MAX(NUMELS_L,NUMELQ_L)
         IF (MULTI_FVM%IS_USED .AND. N2D /= 0) THEN
@@ -950,17 +954,19 @@ C--------------------------------------
       ALLOCATE(IEBCS_LISTDP0_L(0))
       EBCS_TAB_LOC%nebcs_fvm = 0
       NEBCS_FVM = 0
-      NEBCS_NRF = 0
+      NEBCS_PARALLEL = 0
       OTHER_NEBCS = 0
       IF (NEBCS > 0) THEN
 ! Workaround for issues with Polymorphic types with some compilers
 !$OMP CRITICAL
          DO II = 1, NEBCS
+            IS_EBCS_PARALLEL = .FALSE.
+            IF(EBCS_TAB%tab(II)%poly%type==10 .or. EBCS_TAB%tab(II)%poly%type==11) IS_EBCS_PARALLEL=.TRUE.
             IF (EBCS_TAB%tab(II)%poly%is_multifluid) THEN
                NEBCS_FVM = NEBCS_FVM + 1
-            ELSEIF(EBCS_TAB%tab(II)%poly%type==10) THEN
-                NEBCS_NRF = NEBCS_NRF + 1
-                LIST_EBCS_NRF(NEBCS_NRF) = II
+            ELSEIF(IS_EBCS_PARALLEL) THEN
+                NEBCS_PARALLEL = NEBCS_PARALLEL + 1
+                LIST_EBCS_PARALLEL(NEBCS_PARALLEL) = II
             ELSEIF(P==1) THEN
                 OTHER_NEBCS = OTHER_NEBCS + 1
                 LIST_OTHER_EBCS(OTHER_NEBCS) = II
@@ -971,12 +977,12 @@ C--------------------------------------
          EBCS_TAB_LOC%nebcs_fvm = NEBCS_FVM
 
          ! allocation of EBCS type nrf
-         EBCS_TAB_LOC_2%nebcs_nrf = NEBCS_NRF
+         EBCS_TAB_LOC_2%nebcs_parallel = NEBCS_PARALLEL
+         CALL EBCS_TAB_LOC_2%create(NEBCS_PARALLEL)
          EBCS_TAB_LOC_2%nebcs_loc = OTHER_NEBCS
-         CALL EBCS_TAB_LOC_2%create(NEBCS_NRF)
          EBCS_TAB_LOC_2%nebcs_fvm = 0
          ! --------------------
-         ! mode 0 : count the number of entity/element
+         ! mode 0 : count the number of entity/element  (if %has_ielem == .true.)
          CALL C_IEBCS(IXS, IXQ, IXTG,
      .        NUMELS, NUMELQ, NUMELTG,
      .        NEBCS, CEP, NUMELS + NUMELQ + NUMELTG,
@@ -1005,7 +1011,7 @@ C        ALLOCATE
 
 
          NEBCS_FVM = 0
-         NEBCS_NRF = 0
+         NEBCS_PARALLEL = 0
          IPT = 1
         ! --------------------
         ! loop over the ebcs, 3 cases :
@@ -1014,6 +1020,9 @@ C        ALLOCATE
         ! (3) other ebcs  : sequential --> all the elements/nodes of the ebcs are on main processor
         ! for cases (1) & (2) : need to convert global id into local processor id
          DO II = 1, NEBCS
+            IS_EBCS_PARALLEL = .FALSE.
+            IF(EBCS_TAB%tab(II)%poly%type == 10 .OR. EBCS_TAB%tab(II)%poly%type == 11 )IS_EBCS_PARALLEL = .TRUE.
+
             ! ------------
             ! multifluid ebcs
             IF (EBCS_TAB%tab(II)%poly%is_multifluid) THEN
@@ -1040,22 +1049,22 @@ C        ALLOCATE
                   IPT = IPT + 1
                ENDDO
             ! ------------
-            ! /NRF ebcs
-            ELSEIF(EBCS_TAB%tab(II)%poly%type==10) THEN
-               NEBCS_NRF = NEBCS_NRF + 1
-               ALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly, source = EBCS_TAB%tab(II)%poly)   
+            ! parallel ebcs : /NRF /PROPERGOL
+            ELSEIF(IS_EBCS_PARALLEL)THEN
+               NEBCS_PARALLEL = NEBCS_PARALLEL + 1
+               ALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly, source = EBCS_TAB%tab(II)%poly)
                IF(EBCS_TAB%tab(II)%poly%has_ielem) THEN     
-                    EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%nb_elem = IEBCS_NELEM_L(II)
-                    IF (ALLOCATED(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%iface)) THEN
-                       DEALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%iface)
+                    EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%nb_elem = IEBCS_NELEM_L(II)
+                    IF (ALLOCATED(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%iface)) THEN
+                       DEALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%iface)
                     ENDIF
-                    EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%nb_elem = IEBCS_NELEM_L(II)
-                    ALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%iface(IEBCS_NELEM_L(II)))
+                    EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%nb_elem = IEBCS_NELEM_L(II)
+                    ALLOCATE(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%iface(IEBCS_NELEM_L(II)))
                     DO JJ = 1, IEBCS_NELEM_L(II)
-                       EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%ielem(JJ) = IEBCS_LISTELEM_L(IPT)
-                       EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%iface(JJ) = IEBCS_LISTFAC_L(IPT)
-                       IF(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%has_dp0) THEN
-                          EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%dp0(JJ) = IEBCS_LISTDP0_L(IPT)
+                       EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%ielem(JJ) = IEBCS_LISTELEM_L(IPT)
+                       EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%iface(JJ) = IEBCS_LISTFAC_L(IPT)
+                       IF(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%has_dp0) THEN
+                          EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%dp0(JJ) = IEBCS_LISTDP0_L(IPT)
                        ENDIF
                        IPT = IPT + 1
                     ENDDO
@@ -1085,9 +1094,8 @@ C        ALLOCATE
          ENDDO
 
         ! --------------------
-        ! additional computation for /NRF ebcs
-         CALL SPLIT_EBCS(P,NEBCS_NRF,LIST_EBCS_NRF,SCEL,CEP,IGRSURF,
-     .                   CEL,EBCS_TAB,EBCS_TAB_LOC_2)
+        ! additional computation for /NRF ebcs  (ids : global -> local)
+         CALL SPLIT_EBCS(P,NEBCS_PARALLEL,LIST_EBCS_PARALLEL,SCEL,CEP,IGRSURF,CEL,EBCS_TAB,EBCS_TAB_LOC_2)
         ! --------------------
 !$OMP END CRITICAL
       ENDIF
@@ -1476,7 +1484,7 @@ C--------------------------------------------
         CALL C_FASOLFR(FASOLFR, CEP, P-1, CEL, NFASOLFR_L)
       ENDIF
 C--------------------------------------------
-C Counting "externam segments of quads"
+C Counting "external segments of quads"
 C--------------------------------------------
       NSEGQUADFR_L= 0
       IF(NSEGQUADFR/=0 .AND. NUMELQ_L/=0)THEN
@@ -1486,26 +1494,26 @@ C--------------------------------------
 C counts flux convec
 C--------------------------------------
       NCONV_L = 0
-      IF (NUMCONV>0)
-     .    CALL C_ICONV(IBCV,CEP,P-1,NCONV_L)
+      IF (GLOB_THERM%NUMCONV > 0)
+     .    CALL C_ICONV(IBCV,CEP,P-1,NCONV_L,GLOB_THERM%NUMCONV,GLOB_THERM%NICONV)
 C--------------------------------------
 C counts radiative fluxes              
 C--------------------------------------
       NRADIA_L = 0
-      IF (NUMRADIA>0)
-     .    CALL C_IRADIA(IBCR,CEP,P-1,NRADIA_L)
+      IF (GLOB_THERM%NUMRADIA > 0) CALL C_IRADIA(IBCR,CEP,P-1,NRADIA_L,
+     .           GLOB_THERM%NUMRADIA,GLOB_THERM%NUMCONV,GLOB_THERM%NIRADIA)
 C--------------------------------------
 C counts imposed fluxes 
 C--------------------------------------
       NFXFLUX_L = 0
-      IF (NFXFLUX>0)
-     .    CALL C_ITHFLUX(IBFFLUX,CEP,P-1,NFXFLUX_L)
+      IF (GLOB_THERM%NFXFLUX > 0) CALL C_ITHFLUX(IBFFLUX,CEP,P-1,NFXFLUX_L,
+     .           GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NFXFLUX,GLOB_THERM%NITFLUX)
 C--------------------------------------
 c counts Fixtemp
 C--------------------------------------
       NFXTEMP_L = 0
-      IF (NFXTEMP>0)
-     .  CALL C_IBFT(IBFT,NFXTEMP,NFXTEMP_L,P-1,DD_LAGF)
+      IF (GLOB_THERM%NFXTEMP > 0)
+     .  CALL C_IBFT(IBFT,GLOB_THERM%NFXTEMP,NFXTEMP_L,P-1,DD_LAGF,GLOB_THERM%NIFT)
 C--------------------------------------
 C count Lagrange multiplier
 C--------------------------------------
@@ -1607,7 +1615,7 @@ C
      2      NUMELC_L,NUMELTG_L,NUMELT_L  ,NUMELP_L ,NUMELR_L,
      3      NUMNOD_L,NMNT     ,L_MUL_LAG1,L_MUL_LAG,MAXNX   ,
      4      LWASPH_L,NUMSPH_L  ,LWASPIO, NRCVVOIS, 
-     5      LWAMP_L, LWANMP_L)
+     5      LWAMP_L, LWANMP_L,GLOB_THERM%ITHERM )
 C--------------------------------------
 C counts LLCFIELD
 C--------------------------------------
@@ -1778,10 +1786,11 @@ C--------------------------------------------
      4   N_ANCHOR_REMOTE_SEND_L,N_SEATBELT_L,N_SEATBELT_2D_L,DYNAIN_DATA,
      5   NUMSH4N_L,NUMSH3N_L,INTERFACES%PARAMETERS,SENSORS,LOADS_PER_PROC%NLOAD_CYL,
      6   NCLOAD_L,NPLOAD_L,NDAMP_VREL_L, UNITAB,
-     7   LWAMP_L,LWANMP_L,NINIVELT_L)
+     7   LWAMP_L,LWANMP_L,NINIVELT_L,GLOB_THERM,PBLAST)
      
 
-      CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P,INTERFACES%PARAMETERS,UNITAB)
+      CALL WRCOMR(LMXVREA,LVARREA,TABVREA,MSNDP(P),P,INTERFACES%PARAMETERS,
+     .            UNITAB ,GLOB_THERM, OUTPUT)
 C--------------------------------------
 C     write TEXT
 C--------------------------------------
@@ -1915,7 +1924,7 @@ C--------------------------------------------
 C--------------------------------------------
 C boundary Elts CFD/ALE
 C--------------------------------------------
-      IF(IALE+IEULER+ITHERM+IALELAG/=0) THEN
+      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
         IF(NUMELS_L+NUMELQ_L+NUMELTG_L>0) THEN
           ALLOCATE(IDGLOB_L(NUMELS_L + NSVOIS + NUMELQ_L + NQVOIS + NUMELTG_L + NTGVOIS))
           ALLOCATE(UIDGLOB_L(NUMELS_L + NSVOIS + NUMELQ_L + NQVOIS + NUMELTG_L + NTGVOIS))
@@ -1964,7 +1973,7 @@ C--------------------------------------------
       CALL W_IXLOC(IXS,NIXS,8,CEP(MIN(OFF+1,LEN_CEP)),P-1,
      +             NUMELS,NUMELS_L,NODLOCAL,LEN_IA)
 C
-      IF(IALE+IEULER+ITHERM+IALELAG/=0) THEN
+      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
          CALL WRITE_I_C(IXSF,NIXS*NSVOIS)
          LEN_IA = LEN_IA + NIXS*NSVOIS
          IF(NSVOIS>0)
@@ -1989,7 +1998,7 @@ C--------------------------------------------
 C--------------------------------------------
 C Boundary Elts CFD/ALE
 C--------------------------------------------
-      IF(IALE+IEULER+ITHERM+IALELAG/=0) THEN
+      IF (IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
         CALL WRITE_I_C(IXQF,NIXQ*NQVOIS)
         LEN_IA = LEN_IA + NIXQ*NQVOIS
         IF(NQVOIS>0)
@@ -2023,7 +2032,7 @@ C--------------------------------------
 C--------------------------------------
 C NALE et voisin ALE
 C--------------------------------------
-      IF(IALE+IEULER+ITHERM+IALELAG/=0) THEN
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) THEN
         IF(IALE+IEULER+IALELAG/=0)
      .       CALL W_INLOC(NALE,NODGLOB,NUMNOD_L,LEN_IA)
 
@@ -2165,7 +2174,7 @@ C--------------------------------------
       NEBCS_FVM = 0
       CALL WRITE_I_C(NEBCS, 1) ! total number of /EBCS
       CALL WRITE_I_C(EBCS_TAB_LOC%nebcs_fvm, 1) ! multifluid ebcs number
-      CALL WRITE_I_C(NEBCS_NRF, 1)  ! /NRF ebcs number
+      CALL WRITE_I_C(NEBCS_PARALLEL, 1)  ! /NRF or /PROPERGOL ebcs number
       CALL WRITE_I_C(OTHER_NEBCS, 1) ! other ebcs
       ! ---------------
       ! common data 
@@ -2190,22 +2199,24 @@ C--------------------------------------
 
       ! ---------------
       ! other ebcs
-      NEBCS_NRF = 0
+      NEBCS_PARALLEL = 0
       DO II = 1, NEBCS
         ! ---------------
         ! NRF ebcs
-        IF(.NOT.EBCS_TAB%tab(ii)%poly%is_multifluid.AND.EBCS_TAB%tab(ii)%poly%type==10) THEN
-            NEBCS_NRF = NEBCS_NRF + 1
-            DO JJ = 1, EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%nb_node
-                IF( NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(jj)) > 0 .AND.
-     .              NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(jj)) <= NUMNOD ) THEN
-                    EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(JJ) =
-     .               NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%node_list(JJ))                
+        IS_EBCS_PARALLEL = .FALSE.
+        IF(EBCS_TAB%tab(ii)%poly%type==10 .OR. EBCS_TAB%tab(ii)%poly%type==11)IS_EBCS_PARALLEL=.TRUE.
+        IF(.NOT.EBCS_TAB%tab(ii)%poly%is_multifluid .AND. IS_EBCS_PARALLEL) THEN
+            NEBCS_PARALLEL = NEBCS_PARALLEL + 1
+            DO JJ = 1, EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%nb_node
+                IF( NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%node_list(jj)) > 0 .AND.
+     .              NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%node_list(jj)) <= NUMNOD ) THEN
+                    EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%node_list(JJ) =
+     .               NODLOCAL(EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%node_list(JJ))
                 ENDIF
             ENDDO
             IF (.NOT. EBCS_TAB%tab(ii)%poly%is_multifluid) THEN
-                CALL EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%write_common_data(LEN_IA, LEN_AM)
-                CALL EBCS_TAB_LOC_2%tab(NEBCS_NRF)%poly%write_data(LEN_IA, LEN_AM)
+                CALL EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%write_common_data(LEN_IA, LEN_AM)
+                CALL EBCS_TAB_LOC_2%tab(NEBCS_PARALLEL)%poly%write_data(LEN_IA, LEN_AM)
             ENDIF
         ! ---------------
         ! other ebcs
@@ -2471,7 +2482,8 @@ C--------------------------------------------
      .                         OFF  )
        ENDIF
        IF (OUTPUT%TH%TH_SURF%LOADP_FLAG > 0) THEN 
-          OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+NUMELX+NCONLD+NUMCONV+NUMRADIA+NFXFLUX
+          OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR+NUMELX+NCONLD
+     .        + GLOB_THERM%NUMCONV+GLOB_THERM%NUMRADIA+GLOB_THERM%NFXFLUX
           CALL W_TH_SURF_LOADP(ILOADP  ,NODLOCAL  ,P-1   ,LEN_IA  ,CEP    ,
      .                OUTPUT%TH%TH_SURF,NUMNOD    ,SIZLOADP,NLOADP,LEN_CEP,
      .                OFF              )
@@ -2512,7 +2524,7 @@ C--------------------------------------
      K   CSRECT  ,NBDDNORT_L,NBDDNOR_MAX_L,NBCCFR25_L,NBCCNOR_L,
      L   NUMNOR_L ,NBDDEDGT_L,NBDDEDG_MAX_L,INTERCEP ,NBDDCNDM,
      M   ITABCNDM,MULTI_FVM,IGRSURF,ISKWP_L,ALE_ELM,
-     N   SIZE_ALE_ELM,SENSORS%NSENSOR,NLOC_DMG,constraint_struct)
+     N   SIZE_ALE_ELM,SENSORS%NSENSOR,NLOC_DMG,constraint_struct,GLOB_THERM%ITHERM)
       DEALLOCATE(ITABI2M)
       DEALLOCATE(ITABRBE3M)
       DEALLOCATE(ITABRBE2M)
@@ -2548,8 +2560,8 @@ C--------------------------------------
      N      CRKNODIAD ,INTBUF_TAB,NUMELIG3D_L,KXIG3D,IXIG3D,
      O      IBFFLUX   ,NFXFLUX_L ,CEPCND  ,CELCND   ,ADDCNCND    ,
      P      CNCND     ,NS10E_L   ,ICNDS10 ,LCNCND_L ,ITAGND ,IGRSURF,
-     Q      IGRSURF_PROC ,NEBCS_NRF, EBCS_TAB_LOC_2,
-     R      NUMBER_LOAD_CYL,LOADS,LOADS_PER_PROC)
+     Q      IGRSURF_PROC ,NEBCS_PARALLEL, EBCS_TAB_LOC_2,
+     R      NUMBER_LOAD_CYL,LOADS,LOADS_PER_PROC,GLOB_THERM)
 
       ! -------------------
       CALL EBCS_TAB_LOC_2%destroy()
@@ -2627,12 +2639,16 @@ C--------------------------------------
 C ICFIELD
 C--------------------------------------
       IF (NLOADC>0)CALL W_ICFIELD(ICFIELD,LCFIELD,NODLOCAL,P-1,LLCFIELD_L,LEN_IA,P,NUMNOD_L)
-      IF (NLOADP>0)CALL W_ILOADP(ILOADP,LLOADP,NODLOCAL,P-1,LLLOADP_L,LEN_IA,P,CEP,ITAB)
+      IF (NLOADP>0)CALL W_ILOADP(ILOADP,LLOADP,NODLOCAL,P-1,LLLOADP_L,LEN_IA,P,CEP,ITAB,
+     .    GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NFXFLUX)
 C--------------------------------------------
 C LOAD/PBLAST
 C--------------------------------------------
-      IF(NLOADP_B>0)THEN
-        CALL PBLAST_WRITE_STARTER(PBLAST_TAB,P-1,CEP)
+      IF(PBLAST%NLOADP_B>0)THEN
+        CALL PBLAST_WRITE_STARTER(PBLAST,GLOB_THERM,P-1,CEP,SCEP,
+     *                            NUMELC,NUMELTG,NUMELS,
+     *                            NUMELQ,NUMELT,NUMELP,
+     *                            NUMELR,NUMELX,NCONLD)
       ENDIF
 C
 C--------------------------------------------
@@ -2695,13 +2711,13 @@ C--------------------------------------------
 
 C--------------------------------------------
       CALL W_R3NLOC(X,NODGLOB,NUMNOD_L,LEN_AM)
-      IF(IALE+IEULER+ITHERM+IALELAG/=0)
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0)
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       CALL W_R3NLOC(D,NODGLOB,NUMNOD_L,LEN_AM)
-      IF(IALE+IEULER+ITHERM+IALELAG/=0)
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0)
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       CALL W_R3NLOC(V,NODGLOB,NUMNOD_L,LEN_AM)
-      IF(IALE+IEULER+ITHERM+IALELAG/=0)
+      IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0)
      .  CALL W_BID(3*NRCVVOIS,LEN_AM)
       IF(IRODDL>0) THEN
         CALL W_R3NLOC(VR,NODGLOB,NUMNOD_L,LEN_AM)
@@ -2755,6 +2771,10 @@ c
       CALL WRITE_MATPARAM(MAT_ELEM,LEN)
 C     LEN_AM = LEN_AM + LEN !LEN is corrupted by uninitialized variable
 C     in write_matparam
+C--------------------------------------------
+C global thermal parameters
+C--------------------------------------------
+!      CALL WRITE_GLOB_THERM(MAT_ELEM,LEN)
 C--------------------------------------
 C ELGROUP_PARAM
 C--------------------------------------
@@ -3138,7 +3158,7 @@ C--------------------------------------
       IF(NADMESH /= 0)THEN
         CALL WRITE_DB(PADMESH,KPADMESH*NPART)
         LEN_AM = LEN_AM + KPADMESH*NPART
-        IF(ITHERM_FE > 0)THEN
+        IF (GLOB_THERM%ITHERM_FE > 0)THEN
           CALL WRITE_DB(MCPC,NUMELC)
           LEN_AM = LEN_AM + NUMELC
           CALL WRITE_DB(MCPTG,NUMELTG)
@@ -3295,7 +3315,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C thermique des coques + solides
 C-----------------------------------------------
-        IF(ITHERM_FE > 0  ) THEN
+        IF(GLOB_THERM%ITHERM_FE > 0  ) THEN
           CALL W_RNLOC(MCP,NODGLOB,NUMNOD_L,LEN_AM)
           CALL W_RNLOC(TEMP,NODGLOB,NUMNOD_L,LEN_AM)
         ENDIF
@@ -3328,43 +3348,50 @@ c integer
 C--------------------------------------
 C ICONV + fconv
 C--------------------------------------
-      IF (NUMCONV > 0 )THEN
+      IF (GLOB_THERM%NUMCONV > 0 )THEN
 C float
-        CALL W_FCONV(FCONV,CEP,P-1,NCONV_L,LEN_AM)
+        CALL W_FCONV(FCONV,CEP,P-1,NCONV_L,LEN_AM,
+     .         GLOB_THERM%NUMCONV,GLOB_THERM%LFACTHER)
 C integer
         CALL W_ICONV(IBCV,CEP,P-1,NODLOCAL,NCONV_L,LEN_IA,
-     .                CEL,IPARG,NUMLOCGROUP)
+     .                CEL,IPARG,NUMLOCGROUP,GLOB_THERM%NUMCONV,GLOB_THERM%NICONV)
 
       ENDIF
 C--------------------------------------
 C IRADIA + fradia
 C--------------------------------------
-      IF (NUMRADIA > 0 )THEN
+      IF (GLOB_THERM%NUMRADIA > 0 )THEN
 C float
-        CALL W_FRADIA(FRADIA,CEP,P-1,NRADIA_L,LEN_AM)
-C integer
+        CALL W_FRADIA(FRADIA,CEP,P-1,NRADIA_L,LEN_AM,
+     .           GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%LFACTHER)
+!
         CALL W_IRADIA(IBCR,CEP,P-1,NODLOCAL,NRADIA_L,LEN_IA,
-     .                CEL,IPARG,NUMLOCGROUP)
+     .                CEL,IPARG,NUMLOCGROUP,
+     .           GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NIRADIA)
       ENDIF
 C--------------------------------------
 C Imposed heat flux
 C--------------------------------------
-      IF (NFXFLUX > 0 )THEN
+      IF (GLOB_THERM%NFXFLUX > 0 )THEN
 C float
-        CALL W_FTHFLUX(FBFFLUX,CEP,P-1,NFXFLUX_L,LEN_AM)
-C integer
-        CALL W_ITHFLUX(IBFFLUX,CEP,P-1,NODLOCAL,NFXFLUX_L,LEN_IA,CEL,IXS)
+        CALL W_FTHFLUX(FBFFLUX,CEP,P-1,NFXFLUX_L,LEN_AM,
+     .       GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NFXFLUX,GLOB_THERM%LFACTHER)
+!
+        CALL W_ITHFLUX(IBFFLUX,CEP,P-1,NODLOCAL,NFXFLUX_L,LEN_IA,CEL,IXS,
+     .           GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NFXFLUX,GLOB_THERM%NITFLUX)
       ENDIF
 C ----------------------------------------------
 C fix temp
 C-----------------------------------------------
-       IF(NFXTEMP > 0) THEN
+       IF(GLOB_THERM%NFXTEMP > 0) THEN
 C Fixtemp float
-         CALL W_FBFT(FBFT,NFXTEMP,IBFT,NFXTEMP_L,LEN_AM,P-1)
+         CALL W_FBFT(FBFT,GLOB_THERM%NFXTEMP,IBFT,NFXTEMP_L,LEN_AM,P-1,
+     .           GLOB_THERM%NIFT,GLOB_THERM%LFACTHER)
 C fixtemp integer
-         CALL W_IBFT(IBFT,NFXTEMP,NODLOCAL,LEN_IA,
-     .          NFXTEMP_L,P-1)
+         CALL W_IBFT(IBFT,GLOB_THERM%NFXTEMP,NODLOCAL,LEN_IA,
+     .          NFXTEMP_L,P-1,GLOB_THERM%NIFT)
        ENDIF
+C-----------------------------------------------
 C
 C  ply xfem
 C
@@ -3497,7 +3524,8 @@ C--------------------------------------------
         IF(SKNOT > 0) CALL WRITE_DB(KNOT,SKNOT)
         IF(SKNOTLOCPC > 0 .AND. SKNOTLOCEL > 0) THEN
           CALL W_KNOTLOC(KXIG3D,NUMELIG3D_L,ISUMNIG3D_L,IXIG3D,CEP,
-     .                   PROC,NODLOCAL,LEN_IA,KNOTLOCPC,KNOTLOCEL,NUMNOD_L)
+     .                   PROC,NODLOCAL,LEN_IA,KNOTLOCPC,KNOTLOCEL,NUMNOD_L,
+     .                   GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA)
         ENDIF
 C--------------------------------------------
 C WIGE (ISO-GEOM ELEMENTS)
@@ -3638,7 +3666,7 @@ C
         LSKYI = NINT(5*MAX(4*NUMNOD_L,IMAXIMP_L)*PROBINT)+4*NUMSPH_L+NSKYI18_L
         R_EVAL = R_EVAL+8*NUMNOD_L+NPSAV*NPART
         R_EVAL = R_EVAL+8*LCNE_L
-        IF(N2D==0.AND.IALE+IEULER+ITHERM+IALELAG/=0) R_EVAL = R_EVAL+ LCNE_L
+        IF (N2D==0.AND.IALE+IEULER+GLOB_THERM%ITHERM+IALELAG > 0) R_EVAL = R_EVAL+ LCNE_L
 C NFSKYI = 5
         R_EVAL = R_EVAL+5*LSKYI
         I_EVAL = I_EVAL+LSKYI+NUMNOD_L+1+LCNI2_L
@@ -3650,7 +3678,7 @@ C NFSKYI = 5
         IF(I2NSNT>0.AND.IVECTOR==1)I_EVAL = I_EVAL+ NUMNOD_L
       ELSE
         R_EVAL = R_EVAL+7*NUMNOD_L+NUMNOD_L*IRODDL+NPSAV*NPART
-        R_EVAL = R_EVAL+2*MAX(IALE,ITHERM,IEULER)*(NUMELS_L+NUMELQ_L)
+        R_EVAL = R_EVAL+2*MAX(IALE,GLOB_THERM%ITHERM,IEULER)*(NUMELS_L+NUMELQ_L)
       END IF
 C      IF(KDTINT/=0)
       R_EVAL = R_EVAL+NUMNOD_L

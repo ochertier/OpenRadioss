@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,16 +28,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    qaprint               ../common_source/qa/qa_out_mod.F
       !||--- uses       -----------------------------------------------------
       !||    dt_mod                ../engine/source/modules/dt_mod.F
+      !||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    message_mod           ../engine/share/message_module/message_mod.F
       !||    qa_out_mod            ../common_source/qa/qa_out_mod.F
       !||====================================================================
-      SUBROUTINE ENG_QAPRINT_DTINPUT(DT)
+      SUBROUTINE ENG_QAPRINT_DTINPUT(DT,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE QA_OUT_MOD
       USE MESSAGE_MOD
       USE DT_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,13 +50,13 @@ C-----------------------------------------------
 #include      "scr02_c.inc"
 #include      "scr18_c.inc"
 #include      "scr17_c.inc"
-#include      "scr_thermal_c.inc"
 #include      "sms_c.inc"
 #include      "cong2_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE(DT_)  , INTENT(INOUT)                      :: DT
+      type (glob_therm_) ,intent(in) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -145,13 +147,13 @@ C-----------------------------------------------
 C     Thermique
 C-----------------------------------------------
         WRITE(VARNAME,'(A)') 'NODADT_THERM'
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),NODADT_THERM,0.0_8)
+        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),GLOB_THERM%NODADT_THERM,0.0_8)
 
         WRITE(VARNAME,'(A)') 'IDT_THERM'
-        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),IDT_THERM,0.0_8)
+        CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),GLOB_THERM%IDT_THERM,0.0_8)
 
         WRITE(VARNAME,'(A)') 'DTFACTHERM'
-        TEMP_DOUBLE = DTFACTHERM
+        TEMP_DOUBLE = GLOB_THERM%DTFACTHERM
         CALL QAPRINT(VARNAME(1:LEN_TRIM(VARNAME)),0,TEMP_DOUBLE)
 
 C-----------------------------------------------

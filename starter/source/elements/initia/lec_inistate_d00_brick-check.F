@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -62,7 +62,7 @@ C-----------------------------------------
 C     INITIALE STRESS FILE D00
 C     CHECK INPUT CONSISTENCY BETWEEN /INIBRI AND D00
 C     Erreur if difference in data ( D00 & INIBRI)
-C-----------------------------------------       
+C-----------------------------------------
       IPIDD00  = IXS(10,IE)
       JJHBED00 = IGEO(10,IPIDD00)
       IGTYP    = IGEO(11,IPIDD00)
@@ -77,6 +77,7 @@ C
       IF (ISOLNOD==16.OR.ISOLNOD==20) JJHBED00=16
       IF ((ISOLNOD==4.OR.ISOLNOD==10).AND.JJHBE /= 1) JJHBE = 1
       IF (JJHBE == 0) JJHBE = 1
+      IF (JJHBED00 == 1 .AND. IINT == 3) JJHBED00 = 5
 
       IF ((JJHBED00 /=JJHBE) .AND.((JJHBED00 /= 2).AND.
      .         (JJHBE /= 0)) .AND. ISOLNOD /= 4)  THEN
@@ -131,6 +132,9 @@ C
          NLY = NPTT
          IF (NLY ==0) NLY =IINT 
          NPTD00 = NLY*NPTR*NPTS
+        CASE DEFAULT 
+         NLY = -HUGE(NLY)
+         NPTD00 = -HUGE(NPTD00)
        END SELECT
 C
 C  Number of layers

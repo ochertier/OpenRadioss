@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    set_rhs_mumps       ../engine/share/modules/linear_solver_mod.F
       !||    solve_cg            ../engine/share/modules/linear_solver_mod.F
       !||--- calls      -----------------------------------------------------
-      !||    get_dim             ../common_source/linearalgebra/matrix_mod.F
+      !||    get_dim             ../common_source/linearalgebra/vector_mod.F
       !||    norm                ../common_source/linearalgebra/vector_mod.F
       !||====================================================================
       MODULE VECTOR_MOD
@@ -62,7 +62,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !     ********************     !
 
       !||====================================================================
-      !||    get_dim      ../common_source/linearalgebra/matrix_mod.F
+      !||    get_dim      ../common_source/linearalgebra/vector_mod.F
       !||--- called by ------------------------------------------------------
       !||    matrix_mod   ../common_source/linearalgebra/matrix_mod.F
       !||    prod_vec     ../common_source/linearalgebra/matrix_mod.F
@@ -92,7 +92,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !     ***************     !
 
       !||====================================================================
-      !||    create   ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    create   ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||====================================================================
       subroutine create(this, nn)
 C-----------------------------------------------
@@ -110,7 +110,7 @@ C-----------------------------------------------
 !     *********************     !
 
       !||====================================================================
-      !||    destroy   ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    destroy   ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||====================================================================
       subroutine destroy(this)
 C-----------------------------------------------

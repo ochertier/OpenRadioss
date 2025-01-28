@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,18 +46,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i_cor_epfit3                ../engine/source/interfaces/int24/i24cor3.F
       !||    i_corpfit3                  ../engine/source/interfaces/int24/i24cor3.F
       !||    my_barrier                  ../engine/source/system/machine.F
-      !||    startime                    ../engine/source/system/timer.F
-      !||    stoptime                    ../engine/source/system/timer.F
+      !||    startime                    ../engine/source/system/timer_mod.F90
+      !||    stoptime                    ../engine/source/system/timer_mod.F90
       !||    sum_6_float_sens            ../engine/source/system/parit.F
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod                     ../engine/share/modules/h3d_mod.F
       !||    intbuf_fric_mod             ../common_source/modules/interfaces/intbuf_fric_mod.F90
       !||    message_mod                 ../engine/share/message_module/message_mod.F
       !||    outputs_mod                 ../common_source/modules/outputs_mod.F
+      !||    timer_mod                   ../engine/source/system/timer_mod.F90
       !||    tri25ebox                   ../engine/share/modules/tri25ebox.F
       !||    tri7box                     ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I25MAINF(
+      SUBROUTINE I25MAINF(TIMERS,
      1                   IPARI  ,INTBUF_TAB         ,X        ,A      ,
      2                   ICODT  ,FSAV    ,V         ,MS       ,DT2T   ,
      3                   NELTST ,ITYPTST ,ITAB      ,STIFN    ,FSKYI  ,
@@ -72,7 +73,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D                   PCONTACT,TEMP      ,FTHE     ,FTHESKYI,
      E                   PM      ,IPARG ,IAD17   ,MSKYI_SMS  ,ISKYI_SMS,
      F                   NODNX_SMS,MS0  ,INOD_PXFEM,MS_PLY    ,WAGAP  ,
-     G                   FBSAV6   ,ISENSINT,
+     G                   FBSAV6   ,ISENSINT,NODADT_THERM,THEACCFACT,
      H                   DIMFB     ,H3D_DATA,INTBUF_FRIC_TAB  ,NISKYFIE,
      I                   APINCH    ,STIFPINCH,NPC   ,TF       ,CONDN   ,
      J                   CONDNSKYI ,QFRICINT,TAGNCONT,KLOADPINTER,LOADPINTER,
@@ -82,6 +83,7 @@ C=======================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTBUFDEF_MOD
       USE TRI7BOX
       USE H3D_MOD
@@ -115,6 +117,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER NELTST,ITYPTST,NIN,NEWFRONT,
      .        NSTRF(*),
      .        NRTMDIM, IAD17, IPARSENS
@@ -130,7 +133,9 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: S_LOADPINTER
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
+      INTEGER  , INTENT(IN) :: NODADT_THERM
       INTEGER  , INTENT(IN) :: INTEREFRIC
+      my_real  , INTENT(IN) :: THEACCFACT
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real 
      .        EMINX(*)
@@ -657,12 +662,12 @@ C
           IPARI(29,NIN) = 1
 C
           IF (DEBUG(3)>=1) NB_IMPCT = NB_IMPCT + JLT_NEW
-          IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1) 
+          IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20) 
 
 C-------------------------------------------------------------------------------
 C Friction model : computation of friction coefficients based on Material of connected Parts
 C-------------------------------------------------------------------------------
-        IF(JTASK==1) CALL STARTIME(MACRO_TIMER_FRIC,1)
+        IF(JTASK==1) CALL STARTIME(TIMERS,MACRO_TIMER_FRIC)
           JJ = 0
           IF(IORTHFRIC > 0) THEN
             CALL FRICTIONPARTS_MODEL_ORTHO(
@@ -688,7 +693,7 @@ C-------------------------------------------------------------------------------
      6       TEMP           , H1          ,H2               ,H3           ,H4          ,
      7       IX1            , IX2         ,IX3              ,IX4          ,IFORM       ) 
           ENDIF
-        IF(JTASK==1) CALL STOPTIME(MACRO_TIMER_FRIC,1)
+        IF(JTASK==1) CALL STOPTIME(TIMERS,MACRO_TIMER_FRIC)
 
           CALL I25FOR3(
      1  JLT          ,A         ,V            ,IBC         ,ICODT    ,
@@ -726,7 +731,7 @@ C-------------------------------------------------------------------------------
      E  INTBUF_TAB%TYPSUB,IPARI(40,NIN),NINLOADP,DGAPLOADINT,S_LOADPINTER,
      F  DIST        ,DGAPLOADPMAX,INTEREFRIC  ,INTCAREA   ,INTERFACES%PARAMETERS)
 C
-          IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+          IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
 
         IF(INTTH > 0) THEN
 
@@ -741,7 +746,7 @@ C
      8     Z2     ,X3     ,Y3     ,Z3     ,X4     ,
      9     Y4     ,Z4     ,IX1    ,IX2    ,IX3    ,
      A     IX4    ,PHI    ,PHI1   ,PHI2   ,PHI3   ,
-     B     PHI4   ,PM     ,NSVG   ,ITAB   )
+     B     PHI4   ,PM     ,NSVG   ,ITAB   ,THEACCFACT)
          
          ENDIF
 
@@ -759,7 +764,7 @@ C
      9    FX1         ,FY1      ,FZ1        ,FX2       ,FY2       ,
      A    FZ2         ,FX3      ,FY3        ,FZ3       ,FX4       ,
      B    FY4         ,FZ4      ,FXI        ,FYI       ,FZI       ,
-     F    IFORM       ,CONDINT  ,CONDN      ,CONDNSKYI )
+     F    IFORM       ,CONDINT  ,CONDN      ,CONDNSKYI ,NODADT_THERM)
 
       ENDDO
 C-----------------------------------------------------------------------
@@ -901,12 +906,12 @@ C         preparation candidats retenus
      G      DGAPLOADPMAX)
 
 C
-          IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+          IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
 
 
           JLT = JLT_NEW
           IF(JLT_NEW/=0) THEN
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
             IPARI(29,NIN) = 1
             IF (DEBUG(3)>=1) NB_IMPCT = NB_IMPCT + JLT
 
@@ -954,7 +959,7 @@ C-------------------------------------------------------------------------------
      J TAGNCONT   ,KLOADPINTER  ,LOADPINTER ,LOADP_HYD_INTER, INTBUF_TAB%TYPSUB,
      K STARTT     ,NINLOADP,DGAPLOADINT,S_LOADPINTER)
 
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
 
 
 
@@ -1084,7 +1089,7 @@ C
 
           JLT=JLT_NEW
           IF(JLT_NEW/=0) THEN
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
             IPARI(29,NIN) = 1
             IF (DEBUG(3)>=1) NB_IMPCT = NB_IMPCT + JLT
 
@@ -1134,7 +1139,7 @@ C-------------------------------------------------------------------------------
      K TAGNCONT   ,KLOADPINTER  ,LOADPINTER ,LOADP_HYD_INTER,INTBUF_TAB%TYPSUB,
      O STARTT     ,NINLOADP,DGAPLOADINT,S_LOADPINTER)
 
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
           ENDIF
         ENDDO
  

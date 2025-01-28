@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,9 @@ C-----------------------------------------------
      .       D1,D2,D3,D4,D12,D23,D34,D41,PS,N12,
      .       NX,NY,NZ   
 C-----------------------------------------------
+           D2 = -HUGE(D2)
+           D3 = -HUGE(D3)
+           D4 = -HUGE(D4)
            IF (FLAG==1) DPS(NP) = 1.E+20
            NORMSEG=0
            X1 = XX(1)

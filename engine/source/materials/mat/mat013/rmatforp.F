@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,15 +27,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    rmatpon           ../engine/source/materials/mat/mat013/rmatpon.F
       !||    spmd_exch_a_rm6   ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rm6.F
-      !||    startime          ../engine/source/system/timer.F
-      !||    stoptime          ../engine/source/system/timer.F
+      !||    startime          ../engine/source/system/timer_mod.F90
+      !||    stoptime          ../engine/source/system/timer_mod.F90
+      !||--- uses       -----------------------------------------------------
+      !||    timer_mod         ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE RMATFORP(
+      SUBROUTINE RMATFORP(TIMERS,
      1   A       ,AR       ,X        ,VR     ,IN     ,
      2   STIFN   ,STIFR    ,IRBY     ,LNRBY  ,RBY    , 
      3   ICODRBY ,WEIGHT   ,MS       ,V      ,FR_RBM ,
      4   IAD_RBY ,ARBY    ,VRBY     ,ARRBY   ,VRRBY  ,
      5   KIND    ,RBYM6   )
+        USE TIMER_MOD
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,6 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER FR_RBM(*),IAD_RBY(*),
      .        ICODRBY(2,*),WEIGHT(*),LNRBY(*),IRBY(NIRBYM,*),
      .        KIND(NRBYM)
@@ -92,13 +96,13 @@ C-------------------------------------
 
         IF (NSPMD > 1) THEN
 !$OMP SINGLE
-          IF (IMON>0) CALL STARTIME(11,1)
+          IF (IMON>0) CALL STARTIME(TIMERS,11)
 C
 C Comm non multi-thread
 C
           CALL SPMD_EXCH_A_RM6(
      1         IAD_RBY,FR_RBM,IAD_RBY(NSPMD+1),RBYM6 )
-          IF (IMON>0) CALL STOPTIME(11,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,11)
 !$OMP END SINGLE
 
         END IF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,7 +36,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       SUBROUTINE DTNODA(NODFT ,NODLT ,NELTST,ITYPTST,ITAB   ,
      2                  MS    ,IN    ,STIFN ,STIFR  ,DT2T   ,
      3                  DMAST ,DINERT,ADT   ,ADM    ,IMSCH  ,
-     4                  WEIGHT,A     ,AR    ,IGRNOD ,
+     4                  WEIGHT,A     ,AR    ,IGRNOD ,NODADT_THERM,
      5                  ADI   ,RBYM  ,ARBY  ,ARRBY  ,WEIGHT_MD,
      6                  MCP   ,MCP_OFF,CONDN ,NALE  ,H3D_DATA)
 C-----------------------------------------------
@@ -72,6 +72,7 @@ C-----------------------------------------------
       INTEGER NODFT, NODLT,NELTST,ITYPTST,ITAB(*),
      .        WEIGHT(*),IMSCH,WEIGHT_MD(*)
       INTEGER,INTENT(IN) :: NALE(*)
+      INTEGER, INTENT(IN) :: NODADT_THERM
       my_real DT2T, DMAST, DINERT,
      .   MS(*) ,IN(*) ,STIFN(*), STIFR(*),ADT(*) ,ADM(*) ,
      .   A(3,*) ,AR(3,*) ,ADI(*) ,RBYM(NFRBYM,*),ARBY(3,*),
@@ -89,6 +90,7 @@ C-----------------------------------------------
 C----------------------------------------------------------
 C     TAG NODAL GROUP 
 C----------------------------------------------------------
+      DTNOD = HUGE(DTNOD)
       IF (NCYCLE == 0) THEN
 !$OMP SINGLE
         IF(IDTGR(11)<0)THEN

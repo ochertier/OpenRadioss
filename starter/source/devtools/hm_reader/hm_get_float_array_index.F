@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,7 +39,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_inistate_d00            ../starter/source/elements/initia/hm_read_inistate_d00.F
       !||    hm_read_initemp                 ../starter/source/initial_conditions/thermic/hm_read_initemp.F
       !||    hm_read_inivel                  ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
-      !||    hm_read_inivol                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_inject1                 ../starter/source/properties/injector/hm_read_inject1.F
       !||    hm_read_inject2                 ../starter/source/properties/injector/hm_read_inject2.F
       !||    hm_read_load_pressure           ../starter/source/loads/general/load_pressure/hm_read_load_pressure.F
@@ -53,7 +53,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat51                   ../starter/source/materials/mat/mat051/hm_read_mat51.F
       !||    hm_read_mat51_iform11           ../starter/source/materials/mat/mat051/hm_read_mat51_iform11.F
       !||    hm_read_mat52                   ../starter/source/materials/mat/mat052/hm_read_mat52.F
-      !||    hm_read_mat57                   ../starter/source/materials/mat/mat057/hm_read_mat57.F
+      !||    hm_read_mat57                   ../starter/source/materials/mat/mat057/hm_read_mat57.F90
       !||    hm_read_mat59                   ../starter/source/materials/mat/mat059/hm_read_mat59.F
       !||    hm_read_mat62                   ../starter/source/materials/mat/mat062/hm_read_mat62.F
       !||    hm_read_mat65                   ../starter/source/materials/mat/mat065/hm_read_mat65.F
@@ -61,7 +61,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_mat70                   ../starter/source/materials/mat/mat070/hm_read_mat70.F
       !||    hm_read_mat77                   ../starter/source/materials/mat/mat077/hm_read_mat77.F
       !||    hm_read_mat82                   ../starter/source/materials/mat/mat082/hm_read_mat82.F
-      !||    hm_read_mat87                   ../starter/source/materials/mat/mat087/hm_read_mat87.F
+      !||    hm_read_mat87                   ../starter/source/materials/mat/mat087/hm_read_mat87.F90
       !||    hm_read_mat88                   ../starter/source/materials/mat/mat088/hm_read_mat88.F
       !||    hm_read_mat90                   ../starter/source/materials/mat/mat090/hm_read_mat90.F
       !||    hm_read_mat93                   ../starter/source/materials/mat/mat093/hm_read_mat93.F

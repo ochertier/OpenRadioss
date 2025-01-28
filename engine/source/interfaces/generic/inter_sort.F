@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,17 +30,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    inter_sort_07           ../engine/source/interfaces/int07/inter_sort_07.F
       !||--- uses       -----------------------------------------------------
       !||    command_line_args_mod   ../engine/share/modules/command_line_args.F
+      !||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                 ../engine/share/modules/h3d_mod.F
       !||    inter_sorting_mod       ../engine/share/modules/inter_sorting_mod.F
       !||    inter_struct_mod        ../engine/share/modules/inter_struct_mod.F
       !||    metric_mod              ../common_source/modules/interfaces/metric_mod.F
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod              ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    sensor_mod              ../common_source/modules/sensor_mod.F90
+      !||    timer_mod               ../engine/source/system/timer_mod.F90
       !||====================================================================
-        SUBROUTINE INTER_SORT( ITASK,NB_INTER_SORTED,LIST_INTER_SORTED,RETRI,IPARI,
+        SUBROUTINE INTER_SORT( TIMERS,ITASK,NB_INTER_SORTED,LIST_INTER_SORTED,RETRI,IPARI,
      1                         NSENSOR,ISENDTO,IRECVFROM,INTBUF_TAB,X,ITAB,
      2                         RENUM,NSNFIOLD,MULTI_FVM,H3D_DATA,SENSOR_TAB,
-     3                         INTER_STRUCT,SORT_COMM,RENUM_SIZ )
+     3                         INTER_STRUCT,SORT_COMM,RENUM_SIZ,GLOB_THERM )
 !$COMMENT
 !       INTER_SORT description
 !       sort computation
@@ -58,6 +60,8 @@ C-----------------------------------------------
       USE INTER_STRUCT_MOD
       USE INTER_SORTING_MOD
       USE SENSOR_MOD
+      USE glob_therm_mod
+      USE TIMER_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,6 +78,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(inout) :: TIMERS
       INTEGER, INTENT(in) :: ITASK    !   omp thread ID
       INTEGER, INTENT(in) :: NB_INTER_SORTED        !   number of interfaces that need to be sorted
       INTEGER, INTENT(in) :: NSENSOR
@@ -92,6 +97,7 @@ C-----------------------------------------------
       TYPE(inter_struct_type), DIMENSION(NINTER), INTENT(inout) :: INTER_STRUCT   !   structure for interface
       TYPE(sorting_comm_type), DIMENSION(NINTER), INTENT(inout) :: SORT_COMM   ! structure for interface sorting comm
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      type (glob_therm_) ,INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -142,10 +148,10 @@ C-----------------------------------------------
                   ESHIFT = ITASK*NRTM_T
                   IF(ITASK==NTHREAD-1)NRTM_T=IPARI(4,N)-(NTHREAD-1)*NRTM_T
                 ENDIF
-                CALL INTER_SORT_07( IPARI,X,N,ITASK,ISENDTO,
+                CALL INTER_SORT_07( TIMERS,IPARI,X,N,ITASK,ISENDTO,
      1                              IRECVFROM,RETRI,ITAB,NRTM_T,RENUM,RENUM_SIZ,
      2                              NSNFIOLD,ESHIFT,MULTI_FVM,INTBUF_TAB(N),H3D_DATA,
-     3                              INTER_STRUCT,SORT_COMM)
+     3                              INTER_STRUCT,SORT_COMM,GLOB_THERM%INTHEAT, GLOB_THERM%IDT_THERM, GLOB_THERM%NODADT_THERM)
             ENDIF
             ! -----------------------------------------------------
 

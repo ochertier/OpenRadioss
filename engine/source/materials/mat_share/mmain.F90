@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -148,8 +148,8 @@
       !||    sesa10                 ../engine/source/materials/mat/mat026/sesa10.F
       !||    sesa20                 ../engine/source/materials/mat/mat026/sesa20.F
       !||    sesa30                 ../engine/source/materials/mat/mat026/sesa30.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||    usermat_solid          ../engine/source/materials/mat_share/usermat_solid.F
       !||    viscmain               ../engine/source/materials/visc/viscmain.F
       !||--- uses       -----------------------------------------------------
@@ -158,13 +158,15 @@
       !||    anim_mod               ../common_source/modules/output/anim_mod.F
       !||    constant_mod           ../common_source/modules/constant_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    mulaw_mod              ../engine/source/materials/mat_share/mulaw.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-        subroutine mmain(&
+        subroutine mmain(timers,&
         &elbuf_tab,   ng,          pm,          geo,&
         &ale_connect, ix,          iparg,&
         &v,           tf,          npf,         bufmat,&
@@ -191,19 +193,20 @@
         &table,       fvd2,        fdeltax,     fssp,&
         &fqvis,       iparg1,      igeo,        conde,&
         &itask,       nloc_dmg,    varnl,       mat_elem,&
-        &h3d_strain,  jplasol,     jsph,        sz_bufvois,&
-        &             snpc,        stf,         sbufmat,&
-        &svis,        sz_ix,       iresp,&
+        &h3d_strain,  jplasol,     jsph,        sz_bufvois,   &
+        &snpc,        stf,         sbufmat,     glob_therm,   &
+        &svis,        sz_ix,       iresp,                     &
         &n2d,         th_strain,   ngroup,      tt,&
         &dt1,         ntable,      numelq,      nummat,&
         &numgeo,      numnod,      numels,            &
         &idel7nok,    idtmin,      maxfunc    ,        &
-        &imon_mat,    userl_avail, heat_meca,   impl_s,&
+        &imon_mat,    userl_avail, impl_s,&
         &idyna,       dt,          fheat    ,   opt_mtn,     opt_jcvt,&
-        &opt_isorth,  opt_isorthg)
+        &opt_isorth,  opt_isorthg  )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
+          use timer_mod
           use table_mod
           use mat_elem_mod
           use nlocal_reg_mod
@@ -214,6 +217,7 @@
           use mulaw_mod
           use constant_mod
           use dt_mod
+          use glob_therm_mod
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -227,6 +231,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Arguments
 ! ----------------------------------------------------------------------------------------------------------------------
+          type(timer_), intent(inout) :: timers !< timers for /MON option
           integer, optional, intent(in) :: opt_mtn, opt_jcvt, opt_isorth,  opt_isorthg
           my_real, intent(in) :: dt1
           my_real, intent(in) :: tt
@@ -278,11 +283,10 @@
           integer,dimension(n_var_iparg),intent(in) :: iparg1
           !
           my_real,intent(in) :: dt2t
-          my_real,intent(inout) :: heat_meca
           my_real, dimension(mvsiz,6), intent(inout)  :: svis
           my_real, dimension(n_var_geo,numgeo), intent(inout) :: geo
           my_real, dimension(n_var_pm,nummat), intent(inout) :: pm
-          my_real, dimension(3,numnod), intent(in) :: v
+          my_real, dimension(3,numnod), intent(inout) :: v
           my_real, dimension(3,numnod), intent(in) :: x
           my_real, dimension(3,numnod), intent(in) :: w
           my_real, dimension(numels), intent(inout) :: mssa
@@ -366,14 +370,15 @@
           type (nlocal_str_) :: nloc_dmg
           type (t_ale_connectivity), intent(in) :: ale_connect
           type (dt_), intent(in) :: dt
-          type (mat_elem_) ,intent(inout) :: mat_elem
+          type (mat_elem_)   ,intent(inout) :: mat_elem
+          type (glob_therm_) ,intent(inout) :: glob_therm
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
           integer ibidon1,ibidon2,ibidon3,ibidon4                     ! Dummy arguments
           integer i,ipg,nuvar,nparam,nfunc,ifunc_alpha,ilaw,imat,&
           &        nvarf,nfail,ntabl_fail,ir,irupt,ivisc,eostyp,npts,nptt,nptr,npg,  &
-          &        isvis,mx,nvartmp,nlay,inloc,iselect,ibpreld,nvareos,nvarvis
+          &        isvis,nvartmp,nlay,inloc,iselect,ibpreld,nvareos,nvarvis
           integer ifunc(maxfunc)
 
           ! Float/Double
@@ -700,56 +705,57 @@
 ! --------------------------------------------------------
 !    thermal material istrope expansion
 ! --------------------------------------------------------
-          if (iexpan > 0 .and. jthe < 0 .and. tt/=zero ) then
-            if (ismstr==4) then
-              amu(1:nel)  = amu(1:nel) /(amu(1:nel) + one) ! to get amu = 1-rho0/rho
-            endif
-            if(ismstr==2) then
-              do i=1,nel
-                if(abs(lbuf%off(i))<=one)then
-                  amu(i)  = amu(i) /(amu(i) + one)
-                end if
-              enddo
+      if (iexpan > 0 .and. jthe < 0 .and. tt/=zero ) then
+        if (ismstr==4) then
+          amu(1:nel)  = amu(1:nel) /(amu(1:nel) + one) ! to get amu = 1-rho0/rho
+        endif
+        if(ismstr==2) then
+          do i=1,nel
+            if(abs(lbuf%off(i))<=one)then
+              amu(i)  = amu(i) /(amu(i) + one)
             end if
+          enddo
+        end if
 
-            do i=1,nel
-              ifunc_alpha = ipm(219,imat)
-              fscal_alpha = pm(191,imat)
-              tempel0(i)  = lbuf%temp(i)
-              alpha = finter(ifunc_alpha,tempel(i),npf,tf,bidon1)
-              alpha = alpha * fscal_alpha
-              eth(i)= alpha *(tempel(i)-tempel0(i))*off(i)
-              lbuf%forth(i) = lbuf%forth(i) + eth(i)  ! lbuf%forth the total thermal strain over time
-              epsth(i)= three*lbuf%forth(i)
-              dxx(i)  = dxx(i)-eth(i)/dt1
-              dyy(i)  = dyy(i)-eth(i)/dt1
-              dzz(i)  = dzz(i)-eth(i)/dt1
-              dvol(i) = dvol(i)-three*eth(i)*vol_avg(i)
-              amu(i)  = amu(i) + epsth(i)
-              sigkk(i)= lbuf%sig(nel*(1-1)+i)+lbuf%sig(nel*(2-1)+i)+lbuf%sig(nel*(3-1)+i)
-              lbuf%eintth(i) = lbuf%eintth(i)-half*sigkk(i)*eth(i)
-            enddo
-          else
-            epsth(1:nel)= zero
-          endif
+        do i=1,nel
+          ifunc_alpha = ipm(219,imat)
+          fscal_alpha = pm(191,imat)
+          tempel0(i)  = lbuf%temp(i)
+          alpha = finter(ifunc_alpha,tempel(i),npf,tf,bidon1)
+          alpha = alpha * fscal_alpha
+          eth(i)= alpha *(tempel(i)-tempel0(i))*off(i)
+          lbuf%forth(i) = lbuf%forth(i) + eth(i)  ! lbuf%forth the total thermal strain over time
+          epsth(i)= three*lbuf%forth(i)
+          dxx(i)  = dxx(i)-eth(i)/dt1
+          dyy(i)  = dyy(i)-eth(i)/dt1
+          dzz(i)  = dzz(i)-eth(i)/dt1
+          dvol(i) = dvol(i)-three*eth(i)*vol_avg(i)
+          amu(i)  = amu(i) + epsth(i)
+          sigkk(i)= lbuf%sig(nel*(1-1)+i)+lbuf%sig(nel*(2-1)+i)+lbuf%sig(nel*(3-1)+i)
+          lbuf%eintth(i) = lbuf%eintth(i)-half*sigkk(i)*eth(i)
+        enddo
+      else
+        epsth(1:nel)= zero
+      endif
 !
 !-----tstar computation for jonhson cook failure : t* = (t-tref)/(tmelt-tref) => move to JC routine
-          tref  = pm(79, imat)
-          tmelt = pm(80, imat)
-          do i=1,nel
-            tstar(i) = max(zero,(el_temp(i)-tref) / max((tmelt-tref),em20) )
-          enddo
+      tref  = pm(79, imat)
+      tmelt = pm(80, imat)
+      do i=1,nel
+        tstar(i) = max(zero,(el_temp(i)-tref) / max((tmelt-tref),em20) )
+      enddo
 !-----------------------------------
 !     eos part1
 !-----------------------------------
           eostyp = mat_elem%mat_param(imat)%ieos
-          if (eostyp > 0 .and. mtn /=12 ) then
-            call eosmain(0       ,nel      ,eostyp  ,pm        ,off      ,lbuf%eint,&
-            &lbuf%rho,rho0     ,amu     ,amu2      ,espe     ,&
-            &dvol    ,df       ,voln    ,mat       ,psh      ,&
-            &pnew    ,dpdm     ,dpde    ,lbuf%temp ,ecold    ,&
-            &bufmat  ,lbuf%sig ,lbuf%mu ,mtn       ,pold     ,&
-            &npf     ,tf       ,ebuf%var,nvareos)
+          if (eostyp > 0 .and. mtn /= 12 ) then
+            call eosmain(0         ,nel      ,eostyp  ,pm        ,off      ,lbuf%eint,&
+                         lbuf%rho  ,rho0     ,amu     ,amu2      ,espe     ,&
+                         dvol      ,df       ,voln    ,mat       ,psh      ,&
+                         pnew      ,dpdm     ,dpde    ,lbuf%temp ,ecold    ,&
+                         bufmat    ,lbuf%sig ,lbuf%mu ,mtn       ,pold     ,&
+                         npf       ,tf       ,ebuf%var,nvareos , mat_elem%mat_param(imat),&
+                         lbuf%bfrac)
           endif
 !-----------------------------------
 !     stresses deviatoric/total
@@ -776,7 +782,8 @@
             &amu,        vol_avg,    gbuf%dt,    gbuf%g_dt,&
             &off,        ipm,        rhoref,     rhosp,&
             &lbuf%vol0dp,ismstr,     jsph,       jtur,&
-            &ity,        jthe,       jsms,       npg )
+            &ity,        jthe,       jsms,       npg ,&
+            glob_therm)
           else if (mtn == 1) then
 !
             if (jhbe==17.and.iint==3.and.ismstr == 1) then
@@ -795,7 +802,7 @@
               &vol_avg,  gbuf%dt,  gbuf%g_dt,nel,&
               &ipm,      rhoref,   rhosp,    ity,&
               &jtur,     jthe,     jsph,     ismstr,&
-              &jsms,     npg )
+              &jsms,     npg ,     glob_therm)
             else if(ismstr >= 10.and.ismstr <= 12)then
               call m1lawtot(&
               &pm,         off,        lbuf%sig,   lbuf%eint,&
@@ -816,7 +823,7 @@
               &iselect,    ipm,        rhoref,     rhosp,&
               &lbuf%sigl,  ity,        ismstr,     jtur,&
               &jthe,       jcvt,       jsph,       jsms,&
-              &npg )
+              &npg ,       glob_therm)
             else
               call m1law(&
               &pm,       off,      lbuf%sig, lbuf%eint,&
@@ -833,7 +840,7 @@
               &vol_avg,  gbuf%dt,  gbuf%g_dt,nel,&
               &ipm,      rhoref,   rhosp,    ity,&
               &jtur,     jthe,     jsph,     ismstr,&
-              &jsms,     npg )
+              &jsms,     npg ,     glob_therm)
             end if
 !
           elseif (mtn == 2) then
@@ -857,7 +864,7 @@
             &nel,      ipm,      rhoref,   rhosp,&
             &ipg,      lbuf%dmg, ity,      jtur,&
             &jthe,     jsph,     ismstr,   jsms,&
-            &lbuf%epsq,npg ,mat_elem%mat_param(imat)%ieos ,dpdm  ,fheat )
+            &lbuf%epsq,npg ,mat_elem%mat_param(imat)%ieos ,dpdm  ,fheat ,glob_therm)
 !----------------
             if (istrain > 0 .and.&
             &(h3d_strain == 1 .or. th_strain == 1 )) then
@@ -986,7 +993,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1012,12 +1019,12 @@
           elseif (mtn == 4) then
             call m4law(&
             &pm,       off,      lbuf%sig, lbuf%pla,&
-            &mat,      lbuf%temp,cxx,      dxx,&
+            &mat,      cxx,      lbuf%vol, dxx,      &
             &dyy,      dzz,      d4,       d5,&
             &d6,       rho0,     dpdm,     lbuf%epsd,&
             &jplasol,  sigy,     defp,     dpla,&
-            &epsp,     tstar,    tempel,   nel,&
-            &jthe)
+            &epsp,     tstar,    el_temp,  nel   , jthe,   &
+            &mat_elem%mat_param(imat)%ieos,fheat )
             if (jsph == 0) then
               call mqviscb(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1031,7 +1038,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1161,11 +1168,11 @@
 !----------------
 !
           elseif (mtn == 5) then
-            call m5law(pm   ,lbuf%sig ,lbuf%eint  ,lbuf%rho ,psh       ,&
-            &p0   ,lbuf%tb  ,lbuf%bfrac ,voln     ,deltax    ,&
-            &mat  ,nel      ,cxx        ,df       ,&
-            &er1v ,er2v     ,wdr1v      ,wdr2v    ,w1        ,&
-            &rho0, amu)
+            call m5law(pm    ,lbuf%sig ,lbuf%eint  ,lbuf%rho ,psh    ,&
+            &          p0    ,lbuf%tb  ,lbuf%bfrac ,voln     ,deltax ,&
+            &          mat   ,nel      ,cxx        ,df       ,        &
+            &          er1v  ,er2v     ,wdr1v      ,wdr2v    ,w1     ,&
+            &          rho0  ,amu      ,nummat     ,tt     )
             if (jsph == 0) then
               call mqviscb(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1179,7 +1186,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1223,7 +1230,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1285,7 +1292,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1340,7 +1347,8 @@
             &df,         psh,        pnew,       dpdm,&
             &dpde,       lbuf%rho,   lbuf%temp,  ecold,&
             &bufmat,     npf,        tf,         lbuf%tsaiwu,&
-            &ebuf%var,   nvareos,    jcvt,       jsph)
+            &ebuf%var,   nvareos,    jcvt,       jsph,&
+            &mat_elem%mat_param(imat))
             if (jsph == 0) then
               call mqviscb(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1354,7 +1362,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1398,7 +1406,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1440,7 +1448,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1482,7 +1490,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1521,7 +1529,7 @@
             &lbuf%deltax,tf,         npf,        dt2t,&
             &neltst,     ityptst,    ipm,        stifn,&
             &voln,       mat,        ngl,        conde,&
-            &nel,        ity)
+            &nel,        ity,        glob_therm%idt_therm,glob_therm%dt_therm)
           elseif (mtn == 21) then
             call m21law(pm    ,off     ,lbuf%sig,lbuf%eint,lbuf%rho,&
             &lbuf%epsq,lbuf%pla,lbuf%vol,mat      ,cxx     ,&
@@ -1529,7 +1537,7 @@
             &d4       ,d5      ,d6      ,s1       ,s2      ,&
             &s3       ,s4      ,s5      ,s6       ,tf      ,&
             &npf      ,sigy    ,defp    ,ipm      ,pnew    ,&
-            &psh      ,amu     ,lbuf%seq,nel      )
+            &psh      ,amu     ,lbuf%seq,nel      ,nummat      )
             if (jsph == 0) then
               call mqviscb(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1543,7 +1551,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1585,7 +1593,7 @@
             &gbuf%dt,  gbuf%g_dt,nel,      ipm,&
             &rhoref,   rhosp,    nft,      jsph,&
             &ity,      jtur,     jthe,     ismstr,&
-            &jsms,     npg )
+            &jsms,     npg ,     glob_therm)
           elseif (mtn == 23) then
             call m22law(&
             &pm,       off,      lbuf%sig, lbuf%eint,&
@@ -1604,7 +1612,7 @@
             &gbuf%dt,  gbuf%g_dt,nel,      ipm,&
             &rhoref,   rhosp,    nft,      jsph,&
             &ity,      jtur,     jthe,     ismstr,&
-            &jsms,     npg )
+            &jsms,     npg ,     glob_therm)
           elseif (mtn == 24) then
             call m24law(&
             &lbuf,     pm,       off,      lbuf%sig,&
@@ -1624,7 +1632,7 @@
             &gbuf%g_dt,ipm,      rhoref,   rhosp,&
             &lbuf%epsd,ity,      jtur,     jthe,&
             &jhbe,     jcvt,     jsph,     ismstr,&
-            &jsms,     npg,      svis )
+            &jsms,     npg,      svis ,    glob_therm)
 !     like law25 for shell + s33 = eps33*e33
           elseif (mtn == 25) then
             call m25law(mat_elem%mat_param(imat),&
@@ -1655,7 +1663,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1728,7 +1736,7 @@
             &vol_avg,  gbuf%dt,  gbuf%g_dt,nel,&
             &d4,       d5,       d6,       rhoref,&
             &rhosp,    ismstr,   ity,      jsms,&
-            &jtur,     jthe,     npg,svis )
+            &jtur,     jthe,     npg,svis ,glob_therm)
 !
           elseif (mtn == 49) then
             call m49law (mat      ,pm       ,off     ,lbuf%sig,lbuf%pla,&
@@ -1749,7 +1757,7 @@
               &facq0,    conde,    gbuf%dt,  gbuf%g_dt,&
               &ipm,      rhoref,   rhosp,    nel,&
               &ity,      ismstr,   jtur,     jthe,&
-              &jsms,     npg )
+              &jsms,     npg   ,   glob_therm)
             else
               call mdtsph(&
               &pm,       off,      lbuf%rho, lbuf%rk,&
@@ -1778,7 +1786,7 @@
             nuvar   = elbuf_tab(ng)%bufly(ilay)%nvar_mat
             l_mulaw_called=.true.
 !
-            call usermat_solid(&
+            call usermat_solid(timers,&
             &lft,        llt,        nft,        mtn,&
             &jcvt,       pm,         off,        lbuf%sig,&
             &lbuf%eint,  lbuf%rho,   lbuf%qvis,  lbuf%vol,&
@@ -1817,7 +1825,7 @@
             &iselect,    tstar,      lbuf%mu,    amu2,&
             &dpdm,       rhoref,     rhosp,      nloc_dmg,&
             &ity,        jtur,       mat_elem,   idel7nok,svis,&
-            &dt)
+            &dt ,        glob_therm )
 !
           else   ! 'user type' radioss material laws
 !---
@@ -1825,7 +1833,7 @@
             nvartmp = elbuf_tab(ng)%bufly(ilay)%nvartmp
             l_mulaw_called =.true.
 !
-            call mulaw(&
+            call mulaw(timers,&
             &nft,         mtn,         jcvt,        pm,&
             &off,         lbuf%sig,    lbuf%eint,   lbuf%rho,&
             &lbuf%qvis,   lbuf%vol,    lbuf%stra,   lbuf%sigl,&
@@ -1868,7 +1876,7 @@
             &sbufmat,     svis,        n2d,         ngroup,&
             &imon_mat,    numnod,      numels,      ntable,&
             &numgeo,      nummat,      numelq,      idtmin,&
-            &dt1,         tt,&
+            &dt1,         tt,         glob_therm,          &
             &impl_s,&
             &idyna,       userl_avail, nixs,        nixq,&
             &dt)
@@ -1883,11 +1891,12 @@
               pnew(:) = zero
             endif
             call eosmain(1       ,nel      ,eostyp  ,pm       ,off      ,lbuf%eint,&
-            &lbuf%rho,rho0     ,amu     ,amu2     ,espe     ,&
-            &dvol    ,df       ,voln    ,mat      ,psh      ,&
-            &pnew    ,dpdm     ,dpde    ,lbuf%temp,ecold    ,&
-            &bufmat  ,lbuf%sig ,lbuf%mu ,mtn      ,pold     ,&
-            &npf     ,tf       ,ebuf%var,nvareos)
+            &lbuf%rho  ,rho0     ,amu     ,amu2     ,espe     ,&
+            &dvol      ,df       ,voln    ,mat      ,psh      ,&
+            &pnew      ,dpdm     ,dpde    ,lbuf%temp,ecold    ,&
+            &bufmat    ,lbuf%sig ,lbuf%mu ,mtn      ,pold     ,&
+            &npf       ,tf       ,ebuf%var,nvareos , mat_elem%mat_param(imat),&
+            &lbuf%bfrac)
 !
             call eosupda(off  ,lbuf%sig ,lbuf%eint, lbuf%vol ,pnew,nel)
 !
@@ -1922,7 +1931,7 @@
               enddo
             end if
 !$omp critical
-            heat_meca = heat_meca_l + heat_meca
+            glob_therm%heat_meca = glob_therm%heat_meca + heat_meca_l
 !$omp end critical
           endif
           if((iexpan > 0).and.(jthe < 0).and.(tt/=0)) then
@@ -2057,7 +2066,7 @@
 !-----------------------------------------------------------------------
 !     failure for law no user ---
 !-----------------------------------------------------------------------
-          if ((itask==0).and.(imon_mat==1))call startime(121,1)
+          if ((itask==0).and.(imon_mat==1))call startime(timers, 121)
           if (nfail > 0 .and. (mtn < 28 .or. mtn == 49)) then
             if (istrain > 0 .or. mtn==24 .or. mtn==25 .or. mtn==15) then
               do i=1,nel
@@ -2486,7 +2495,8 @@
                 &ngl      ,el_len   ,dpla     ,epsp     ,uvarf    ,&
                 &ss1      ,ss2      ,ss3      ,ss4      ,ss5      ,ss6      ,&
                 &tempel   ,off      ,dfmax    ,tdel     ,lbuf%dmgscl,&
-                &gbuf%uelr,ipg      ,npg      ,lbuf%off ,ntabl_fail,itabl_fail)
+                &gbuf%uelr,ipg      ,npg      ,lbuf%off ,ntabl_fail,itabl_fail,&
+                gbuf%noff,voln      )
 !
               elseif (irupt == 42) then
 !---- inievo failure model
@@ -2630,7 +2640,7 @@
               endif
             endif
           endif     !  nfail > 0  & user laws
-          if ((itask==0).and.(imon_mat==1))call stoptime(121,1)
+          if ((itask==0).and.(imon_mat==1))call stoptime(timers, 121)
 !-----------------------------------------------------------------
           if(ipartsph/=0)then
             do i=1,nel

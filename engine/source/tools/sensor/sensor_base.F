@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,6 +35,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sensor_gauge            ../engine/source/tools/sensor/sensor_gauge.F
       !||    sensor_hic              ../engine/source/tools/sensor/sensor_hic.F
       !||    sensor_nic              ../engine/source/tools/sensor/sensor_nic.F
+      !||    sensor_python           ../engine/source/tools/sensor/sensor_python.F90
       !||    sensor_rbody            ../engine/source/tools/sensor/sensor_rbody.F
       !||    sensor_rwall            ../engine/source/tools/sensor/sensor_rwall.F
       !||    sensor_section          ../engine/source/tools/sensor/sensor_section.F
@@ -45,15 +46,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod            ../common_source/modules/groupdef_mod.F
       !||    message_mod             ../engine/share/message_module/message_mod.F
-      !||    sensor_mod              ../engine/share/modules/sensor_mod.F
+      !||    python_funct_mod        ../common_source/modules/python_mod.F90
+      !||    sensor_mod              ../common_source/modules/sensor_mod.F90
+      !||    sensor_python_mod       ../engine/source/tools/sensor/sensor_python.F90
       !||====================================================================
       SUBROUTINE SENSOR_BASE(SENSORS  ,NSENSOR   ,TIME      ,TIMESTEP  ,
      .           XSENS     ,IPARI     ,PARTSAV2  ,GAUGE     ,FSAV      ,
      .           X         ,V         ,A         ,ACC       ,NPRW      ,
-     .           SUBSET    ,IGRSURF   ,IGRNOD    )
+     .           SUBSET    ,IGRSURF   ,IGRNOD    ,PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
+      USE SENSOR_PYTHON_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
       USE MESSAGE_MOD
@@ -85,16 +90,23 @@ C-----------------------------------------------
       TYPE(SURF_)    ,DIMENSION(NSURF)  ,INTENT(IN) :: IGRSURF
       TYPE(GROUP_)   ,DIMENSION(NGRNOD) ,INTENT(IN) :: IGRNOD
       TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
+      TYPE(PYTHON_), INTENT(INOUT) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER TYP,ISENS,SENS_ID,SIZE,STABS,SFSAV
       CHARACTER(LEN=256) :: OPTION
+      LOGICAL :: ANY_PYTHON_SENSOR
+      INTEGER, DIMENSION(:), ALLOCATABLE :: UIDS
+      DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: RESULTS
+      INTEGER, DIMENSION(:), ALLOCATABLE :: STATUSES
+      INTEGER, DIMENSION(:), ALLOCATABLE :: TYPES
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
 C     this routine checks activation condition of all basic sensor types
 C=======================================================================
+      ANY_PYTHON_SENSOR = .FALSE.
       STABS   = SENSORS%STABSEN 
       SFSAV   = SENSORS%SFSAV
 c--------------------------------------------------
@@ -102,10 +114,9 @@ c     Parallel loop over sensor list
 c--------------------------------------------------
 
 !$OMP PARALLEL DO PRIVATE(ISENS,TYP)
-
 c--------------------------------------------------
       DO ISENS = 1,NSENSOR
-
+        SENSORS%SENSOR_TAB(ISENS)%RESULTS(SENSOR_RESULT_SIZE) = ZERO
         TYP = SENSORS%SENSOR_TAB(ISENS)%TYPE
 C--------------------------------
 C       SENSOR - TIME
@@ -186,7 +197,8 @@ c       SENSOR --- ENERGY ---
 c--------------------------------        
         ELSEIF (TYP == 14) THEN
  
-          CALL SENSOR_ENERGY(SENSORS%SENSOR_TAB(ISENS),ISENS ,SUBSET    ,PARTSAV2 )
+          CALL SENSOR_ENERGY(SENSORS%SENSOR_TAB(ISENS),ISENS ,SUBSET,PARTSAV2,
+     *                       SENSORS%NSENSOR,SENSORS%SENSOR_STRUCT )
 c
 c--------------------------------
 c       SENSOR Distance to surface
@@ -256,7 +268,6 @@ c--------------------------------
         ELSEIF (TYP == 31) THEN
 c--------------------------------
 c       USER SENSOR TYPE 31
-
           SENS_ID  = SENSORS%SENSOR_TAB(ISENS)%SENS_ID
 
           IF (USERL_AVAIL==1) THEN
@@ -270,15 +281,43 @@ c       USER SENSOR TYPE 31
               CALL ARRET(2)
              ! ----------------
           ENDIF
-
+       ELSEIF (TYP == SENSOR_TYPE_PYTHON) THEN
+c         CALL SENSOR_PYTHON(SENSORS%SENSOR_TAB(ISENS) )
+         ANY_PYTHON_SENSOR = .TRUE.
        ENDIF  ! TYP 
 c----
       END DO  ! ISENS
 c--------------------------------------------------
 c     END of parallel loop
-
 !$OMP END PARALLEL DO
-
+c--------------------------------------------------
+      IF(PYTHON%NB_FUNCTS > 0) THEN
+        ALLOCATE(UIDS(NSENSOR))
+        ALLOCATE(RESULTS(SENSOR_RESULT_SIZE,NSENSOR))
+        ALLOCATE(STATUSES(NSENSOR))
+        ALLOCATE(TYPES(NSENSOR))
+        DO ISENS = 1,NSENSOR
+          TYP = SENSORS%SENSOR_TAB(ISENS)%TYPE
+          TYPES(ISENS) = TYP
+          UIDS(ISENS) = SENSORS%SENSOR_TAB(ISENS)%SENS_ID
+          STATUSES(ISENS) = SENSORS%SENSOR_TAB(ISENS)%STATUS 
+          RESULTS(1:SENSOR_RESULT_SIZE,ISENS) = SENSORS%SENSOR_TAB(ISENS)%RESULTS(1:SENSOR_RESULT_SIZE)
+        END DO  ! ISENS
+        CALL PYTHON_UPDATE_SENSORS(TYPES,UIDS,STATUSES,RESULTS,NSENSOR)
+        DEALLOCATE(TYPES)
+        DEALLOCATE(UIDS)
+        DEALLOCATE(RESULTS)
+        DEALLOCATE(STATUSES)
+      ENDIF
+      IF (ANY_PYTHON_SENSOR) THEN
+        DO ISENS = 1,NSENSOR
+          TYP = SENSORS%SENSOR_TAB(ISENS)%TYPE
+          IF (TYP == SENSOR_TYPE_PYTHON) THEN
+            CALL SENSOR_PYTHON(SENSORS%SENSOR_TAB(ISENS))
+          ENDIF  ! TYP 
+        END DO  ! ISENS
+      ENDIF
+c
 c--------------------------------------------------
       IF (STABS > 0) SENSORS%FSAV(1:12,1:6,1:SFSAV) = ZERO
 

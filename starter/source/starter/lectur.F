@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -43,6 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    arret                               ../starter/source/system/arret.F
       !||    bcscycmodif_nd                      ../starter/source/elements/solid/solide10/dim_s10edg.F
       !||    bcsmodif_nd                         ../starter/source/elements/solid/solide10/dim_s10edg.F
+      !||    brokmann_elem_renum                 ../starter/source/materials/fail/windshield_alter/brokmann_elem_spmd_renum.F90
       !||    build_addcnel_sub                   ../starter/source/model/mesh/build_addcnel_sub.F
       !||    build_admesh                        ../starter/source/model/remesh/build_admesh.F
       !||    build_cnel                          ../starter/source/model/mesh/build_cnel.F
@@ -183,7 +184,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_inimap2d                    ../starter/source/initial_conditions/inimap/hm_read_inimap2d.F
       !||    hm_read_initemp                     ../starter/source/initial_conditions/thermic/hm_read_initemp.F
       !||    hm_read_inivel                      ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
-      !||    hm_read_inivol                      ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                      ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_interfaces                  ../starter/source/interfaces/reader/hm_read_interfaces.F
       !||    hm_read_intsub                      ../starter/source/output/subinterface/hm_read_intsub.F
       !||    hm_read_lines                       ../starter/source/groups/hm_read_lines.F
@@ -254,6 +255,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ini_ifront                          ../starter/source/spmd/node/ddtools.F
       !||    inicrkfill                          ../starter/source/elements/xfem/inicrkfill.F
       !||    iniebcs                             ../starter/source/boundary_conditions/ebcs/iniebcs.F
+      !||    iniebcs_propergol                   ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
       !||    iniebcsp0                           ../starter/source/boundary_conditions/ebcs/iniebcsp0.F
       !||    inimu2                              ../starter/source/ale/bimat/inimu2.F
       !||    inimu3                              ../starter/source/ale/bimat/inimu3.F
@@ -463,6 +465,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    yctrl                               ../starter/source/initial_conditions/inista/yctrl.F
       !||--- uses       -----------------------------------------------------
       !||    bpreload_mod                        ../starter/share/modules1/bpreload_mod.F
+      !||    brokmann_elem_renum_mod             ../starter/source/materials/fail/windshield_alter/brokmann_elem_spmd_renum.F90
       !||    chk_shell_offset_mod                ../starter/source/elements/shell/shell_offset/chk_shell_offset.F90
       !||    cluster_mod                         ../starter/share/modules1/cluster_mod.F
       !||    constraint_mod                      ../starter/source/modules/constaint_mod.F90
@@ -480,12 +483,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    group_mod                           ../starter/share/modules1/group_mod.F
       !||    hm_option_read_mod                  ../starter/share/modules1/hm_option_read_mod.F
       !||    hm_preread_inivel_mod               ../starter/source/initial_conditions/general/inivel/hm_preread_inivel.F90
+      !||    hm_read_inivol_mod                  ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_preload_axial_mod           ../starter/source/loads/general/preload/hm_read_preload_axial.F90
+      !||    iniebcs_propergol_                  ../starter/source/boundary_conditions/ebcs/iniebcs_propergol.F90
       !||    inigrav                             ../starter/share/modules1/inigrav_mod.F
       !||    inimap1d_mod                        ../starter/share/modules1/inimap1d_mod.F
       !||    inimap2d_mod                        ../starter/share/modules1/inimap2d_mod.F
       !||    inivol_def_mod                      ../starter/share/modules1/inivol_mod.F
-      !||    inivol_interf_mod                   ../starter/share/modules1/inivol_mod.F
       !||    intbufmod                           ../starter/share/modules1/restart_mod.F
       !||    intbufscratch_mod                   ../starter/source/interfaces/interf1/intbufscratch_mod.F
       !||    inter_cand_mod                      ../starter/share/modules1/inter_cand_mod.F
@@ -505,7 +509,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    read_funct_python_mod               ../starter/source/tools/curve/hm_read_funct_python.F90
       !||    reorder_mod                         ../starter/share/modules1/reorder_mod.F
       !||    restmod                             ../starter/share/modules1/restart_mod.F
-      !||    sensor_mod                          ../starter/share/modules1/sensor_mod.F
       !||    set_mod                             ../starter/share/modules1/set_mod.F
       !||    shell_offset_ini_mod                ../starter/source/elements/shell/shell_offset/shell_offset_ini.F90
       !||    shell_offsetp_mod                   ../starter/source/elements/shell/shell_offset/shell_offsetp.F90
@@ -519,11 +522,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    submodel_mod                        ../starter/share/modules1/submodel_mod.F
       !||    table_glob_mod                      ../starter/share/modules1/table_glob_mod.F
       !||    updfail_mod                         ../starter/source/materials/updfail.F90
-      !||    user_sensor_mod                     ../starter/share/modules1/user_interface_mod.F
+      !||    user_sensor_mod                     ../starter/source/modules/user_interface_mod.F90
       !||====================================================================
       SUBROUTINE LECTUR(MULTI_FVM                   ,LSUBMODEL          ,IS_DYNA         ,DETONATORS   ,EBCS_TAB,
      .                  SEATBELT_CONVERTED_ELEMENTS ,NB_SEATBELT_SHELLS ,NB_DYNA_INCLUDE ,USER_WINDOWS ,OUTPUT  ,
-     .                  MAT_ELEM,NAMES_AND_TITLES,DEFAULTS)
+     .                  MAT_ELEM,NAMES_AND_TITLES,DEFAULTS,glob_therm,pblast,
+     .                  SENSOR_USER_STRUCT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -583,7 +587,6 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE DRAPE_MOD
       USE INIVOL_DEF_MOD
-      USE INIVOL_INTERF_MOD
       USE SENSOR_MOD
       USE RANDOM_MOD
       USE ALE_EBCS_MOD
@@ -603,7 +606,7 @@ C-----------------------------------------------
       USE READ_FUNCT_PYTHON_MOD
       USE PYTHON_FUNCT_MOD
       USE INTER_CAND_MOD
-      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,NCHARLINE
+      USE NAMES_AND_TITLES_MOD
       USE damping_rby_spmdset_mod
       USE HM_READ_PRELOAD_AXIAL_MOD
       USE BCS_MOD, ONLY : BCS, BCS_STRUCT_
@@ -619,6 +622,12 @@ C-----------------------------------------------
       use stifint_icontrol_mod, only : stifint_icontrol
       use fractal_elem_renum_mod
       use hm_preread_inivel_mod, only : hm_preread_inivel
+      use brokmann_random_def_mod
+      use brokmann_elem_renum_mod
+      use glob_therm_mod
+      use hm_read_inivol_mod
+      use pblast_mod
+      use iniebcs_propergol_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -626,18 +635,21 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE(MULTI_FVM_STRUCT)              :: MULTI_FVM
-      TYPE(SUBMODEL_DATA)                 :: LSUBMODEL(NSUBMOD)
-      INTEGER,INTENT(IN)                  ::IS_DYNA
-      TYPE(DETONATORS_STRUCT_),TARGET     :: DETONATORS
-      TYPE(T_EBCS_TAB), INTENT(INOUT)     :: EBCS_TAB
-      INTEGER,INTENT(IN)                  ::NB_SEATBELT_SHELLS
-      INTEGER,INTENT(INOUT)               ::SEATBELT_CONVERTED_ELEMENTS(3,NB_SEATBELT_SHELLS)
-      INTEGER,INTENT(IN)                  ::NB_DYNA_INCLUDE
-      TYPE(USER_WINDOWS_), INTENT(INOUT)  :: USER_WINDOWS
-      TYPE(OUTPUT_),  INTENT(INOUT)       :: OUTPUT
+      TYPE(MULTI_FVM_STRUCT)                :: MULTI_FVM
+      TYPE(SUBMODEL_DATA)                   :: LSUBMODEL(NSUBMOD)
+      INTEGER,INTENT(IN)                    :: IS_DYNA
+      TYPE(DETONATORS_STRUCT_),TARGET       :: DETONATORS
+      TYPE(T_EBCS_TAB), INTENT(INOUT)       :: EBCS_TAB
+      INTEGER,INTENT(IN)                    :: NB_SEATBELT_SHELLS
+      INTEGER,INTENT(INOUT)                 :: SEATBELT_CONVERTED_ELEMENTS(3,NB_SEATBELT_SHELLS)
+      INTEGER,INTENT(IN)                    :: NB_DYNA_INCLUDE
+      TYPE(USER_WINDOWS_), INTENT(INOUT)    :: USER_WINDOWS
+      TYPE(OUTPUT_),  INTENT(INOUT)         :: OUTPUT
       TYPE(NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES !< NAMES_AND_TITLES host the input deck names and titles for outputs
-      TYPE(DEFAULTS_),INTENT(INOUT)       :: DEFAULTS
+      TYPE(DEFAULTS_),INTENT(INOUT)         :: DEFAULTS
+      type(glob_therm_) ,intent(inout)      :: glob_therm
+      TYPE(PBLAST_),INTENT(INOUT)           :: PBLAST
+      TYPE(SENSOR_USER_STRUCT_)              :: SENSOR_USER_STRUCT
 C-----------------------------------------------
 C   G l o b a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -687,7 +699,6 @@ C-----------------------------------------------
 #include      "elbuf_c.inc"
 #include      "userlib.inc"
 #include      "drape_c.inc"
-#include      "thermal_c.inc"
 #include      "boltpr_c.inc"
 #include      "inigrav_c.inc"
 #include      "inter18.inc"
@@ -898,6 +909,8 @@ C-----------------------------------------------
       INTEGER SCR_FILE_NAME_LEN
       CHARACTER(LEN=ncharkey) :: KEY
       INTEGER NUSPHCEL
+      INTEGER, DIMENSION(:,:), ALLOCATABLE :: IXSPS
+      LOGICAL MAT20_DISCRETE_FILL
 C-----------------------------------------------
 C Model Checker Memory
       DATA IUN/1/
@@ -1147,15 +1160,17 @@ c For /RANDOM --------------------------------------------------
       ! -------------
       ! Load structure
       TYPE (LOADS_) :: LOADS ! global structure for /LOAD
-      TYPE (LOADS_), DIMENSION(NSPMD) :: LOADS_PER_PROC ! local structure for each processor --> used for the restart operation
+      TYPE (LOADS_), DIMENSION(NSPMD) :: LOADS_PER_PROC ! local structurfsdcod(e for each processor --> used for the restart operation
       ! -------------
       ! BCS wall structure
       TYPE (bcs_struct_), DIMENSION(NSPMD) :: BCS_PER_PROC
       ! -------------
       INTEGER NINIVELT
+      INTEGER NINTEMP
+      INTEGER ALE_EULER
 
 C MERGE NODES
-      INTEGER NMERGE_NODE_CAND,NMERGE_NODE_DEST,NMERGE_TOT,ALE_EULER
+      INTEGER NMERGE_NODE_CAND,NMERGE_NODE_DEST,NMERGE_TOT
       INTEGER, DIMENSION(:), ALLOCATABLE :: MERGE_NODE_TAB
       my_real,DIMENSION(:),ALLOCATABLE :: MERGE_NODE_TOL
 C
@@ -1171,7 +1186,8 @@ C SEATBELTS
       INTEGER :: NDAMP_VREL_RBY
 
       TYPE(INTER_CAND_) :: INTER_CAND
-      TYPE (FAIL_FRACTAL_) :: FAIL_FRACTAL
+      TYPE (FAIL_FRACTAL_)  :: FAIL_FRACTAL
+      TYPE (FAIL_BROKMANN_) :: FAIL_BROKMANN
       INTEGER DEF_INTER(100)
       ! constraint structure
       type(constraint_) :: constraint_struct
@@ -1208,11 +1224,6 @@ c=======================================================================
       NXLAYMAX = 0   ! max layer nb in parts xfem
 C     /DAMP/VREL + RBY      
       NDAMP_VREL_RBY = 0
-C bc heat
-      NUMCONV = 0
-      NFXTEMP = 0
-      NFXFLUX = 0
-      NUMRADIA= 0
 C ply xfem
       IPLYXFEM  = 0
       NPLYXFE = 0
@@ -1266,6 +1277,10 @@ C------------------------------------------------------------------
       SFNOISE = 0
       ALLOCATE(INOISE(0))
       ALLOCATE(FNOISE(0))
+C------------------------------------------------------------------
+C Initialisation size for INISHCEL
+C------------------------------------------------------------------
+      NUSPHCEL = 0
 C----------------------------------------------
 C     ALLOCATION TO REDUCE STACKSIZE
 C----------------------------------------------
@@ -1794,6 +1809,7 @@ C---  Pointeurs : sous-tableaux
       IGRSURF(1:NSURF+NSETS)%NB_MADYMO = 0
       IGRSURF(1:NSURF+NSETS)%NSEG_R2R_ALL = 0
       IGRSURF(1:NSURF+NSETS)%NSEG_R2R_SHARE = 0
+      IGRSURF(1:NSURF+NSETS)%EXT_ALL = 0
 !--
 !      IF(NBOX > 0)    CALL MY_ALLOC(IGRBOX,NBOX)
 C     ipart
@@ -1952,6 +1968,7 @@ C--------------------------------------------
       ERR_CATEGORY='FUNCTIONS & TABLES'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
 c
+      PYTHON%nb_functs = 0
       IF(NFUNCT > 0 .OR. NTABLE > 0) THEN
 C
 C NTABLE = NFUNCT + ...
@@ -1981,7 +1998,7 @@ C       TABLES
         CALL HM_READ_TABLE1 (NTABLE, TABLE ,NFUNCT ,NPC ,TF ,
      .                NOM_OPT(LNOPT1*INOM_OPT(20)+1), UNITAB, LSUBMODEL)
 
-        CALL HM_READ_FUNCT_PYTHON(PYTHON,NPC,SNPC,NFUNCT,LSUBMODEL,NSUBMOD)
+        CALL HM_READ_FUNCT_PYTHON(PYTHON,NPC,SNPC,NFUNCT,LSUBMODEL,NSUBMOD,TF,NPTS,TABLE, NTABLE)
         CALL CHKFUNCT (NFUNCT, NPC,NOM_OPT(LNOPT1*INOM_OPT(20)+1))
         IF(NFUNCT > 0) THEN
           CALL HM_READ_MOVE_FUNCT(NPC    ,TF     ,NFUNCT ,TABLE, NTABLE,FUNCRYPT, UNITAB, LSUBMODEL)
@@ -2080,10 +2097,11 @@ c------------------------------------
       NLOC_DMG%IMOD = 0
 c---------------------------------------------------------------
       CALL READ_MATERIAL_MODELS(
-     .     MAT_ELEM    ,MLAW_TAG ,FAIL_TAG ,EOS_TAG   ,
-     .     RWORK       ,SBUFMAT  ,IPM      ,PM        ,UNITAB    ,
-     .     MULTI_FVM   ,FAILWAVE ,NLOC_DMG ,LSUBMODEL ,
-     .     TABLE       ,NPC      )
+     .     MAT_ELEM    ,MLAW_TAG ,FAIL_TAG ,EOS_TAG    ,
+     .     RWORK       ,SBUFMAT  ,IPM      ,PM         ,UNITAB    ,
+     .     MULTI_FVM   ,FAILWAVE ,NLOC_DMG ,LSUBMODEL  ,TABLE     ,
+     .     LTITR       ,MAT20_DISCRETE_FILL,USERL_AVAIL,MAT_NUMBER,
+     .     NPC         ,TF       ,SNPC     ,NPTS       ,SBUFMAT   )
 c---------------------------------------------------------------
       ALLOCATE(BUFMAT(SBUFMAT)    ,STAT=stat)
       IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
@@ -2317,7 +2335,7 @@ C-----------------------------------------------------
       ALLOCATE(THK_PART(NPART)    ,STAT=stat)
 C
       CALL HM_READ_PART(IPART  ,PM      ,GEO       ,IPM     ,IGEO ,IWORK ,THK_PART,
-     .                  UNITAB,LSUBMODEL,MULTI_FVM ,MLAW_TAG,MAT_ELEM%MAT_PARAM)
+     .                  UNITAB,LSUBMODEL,MULTI_FVM ,MLAW_TAG,MAT_ELEM%MAT_PARAM,GLOB_THERM)
 
       CALL TRACE_OUT1()
       
@@ -2325,7 +2343,7 @@ C--------------------------------------------
 C     STOCKAGE DYNAMIQUE (A.L.E.) ENTIER
 C--------------------------------------------
       ALE%GLOBAL%SNALE  = MAX(IALE,IEULER,IALELAG)*NUMNOD
-      ALE%GLOBAL%SIELVS = 6*NUMELS+MAX(IALE,ITHERM,IEULER,IALELAG)* (4 * NUMELQ + 3 * NUMELTG)
+      ALE%GLOBAL%SIELVS = 6*NUMELS+MAX(IALE,GLOB_THERM%ITHERM,IEULER,IALELAG)* (4 * NUMELQ + 3 * NUMELTG)
       SIFILL = NMULT*NUMNOD
       SIMS   = NMULT*NUMNOD
 C---
@@ -2390,16 +2408,19 @@ C--------------------------------------------
         R2R_SIU = 1
 c       complete mlaw_tag for new void materials
         IF(NUMMAT > NUMMAT0) THEN
-         ALLOCATE(MTAG_R2R(NUMMAT))
-         ALLOCATE(MPARAM_R2R(NUMMAT))
-         CALL INIT_MLAW_TAG(MTAG_R2R   ,NUMMAT)
-         MTAG_R2R(1:NUMMAT0) = MTAG_INI(1:NUMMAT0)
-         CALL R2R_MATPARAM_COPY(MPARAM_R2R, MPARAM_INI   ,NUMMAT0 ,NUMMAT)
-         MLAW_TAG(1:NUMMAT)     => MTAG_R2R(1:NUMMAT)
-         MAT_ELEM%MAT_PARAM(1:NUMMAT) => MPARAM_R2R(1:NUMMAT)
-         MAT_ELEM%NUMMAT = NUMMAT
-         DEALLOCATE(MTAG_INI)
-         DEALLOCATE(MPARAM_INI)
+          ALLOCATE(MTAG_R2R(NUMMAT))
+          ALLOCATE(MPARAM_R2R(NUMMAT))
+          CALL INIT_MLAW_TAG(MTAG_R2R   ,NUMMAT)
+          MTAG_R2R(1:NUMMAT0) = MTAG_INI(1:NUMMAT0)
+          CALL R2R_MATPARAM_COPY(MPARAM_R2R, MPARAM_INI   ,NUMMAT0 ,NUMMAT)
+          MLAW_TAG(1:NUMMAT)     => MTAG_R2R(1:NUMMAT)
+          MAT_ELEM%MAT_PARAM(1:NUMMAT) => MPARAM_R2R(1:NUMMAT)
+          MAT_ELEM%NUMMAT = NUMMAT
+          DEALLOCATE(MTAG_INI)
+          IF(ALLOCATED(MPARAM_INI))THEN
+            DO I=1,NUMMAT0 ; CALL MPARAM_INI(I)%DESTRUCT() ; ENDDO
+            DEALLOCATE(MPARAM_INI)
+          ENDIF
         ENDIF
       ELSE
         ALLOCATE(TAG_PART(0),IPART_R2R(4,0))
@@ -4000,7 +4021,7 @@ C---  Allocation de FRONTB_R2R
 C ------------------------------------------------
 C Tri des surfaces pour les Airbags et Modif files
 C ------------------------------------------------
-      CALL SORT_SURF(IGRSURF,IXS,IXC,IXTG,IXQ)
+      CALL SORT_SURF(IGRSURF,IXS,IXC,IXTG,IXQ,IXP,IXR,IXT, KXX,NIXX)
 C--------------------------------------------
       CALL PRINTGROUP(
      1                ITAB    ,ITABM1   ,IGRNOD   ,NINICRACK,BUFSF   ,
@@ -4370,7 +4391,7 @@ C--------------------------------------------
        CALL ALELEC(
      1     ICODE    ,IXS      ,IXQ       ,IXC               ,IXT     ,
      2     IXTG     ,PM       ,IGEO      ,ITAB              ,GEO     ,
-     3     NALE_R2R ,NSUBDOM  ,MULTI_FVM ,ALE_CONNECTIVITY)
+     3     NALE_R2R ,NSUBDOM  ,MULTI_FVM ,ALE_CONNECTIVITY,GLOB_THERM%ITHERM)
 C     ---------------------------------------------------------------
 C     Unplug neighbor elements in case of direct lagrangian coupling
 C     ---------------------------------------------------------------
@@ -4389,7 +4410,7 @@ C--------------------------------------------
      .      CALL INIMU3(PM     ,IXS    ,FILL   ,DFILL  )
         IF(NUMELQ>0)
      .      CALL INIMU2(PM     ,IXQ    ,FILL   ,DFILL  )
-          CALL INIMUL  (PM     ,FILL   ,DFILL  )
+          CALL INIMUL  (PM     ,FILL   ,DFILL  ,MAT20_DISCRETE_FILL)
        ENDIF
       ENDIF
       CALL TRACE_OUT1()
@@ -4659,9 +4680,9 @@ C     PFLUID & PBLAST
       NUMLOADP=0
       NINTLOADP=0
       CALL HM_PREREAD_PFLUID(NUMLOADP,IGRNOD,IGRSURF,LSUBMODEL)
-      CALL HM_PREREAD_PBLAST(NUMLOADP,IGRSURF,LSUBMODEL)
+      CALL HM_PREREAD_PBLAST(PBLAST,NUMLOADP,IGRSURF,LSUBMODEL,NSURF)
       CALL HM_PREREAD_LOAD_PRESSURE(NUMLOADP,IGRSURF,LSUBMODEL)
-      NLOADP       = NLOADP_F+NLOADP_B+NLOADP_HYD
+      NLOADP       = NLOADP_F+PBLAST%NLOADP_B+NLOADP_HYD
       SLOADP       = LFACLOAD*NLOADP
       SILOADP      = SIZLOADP*NLOADP
       SLLOADP      = NUMLOADP
@@ -4747,8 +4768,9 @@ C     *****************************************************************    C
 C     Check if ALE or EULER materials are used with lagrangian thermics
 C     *****************************************************************    C
 
-      IF(IALE + IEULER /= 0) THEN
-         IF(ITHERM_FE == 0 .AND. (NIMTEMP /= 0 .OR. NINTEMP /=0)) THEN
+      NINTEMP = GLOB_THERM%NINTEMP
+      IF (IALE + IEULER /= 0) THEN
+         IF (GLOB_THERM%ITHERM_FE == 0 .AND. (GLOB_THERM%NIMTEMP /= 0 .OR. NINTEMP /= 0)) THEN
             CALL ANCMSG(MSGID=1724, ANMODE=ANINFO, MSGTYPE=MSGWARNING)
          ENDIF
       ENDIF
@@ -4760,64 +4782,72 @@ C
       ERR_MSG='INITIAL TEMPERATURES'
       ERR_CATEGORY='INITIAL TEMPERATURES'
       CALL TRACE_IN1(ERR_MSG,LEN_TRIM(ERR_MSG))
-      IF(ITHERM_FE > 0 ) THEN
+      IF (GLOB_THERM%ITHERM_FE > 0 ) THEN
          ALLOCATE(MCP(NUMNOD),TEMP(NUMNOD))
-         DO J = 1,NUMNOD
-           MCP(J) = ZERO
-           TEMP(J) = ZERO
-         ENDDO
+         MCP (1:NUMNOD) = ZERO
+         TEMP(1:NUMNOD) = ZERO
 C ----
-         IF(NINTEMP > 0)THEN
+         IF (GLOB_THERM%NINTEMP > 0) THEN
            WRITE(ISTDO,'(A)')TITRE(35)
            ALLOCATE(INTIDS(NINTEMP))
-           CALL HM_READ_INITEMP(TEMP  ,ITAB  ,ITABM1  ,IGRNOD  ,INTIDS ,UNITAB,
-     .                          LSUBMODEL )
+           CALL HM_READ_INITEMP(TEMP    ,NINTEMP ,GLOB_THERM%ITHERM_FE,ITAB  ,ITABM1  ,
+     .                          IGRNOD  ,INTIDS  ,UNITAB,LSUBMODEL )
            DEALLOCATE(INTIDS)
          ENDIF
 C
-c         CALL PRELECTHERBC(IGRSURF, IGRNOD, IGRBRIC)
+         CALL HM_PREREAD_IMPTEMP(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL,
+     .                           GLOB_THERM%NIMTEMP,GLOB_THERM%NFXTEMP)
+c
+         CALL HM_PREREAD_CONVEC(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL,
+     .                          GLOB_THERM%NCONVEC ,GLOB_THERM%NUMCONV )
+c
+         CALL HM_PREREAD_RADIATION(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL,
+     .                             GLOB_THERM%NRADIA ,GLOB_THERM%NUMRADIA)
+c
+         CALL HM_PREREAD_IMPFLUX(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL,
+     .                           GLOB_THERM%NIMPFLUX,GLOB_THERM%NFXFLUX)
+c
 
-         CALL HM_PREREAD_IMPTEMP(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL)
-c
-         CALL HM_PREREAD_CONVEC(IGRSURF, IGRNOD, IGRBRIC, UNITAB, LSUBMODEL)
-c
-         CALL HM_PREREAD_RADIATION(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL)
-c
-         CALL HM_PREREAD_IMPFLUX(IGRSURF, IGRNOD, IGRBRIC,UNITAB, LSUBMODEL)
-c
-
-         ALLOCATE(IBCV(NICONV*NUMCONV),    FCONV(LFACTHER*NUMCONV),
-     .            IBFTEMP(NIFT*NFXTEMP),   FBFTEMP(LFACTHER*NFXTEMP),
-     .            IBFFLUX(NITFLUX*NFXFLUX),FBFFLUX(LFACTHER*NFXFLUX),
-     .            IBCR(NIRADIA*NUMRADIA),  FRADIA(LFACTHER*NUMRADIA),
-     .            STAT=stat)
+         ALLOCATE(IBCV(GLOB_THERM%NICONV*GLOB_THERM%NUMCONV)     ,STAT=stat)
+         ALLOCATE(FCONV(GLOB_THERM%LFACTHER*GLOB_THERM%NUMCONV)  ,STAT=stat)
+         ALLOCATE(IBFTEMP(GLOB_THERM%NIFT*GLOB_THERM%NFXTEMP)    ,STAT=stat)
+         ALLOCATE(FBFTEMP(GLOB_THERM%LFACTHER*GLOB_THERM%NFXTEMP),STAT=stat)
+         ALLOCATE(IBFFLUX(GLOB_THERM%NITFLUX*GLOB_THERM%NFXFLUX) ,STAT=stat)
+         ALLOCATE(FBFFLUX(GLOB_THERM%LFACTHER*GLOB_THERM%NFXFLUX),STAT=stat)
+         ALLOCATE(IBCR(GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA)   ,STAT=stat)
+         ALLOCATE(FRADIA(GLOB_THERM%LFACTHER*GLOB_THERM%NUMRADIA),STAT=stat)
+     .            
          IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                              MSGTYPE=MSGERROR,
      .                              C1='THERMAL DATA')
-          IBCR(1:NIRADIA*NUMRADIA) = 0
+          IBCR(1:GLOB_THERM%NIRADIA*GLOB_THERM%NUMRADIA) = 0
 C
-         IF(NUMCONV > 0 ) THEN
+         IF (GLOB_THERM%NUMCONV > 0 ) THEN
            IBCV = 0
            FCONV = ZERO
-           CALL HM_READ_CONVEC(IBCV,FCONV,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL)
+           CALL HM_READ_CONVEC(IBCV,FCONV,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL,
+     .          GLOB_THERM%NCONVEC ,GLOB_THERM%NICONV,GLOB_THERM%NUMCONV,GLOB_THERM%LFACTHER)
          ENDIF
 C
-         IF(NUMRADIA > 0 ) THEN
-           CALL HM_READ_RADIATION(IBCR,FRADIA,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL)
+         IF (GLOB_THERM%NUMRADIA > 0 ) THEN
+           CALL HM_READ_RADIATION(IBCR,FRADIA,ITAB,IXS,IGRSURF,UNITAB,LSUBMODEL,
+     .          GLOB_THERM%NRADIA ,GLOB_THERM%NUMRADIA,GLOB_THERM%NIRADIA,GLOB_THERM%LFACTHER)
          ENDIF
 C
-         IF(NFXTEMP > 0) THEN
+         IF (GLOB_THERM%NFXTEMP > 0) THEN
            IBFTEMP = 0
            FBFTEMP = ZERO
-           CALL HM_READ_IMPTEMP(IBFTEMP,FBFTEMP,NFXTEMP,ITABM1,
-     .                    IGRNOD ,IBFTEMP,ITAB   ,UNITAB,LSUBMODEL)
+           CALL HM_READ_IMPTEMP(IBFTEMP,FBFTEMP,GLOB_THERM%NFXTEMP,ITABM1,
+     .                    IGRNOD ,IBFTEMP,ITAB   ,UNITAB,LSUBMODEL,
+     .                    GLOB_THERM%NIMTEMP,GLOB_THERM%NIFT,GLOB_THERM%LFACTHER)
          ENDIF
 C
-         IF(NFXFLUX > 0 ) THEN
+         IF (GLOB_THERM%NFXFLUX > 0 ) THEN
            IBFFLUX = 0
            FBFFLUX = ZERO
            CALL HM_READ_IMPFLUX(IBFFLUX ,FBFFLUX ,ITAB   ,IXS    ,IGRSURF   ,
-     .                    UNITAB  ,IGRNOD  ,IGRBRIC, LSUBMODEL)
+     .                    UNITAB  ,IGRNOD  ,IGRBRIC, LSUBMODEL,
+     .                    GLOB_THERM%NIMPFLUX,GLOB_THERM%NITFLUX,GLOB_THERM%LFACTHER)
          ENDIF
 C
        ELSE
@@ -4871,7 +4901,7 @@ C-------------------------------------------------
         IF(.NOT. ALLOCATED(SENSOR_TMP)) ALLOCATE( SENSOR_TMP(0) )
         CALL INIEBCS(ALE_CONNECTIVITY, 0, IGRSURF, IXS, IXQ, IXTG,
      .               PM, IGEO, X, SENSOR_TMP, MONVOl, MULTI_FVM%IS_USED,
-     .               EBCS_TAB, EBCS_TAG_CELL_SPMD)
+     .               EBCS_TAB, EBCS_TAG_CELL_SPMD,MAT_ELEM%MAT_PARAM)
         DEALLOCATE(SENSOR_TMP)
       ENDIF
       CALL TRACE_OUT1()
@@ -4917,13 +4947,14 @@ C--------------------------------------------
 c
       ! -------------
       ! size initialization for user sensor
-      CALL SENSOR_USER_INIT()
+      CALL SENSOR_USER_INIT(SENSOR_USER_STRUCT)
       ! -------------
 c
-      CALL HM_READ_SENSORS(
+      CALL HM_READ_SENSORS(PYTHON,
      .     SENSORS   ,LACCELM  ,ITABM1    ,IPART     ,LGAUGE    ,
      .     SUBSETS   ,NSETS    ,IGRSURF   ,IGRNOD    ,BUFSF     ,
-     .     SKEW      ,ISKWN    ,UNITAB    ,LSUBMODEL ,HM_NSENSOR)
+     .     SKEW      ,ISKWN    ,UNITAB    ,LSUBMODEL ,HM_NSENSOR,
+     .     SENSOR_USER_STRUCT)
       ! -----------------
       ! check if a user sensor is used with a list of node
       ! convert the list of User node ID into Local node ID
@@ -5221,7 +5252,11 @@ C--------------------------------------------
 C--------------------------------------------
 C     LECTURE DES INITIAL VOLUME FRACTIONS
 C--------------------------------------------
-      CALL HM_READ_INIVOL(INIVOL, KVOL, IGRSURF ,IPART, MULTI_FVM, BUFMAT, IPM, NBSUBMAT, LSUBMODEL, UNITAB)
+      CALL HM_READ_INIVOL(INIVOL, KVOL, IGRSURF ,IPART, MULTI_FVM, BUFMAT, 
+     *                    IPM, NBSUBMAT, LSUBMODEL, UNITAB,
+     *                    N2D ,NUMELTG,NUMELS,NUMELQ,NUMMAT,
+     *                    NPART,NSURF,LIPART1,NPROPMI,SIPART,SINIVOL,
+     *                    NSUBDOM,SBUFMAT,IGRNOD,NGRNOD)
 C--------------------------------------------
 C     Surfaces fictives IGE
 C--------------------------------------------
@@ -5439,7 +5474,7 @@ C------------------------------------------------------------------------
      .            IBCSLAG  ,IGEO     ,IPM      ,
      .            IBFTEMP  ,IBCV     ,IBFV      ,
      .            IBCR     ,TABLE    ,NPC1     ,NPC       ,TF                 ,
-     .            NOM_OPT(LNOPT1*INOM_OPT(3)+1),IBFFLUX   )
+     .            NOM_OPT(LNOPT1*INOM_OPT(3)+1),IBFFLUX   ,GLOB_THERM)
 C
 c------------------------------------------------------------------------
 c     Update & check parameters of material laws
@@ -5450,7 +5485,8 @@ c------------------------------------------------------------------------
 c
       CALL UPDFAIL(MAT_ELEM%MAT_PARAM ,NUMMAT ,NFUNCT ,NTABLE ,NPC1 ,TABLE ,
      .             FAIL_FRACTAL,NGRSHEL   ,NGRSH3N,IGRSH4N ,IGRSH3N ,
-     .             NIXC    ,IXC   ,NIXTG ,IXTG    ,NUMELC  ,NUMELTG )
+     .             NIXC    ,IXC   ,NIXTG ,IXTG    ,NUMELC  ,NUMELTG ,
+     .             IWORKSH ,STACK ,IGEO  ,NPROPGI ,NUMGEO  ,FAIL_BROKMANN)
 C
       CALL TRACE_OUT1()
 C------------------------------------------------------------------------
@@ -5506,7 +5542,7 @@ C
         CALL CREATE_SEATBELT(IXR,ITAB,KNOD2EL1D,NOD2EL1D,IPM,
      .                       X,SENSORS,BUFMAT,PM,GEO,
      .                       IDDLEVEL,KNOD2ELC,NOD2ELC,IXC,IGEO,
-     .                       ISKWN   )
+     .                       ISKWN   ,TF      ,NPC)
         CALL TRACE_OUT1()
       ENDIF
 C
@@ -5721,9 +5757,9 @@ C        Remise a jour de FRONT pour les procs differents de 0
 C        IL faut prendre en compte les options ou front(i,p) = 1, p<>1
 C        les sensors de type 2 modifient front sur p<>1
       ELSEIF(IDDLEVEL==0) THEN
-         IF(NELEM+NCONLD+NUMCONV+NUMRADIA+NFXFLUX+SLCFIELD>0) THEN
-           SCEP = NELEM+NCONLD+NUMCONV+NUMRADIA+NFXFLUX+SLLOADP+NUMBER_LOAD_CYL
-           SCEL = NELEM+NCONLD+NUMCONV+NUMRADIA+NFXFLUX+SLLOADP+NUMBER_LOAD_CYL
+         IF(NELEM+NCONLD+GLOB_THERM%NUMCONV+GLOB_THERM%NUMRADIA+GLOB_THERM%NFXFLUX+SLCFIELD>0) THEN
+           SCEP = NELEM+NCONLD+GLOB_THERM%NUMCONV+GLOB_THERM%NUMRADIA+GLOB_THERM%NFXFLUX+SLLOADP+NUMBER_LOAD_CYL
+           SCEL = NELEM+NCONLD+GLOB_THERM%NUMCONV+GLOB_THERM%NUMRADIA+GLOB_THERM%NFXFLUX+SLLOADP+NUMBER_LOAD_CYL
            ALLOCATE(CEP(SCEP))
            ALLOCATE(CEL(SCEL))
          ELSE
@@ -5939,9 +5975,9 @@ C After IDDLEVEL Finish Indexes - Fill PERMUTATION%SOLID(NUMELS+1,PERMUTATION%SO
         ENDDO
 !       already done in SGRHEAD / SGRTAILS
 !        CALL APPLYSORT2CLUSTER(CLUSTERS,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
-        CALL APPLYSORT2FLUX(IBFFLUX,NITFLUX,NFXFLUX,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
-        CALL APPLYSORT2FLUX(IBCR,NIRADIA   ,NUMRADIA,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
-        CALL APPLYSORT2FLUX(IBCV,NICONV    ,NUMCONV,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
+        CALL APPLYSORT2FLUX(IBFFLUX,GLOB_THERM%NITFLUX,GLOB_THERM%NFXFLUX,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
+        CALL APPLYSORT2FLUX(IBCR,GLOB_THERM%NIRADIA,GLOB_THERM%NUMRADIA,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
+        CALL APPLYSORT2FLUX(IBCV,GLOB_THERM%NICONV,GLOB_THERM%NUMCONV,PERMUTATION%SOLID(NUMELS+1:2*NUMELS))
       ENDIF
 
 C
@@ -6330,12 +6366,17 @@ C
       ENDIF
 C---------------------------------
       IF(NUMSPH/=0) THEN
+            if ( .NOT. ALLOCATED(IXSPS) ) ALLOCATE(IXSPS(KVOISPH,NUMSPH),STAT=stat)
+            IF (STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
+     .                                 MSGTYPE=MSGERROR,
+     .                                 C1='IXSPS')
+      
           IWORK  = 0
           EADD   => IWORK(1:NUMSPH+1)
           CALL SPGRHEAD(KXSP    ,IXSP    ,IPARGTMP,PM     ,IPART  ,
      2                  IPARTSP ,EADD    ,CEPSP   ,ND     ,IPM    ,
      3                  IGEO    ,SPBUF   ,SPH2SOL,
-     4                  SOL2SPH ,IRST    ,MAT_ELEM%MAT_PARAM)
+     4                  SOL2SPH ,IRST    ,MAT_ELEM%MAT_PARAM,IXSPS)
 C---------------------------------
 C-  GROUPAGE SPMD
 C---------------------------------
@@ -6357,7 +6398,9 @@ C
      2                   IPARTSP ,EADD    ,ND      ,CEPSP,DD_TMP     ,
      3                   IDX     ,IXSP    ,IPM  , IGEO      ,
      4                   SPBUF   ,SPH2SOL,SOL2SPH  ,
-     5                   IRST    ,NOD2SP  ,IPRI    ,MAT_ELEM%MAT_PARAM)
+     5                   IRST    ,NOD2SP  ,IPRI    ,MAT_ELEM%MAT_PARAM,
+     6                   IXSPS)
+        IF (ALLOCATED(IXSPS)) DEALLOCATE(IXSPS)
         ENDIF
 C---------------------------------
       IF(NUMELX>0) THEN
@@ -6607,11 +6650,17 @@ C provisoire
         END DO
       END IF
       NBR_GPMP = NGROUP
-
 c-----------------------------------------------------------------------
-c     element renumbering failure  by /fail/fractal 
-c-----------------------------------------------------------------------
-      call fractal_elem_renum(FAIL_FRACTAL  ,NUMELC  ,NUMELTG)
+!
+      !---------------------------------------------------
+      ! element renumbering after domdec for /fail/fractal 
+      !---------------------------------------------------
+      call fractal_elem_renum(fail_fractal,numelc,numeltg)
+!
+      !---------------------------------------------------
+      ! element renumbering after domdec for /fail/alter + brokmann 
+      !---------------------------------------------------
+      if (iddlevel==1) call brokmann_elem_renum(fail_brokmann,numelc,numeltg)
 c-----------------------------------------------------------------------
 c     set default material/property parameters by element group
 c-----------------------------------------------------------------------
@@ -6856,17 +6905,18 @@ C        PFLUID & PBLAST & LOAD PRESSURE
            CALL HM_READ_PFLUID(NUMLOADP ,ILOADP  ,LLOADP  ,LOADP   ,NPC      ,
      .                        SENSORS   ,IGRSURF ,UNITAB  ,IFRAME  ,LSUBMODEL)
          END IF
-         IF(NLOADP_B/=0)THEN
-           CALL HM_READ_PBLAST(ITAB    ,ITABM1  ,UNITAB  ,IGRSURF,  NUMLOADP,
-     .                        ILOADP   ,LLOADP  ,LOADP   ,X      , BUFSF    ,
-     .                        LSUBMODEL,RTRANS)
+         IF(PBLAST%NLOADP_B/=0)THEN
+           CALL HM_READ_PBLAST( PBLAST,
+     .                          ITAB    ,ITABM1  ,UNITAB  ,IGRSURF,  NUMLOADP,
+     .                          ILOADP   ,LLOADP  ,LOADP   ,X      , BUFSF    ,
+     .                          LSUBMODEL,RTRANS)
          ENDIF
          IF(NLOADP_HYD/=0)THEN
            CALL HM_READ_LOAD_PRESSURE(
      .                       NUMLOADP   ,ILOADP     ,LLOADP       ,INTERLOADP ,LOADP      ,
      .                       KLOADPINTER,LOADPINTER ,NPC          ,SENSORS    ,IGRSURF    ,
      .                       UNITAB     ,ISKWN      ,LSUBMODEL    ,DGAPINT    ,INTGAPLOADP,
-     .                       DGAPLOADINT,S_LOADPINTER)
+     .                       DGAPLOADINT,S_LOADPINTER,PBLAST)
 
          END IF
 
@@ -7217,7 +7267,7 @@ C--------------------------------------------
       ENDIF
       CALL ALE_CONNECTIVITY%ALE_COMPUTE_EE_CONNECTIVITY(PM,IGEO,
      .     NPROPGI,NUMGEO, NPROPM, NUMMAT , NUMNOD, NUMELQ, NUMELTG, NUMELS, N2D,
-     .     IALE  , IEULER, ITHERM, IALELAG,
+     .     IALE  , IEULER, GLOB_THERM%ITHERM, IALELAG,
      .     NIXQ  , NIXTG , NIXS  , ITAB   ,
      .     IXQ   , IXTG  , IXS   )
 C--------------------------------------------
@@ -7327,7 +7377,8 @@ C--------------------------------------------------------------
      5           DEF_INTER       ,NPC1     ,SENSORS    ,MULTI_FVM  ,NOM_OPT(LNOPT1*INOM_OPT(29)+1),
      6           INTBUF_FRIC_TAB ,LSUBMODEL,TF         ,NPTS       ,NPARI                         ,
      7           KLOADPINTER     ,DGAPINT  ,INTERFACES ,SITAB      ,NPARIR                        ,
-     8           SITABM1         ,SISKWN   ,LISKN      ,SNPC       ,SNPC1      )
+     8           SITABM1         ,SISKWN   ,LISKN      ,SNPC       ,SNPC1      ,
+     9           GLOB_THERM%ITHERM_FE,GLOB_THERM%INTHEAT)
 C
        IF(.NOT. ALLOCATED(ALE_CONNECTIVITY%NALE)) ALLOCATE(ALE_CONNECTIVITY%NALE(0))
 
@@ -8106,7 +8157,7 @@ C     tab masse
         IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                           MSGTYPE=MSGERROR,
      .                         C1='PTG')
-        IF(ITHERM_FE > 0)THEN
+        IF(GLOB_THERM%ITHERM_FE > 0)THEN
           ALLOCATE(MCPC(NUMELC)    ,STAT=stat)
           IF(STAT /= 0) CALL ANCMSG(MSGID=268,ANMODE=ANINFO,
      .                           MSGTYPE=MSGERROR,
@@ -8174,7 +8225,6 @@ C
 C
       CALL TRACE_OUT1()
 C--------------------------------------------
-      NUSPHCEL = 0
       ! still need for *Y00, *sty files - not yet covered by CFG files (hm_reader)
       IF(IDDLEVEL == 0) CALL YCTRL(IGRBRIC)
 !
@@ -8553,11 +8603,11 @@ C
      &            RBY        , NPBY           , LPBY             , NPC                , NPTS     ,
      &            TF         , VEUL           , ALE_CONNECTIVITY , SKEW               , FILL     ,
      &            IPART      , ITAB           , SENSORS          , SKVOL              ,
-     &            IXTG       , THKE           , NLOC_DMG         , GROUP_PARAM_TAB    ,
+     &            IXTG       , THKE           , NLOC_DMG         , GROUP_PARAM_TAB    ,GLOB_THERM,
      &            IGRNOD     , IGRSURF        , BUFSF            , VR                 ,
      &            BUFMAT     , XLAS           , ILAS             , DTELEM             , MSS      ,
      &            MSQ        , MSC            , MSTR             , MSP                , MSR      ,
-     &            MSTG       , PTG            , INC              ,
+     &            MSTG       , PTG            , INC              , 
      &            INP        , INR            , INTG             , INDEX              ,
      &            ITRI       , KXX            , IXX              , XELEMWA            ,
      &            IWA        ,
@@ -8604,7 +8654,7 @@ C
      &            KNOD2EL1D  , NOD2EL1D       , EBCS_TAB         , RBY_INIAXIS        , ALEA     ,
      &            KNOD2ELC   , NOD2ELC        , DR               , SLRBODY            , DRAPEG   ,
      &            IPARI      , INTBUF_TAB     , INTERFACES       , MAT_ELEM%MAT_PARAM ,
-     &            NPRELOAD_A , PRELOAD_A      , FAIL_FRACTAL     ,DEFAULTS )
+     &            NPRELOAD_A , PRELOAD_A      , FAIL_FRACTAL     ,FAIL_BROKMANN       ,DEFAULTS  )
 
 
       IF(NINTER>0.AND.NUMELIG3D>0) THEN
@@ -9381,6 +9431,7 @@ c
      .        PM, IGEO, X, SENSORS, MONVOl, MULTI_FVM%IS_USED, EBCS_TAB, EBCS_TAG_CELL_SPMD)
          !initialization
         CALL INIEBCSP0(X, IPARG, ELBUF_TAB, EBCS_TAB, IXS, IXQ, IXTG, IPARTS, IPARTQ, IPARTG, PM, IPM, MAT_ELEM%MAT_PARAM)
+        CALL INIEBCS_PROPERGOL(IXS,IXQ,IXTG,MULTI_FVM%IS_USED,EBCS_TAB,MAT_ELEM%MAT_PARAM,SIXS,SIXQ,SIXTG,NUMMAT)
       ENDIF
       CALL TRACE_OUT1()
 C--------------------------------------------
@@ -9578,7 +9629,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 0,INOM_OPT(31),INOM_OPT(32),SENSORS   ,
-     F       INTERFACES,IPARI   ,OUTPUT%TH%DUMP_THNMS1_FILE)
+     F       INTERFACES,IPARI   ,OUTPUT%TH%DUMP_THNMS1_FILE,GLOB_THERM%ITHERM_FE)
 C
       CALL MY_ALLOC(OUTPUT%TH%ITHBUF,OUTPUT%TH%SITHBUF)
       OUTPUT%TH%ITHBUF(1:OUTPUT%TH%SITHBUF) = ITHBUFTMP(1:OUTPUT%TH%SITHBUF)
@@ -9623,7 +9674,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 1,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFA,OUTPUT%TH%SITHBUFA)
         OUTPUT%TH%ITHBUFA = ITHBUFTMP(1:OUTPUT%TH%SITHBUFA)
@@ -9666,7 +9717,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 2,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFB,OUTPUT%TH%SITHBUFB)
         OUTPUT%TH%ITHBUFB = ITHBUFTMP(1:OUTPUT%TH%SITHBUFB)
@@ -9709,7 +9760,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 3,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFC, OUTPUT%TH%SITHBUFC)
         OUTPUT%TH%ITHBUFC(1:OUTPUT%TH%SITHBUFC) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFC)
@@ -9752,7 +9803,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 4,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFD,OUTPUT%TH%SITHBUFD)
         OUTPUT%TH%ITHBUFD(1:OUTPUT%TH%SITHBUFD) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFD)
@@ -9796,7 +9847,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 5,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFE,OUTPUT%TH%SITHBUFE)
         OUTPUT%TH%ITHBUFE = ITHBUFTMP(1:OUTPUT%TH%SITHBUFE)
@@ -9839,7 +9890,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 6,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFF,OUTPUT%TH%SITHBUFF)
         OUTPUT%TH%ITHBUFF(1:OUTPUT%TH%SITHBUFF) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFF)
@@ -9882,7 +9933,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 7,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFG,OUTPUT%TH%SITHBUFG)
         OUTPUT%TH%ITHBUFG(1:OUTPUT%TH%SITHBUFG) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFG)
@@ -9925,7 +9976,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 8,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFH,OUTPUT%TH%SITHBUFH)
         OUTPUT%TH%ITHBUFH(1:OUTPUT%TH%SITHBUFH) = ITHBUFTMP(1:OUTPUT%TH%SITHBUFH)
@@ -9968,7 +10019,7 @@ c-----
      C       IPARTS   ,IPARTQ   ,IPARTC   ,IPARTT   ,IPARTP  ,IPARTR   ,
      D       IPARTG   ,IPARTX   ,IPARTSP  ,IPARTIG3D,LITHBUFMX,
      E       MAP_TABLES, 9,INOM_OPT(31),INOM_OPT(32),SENSORS,
-     F       INTERFACES,IPARI   ,0)
+     F       INTERFACES,IPARI   ,0,GLOB_THERM%ITHERM_FE)
 C
         CALL MY_ALLOC(OUTPUT%TH%ITHBUFI,OUTPUT%TH%SITHBUFI)
         OUTPUT%TH%ITHBUFI = ITHBUFTMP(1:OUTPUT%TH%SITHBUFI)
@@ -10102,7 +10153,7 @@ C appel a routine generique ici et dans ddsplit
      2      NUMELC,NUMELTG,NUMELT    ,NUMELP   ,NUMELR,
      3      NUMNOD,NMNT   ,L_MUL_LAG1,L_MUL_LAG,MAXNX ,
      4      LWASPH,NUMSPH    ,LWASPIO, NRCVVOIS0,
-     5      LWAMP_L,LWANMP_L )
+     5      LWAMP_L,LWANMP_L ,GLOB_THERM%ITHERM)
       LWAMP  = LWAMP_L   !< Copy values in common
       LWANMP = LWANMP_L  !< Copy values in common
 C init MULTIMAX
@@ -10306,7 +10357,10 @@ C
      D    LGAUGE ,IGAUP   ,NGAUP  ,INTBUF_TAB,IBFFLUX ,
      E    ICNDS10,ITAGND  ,IGEO   ,TAG_SKN   ,SKEWS%MULTIPLE_SKEW,
      F    IBFV   ,IBCSCYC ,LBCSCYC,R_SKEW    ,IPM,
-     G    SENSORS,SCEP    ,EBCS_TAB,LOADS,IFRAME)
+     G    SENSORS,SCEP    ,EBCS_TAB,LOADS,IFRAME,
+     H    GLOB_THERM%NICONV ,GLOB_THERM%NIRADIA ,GLOB_THERM%NITFLUX,
+     I    GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NFXFLUX,
+     J    SENSOR_USER_STRUCT)
 
 C      ELSE
 C       mise a 1 de front i.e. tous les noeuds sur Proc1, poids 1
@@ -10501,7 +10555,7 @@ C----------------------------------------------
      K        SIGI        ,NSIGBEAM   ,SIGBEAM         ,NSIGTRUSS     ,SIGTRUSS         ,
      L        NSIGRS      ,SIGRS      ,MERGE_NODE_TAB  ,MERGE_NODE_TOL,
      M        IMERGE      ,NMERGE_TOT ,IEXLNK ,DRAPEG  ,USER_WINDOWS  ,OUTPUT           ,
-     N        DEFAULTS    )
+     N        DEFAULTS    ,GLOB_THERM ,PBLAST)
 !
       DEALLOCATE(SIGI)
       DEALLOCATE(SIGSH)
@@ -10565,7 +10619,9 @@ C--------------------------------------------
      3      IXR    ,IXTG   ,IXTG1   ,T_MONVOL  ,
      4      IGRSURF,IBCL   ,ADDCNE  ,CEP     ,
      5      ILEN   ,GEO    ,IBCV   ,IBCR    ,IBFFLUX ,
-     6      ILOADP ,LLOADP ,CEL    ,EBCS_TAB,LOADS)
+     6      ILOADP ,LLOADP ,CEL    ,EBCS_TAB,LOADS,
+     7    GLOB_THERM%NICONV ,GLOB_THERM%NIRADIA ,GLOB_THERM%NITFLUX,
+     8    GLOB_THERM%NUMCONV,GLOB_THERM%NUMRADIA,GLOB_THERM%NFXFLUX)
           IF(I2NSNT>0) THEN
             IF(LCNI2G>0) ALLOCATE(CNI2(LCNI2G))
             CALL FILLCNI2(
@@ -10704,14 +10760,14 @@ c         start CPU timer for ddsplit
           CALL GET_SIZE_NUMNOD_LOCAL(NUMNOD,NUMNOD_L)
 
           ALLOCATE( ALE_ELM(NSPMD) )
-          IF( (NUMELS>0).AND.(IALE+IEULER+ITHERM+IALELAG/=0) ) THEN
+          IF( (NUMELS>0).AND.(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG/=0) ) THEN
                 CALL SPLIT_CFD_SOLIDE(NUMELS,ALE_CONNECTIVITY,IXS,ALE_ELM,SIZE_ALE_ELM)
           ELSE
                 SIZE_ALE_ELM(1:NSPMD) = 0
           ENDIF
           ! -----------------------------------------
           ! reverse connectivity for FVM solver : useful to ensure the parith/on
-          IF(IALE+IEULER+ITHERM+IALELAG/=0) THEN
+          IF(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG/=0) THEN
                 ALLOCATE( INDX_S(NUMELS) )
                 ALLOCATE( INDX_Q(NUMELQ) )
                 ALLOCATE( INDX_TG(NUMELTG) )
@@ -10914,7 +10970,7 @@ c
      D         KLOADPINTER  ,LOADPINTER   ,DGAPLOADINT   ,S_LOADPINTER, SCEP,DYNAIN_DATA,
      E         DRAPEG       ,USER_WINDOWS ,OUTPUT        ,INTERFACES  ,NUMBER_LOAD_CYL ,
      F         LOADS_PER_PROC(P), PYTHON,DPL0CLD,VEL0CLD ,NAMES_AND_TITLES,
-     G         BCS_PER_PROC(P),constraint_struct)
+     G         BCS_PER_PROC(P),constraint_struct,glob_therm,PBLAST)
       GOTO 220
  221  CONTINUE
 
@@ -10928,7 +10984,7 @@ C
       CALL DEALLOCATE_IGRSURF_SPLIT(T_MONVOL,IGRSURF_PROC)
       DEALLOCATE( IGRSURF_PROC )
 
-      IF( (NUMELS>0).AND.(IALE+IEULER+ITHERM+IALELAG/=0) ) CALL DEALLOCATE_SPLIT_CFD_SOLIDE(ALE_ELM)
+      IF( (NUMELS>0).AND.(IALE+IEULER+GLOB_THERM%ITHERM+IALELAG/=0) ) CALL DEALLOCATE_SPLIT_CFD_SOLIDE(ALE_ELM)
 
       CALL BCS%DEALLOCATE()
       DO P=1,NSPMD
@@ -11064,10 +11120,23 @@ C
           IF(NRETRACTOR > 0) THEN
             DO I=1,NRETRACTOR
               DEALLOCATE(RETRACTOR(I)%INACTI_NODE)
+              DO J=1,2   
+                IF (RETRACTOR(I)%IFUNC(J) > 0) THEN                                    
+                  DEALLOCATE(RETRACTOR(I)%TABLE(J)%X(1)%VALUES)
+                  DEALLOCATE(RETRACTOR(I)%TABLE(J)%X)
+                  DEALLOCATE(RETRACTOR(I)%TABLE(J)%Y%VALUES)
+                  DEALLOCATE(RETRACTOR(I)%TABLE(J)%Y)
+                ENDIF  
+              ENDDO  
             ENDDO
             DEALLOCATE(RETRACTOR)
           ENDIF
           IF((IPART_STACK > 0 .OR. IPART_PCOMPP > 0) .AND. NDRAPE > 0) DEALLOCATE(IWORK_T)
+
+          IF(ALLOCATED(MPARAM_R2R))THEN
+            DO I=1,NUMMAT  ; CALL MPARAM_R2R(I)%DESTRUCT() ; ENDDO
+            DEALLOCATE(MPARAM_R2R)
+          ENDIF
 
           ! -----------------------------------------
           ! deallocation of constraint_struct
@@ -11171,7 +11240,7 @@ C
       IF(ALLOCATED(ALEA))  DEALLOCATE(ALEA)
       IF(ALLOCATED(IRAND)) DEALLOCATE(IRAND)
       IF(ALLOCATED(SENSORS%SENSOR_TAB)) DEALLOCATE(SENSORS%SENSOR_TAB )
-      IF(ALLOCATED(LOGICAL_SENSORS_LIST)) DEALLOCATE(LOGICAL_SENSORS_LIST)
+      IF(ALLOCATED(SENSORS%LOGICAL_SENSORS_LIST)) DEALLOCATE(SENSORS%LOGICAL_SENSORS_LIST)
 C
       CALL EBCS_TAB%destroy()
       IF(NINIMAP1D > 0 .AND. .NOT. MULTI_FVM%IS_USED) THEN

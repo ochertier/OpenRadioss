@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_i_c              ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE WRITE_SENSORS(SENSORS)
 C-----------------------------------------------
@@ -122,14 +122,17 @@ c
             CALL WRITE_DB (SENSOR%FLOAT_USERBUF,LSENBUF)
 
           ENDIF
+          IF(TYP == 40 ) THEN
+            CALL WRITE_I_C(SENSOR%PYTHON_FUNCTION_ID,1)
+          ENDIF
         END DO
 c
 c--------------------------------------
 c       Write Logical sensor index array
 c--------------------------------------
 
-        CALL WRITE_I_C(LOGICAL_SENSOR_COUNT,1)
-        CALL WRITE_I_C(LOGICAL_SENSORS_LIST,LOGICAL_SENSOR_COUNT)
+        CALL WRITE_I_C(SENSORS%LOGICAL_SENSOR_COUNT,1)
+        CALL WRITE_I_C(SENSORS%LOGICAL_SENSORS_LIST,SENSORS%LOGICAL_SENSOR_COUNT)
 c
 c--------------------------------------
 c       Write spmd/PON exchange arrays

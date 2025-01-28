@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    fail_wind_frwave   ../engine/source/materials/fail/alter/fail_wind_frwave.F
       !||--- calls      -----------------------------------------------------
-      !||    newman_raju        ../engine/source/materials/fail/alter/newman_raju.F
+      !||    newman_raju        ../common_source/fail/newman_raju.F90
+      !||--- uses       -----------------------------------------------------
+      !||    newman_raju_mod    ../common_source/fail/newman_raju.F90
       !||====================================================================
       SUBROUTINE FAIL_BROKMANN(
      .     NEL       ,NUPARAM   ,NUVAR     ,TIME      ,TIMESTEP  ,
      .     UPARAM    ,NGL       ,SIGNXX    ,SIGNYY    ,SIGNXY    ,
      .     UVAR      ,OFF       ,IPT       ,NINDXF    ,INDXF     ,
      .     TDEL      )
+!-----------------------------------------------
+!   M o d u l e s
+!-----------------------------------------------
+      use newman_raju_mod
 C-----------------------------------------------
 c    Test of Ch. Brokmann criterion in glass, taking account for initial
 c    statistically distributed micro cracks

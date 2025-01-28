@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,29 +41,33 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_tri20boxe               ../engine/source/mpi/interfaces/spmd_tri20boxe.F
       !||    spmd_tri20gat                ../engine/source/mpi/interfaces/spmd_i7crit.F
       !||    spmd_tri20gate               ../engine/source/mpi/interfaces/spmd_i7crit.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+      !||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I20MAIN_TRI(
+      SUBROUTINE I20MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,V       ,
      2                  MS      ,NIN     ,ITASK   ,MWAG    ,WEIGHT  ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM ,
      4                  ITAB    ,KINET   ,TEMP    ,NRTM_T  ,RENUM   ,
      5                  NSNFIOLD,ESHIFT  ,NUM_IMP ,IND_IMP ,DIAG_SMS,
-     6                  NODNX_SMS,INTBUF_TAB,H3D_DATA)
+     6                  NODNX_SMS,INTBUF_TAB,H3D_DATA,GLOB_THERM)
 C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       use check_sorting_criteria_mod , only : check_sorting_criteria
+      use glob_therm_mod 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -87,6 +91,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER NIN ,ITASK, RETRI,NRTM_T,ESHIFT,
      .        NUM_IMP ,IND_IMP(*),
      .        ITAB(*), KINET(*),
@@ -100,6 +105,7 @@ C     REAL
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
+      type (glob_therm_) ,INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -292,6 +298,7 @@ C BARRIER II_STOK et RESULT
 C
 C recuperation des noeuds remote NSNR stockes dans XREM
 C
+       IF(IMONM > 0) CALL STARTIME(TIMERS,25)
        CALL SPMD_TRI20BOX(
      1      INTBUF_TAB%NSV,NSN    ,INTBUF_TAB%XA,INTBUF_TAB%VA,MS     ,
      2      BMINMA   ,WEIGHT  ,INTBUF_TAB%STFA,NIN        ,ISENDTO,
@@ -301,6 +308,7 @@ C
      6      NUM_IMP  ,INTBUF_TAB%NLG,INTBUF_TAB%PENIS,INTBUF_TAB%PENIA   ,
      +                  DIAG_SMS        ,
      7      NODNX_SMS  ,INTBUF_TAB%NBINFLG,INTBUF_TAB%AVX_ANCR(1),INTBUF_TAB%AVX_ANCR(1+3*NLN) )
+         IF(IMONM > 0) CALL STOPTIME(TIMERS,25)
 C
 C renumerotation locale des anciens candidats
 C
@@ -325,7 +333,7 @@ C
  50   CALL MY_BARRIER
 
 C
-      IF (IMONM > 0) CALL STARTIME(30,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,30)
       IF(NRTM_T/=0)THEN
         CALL I20BUCE(
      1   INTBUF_TAB%XA,INTBUF_TAB%IRECTM(1+4*ESHIFT),INTBUF_TAB%NSV,IPARI(22,NIN),
@@ -337,7 +345,8 @@ C
      6   INTBUF_TAB%STFA,NIN  ,INTBUF_TAB%STFM(1+ESHIFT) ,IGAP  ,INTBUF_TAB%GAP_S,
      7   NSNR  ,NCONT     ,RENUM    ,NSNROLD  ,INTBUF_TAB%GAP_M(1+ESHIFT),
      8   GAPMIN,GAPMAX      ,NUM_IMP      ,NLN          ,INTBUF_TAB%NLG,
-     9   INTBUF_TAB%GAP_SH,INTBUF_TAB%NBINFLG,INTBUF_TAB%MBINFLG,ISYM ,I_MEM     )
+     9   INTBUF_TAB%GAP_SH,INTBUF_TAB%NBINFLG,INTBUF_TAB%MBINFLG,ISYM ,I_MEM     ,
+     .   GLOB_THERM%INTHEAT, GLOB_THERM%IDT_THERM, GLOB_THERM%NODADT_THERM)
 
       ENDIF
 
@@ -367,7 +376,7 @@ C        UPGRADE_MULTIMP routine !!!!
         ENDIF
 
 
-      IF (IMONM > 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,30)
 C
 #include "lockon.inc"
       INTBUF_TAB%VARIABLES(9)  = MIN(MAXBOX,INTBUF_TAB%VARIABLES(9))
@@ -396,7 +405,7 @@ C mise a - de dist temporairement pour reperage dans partie frontiere
       IF(NSPMD>1)THEN
 C mono tache
 !$OMP SINGLE
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
         INTBUF_TAB%VARIABLES(5) = -INTBUF_TAB%VARIABLES(5)
 
         CALL SPMD_TRI20GAT(
@@ -408,7 +417,7 @@ C mono tache
         IF (NUM_IMP>0) 
      .    CALL IMP_RNUMCD(INTBUF_TAB%CAND_N,NIN,NSN,NUM_IMP,IND_IMP )
 
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 
 !$OMP END SINGLE
       ENDIF
@@ -455,12 +464,14 @@ C recuperation des noeuds remote NLINSR stockes dans XREM
 C
           NLINSR = 0
           IF(NSPMD>1) THEN
+          IF(IMONM >0) CALL STARTIME(TIMERS,25)
       CALL SPMD_TRI20BOXE(
      1       INTBUF_TAB%IXLINS,NLINSA  ,INTBUF_TAB%XA,INTBUF_TAB%VA,MS     ,
      2       BMINMAE    ,WEIGHT  ,INTBUF_TAB%STFS,NIN        ,ISENDTO,
      3       IRCVFROM   ,IAD_ELEM,FR_ELEM  ,NLINSR ,IPARI(22,NIN),
      4       INTBUF_TAB%GAP_SE,INTBUF_TAB%PENISE,ITAB  ,IGAP   ,TZINF  ,
      5       INTBUF_TAB%NLG,INTBUF_TAB%PENIA,DIAG_SMS,NODNX_SMS)
+          IF(IMONM >0) CALL STOPTIME(TIMERS,25)
           END IF
         END IF
 C -------------------------------------------------------------
@@ -544,7 +555,7 @@ C--------------------------------------------------------------
 C mise a - de dist temporairement pour reperage dans partie frontiere
 C mono tache
 !$OMP SINGLE
-          IF (IMONM > 0) CALL STARTIME(26,1)
+          IF (IMONM > 0) CALL STARTIME(TIMERS,26)
 
           IF(INTBUF_TAB%VARIABLES(5)>=ZERO) INTBUF_TAB%VARIABLES(5)= -INTBUF_TAB%VARIABLES(5)
        CALL SPMD_TRI20GATE(
@@ -552,7 +563,7 @@ C mono tache
      2 IPARI(22,NIN),NLINSR,MULTIMP  ,IGAP      )
        IPARI(57,NIN) = NLINSR
 
-          IF (IMONM > 0) CALL STOPTIME(26,1)
+          IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 
 !$OMP END SINGLE
         ENDIF

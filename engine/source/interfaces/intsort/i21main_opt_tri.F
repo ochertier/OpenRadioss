@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,13 +28,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i21optcd          ../engine/source/interfaces/int21/i21optcd.F
       !||--- uses       -----------------------------------------------------
       !||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
+      !||    timer_mod         ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I21MAIN_OPT_TRI(
+      SUBROUTINE I21MAIN_OPT_TRI(TIMERS,
      1                  IPARI   ,INTBUF_TAB ,NIN     ,ITASK ,
      2                  INTSTAMP,NB_STOK_N,NB_JLT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTSTAMP_MOD
       USE INTBUFDEF_MOD 
 C-----------------------------------------------
@@ -51,6 +53,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER IPARI(NPARI,NINTER), ITASK, NIN,
      .     NB_STOK_N(*),NB_JLT(*)
       TYPE(INTSTAMP_DATA) INTSTAMP
@@ -86,7 +89,7 @@ C     Filtrage des candidats a l'impact
 C     (si candidat retenu, cand_n(i) = - cand_n(i))
 C-----------------------------------------------------------
        I_STOK = INTBUF_TAB%I_STOK(1)
-       CALL I21OPTCD(
+       CALL I21OPTCD(TIMERS,
      1 INTBUF_TAB%CAND_E,INTBUF_TAB%CAND_N,INTBUF_TAB%XSAV(ADXLOC),
      .                                    I_STOK     ,INTBUF_TAB%IRECTM,
      2GAP      ,INTBUF_TAB%GAP_S,IPARI(21,NIN),IPARI(5,NIN) ,INTBUF_TAB%STFNS,

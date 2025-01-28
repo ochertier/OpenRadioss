@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ C-----------------------------------------------
       !||====================================================================
       !||    viscsinh    ../engine/source/materials/mat/mat100/viscsinh.F
       !||--- called by ------------------------------------------------------
-      !||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F90
       !||====================================================================
         SUBROUTINE VISCSINH ( NEL, TBNORM,  A1, B0 ,EXPN, DGAMMA ) !HYPERBOLIC SINE
 C-----------------------------------------------

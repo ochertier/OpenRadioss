@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,12 +35,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod            ../engine/share/resol/initbuf.F
-      !||    loads_mod              ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
       !||    schlieren_mod          ../engine/share/modules/schlieren_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
       SUBROUTINE H3D_SKIN_SCALAR(
@@ -52,7 +51,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6                  IAD_ELEM        ,FR_ELEM     , WEIGHT    ,TAG_SKINS6,
      7                  NPF   ,TF    ,BUFMAT,IBCL    ,ILOADP     ,LLOADP    ,FAC    ,
      8                  NSENSOR,SENSOR_TAB,TAGNCONT    ,LOADP_HYD_INTER,XFRAME,FORC    ,
-     9                  NODAL_IPART ,IMAPSKP ,LOADS  ,TABLE, IFRAME,MAT_PARAM,D) 
+     9                  NODAL_IPART ,IMAPSKP ,LOADS  ,TABLE, IFRAME,MAT_PARAM,D,PBLAST) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -67,6 +66,7 @@ C-----------------------------------------------
       USE LOADS_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE ELBUFDEF_MOD
+      USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -105,6 +105,7 @@ C-----------------------------------------------
       INTEGER ,       DIMENSION(LISKN,NUMFRAM+1)  ,INTENT(IN) :: IFRAME
       TYPE (TTABLE)  ,DIMENSION(NTABLE)   ,INTENT(IN) :: TABLE
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
+      TYPE (PBLAST_),INTENT(IN) :: PBLAST
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -493,7 +494,8 @@ C------for solid elements
      .                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,
      .                   IBCL,ILOADP,LLOADP,FAC ,NPF,TF ,SENSOR_TAB,
      .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME ,X ,V ,
-     .                   IMAPSKP,NSKIN ,NSENSOR,LOADS ,TABLE, IFRAME,D)
+     .                   IMAPSKP,NSKIN ,NSENSOR,LOADS ,TABLE, IFRAME,D,
+     .                   PBLAST)
 C-----------------------------------------------
       RETURN
       END
@@ -513,18 +515,17 @@ C-----------------------------------------------
       !||--- uses       -----------------------------------------------------
       !||    h3d_inc_mod            ../engine/share/modules/h3d_inc_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    loads_mod              ../common_source/modules/loads/loads_mod.F
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    pblast_mod             ../common_source/modules/loads/pblast_mod.F
       !||    pinchtype_mod          ../common_source/modules/pinchtype_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
       !||====================================================================
       SUBROUTINE H3D_PRE_SKIN_SCALAR(SKIN_SCALAR,NODAL_IPART,
      .                   IS_WRITTEN_SKIN  ,H3D_PART,INFO1   ,KEYWORD ,
      .                   IB ,ILOADP,LLOADP,FAC ,NPC,TF ,SENSOR_TAB,
      .                   TAGNCONT,LOADP_HYD_INTER,FORC,XFRAME,X ,V ,
-     .                   IMAPSKP, NSKIN ,NSENSOR ,LOADS ,TABLE,IFRAME,DIS)
+     .                   IMAPSKP, NSKIN ,NSENSOR ,LOADS ,TABLE,IFRAME,DIS,
+     .                   PBLAST)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
@@ -576,6 +577,7 @@ C-----------------------------------------------
       TYPE (LOADS_)   , INTENT(IN) :: LOADS
       INTEGER ,       DIMENSION(LISKN,NUMFRAM+1)  ,INTENT(IN) :: IFRAME
       TYPE (TTABLE)  ,DIMENSION(NTABLE)   ,INTENT(IN) :: TABLE
+      TYPE(PBLAST_), INTENT(IN) :: PBLAST
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -589,15 +591,14 @@ C-----------------------------------------------
      .        NITER,ITER,IMODEL,IL,IS,SEGCONT,FUN_HSP,IFRA1,IFLOAD,NP0,NPI
       my_real
      .   NX, NY, NZ, AXI, AA, A0, VV, FX, FY, FZ, AX, DYDX, TS,
-     .   SIXTH,TFEXTT,X_OLD, F1, F2,XSENS,FCX,FCY,FCYPINCH,FP,
+     .   SIXTH,X_OLD, F1, F2,XSENS,FCX,FCY,FCYPINCH,FP,
      .   FCX1,FCY1,FCX2,FCY2,VX,VY,VZ,VEL,VSEG,NORM
       my_real FINTER, ZFx,ZFy,ZFz, ZZFx,ZZFy,ZZFz,PS, Zx,Zy,Zz,FINTER_SMOOTH
 c
       my_real COORMEAN,YMEAN,ZMEAN,PVEL,NSIGN,DNORM,
      .        Xdet,Ydet,Zdet,Tdet,Wtnt,PMIN,Dx,Dy,Dz,NORMD, P,
      .        FAC_M_bb, FAC_L_bb, FAC_T_bb, FAC_P_bb, FAC_I_bb, T0INF_LOC, TA_SHIFT, TT_STAR
-      
-C      
+
       INTEGER :: IFUN,IFRA,M1,M2,NDIM,NPOINT, IIOUT,SHIFT,FUNCTYPE
        my_real :: A11,A12,A21,A22,B1,B2,DET,LEN,DIRX,DIRY,DIRZ,
      .     BETA,GAMMA,R,S,RMAX,XFACR,XFACT,YFAC,SEGP,PRESS,DISP
@@ -685,7 +686,7 @@ C--------default zero
          SKIN_SCALAR(NSKIN)=AA
        END DO 
 C----------load_pressure
-       SHIFT =   NLOADP_F+NLOADP_B
+       SHIFT =   NLOADP_F+PBLAST%NLOADP_B
        DO NP=1+SHIFT,NLOADP_HYD+SHIFT
          ISIZ_SEG = ILOADP(1,NP)/4 
          IFUNC = ILOADP(3,NP)
@@ -935,7 +936,7 @@ C
          END DO 
        END DO 
 C---------pblast     
-       DO NL=1+NLOADP_F,NLOADP_F+NLOADP_B
+       DO NL=1+NLOADP_F,NLOADP_F+PBLAST%NLOADP_B
 C--------default zero        
          ISIZ_SEG  = ILOADP(1,NL)/4 
          IAD = ILOADP(4,NL)
@@ -957,7 +958,7 @@ C--------default zero
            NP0 = NP0 + 1
            IF (TT<TDET) CYCLE     
            NSKIN = NSKIN0+ IMAPSKP(NP0)
-           P = PBLAST_TAB(IL)%PRES(I)                                                           
+           P = PBLAST%PBLAST_TAB(IL)%PRES(I)                                                           
            SKIN_SCALAR(NSKIN)= SKIN_SCALAR(NSKIN)-P
          ENDDO!next I
        END DO 

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,16 +34,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
       !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    my_alloc_mod                 ../common_source/tools/memory/my_alloc.F90
       !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
       !||====================================================================
       SUBROUTINE DFUNC0(ELBUF_TAB, FUNC             ,IFUNC     ,IPARG   ,
      2                  MASS     , PM               ,EL2FA     ,NBF     ,
      3                  NBPART   , IADG             ,SPBUF     ,IPART   ,
      4                  IPARTSP  , ALE_CONNECTIVITY ,IXQ       ,IPM     ,
-     5                  X        , V                ,W         ,
+     5                  X        , V                ,W         ,ITHERM  ,
      6                  NERCVOIS , NESDVOIS         ,LERCVOIS  ,LESDVOIS, 
-     7                  BUFMAT   , MULTI_FVM)
+     7                  BUFMAT   , MULTI_FVM        ,KXSP      ,DEFAULT_OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -53,6 +54,7 @@ C-----------------------------------------------
       USE MULTI_FVM_MOD 
       USE SCHLIEREN_MOD    
       USE ALE_CONNECTIVITY_MOD
+      USE my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,6 +78,8 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,NGROUP),EL2FA(*),IFUNC,NBF,
      .        NBPART,IADG(NSPMD,*),IPART(LIPART1,*),IPARTSP(*),
      .        NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),IXQ(NIXQ,NUMELQ),IPM(NPROPMI,NUMMAT)
+      INTEGER, INTENT(IN) :: ITHERM
+      INTEGER, INTENT(IN) :: KXSP(NISP,NUMSPH),DEFAULT_OUTPUT
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
@@ -84,7 +88,8 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       my_real EVAR(MVSIZ), P, VONM2, VONM, S1, S2, S3, VALUE
       INTEGER I,II(6),N,NN,NN1,NG,NEL,JTURB,MT,MLW,IALEL,IPRT,IUS,BUF,NUVAR,IR,NFAIL,IALEFVM_FLG,IEOS,NVAREOS
-      REAL R4,WA(NBF)
+      REAL R4
+      REAL,DIMENSION(:),ALLOCATABLE :: WA
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF
       TYPE(BUF_MAT_) ,POINTER :: MBUF
@@ -93,13 +98,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
+      CALL MY_ALLOC(WA,NBF)
       NN1 = 1
 
       !-------------------------------------------------------!
       !     INITIALIZATION IF SCHLIEREN DEFINED               !
       !-------------------------------------------------------!      
       IF(IFUNC==4892)THEN
-        CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM)
+        CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM, ITHERM)
       ENDIF!(IFUNC==4892)
 
 C-----------------------------------------------
@@ -118,13 +124,22 @@ C-----------------------------------------------
 C-----------------------------------------------
         IF (ITY == 51) THEN
 C-----------------------------------------------
-C       PARTICULES SPH.
+C       SPH PARTICLES
+C          DEFAULT_OUTPUT = 1 -> diameter always printed
+C          DEFAULT_OUTPUT = 2 -> nb of neighbours always printed
 C-----------------------------------------------
           IF(IFUNC == 0)THEN
-            DO I=LFT,LLT
-             N = I + NFT
-             FUNC(EL2FA(NN1+N)) = SPBUF(1,N)
-            ENDDO
+            IF (DEFAULT_OUTPUT == 1) THEN
+              DO I=LFT,LLT
+                N = I + NFT
+                FUNC(EL2FA(NN1+N)) = SPBUF(1,N)
+              ENDDO
+            ELSEIF (DEFAULT_OUTPUT == 2) THEN
+              DO I=LFT,LLT
+                N = I + NFT
+                FUNC(EL2FA(NN1+N)) = KXSP(4,N)
+              ENDDO  
+            ENDIF  
           ELSE
            GBUF => ELBUF_TAB(NG)%GBUF
            LBUF => ELBUF_TAB(NG)%BUFLY(1)%LBUF(1,1,1)
@@ -518,9 +533,7 @@ c-----------OFF
              ENDIF
 c-----------TILLOTSON             
            ELSEIF(IFUNC == 5172)THEN   !/ANIM/ELEM/TILLOTSON
-              DO I=LFT,NEL
-                EVAR(I) = ZERO
-              ENDDO 
+              EVAR(1:NEL) = ZERO
               N=1+NFT
               IPRT=IPARTSP(N)
               MT=IPART(1,IPRT)                                                        
@@ -532,7 +545,24 @@ c-----------TILLOTSON
                   EVAR(I) = EBUF%VAR(I)
                 ENDDO
               ENDIF 
-              FUNC(EL2FA(NN1+NFT+1:NN1+NFT+NEL)) = EVAR(1:NEL)                       
+              FUNC(EL2FA(NN1+NFT+1:NN1+NFT+NEL)) = EVAR(1:NEL)
+
+c-----------VOLUMETRIC STRAIN (VSTRAIN)
+           ELSEIF(IFUNC == 5173)THEN   !/ANIM/ELEM/VSTRAIN
+              EVAR(1:NEL) = ZERO
+              IPRT=IPARTSP(1+NFT)
+              MT=IPART(1,IPRT)
+              IF(PM(89,MT) > ZERO)THEN
+              DO  I=1,NEL
+                EVAR(I) = GBUF%RHO(I) / PM(89,MT) - ONE
+              ENDDO
+              ENDIF
+              FUNC(EL2FA(NN1+NFT+1:NN1+NFT+NEL)) = EVAR(1:NEL)
+
+           ELSEIF(IFUNC >= 5173+1 .AND. IFUNC <= 5173+21)THEN   !/ANIM/ELEM/VSTRAIN
+              EVAR(1:NEL) = ZERO
+              FUNC(EL2FA(NN1+NFT+1:NN1+NFT+NEL)) = EVAR(1:NEL)
+              !submaterial modeling not compatible with sph (output 0.0 for VSTRAIN/[i])
 c-----------
            ELSE
             DO I=LFT,LLT
@@ -570,6 +600,7 @@ C-----------------------------------------------
           CALL SPMD_R4GET_PARTN(1,NBF,NBPART,IADG,WA,BUF)
       ENDIF
 c-----------
-      IF(ALLOCATED(WA_L))DEALLOCATE(WA_L)      
+      IF(ALLOCATED(WA_L))DEALLOCATE(WA_L)
+      IF(ALLOCATED(WA))DEALLOCATE(WA)
       RETURN
       END

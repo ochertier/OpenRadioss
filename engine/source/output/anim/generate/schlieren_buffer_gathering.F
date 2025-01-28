@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,12 +35,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod                    ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
       !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
       !||====================================================================
       SUBROUTINE SCHLIEREN_BUFFER_GATHERING(
      1                     NERCVOIS , NESDVOIS  ,LERCVOIS   ,LESDVOIS ,
-     2                     IPARG    , ELBUF_TAB , MULTI_FVM)
+     2                     IPARG    , ELBUF_TAB , MULTI_FVM, ITHERM)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -76,6 +76,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(INOUT) :: NERCVOIS(SNERCVOIS),NESDVOIS(SNESDVOIS),LERCVOIS(SLERCVOIS),LESDVOIS(SLESDVOIS)
       INTEGER,INTENT(IN) :: IPARG(NPARG,NGROUP)
+      INTEGER, INTENT(IN) :: ITHERM
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM      
 C-----------------------------------------------
@@ -97,7 +98,7 @@ C-----------------------------------------------
         NEL = IPARG(02,NG)
         ITY = IPARG(05,NG)
        IF (MLW /= 13) THEN
-        DO OFFSET = 0,NEL-1,NVSIZ                                                                                       
+        DO OFFSET = 0,NEL-1,NVSIZ                                                                                    
           NFT = IPARG(3,NG) + OFFSET
           NEL = MIN(NVSIZ,NEL-OFFSET)
           IALEL = IPARG(7,NG) + IPARG(11,NG)                                                                            

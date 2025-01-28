@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,19 +27,21 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    arret                   ../engine/source/system/arret.F
       !||    limiter                 ../engine/source/multifluid/multi_muscl_gradients.F
-      !||    startime                ../engine/source/system/timer.F
-      !||    stoptime                ../engine/source/system/timer.F
+      !||    startime                ../engine/source/system/timer_mod.F90
+      !||    stoptime                ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod    ../common_source/modules/ale/ale_connectivity_mod.F
       !||    elbufdef_mod            ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod             ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    timer_mod               ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE MULTI_MUSCL_GRADIENTS(ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
+      SUBROUTINE MULTI_MUSCL_GRADIENTS(TIMERS,ELBUF_TAB, IPARG, ITASK, IXS, IXQ, IXTG,
      .     PM, IPM, MULTI_FVM, ALE_CONNECTIVITY, WGRID, XGRID, ITAB, NBMAT, CURRENT_TIME, BUFMAT)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INITBUF_MOD      
       USE ELBUFDEF_MOD
       USE MULTI_FVM_MOD
@@ -60,6 +62,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       TYPE(ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       INTEGER, INTENT(IN) :: IPARG(NPARG, *)
       INTEGER, INTENT(IN) :: ITASK ! SMP TASK
@@ -100,7 +103,7 @@ C-----------------------------------------------
 
 
 
-      IF(ITASK == 0) CALL STARTIME(MACRO_TIMER_MUSCL,1)
+      IF(ITASK == 0) CALL STARTIME(TIMERS,MACRO_TIMER_MUSCL)
       EPS_INT = FIVE * EM02
 
       DO NG = ITASK + 1, NGROUP, NTHREAD
@@ -615,7 +618,7 @@ C     Pressure gradient limitation
             ENDDO               !II = 1, NEL
          ENDIF                  !MATLAW == 151
       ENDDO                     !NG
-      IF(ITASK == 0) CALL STOPTIME(MACRO_TIMER_MUSCL,1)
+      IF(ITASK == 0) CALL STOPTIME(TIMERS,MACRO_TIMER_MUSCL)
 
       END SUBROUTINE MULTI_MUSCL_GRADIENTS
 

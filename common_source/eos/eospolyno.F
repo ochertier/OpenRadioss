@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,19 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    eospolyno   ../common_source/eos/eospolyno.F
+      !||    eospolyno    ../common_source/eos/eospolyno.F
       !||--- called by ------------------------------------------------------
-      !||    eosmain     ../common_source/eos/eosmain.F
+      !||    eosmain      ../common_source/eos/eosmain.F
+      !||--- uses       -----------------------------------------------------
+      !||    output_mod   ../common_source/modules/output/output_mod.F90
       !||====================================================================
       SUBROUTINE EOSPOLYNO(IFLAG,NEL,PM   ,OFF  ,EINT ,MU   ,MU2 , 
      2                     ESPE ,DVOL ,DF   ,VNEW ,MAT  ,PSH ,
      3                     PNEW ,DPDM ,DPDE ,THETA,ECOLD)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -65,7 +71,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I, MX
-      my_real :: AA, BB,TFEXTT, DVV, PP
+      my_real :: AA, BB,WFEXTT, DVV, PP
       my_real :: C0,C1,C2,C3,C4,C5,PC,SPH
 C-----------------------------------------------
 C   S o u r c e  L i n e s
@@ -100,7 +106,7 @@ C-----------------------------------------
 C----------------------------------------
 C     UPDATE PRESSURE AND INTERNAL ENERGY
 C----------------------------------------
-       TFEXTT=ZERO
+       WFEXTT=ZERO
        MX  = MAT(1)
        C0  = PM(104,MX)
        C1  = PM( 32,MX)
@@ -119,11 +125,11 @@ C
          PNEW(I) = PNEW(I) + (AA+BB*(ESPE(I)-PSH(I) *DVV))/(ONE+BB*DVV)
          PNEW(I) = MAX(PNEW(I),PC )*OFF(I)
          EINT(I) = EINT(I) - HALF*DVOL(I)*(PNEW(I)+PSH(I) )
-         TFEXTT  = TFEXTT-DVOL(I)*PSH(I) 
+         WFEXTT  = WFEXTT-DVOL(I)*PSH(I)
        ENDDO
        
 #include "atomic.inc"
-       TFEXT = TFEXT + TFEXTT
+       WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
 C
 C------------------------

@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -2109,6 +2109,7 @@ void delete_user_file_(char * filnam,int * len)
   filn[*len]='\0';
 
   remove(filn);
+  free(filn);
 }
 
 void _FCALL DELETE_USER_FILE(char * filnam,int * len)
@@ -2122,4 +2123,5 @@ void _FCALL DELETE_USER_FILE(char * filnam,int * len)
   filn[*len]='\0';
 
   remove(filn);
+  free(filn);
 }

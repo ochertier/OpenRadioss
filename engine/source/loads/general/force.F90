@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,20 +50,20 @@
       !||    h3d_mod               ../engine/share/modules/h3d_mod.F
       !||    pinchtype_mod         ../common_source/modules/pinchtype_mod.F
       !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||    skew_mod              ../common_source/modules/skew_mod.F90
       !||    th_surf_mod           ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
-        subroutine force (                                             &
+        subroutine force (                                           &
         & nibcld     ,ib         ,lfaccld    ,fac       ,snpc       ,&
         & npc        ,stf        ,tf         ,a         ,v          ,&
         & x          ,skews      ,ar                                ,&
-        & vr         ,nsensor    ,sensor_tab ,tfexc     ,iadc       ,&
+        & vr         ,nsensor    ,sensor_tab ,wfexc     ,iadc       ,&
         & lsky       ,fsky       ,fext       ,h3d_data  ,cptreac    ,&
         & fthreac    ,nodreac    ,th_surf    ,                       &
         & dpl0cld    ,vel0cld    ,d          ,dr        ,nconld     ,&
-        & numnod     ,nfunct     ,anim_v    ,outp_v     ,            &
-        & iparit     ,tt         ,dt1        ,n2d       ,tfext      ,&
+        & numnod     ,nfunct     ,anim_v     ,outp_v    ,            &
+        & iparit     ,tt         ,dt1        ,n2d       ,wfext      ,&
         & impl_s     ,python )
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
@@ -133,12 +133,12 @@
           type (th_surf_) , intent(inout) :: th_surf           !< Time history / surface
           ! Inout / output
           type(skew_), intent(inout) :: skews                  !< Skews structure
-          my_real, intent(inout) :: fsky(8,lsky)               !< skyline vector : Strore forces for PARITH/ON
+          my_real, intent(inout) :: fsky(8,lsky)               !< skyline vector : Store forces for PARITH/ON
           my_real, intent(inout) :: a(3,numnod)                !< node accelerations
           my_real, intent(inout) :: ar(3,numnod)               !< node rotational accelerations
           my_real, intent(inout) :: fext(3,numnod)             !< nodal external work
-          double precision, intent(inout) :: tfext             !< external work - Care : double precision
-          my_real, intent(inout) :: tfexc                      !< external work
+          double precision, intent(inout) :: wfext             !< external work - Care : double precision
+          my_real, intent(inout) :: wfexc                      !< external work
           my_real, intent(inout) :: fthreac(6,cptreac)         !< TH forces
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
@@ -149,14 +149,18 @@
           integer :: up_bound
           integer :: fid ! id of the python function
           my_real nx, ny, nz, axi, aa, a0, vv, fx, fy, fz, ax, dydx, ts,&
-          &sixth,tfextt,x_old, f1, f2,xsens,fcx,fcy,area,&
+          &sixth,wfextt,x_old, f1, f2,xsens,fcx,fcy,area,&
           &disp,disp_old,vel,vel_old
           my_real finter, finter_smooth
           external finter,finter_smooth
 ! ----------------------------------------------------------------------------------------------------------------------
+          nx = -huge(nx)
+          ny = -huge(ny)
+          nz = -huge(nz)
+          idir = 0
           sixth  = one_over_6
-          tfexc  = zero
-          tfextt = zero
+          wfexc  = zero
+          wfextt = zero
           n_old  = 0
           x_old  = zero
           disp_old = zero
@@ -306,7 +310,7 @@
                     if(ianim >0 .and.impl_s==0) then
                       fext(n2,n1)=fext(n2,n1)+aa
                     endif
-                    tfexc = tfexc+half*(a0+aa)*v(n2,n1)*axi
+                    wfexc = wfexc+half*(a0+aa)*v(n2,n1)*axi
                   else
                     k1=3*n2-2
                     k2=3*n2-1
@@ -335,7 +339,7 @@
                   n2 = n2 - 3
                   if(isk<=1)then
                     ar(n2,n1)=ar(n2,n1)+aa
-                    tfexc=tfexc+half*(a0+aa)*vr(n2,n1)
+                    wfexc=wfexc+half*(a0+aa)*vr(n2,n1)
 !
                     if (cptreac > 0) then
                       if(nodreac(n1)/=0) then
@@ -360,7 +364,7 @@
                       endif
                     endif
 !
-                    tfexc    = tfexc+half*(a0+aa)*vv
+                    wfexc    = wfexc+half*(a0+aa)*vv
                   endif
                 endif
 !
@@ -528,7 +532,7 @@
                     endif
 !
 !
-                    tfextt=tfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)+v(1,n4))&
+                    wfextt=wfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)+v(1,n4))&
                     &+fy*(v(2,n1)+v(2,n2)+v(2,n3)+v(2,n4))&
                     &+fz*(v(3,n1)+v(3,n2)+v(3,n3)+v(3,n4)))
 !
@@ -604,7 +608,7 @@
                     endif
 !
 !
-                    tfextt=tfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)) + fy*(v(2,n1)+v(2,n2)+v(2,n3)) + fz*(v(3,n1)+v(3,n2)+v(3,n3)))
+                    wfextt=wfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)) + fy*(v(2,n1)+v(2,n2)+v(2,n3)) + fz*(v(3,n1)+v(3,n2)+v(3,n3)))
 
                   endif
                 else
@@ -654,14 +658,14 @@
                   else
                     ax     = one
                   endif
-                  tfextt  = tfextt+dt1*(fy*(v(2,n1)+v(2,n2))+fz*(v(3,n1)+v(3,n2)))*ax
+                  wfextt  = wfextt+dt1*(fy*(v(2,n1)+v(2,n2))+fz*(v(3,n1)+v(3,n2)))*ax
 
                 endif
               endif
             enddo
 !
 !$OMP atomic
-            tfext = tfext + tfextt
+            wfext = wfext + wfextt
 !$OMP end atomic
 !
           else
@@ -820,7 +824,7 @@
                       endif
                     endif
 !
-                    tfexc = tfexc+half*(a0+aa)*v(n2,n1)*axi
+                    wfexc = wfexc+half*(a0+aa)*v(n2,n1)*axi
                   else
                     k1  = 3*n2-2
                     k2  = 3*n2-1
@@ -844,7 +848,7 @@
                       endif
                     endif
 !
-                    tfexc = tfexc+half*(a0+aa)*vv*axi
+                    wfexc = wfexc+half*(a0+aa)*vv*axi
                   endif
                 elseif(n2<=6)then
                   n2 = n2 - 3
@@ -857,7 +861,7 @@
                       endif
                     endif
 !
-                    tfexc=tfexc+half*(a0+aa)*vr(n2,n1)
+                    wfexc=wfexc+half*(a0+aa)*vr(n2,n1)
                   else
                     k1  = 3*n2-2
                     k2  = 3*n2-1
@@ -876,7 +880,7 @@
                       endif
                     endif
 !
-                    tfexc=tfexc+half*(a0+aa)*vv
+                    wfexc=wfexc+half*(a0+aa)*vv
                   endif
                 endif
 !
@@ -1048,7 +1052,7 @@
                     endif
 !
 !
-                    tfextt=tfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)+v(1,n4))&
+                    wfextt=wfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)+v(1,n4))&
                     &+fy*(v(2,n1)+v(2,n2)+v(2,n3)+v(2,n4))&
                     &+fz*(v(3,n1)+v(3,n2)+v(3,n3)+v(3,n4)))
 
@@ -1127,7 +1131,7 @@
                     endif
 !
 !
-                    tfextt=tfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)) + fy*(v(2,n1)+v(2,n2)+v(2,n3)) + fz*(v(3,n1)+v(3,n2)+v(3,n3)))
+                    wfextt=wfextt+dt1*(fx*(v(1,n1)+v(1,n2)+v(1,n3)) + fy*(v(2,n1)+v(2,n2)+v(2,n3)) + fz*(v(3,n1)+v(3,n2)+v(3,n3)))
                   endif
                 else
 !        analyse 2d
@@ -1179,12 +1183,12 @@
                   else
                     ax=one
                   endif
-                  tfextt=tfextt+dt1*(fy*(v(2,n1)+v(2,n2))+fz*(v(3,n1)+v(3,n2)))*ax
+                  wfextt=wfextt+dt1*(fy*(v(2,n1)+v(2,n2))+fz*(v(3,n1)+v(3,n2)))*ax
                 endif
               endif
             enddo
 !
-            tfext = tfext + tfextt
+            wfext = wfext + wfextt
 !
           endif
           return

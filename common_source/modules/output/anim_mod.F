@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,7 +22,7 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C Temporary requested module to introduce TANIM_STOP and TANIM_STOP0
 C All REAL VARIABLES related to ANIM were moved in this module
-C       (intially located in ./engine/share/includes/com04_c.inc and engine/share/includes/scr_14.inc) 
+C       (initially located in ./engine/share/includes/com04_c.inc and engine/share/includes/scr_14.inc) 
 C COMMON BLOCK are no longer maintened
       !||====================================================================
       !||    anim_mod                     ../common_source/modules/output/anim_mod.F

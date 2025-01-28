@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -68,7 +68,7 @@
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
           integer :: iseg               !< segment loop
-          integer :: node_iid(4)        !< intenal node identifiers
+          integer :: node_iid(4)        !< internal node identifiers
           integer :: node_uid(4)        !< user node identifiers
           integer :: nale_expected      !< when checking 'ALE' side nale_expected is 1, and 0 for 'LAG' side
           integer :: nale_sum_expected  !< sum of nale values for each node composing the segment
@@ -108,6 +108,11 @@
             nale_sum_expected = npt
             expected_type = chain1
             unexpected_type = chain2
+          case default 
+            nale_expected = 0
+            nale_sum_expected = 0
+            expected_type = ''
+            unexpected_type = ''
         end select
 
         do iseg=1,nseg

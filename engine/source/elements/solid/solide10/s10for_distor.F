@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -318,7 +318,7 @@ C---- seg 4 : 1,3,4 (7 10 8)
      .                   IFC1,      NEL  ,   E_DISTOR,
      .                   DT1 )
         NCTL = NCTL + IFCTL
-C---- force assembalge and STI update (dt)
+C---- force assemblage and STI update (dt)
         IF (NCTL >0) THEN
           DO I=1,NEL
             IF (STI_C(I) ==ZERO) CYCLE

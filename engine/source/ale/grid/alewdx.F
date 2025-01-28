@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -39,8 +39,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    laser1                 ../engine/source/loads/laser/laser1.F
       !||    my_barrier             ../engine/source/system/machine.F
       !||    rgwal1                 ../engine/source/ale/grid/rgwal1.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||    wlag                   ../engine/source/ale/grid/wlag.F
       !||    wpor                   ../engine/source/ale/grid/wpor.F
       !||--- uses       -----------------------------------------------------
@@ -48,10 +48,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    python_funct_mod       ../common_source/modules/python_mod.F90
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE ALEWDX(
+      SUBROUTINE ALEWDX(TIMERS,
      1     GEO             ,X             ,D          ,V          ,VR         ,
      2     W               ,WA            ,WB         ,RBY        ,SKEW       ,
      3     PM              ,XLAS          ,MS         ,FSAV       ,
@@ -67,7 +68,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D     FR_NBCC         ,IADQ          ,XDP        ,IGRNOD     ,
      E     DR              ,INTBUF_TAB    ,ITAB       ,MULTI_FVM  ,
      F     ALE_CONNECTIVITY,DDP           ,NE_NERCVOIS,NE_NESDVOIS,
-     G     NE_LERCVOIS     ,NE_LESDVOIS   ,XCELL      ,XFACE      )
+     G     NE_LERCVOIS     ,NE_LESDVOIS   ,XCELL      ,XFACE      ,WFEXT)
 C-----------------------------------------------
 C     D e s c r i p t i o n
 C-----------------------------------------------
@@ -92,6 +93,7 @@ C      Consequently X is defined here X(3,SX/3) instead of X(3,NUMNOD) as usuall
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE PYTHON_FUNCT_MOD
       USE ELBUFDEF_MOD
       USE INTBUFDEF_MOD
@@ -119,6 +121,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C     D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(inout) :: TIMERS
       TYPE(PYTHON_), INTENT(inout) :: PYTHON
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
       INTEGER ISKEW(*), IXS(NIXS,NUMELS),IXQ(NIXQ,NUMELQ),
@@ -141,6 +144,7 @@ C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD)  :: IGRNOD
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
       INTEGER, INTENT(IN) :: NE_NERCVOIS(*), NE_NESDVOIS(*), NE_LERCVOIS(*), NE_LESDVOIS(*)
+      DOUBLE PRECISION, INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -151,7 +155,7 @@ C-----------------------------------------------
 C     S o u r c e   L i n e s
 C-----------------------------------------------
       IF(IMON > 0 .AND. ITASK == 0) THEN
-         CALL STARTIME(5,1)
+         CALL STARTIME(TIMERS,5)
       ENDIF
 C----------------------------------------
 C     MESH VELOCITIES DEPENDING ON USER FORMULATION
@@ -280,7 +284,7 @@ C----------------------------------------
 C
       CALL MY_BARRIER
 C
-      IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(5,1)
+      IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,5)
       IF (ITASK == 0) THEN
 C----------------------------------------
          IF(NUMPOR > 0)
@@ -289,7 +293,7 @@ C----------------------------------------
 C----------------------------------------
 C     BOUNDARY CONDITIONS AT NODES
 C----------------------------------------
-         IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(4,1)
+         IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
          DO I=1,NUMNOD,1024
             NINDX1 = 0
             NINDX2 = 0
@@ -315,56 +319,56 @@ C----------------------------------------
               CALL BCS3V(NINDX2,INDX2,ISKEW,ICODT(2*NUMNOD+1),W,V,SKEW)
             ENDIF
          ENDDO
-         IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(4,1)
+         IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
 C--------------------------------
 C     ALE/LAGRANGE INTERFACES
 C--------------------------------
          IF(NINTER /= 0) THEN
-            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(2,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,2)
             CALL INTAL3(
      1           IPARI,X     ,V      ,
      2           A    ,W    ,ISKEW ,SKEW  ,ICODT(1+NUMNOD),
      3           IXS  ,IXQ  ,ELBUF_TAB ,IPARG ,
      4           PM   ,ALE_CONNECTIVITY%NALE ,INTBUF_TAB)
-            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(2,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,2)
          ENDIF
 C-----------------------------------
 C     2D GRID VELOCITIES
 C-----------------------------------
          IF(N2D == 1)THEN
-            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(5,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,5)
             DO I=1,NUMNOD
                IF(X(2,I)+DT2*W(2,I) >= ZERO)CYCLE
                W(2,I)=ZERO
                V(2,I)=ZERO
             ENDDO
-            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(5,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,5)
          ENDIF
 C--------------------------------------
 C     /ALE/LINK/VEL
 C--------------------------------------
          IF(NALELK /= 0) THEN
-            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(4,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
             CALL ALELIN(NALELK,LINALE,W,WEIGHT,IGRNOD,ITAB)
-            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(4,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
          ENDIF
 C-----------------------------------
 C     2D GRID VELOCITY
 C-----------------------------------
          IF(N2D == 1)THEN
-            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(5,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,5)
             DO I=1,NUMNOD
                IF(X(2,I)+DT2*W(2,I) >= ZERO)CYCLE
                W(2,I)=ZERO
                V(2,I)=ZERO
             ENDDO!next I
-            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(5,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,5)
          ENDIF
 C-----------------------
 C     RIGID WALL ALE or ALE-TH
 C-----------------------
          IF(NRWALL > 0) THEN
-            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(4,1)
+            IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,4)
             CALL RGWAL1(
      1           X                   ,A                      ,V          ,W       ,RWBUF           ,
      2           NPRW(1+NNPRW*NRWALL),NPRW                   , PYTHON, 
@@ -372,7 +376,7 @@ C-----------------------
      4           IXS                 ,IXQ                    ,ELBUF_TAB  ,IPARG   ,
      5           PM                  ,ALE_CONNECTIVITY%NALE  ,TF         ,NPF     ,WEIGHT          ,
      6           IAD_ELEM            ,FR_ELEM                ,FR_WALL         )
-            IF(IMON > 0.AND. ITASK == 0) CALL STOPTIME(4,1)
+            IF(IMON > 0.AND. ITASK == 0) CALL STOPTIME(TIMERS,4)
          ENDIF
 C-----------------------
 C     LASER
@@ -380,7 +384,7 @@ C-----------------------
          IF (NLASER > 0) THEN
             CALL LASER1(LAS ,XLAS ,MS       ,X    ,V    ,
      .                  W   ,WA   ,IPARG    ,IXQ  ,PM   ,
-     .                  TF  ,NPF  ,ELBUF_TAB)
+     .                  TF  ,NPF  ,ELBUF_TAB,WFEXT)
          ENDIF
 C-----------------------
       ENDIF                     ! ITASK == 0
@@ -400,7 +404,7 @@ C-----------------------------------
 C-----------------------------------
 C     GRID DISPLACEMENT
 C-----------------------------------
-      IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(5,1)
+      IF(IMON > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,5)
 C
       CALL MY_BARRIER
 C
@@ -447,7 +451,7 @@ C-----------------------------------------------
       CALL MY_BARRIER
 C-----------------------------------------------
       IF(IMON > 0 .AND. ITASK == 0) THEN
-         CALL STOPTIME(5,1)
+         CALL STOPTIME(TIMERS,5)
       ENDIF
 C-----------------------------------------------
       RETURN

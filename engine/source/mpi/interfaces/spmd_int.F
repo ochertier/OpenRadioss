@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -202,8 +202,6 @@ C This routine cannot be used for type25 anymore
       !||    arret          ../engine/source/system/arret.F
       !||    spmd_wait      ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany   ../engine/source/mpi/spmd_mod.F90
-      !||    startime       ../engine/source/system/timer.F
-      !||    stoptime       ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod    ../engine/share/message_module/message_mod.F
       !||    spmd_mod       ../engine/source/mpi/spmd_mod.F90
@@ -313,7 +311,6 @@ C   boite minmax pour le tri provenant de i7buce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
-      IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
       BMINMA(3,LOC_PROC) = BMINMAL(3)
@@ -862,7 +859,6 @@ C
         ENDDO
       ENDIF
 C
-      IF (IMONM > 0) CALL STOPTIME(25,1)
 C
 #endif
       RETURN
@@ -878,11 +874,9 @@ c END TRI7VOX
       !||    arret               ../engine/source/system/arret.F
       !||    spmd_wait           ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany        ../engine/source/mpi/spmd_mod.F90
-      !||    startime            ../engine/source/system/timer.F
-      !||    stoptime            ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod         ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod       ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod       ../common_source/modules/ale/multi_fvm_mod.F90
       !||    spmd_mod            ../engine/source/mpi/spmd_mod.F90
       !||    tri7box             ../engine/share/modules/tri7box.F
       !||====================================================================
@@ -993,7 +987,6 @@ C   boite minmax pour le tri provenant de i7buce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
-      IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
       BMINMA(3,LOC_PROC) = BMINMAL(3)
@@ -1367,7 +1360,6 @@ C
         ENDDO
       ENDIF
 C
-      IF (IMONM > 0) CALL STOPTIME(25,1)
 C
 #endif
       RETURN
@@ -1381,8 +1373,6 @@ C
       !||    arret           ../engine/source/system/arret.F
       !||    spmd_wait       ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany    ../engine/source/mpi/spmd_mod.F90
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod     ../engine/share/message_module/message_mod.F
       !||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
@@ -1506,7 +1496,6 @@ C   boite minmax pour le tri provenant de i7buce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
-      IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
       BMINMA(3,LOC_PROC) = BMINMAL(3)
@@ -1789,7 +1778,7 @@ c general case
                 IF(IEDGE4 >0)THEN
 C Local Node : 0, local sleeping node : -1 or E2E Node : 1
 C Local sleeping nodes are nodes which are not candidated but stays
-C in E2E IRTS Secnd surface. Thay must be shipped, but removed from sorting
+C in E2E IRTS Secnd surface. They must be shipped, but removed from sorting
 C IBUF(8,ND) ->ISEDGE_FI
                   IF(TAG_SN(NOD)<0)THEN
                       IBUF(P)%p(L2+8) = -1
@@ -2209,7 +2198,6 @@ C
       IF(ALLOCATED(TAG_SN)) DEALLOCATE(TAG_SN)
       IF(ALLOCATED(TAG_SN)) DEALLOCATE(INDEXE)
 
-      IF (IMONM > 0) CALL STOPTIME(25,1)
 #endif
 C
       RETURN
@@ -2232,7 +2220,7 @@ c END TRI24VOX
       SUBROUTINE SPMD_TRI24GAT(RESULT,NSN ,CAND_N ,I_STOK,NIN,
      2                        IGAP  ,NSNR,MULTIMP,ITY,INTTH ,
      3                        ILEV  ,IEDGE4, H3D_DATA,INTFRIC,
-     4                        INTNITSCHE,ISTIF_MSDT,IFSUB_CAREA)
+     4                        INTNITSCHE,ISTIF_MSDT,IFSUB_CAREA,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -2261,6 +2249,7 @@ C-----------------------------------------------
       INTEGER RESULT, NIN, NSN, I_STOK, IGAP, NSNR, MULTIMP, ITY,
      .        CAND_N(*),INTTH,ILEV,IEDGE4,INTFRIC,INTNITSCHE
       INTEGER , INTENT(IN) :: ISTIF_MSDT, IFSUB_CAREA
+      INTEGER , INTENT(IN) :: NODADT_THERM
       TYPE(H3D_DATABASE) :: H3D_DATA
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
@@ -3002,14 +2991,14 @@ C END TRI24GAT
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod         ../engine/share/modules/h3d_mod.F
       !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
       !||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
       !||    tri7box         ../engine/share/modules/tri7box.F
       !||====================================================================
       SUBROUTINE SPMD_TRI7GAT(RESULT ,NSN    ,CAND_N  ,I_STOK  ,NIN    ,
      2                        IGAP   ,NSNR   ,MULTIMP ,ITY     ,INTTH  ,
      3                        ILEV   ,NSNFIOLD,IPARI  ,H3D_DATA,INTFRIC,
-     4                        MULTI_FVM)
+     4                        MULTI_FVM,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -3041,6 +3030,7 @@ C-----------------------------------------------
       INTEGER RESULT, NIN, NSN, I_STOK, IGAP, NSNR, MULTIMP, ITY,
      .        CAND_N(*),INTTH,ILEV, INTFRIC,
      .        NSNFIOLD(*), IPARI(NPARI,NINTER)
+      INTEGER , INTENT(IN) :: NODADT_THERM
       TYPE(H3D_DATABASE) :: H3D_DATA
       TYPE(MULTI_FVM_STRUCT) :: MULTI_FVM
 C-----------------------------------------------
@@ -4394,7 +4384,6 @@ C END TRI11VOX0
       !||    arret           ../engine/source/system/arret.F
       !||    spmd_wait       ../engine/source/mpi/spmd_mod.F90
       !||    spmd_waitany    ../engine/source/mpi/spmd_mod.F90
-      !||    startime        ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod     ../engine/share/message_module/message_mod.F
       !||    spmd_mod        ../engine/source/mpi/spmd_mod.F90
@@ -4497,7 +4486,6 @@ C   boite minmax pour le tri provenant de i11uce BMINMA
 C
       IF(IRCVFROM(NIN,LOC_PROC)==0.AND.
      .   ISENDTO(NIN,LOC_PROC)==0) RETURN
-      IF (IMONM > 0) CALL STARTIME(25,1)
       BMINMA(1,LOC_PROC) = BMINMAL(1)
       BMINMA(2,LOC_PROC) = BMINMAL(2)
       BMINMA(3,LOC_PROC) = BMINMAL(3)
@@ -4933,7 +4921,7 @@ C END SPMD_TRI11VOX
       !||====================================================================
       SUBROUTINE SPMD_TRI11GAT(RESULT,NRTS ,CAND_S ,I_STOK,NIN,
      2                         INACTI,NRTSR,MULTIMP,IGAP,INTTH,
-     2                         NISUB,INTFRIC)
+     2                         NISUB,INTFRIC,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -4959,6 +4947,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER RESULT, NIN, NRTS, I_STOK, INACTI, NRTSR, MULTIMP, IGAP,
      .        CAND_S(*),INTTH,NISUB,INTFRIC
+      INTEGER ,INTENT(IN) :: NODADT_THERM
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------

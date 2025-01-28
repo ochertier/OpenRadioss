@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_r_c          ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE DFUNCF(ELBUF_TAB ,FUNC  ,IFUNC  ,IPARG    ,GEO  ,
      .                  IXT       ,IXP   ,IXR    ,MASS     ,PM   ,
@@ -38,6 +39,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      USE my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,7 +66,6 @@ C     REAL
      .        IADP(*),NBPART,IADG(NSPMD,*),NANIM1D_L,NBF2,
      .        IGEO(NPROPGI,*)
       INTEGER BUF
-      REAL WAL(NBF+NANIM1D_L)
 C
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
 C-----------------------------------------------
@@ -85,10 +86,12 @@ C     REAL
      .        OFFSET,K,INC,KK,IHBE,ISROT,ILAYER,IR,IS,JJ(6),IPT
       INTEGER LPLA    ! Used for size of PL Buffer
       REAL R4
+      REAL,DIMENSION(:),ALLOCATABLE:: WAL
 C
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_),POINTER :: LBUF
 C-----------------------------------------------
+      CALL MY_ALLOC(WAL,NBF+NANIM1D_L)
 C
       NN1 = 1
       NN3 = 1
@@ -500,6 +503,7 @@ C + X-ELEMENTS
           CALL SPMD_R4GET_PARTN(1,NBF2,NBPART,IADG,WAL,BUF)
       ENDIF
  
+      DEALLOCATE(WAL)
       RETURN
       END
       !||====================================================================

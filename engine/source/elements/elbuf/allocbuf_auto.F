@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -112,6 +112,13 @@ C-----------------------------------------------
       TYPE(BUF_NLOC_)    , POINTER :: BUFNL
       TYPE(BUF_NLOCTS_)  , POINTER :: BUFNLTS
       TYPE(L_BUFEL_DIR_) , POINTER :: LBUF_DIR
+
+
+        LY_SIGPT = 0
+        L_VOL0DP = 0
+        NPG = 0
+        LY_PLAPT = 0
+        NPTTOT = 0
 c-------------------------------------------------
 c       allocation of sub-structures of the element buffer
 C=======================================================================

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -72,7 +72,9 @@ C-----------------------------------------------
 
        SSP0 = ZERO
        TAGMAT(1:NUMMAT) = 0
-       
+       NELS = -HUGE(NELS)
+       NIX = -HUGE(NIX)        
+       IX => NULL()
        IF(NUMELS>0)THEN
          NELS = NUMELS
          NIX=NIXS
@@ -84,7 +86,7 @@ C-----------------------------------------------
        ELSEIF(N2D /=0 .AND. NUMELTG >0)THEN
          NELS = NUMELTG
          NIX=NIXTG
-         IX => IXTG(1:NIX, 1:NELS)         
+         IX => IXTG(1:NIX, 1:NELS)    
        ENDIF
        
        !-----------------------------!

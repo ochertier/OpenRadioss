@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,18 +32,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    matparam_def_mod     ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||    my_alloc_mod         ../common_source/tools/memory/my_alloc.F90
       !||    stack_mod            ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE TENSORC(ELBUF_TAB,IPARG ,ITENS ,INVERT,NELCUT,
      2                   EL2FA    ,NBF   ,TENS  ,EPSDOT,IADP  ,
      3                   NBF_L    ,NBPART,IADG  ,X     ,IXC   ,
-     4                   IGEO     ,IXTG  ,IPM   ,STACK ,MATPARAM_TAB)
+     4                   IGEO     ,IXTG  ,IPM   ,STACK ,MAT_PARAM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE STACK_MOD
       USE MATPARAM_DEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,13 +68,12 @@ C-----------------------------------------------
      .   EL2FA(*),IXC(NIXC,*), IGEO(NPROPGI,*), 
      .   NELCUT,NBF,IADP(*),NBF_L,NBPART,IADG(NSPMD,*),
      .   IXTG(NIXTG,*),IPM(NPROPMI,*)
-      REAL WA(3*NBF_L)
 C     REAL
       my_real
      .   TENS(3,*),EPSDOT(6,*),X(3,*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (STACK_PLY) :: STACK
-      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -98,7 +99,9 @@ C
 C
       my_real,
      .   DIMENSION(:), POINTER :: DIR_A,DIR_B
+      REAL,DIMENSION(:),ALLOCATABLE :: WA
 C-----------------------------------------------
+      CALL MY_ALLOC(WA,3*NBF_L)
 !
       DO J=1,18
         R4(J) = ZERO
@@ -775,7 +778,7 @@ c
                     IL  = 1
                   END IF
                   IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                  IVISC = IPM(222,IMAT)
+                  IVISC = MAT_PARAM(IMAT)%IVISC
                   DO I=1,NEL  
                     DO IR=1,NPTR                
                       DO IS=1,NPTS 
@@ -798,7 +801,7 @@ c
                       ENDDO
                     ENDDO
                   END IF
-                  MAT_ORTH = MATPARAM_TAB(IMAT)%ORTHOTROPY
+                  MAT_ORTH = MAT_PARAM(IMAT)%ORTHOTROPY
                   IF (MAT_ORTH == 2) THEN
                    IF(IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP ==52)) THEN
                      DIR_A => ELBUF_TAB(NG)%BUFLY(IL)%LBUF_DIR(IPT)%DIRA 
@@ -848,7 +851,7 @@ c
                     END IF
 c  
                     IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                    IVISC = IPM(222,IMAT)    
+                    IVISC = MAT_PARAM(IMAT)%IVISC   
                     DO I=1,NEL  
                       DO IR=1,NPTR                
                         DO IS=1,NPTS 
@@ -871,7 +874,7 @@ c
                         ENDDO
                       ENDDO
                     END IF
-                    MAT_ORTH = MATPARAM_TAB(IMAT)%ORTHOTROPY
+                    MAT_ORTH = MAT_PARAM(IMAT)%ORTHOTROPY
                     IF (MAT_ORTH == 2) THEN
                       DIR_A => ELBUF_TAB(NG)%BUFLY(IL)%DIRA  
                       CALL UROTO_TENS2D(NEL,SIGE,DIR_A)
@@ -913,7 +916,7 @@ C-----
                     END IF
                   END DO
                   IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                  IVISC = IPM(222,IMAT)    
+                  IVISC = MAT_PARAM(IMAT)%IVISC
 C
                   SIGE(1:NEL,1:3) = ZERO
                   DO I=1,NEL                                          
@@ -940,7 +943,7 @@ c
                     ENDDO
                   END IF
 c
-                  MAT_ORTH = MATPARAM_TAB(IMAT)%ORTHOTROPY
+                  MAT_ORTH = MAT_PARAM(IMAT)%ORTHOTROPY
                   IF (MAT_ORTH == 2) THEN
                     DIR_A => ELBUF_TAB(NG)%BUFLY(IL)%DIRA  
                     CALL UROTO_TENS2D(NEL,SIGE,DIR_A)
@@ -972,7 +975,7 @@ C-----
                   END IF
                 END DO
                 IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                IVISC = IPM(222,IMAT)    
+                IVISC = MAT_PARAM(IMAT)%IVISC  
 C
                 SIGE(1:NEL,1:3) = ZERO
                 DO I=1,NEL                                          
@@ -999,7 +1002,7 @@ c
                   ENDDO
                 END IF
 c
-                MAT_ORTH = MATPARAM_TAB(IMAT)%ORTHOTROPY
+                MAT_ORTH = MAT_PARAM(IMAT)%ORTHOTROPY
                 IF (MAT_ORTH == 2) THEN
                   DIR_A => ELBUF_TAB(NG)%BUFLY(IL)%DIRA  
                   CALL UROTO_TENS2D(NEL,SIGE,DIR_A)
@@ -1026,7 +1029,7 @@ c               /TENS/STRESS/ILAY - only compatible with IGTYP 10,11,16
 c                  IT = IUS - 10*IL 
                   IPT = 1
                   IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                  IVISC = IPM(222,IMAT)    
+                  IVISC = MAT_PARAM(IMAT)%IVISC 
 C
                   SIGE(1:NEL,1:3) = ZERO
                   DO I=1,NEL                                          
@@ -1053,7 +1056,7 @@ c
                     ENDDO
                   END IF
 c
-                  MAT_ORTH = MATPARAM_TAB(IMAT)%ORTHOTROPY
+                  MAT_ORTH = MAT_PARAM(IMAT)%ORTHOTROPY
                   IF (MAT_ORTH == 2) THEN
                     DIR_A => ELBUF_TAB(NG)%BUFLY(IL)%DIRA  
                     CALL UROTO_TENS2D(NEL,SIGE,DIR_A)
@@ -1088,7 +1091,7 @@ c
                       END IF
                       IF (ID_PLY == PLY_ANIM_STRESS(3*(IPLY - 1) + 1)) THEN
                         IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                        IVISC = IPM(222,IMAT)    
+                        IVISC = MAT_PARAM(IMAT)%IVISC    
                         IF (IPT <= ELBUF_TAB(NG)%BUFLY(IL)%NPTT) THEN 
                           DO I=1,NEL                               
                             DO IR=1,NPTR                                        
@@ -1101,7 +1104,7 @@ c
                             ENDDO    
                           ENDDO
 c
-                          MAT_ORTH = MATPARAM_TAB(IMAT)%ORTHOTROPY
+                          MAT_ORTH = MAT_PARAM(IMAT)%ORTHOTROPY
                           IF (MAT_ORTH > 0) THEN                 
                             IF (IDRAPE > 0 .AND. (IGTYP == 51 .OR. IGTYP ==52) ) THEN
                               DIR_A => ELBUF_TAB(NG)%BUFLY(IL)%LBUF_DIR(IPT)%DIRA
@@ -1156,7 +1159,7 @@ c
                 END IF
 c
                 IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                IVISC = IPM(222,IMAT)    
+                IVISC = MAT_PARAM(IMAT)%IVISC  
                 DO I=1,NEL  
                   DO IR=1,NPTR                
                     DO IS=1,NPTS 
@@ -1219,7 +1222,7 @@ c
                     END DO
                   END IF
                   IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                  IVISC = IPM(222,IMAT)    
+                  IVISC = MAT_PARAM(IMAT)%IVISC  
                   DO I=1,NEL  
                     DO IR=1,NPTR                
                       DO IS=1,NPTS 
@@ -1274,7 +1277,7 @@ c
                       END IF
                       IF (ID_PLY == IPLY) THEN
                         IMAT  = ELBUF_TAB(NG)%BUFLY(IL)%IMAT                          
-                        IVISC = IPM(222,IMAT)    
+                        IVISC = MAT_PARAM(IMAT)%IVISC   
                         IF (IPT <= ELBUF_TAB(NG)%BUFLY(IL)%NPTT) THEN 
                           DO I=1,NEL                               
                             DO IR=1,NPTR                                        
@@ -1415,6 +1418,7 @@ C   verifier l'interet de ce qui est fait ci-dessus  !!!!!!!!!!!!!!
         ENDIF
       ENDIF
 C
+      DEALLOCATE(WA)
       RETURN
       END
       !||====================================================================

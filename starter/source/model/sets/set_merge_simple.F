@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    rbody_box                  ../starter/source/model/sets/fill_clause_rbody_box.F
       !||    sort_set                   ../starter/source/model/sets/sort_sets.F
       !||--- calls      -----------------------------------------------------
+      !||--- uses       -----------------------------------------------------
+      !||    set_mod                    ../starter/share/modules1/set_mod.F
       !||====================================================================
       SUBROUTINE SET_MERGE_SIMPLE( SET_ENTITY,    NB_SET_ENTITY,
      *                             CLAUSE_ENTITY, NB_CLAUSE_ENTITY,
@@ -55,7 +57,10 @@ C============================================================================
 C-----------------------------------------------
 C   D e f i n i t i o n s 
 C-----------------------------------------------
-#include      "set_def.inc"
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE SET_MOD , ONLY : SET_ADD,SET_DELETE,SET_INTERSECT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

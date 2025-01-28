@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -396,7 +396,7 @@ C --------------------------------------------------------
      & ,5X,  'INITIAL SHEAR MODULUS . . . . . . . . .=',1PG20.13/
      & ,5X,  'BULK MODULUS. . . . . . . . . . . . . .=',1PG20.13//)
  279   FORMAT(
-     &  5X,  'MOOONEY-RIVLIN LAW PARAMETERS:',/
+     &  5X,  'MOONEY-RIVLIN LAW PARAMETERS:',/
      & ,5X,  'MU1 . . . . . . . . . . . . . . . . . .=',1PG20.13/
      & ,5X,  'MU2 . . . . . . . . . . . . . . . . . .=',1PG20.13/
      & ,5X,  'AL1 . . . . . . . . . . . . . . . . . .=',1PG20.13/

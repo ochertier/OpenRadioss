@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -101,11 +101,11 @@ c
             KMAX  = MAX(KMAX, SLOPE)
           END DO
 c
-c         check intersection with loading curve
+c         check intersection with loading curve        
           CALL TABLE_INTERS(TABLE,FUNC,FUND,FSCALE1,FSCALE2,XINT,YINT)
 c
           IF (XINT == ZERO .or. YINT == ZERO) THEN
-            CALL ANCMSG(MSGID=1716 ,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_2,
+            CALL ANCMSG(MSGID=3081 ,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_2,
      .                  I1 = MAT_ID,
      .                  I2 = TABLE_ID(1),                                               
      .                  I3 = TABLE_ID(2),                                              

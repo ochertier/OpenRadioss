@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -73,17 +73,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    check_mod                ../common_source/modules/check_mod.F
       !||    dt_mod                   ../engine/source/modules/dt_mod.F
       !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
+      !||    glob_therm_mod           ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
       !||    message_mod              ../engine/share/message_module/message_mod.F
       !||    metric_mod               ../common_source/modules/interfaces/metric_mod.F
       !||    names_and_titles_mod     ../common_source/modules/names_and_titles_mod.F
       !||    output_mod               ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod               ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
       !||    state_mod                ../common_source/modules/state_mod.F
       !||    th_mod                   ../engine/share/modules/th_mod.F
       !||====================================================================
       SUBROUTINE FREFORM(IRUNN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
-     .                   SENSORS,DT,OUTPUT)
+     .                   SENSORS,DT,OUTPUT,GLOB_THERM)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -105,6 +106,7 @@ C-----------------------------------------------
       USE DT_MOD
       USE OUTPUT_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,6 +120,7 @@ C-----------------------------------------------
       TYPE (SENSORS_), INTENT(INOUT) :: SENSORS
       TYPE (DT_), INTENT(INOUT) :: DT
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -148,7 +151,6 @@ C-----------------------------------------------
 #include      "scr19_c.inc"
 #include      "ddspmd_c.inc"
 #include      "sms_c.inc"
-#include      "scr_thermal_c.inc"
 C-----------------------------------------------
 C   L o c a l   P a r a m e t e r s
 C-----------------------------------------------
@@ -879,13 +881,14 @@ C
       IDTMINS_INT=0
       DTFACS_INT=ZERO
       DTMINS_INT=ZERO
-      IDT_THERM=0
+      GLOB_THERM%IDT_THERM  = 0
+      GLOB_THERM%DTFACTHERM = ZERO
       DT%BRICK_CST_DEFV_MIN = ZERO
-      DT%BRICK_CST_COL_MIN = ZERO
+      DT%BRICK_CST_COL_MIN  = ZERO
       DT%BRICK_DEL_DEFV_MIN = ZERO
       DT%BRICK_DEL_DEFV_MAX = ZERO
-      DT%BRICK_DEL_ASP_MAX = ZERO
-      DT%BRICK_DEL_COL_MIN = ZERO
+      DT%BRICK_DEL_ASP_MAX  = ZERO
+      DT%BRICK_DEL_COL_MIN  = ZERO
 C
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
        K=0
@@ -925,14 +928,14 @@ C
        ELSEIF(KEY2=='SMSTR'.AND.KEY3(1:2)=='V4') THEN
          KDTSMSTR=0
        ELSE IF(KEY2=='THERM')THEN
-          IDT_THERM = 1
-          DTFACTHERM = ZEP9
+          GLOB_THERM%IDT_THERM = 1
+          GLOB_THERM%DTFACTHERM = ZEP9
           IF(IKAD(IKEY)+K/=IKAD(IKEY+1))THEN
              READ(IUSC1,REC=IKAD(IKEY)+K,FMT='(1X,A)',ERR=9990)KEY4
              IF(KEY4(1:2)/='DT') THEN
                CALL WRIUSC2(IKAD(IKEY)+K,1,KEY0(IKEY))
-               READ(IUSC2,*,ERR=9990,END=9990)DTFACTHERM
-               IF (DTFACTHERM == ZERO) DTFACA = ZEP9
+               READ(IUSC2,*,ERR=9990,END=9990) GLOB_THERM%DTFACTHERM
+               IF (GLOB_THERM%DTFACTHERM == ZERO) DTFACA = ZEP9
                K=K+1
              ENDIF
           ENDIF
@@ -1301,7 +1304,7 @@ C   Check of compatibility of time step control options - /DT/CST_AMS can not be
         ENDIF
       ENDIF
 C AMS is not compatible with thermal time step
-      IF (IDT_THERM == 1.AND.IDTMINS/=0) THEN
+      IF (GLOB_THERM%IDT_THERM == 1.AND.IDTMINS/=0) THEN
           CALL ANCMSG(MSGID=301,ANMODE=ANINFO,C1=KEY0(IKEY))
           CALL ARRET(0)
       ENDIF
@@ -2584,7 +2587,7 @@ C-----------------------
 C-----------------------
 C     /THERM
 C-----------------------
-      CALL FRETHERMAL(IKAD(0),KEY0,KTHERMAL)
+      CALL FRETHERMAL(IKAD(0),KEY0,KTHERMAL,GLOB_THERM)
 
 C-----------------------
 C     /H3D

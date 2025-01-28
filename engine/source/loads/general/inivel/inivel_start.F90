@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,8 +41,8 @@
       !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
       !||    inivel_mod      ../common_source/modules/inivel_mod.F90
       !||    message_mod     ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
         subroutine inivel_start(                                              &
                        ngrnod,  ngrbric,    ngrquad,       ngrsh3n,           &
@@ -91,7 +91,7 @@
       integer , intent(in   )                          :: ngrbric   !< number solid element group
       integer , intent(in   )                          :: ngrquad   !< number quad element group
       integer , intent(in   )                          :: ngrsh3n   !< number tria element group
-      integer , intent(in   )                          :: lens      !< dimesion of work array itagvel
+      integer , intent(in   )                          :: lens      !< dimension of work array itagvel
       integer , intent(in   ) ,dimension(numnod)       :: weight    !< nodal mass weight array (spmd)
       integer , dimension(nparg,ngroup), intent(in   ) :: iparg     !< element group data array
       type(inivel_), dimension(ninivelt),intent(inout) :: inivel_t  !< inivel_struc 
@@ -101,12 +101,12 @@
       type (group_)  , dimension(ngrsh3n)              :: igrsh3n   !< tria element group array
       type (sensors_) ,intent(in  )                    :: sensors   !< sensor structure
       TYPE(MULTI_FVM_STRUCT), INTENT(INOUT)            :: multi_fvm !< multi_fvm structure
-      type(elbuf_struct_), target, dimension(ngroup)   :: elbuf_tab !< elemnt buffer data
+      type(elbuf_struct_), target, dimension(ngroup)   :: elbuf_tab !< element buffer data
       my_real, intent(in) ,dimension(lskew,numskw+1)   :: skew      !< local skew data
       my_real, intent(in) ,dimension(nxframe,numfram+1):: xframe    !< frame data
       my_real, intent(in) ,dimension(numnod)           :: ms        !< nodal mass
       my_real, intent(in) ,dimension(numnod)           :: in        !< nodal inertia
-      my_real, intent(in) ,dimension(3,numnod)         :: x         !< coordinnate array
+      my_real, intent(in) ,dimension(3,numnod)         :: x         !< coordinate array
       my_real, intent(inout) ,dimension(3,numnod)      :: v         !< velocity
       my_real, intent(inout) ,dimension(3,numnod)      :: vr        !< rotational velocity
       my_real, intent(inout) ,dimension(3,numnod)      :: vflow     !< velocity for int22
@@ -130,6 +130,8 @@
 !  if need update in case of FVM
        iupdate = 0 
        t_kin = zero
+       sens_id = -HUGE(sens_id)
+       tstart = -HUGE(tstart)
        do n =1,ninivelt 
          itype = inivel_t(n)%itype
          if (itype /=5 ) cycle 

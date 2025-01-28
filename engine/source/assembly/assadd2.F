@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,11 +22,14 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 C finalisation parith/on spmd (1ere partie effectuee dans Starter)
       !||====================================================================
-      !||    assadd2      ../engine/source/assembly/assadd2.F
+      !||    assadd2          ../engine/source/assembly/assadd2.F
       !||--- called by ------------------------------------------------------
-      !||    resol_init   ../engine/source/engine/resol_init.F
+      !||    resol_init       ../engine/source/engine/resol_init.F
       !||--- calls      -----------------------------------------------------
-      !||    my_orders    ../common_source/tools/sort/my_orders.c
+      !||    my_orders        ../common_source/tools/sort/my_orders.c
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    my_alloc_mod     ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE ASSADD2(ADDCNE  ,INDSKY  ,FSKY  ,FSKYM    ,IAD_ELEM ,
      2             FR_ELEM ,FR_NBCC ,PROCNE,NISKYFI  ,ADDCNI2  ,        
@@ -36,7 +39,12 @@ C finalisation parith/on spmd (1ere partie effectuee dans Starter)
      6             ISENDP_PXFEM,IRECVP_PXFEM ,IADSDP_PXFEM,IADRCP_PXFEM,
      7             FR_NBCC1 ,INOD_CRKXFEM,ADDCNE_CRKXFEM,PROCNE_CRKXFEM,
      8     ISENDP_CRKXFEM,IRECVP_CRKXFEM,IADSDP_CRKXFEM,IADRCP_CRKXFEM,
-     9             CONDNSKY)
+     9             CONDNSKY,GLOB_THERM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      use glob_therm_mod
+      use my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,11 +81,15 @@ C-----------------------------------------------
      .        IRECVP_CRKXFEM(*),IADSDP_CRKXFEM(*),IADRCP_CRKXFEM(*)
       my_real 
      .        FSKY(8,LSKY),FSKYM(LSKY),FTHESKY(LSKY),CONDNSKY(LSKY)
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, N, K, L, NC1, NC, LOC_PROC, NOD, CC, lsd, lrc,
-     .        WORK(70000), INDEX(2*NUMNOD),LSD1,LRC1,NOD1,XFEM_REM_COUNT
+     .        WORK(70000), LSD1,LRC1,NOD1,XFEM_REM_COUNT
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INDEX
+C-----------------------------------------------
+      CALL MY_ALLOC(INDEX,2*NUMNOD)
 C-----------------------------------------------
 C   Init a ZERO FORCES NODALES 
 C-----------------------------------------------
@@ -93,19 +105,19 @@ C-----------------------------------------------
       ENDDO
 C
 C
-      IF(ITHERM_FE > 0 ) THEN
+      IF (GLOB_THERM%ITHERM_FE > 0 ) THEN
         DO I=1,LSKY 
          FTHESKY(I) = ZERO
        ENDDO
       ENDIF
 C
-      IF(NODADT_THERM > 0 ) THEN
+      IF (GLOB_THERM%NODADT_THERM > 0 ) THEN
         DO I=1,LSKY 
          CONDNSKY(I) = ZERO
        ENDDO
       ENDIF
 C
-      IF (N2D == 0 .AND. IALE+IEULER+ITHERM>0)THEN
+      IF (N2D == 0 .AND. IALE+IEULER + GLOB_THERM%ITHERM > 0) THEN
         DO I = 1, LSKY
           FSKYM(I)=ZERO
         ENDDO
@@ -407,6 +419,7 @@ C fin ivector=1
 C fin interface type I2NSNT > 0
       END IF
 C
+      DEALLOCATE(INDEX)
       RETURN
       END
 C 

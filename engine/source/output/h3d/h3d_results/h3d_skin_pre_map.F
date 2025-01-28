@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,16 +26,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    genh3d             ../engine/source/output/h3d/h3d_results/genh3d.F
       !||--- uses       -----------------------------------------------------
       !||    h3d_inc_mod        ../engine/share/modules/h3d_inc_mod.F
-      !||    loads_mod          ../common_source/modules/loads/loads_mod.F
       !||    pinchtype_mod      ../common_source/modules/pinchtype_mod.F
       !||====================================================================
-      SUBROUTINE H3D_SKIN_PRE_MAP(IB     ,ILOADP    ,LLOADP ,IMAPSKP,LOADS)
+      SUBROUTINE H3D_SKIN_PRE_MAP(IB     ,ILOADP    ,LLOADP ,IMAPSKP,LOADS,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
       USE PINCHTYPE_MOD 
       USE H3D_INC_MOD
       USE LOADS_MOD
+      USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,15 +57,16 @@ C-----------------------------------------------
       INTEGER, DIMENSION(NIBCLD,NCONLD), INTENT(IN)  :: IB
       INTEGER, DIMENSION(NUMSKINP0), INTENT(OUT)  :: IMAPSKP
       TYPE (LOADS_)   , INTENT(IN) :: LOADS
+      TYPE(PBLAST_),INTENT(IN) :: PBLAST
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER NL, N1, ISK, N2, N3, N4, N5, J,IXST,
-     .        IAD ,NP ,NP0 ,NPRES ,N,NSKIN_I,NSKINP0,IERR,SHIFT
+     .        IAD ,NP ,NP0 ,NPRES ,N,NSKIN_I,NSKINP0,SHIFT
       INTEGER, DIMENSION(:,:), ALLOCATABLE  :: IRECT
       INTEGER, DIMENSION(:), ALLOCATABLE  :: ITAGN
 C=======================================================================
-       ALLOCATE(IRECT(4,NUMSKINP),ITAGN(NUMNOD),STAT=IERR)
+       ALLOCATE(IRECT(4,MAX(1,NUMSKINP)),ITAGN(MAX(1,NUMNOD)))
 C
          ITAGN = 0         
          NP = 0
@@ -88,7 +89,7 @@ C
          END DO
          NP0 = NP         
 C----add only not existing           
-           SHIFT =   NLOADP_F+NLOADP_B
+           SHIFT =   NLOADP_F+PBLAST%NLOADP_B
            DO NL=1+SHIFT,NLOADP_HYD+SHIFT
               IAD = ILOADP(4,NL)
               DO N=1, ILOADP(1,NL)/4
@@ -138,7 +139,7 @@ C----add only not existing
               ENDDO
            END DO 
 C           
-           DO  NL=1,NLOADP_F+NLOADP_B
+           DO  NL=1,NLOADP_F+PBLAST%NLOADP_B
               IAD = ILOADP(4,NL)
               DO N=1, ILOADP(1,NL)/4
                 N1 = LLOADP(IAD+4*(N-1))

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,18 +21,22 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    material_flow     ../engine/source/tools/seatbelts/material_flow.F
+      !||    material_flow              ../engine/source/tools/seatbelts/material_flow.F
       !||--- called by ------------------------------------------------------
-      !||    r23l114def3       ../engine/source/elements/spring/r23l114def3.F
+      !||    r23l114def3                ../engine/source/elements/spring/r23l114def3.F
       !||--- calls      -----------------------------------------------------
-      !||    get_u_func        ../engine/source/user_interface/ufunc.F
-      !||    get_u_func_inv    ../engine/source/user_interface/ufunc.F
-      !||    solve_delta_l0    ../engine/source/tools/seatbelts/material_flow.F
-      !||    solve_delta_l02   ../engine/source/tools/seatbelts/material_flow.F
+      !||    get_u_func                 ../engine/source/user_interface/ufunc.F
+      !||    retractor_table_inv        ../engine/source/tools/seatbelts/retractor_table_inv.F90
+      !||    retractor_table_inv2       ../engine/source/tools/seatbelts/retractor_table_inv2.F90
+      !||    solve_delta_l0             ../engine/source/tools/seatbelts/material_flow.F
+      !||    solve_delta_l02            ../engine/source/tools/seatbelts/material_flow.F
+      !||    table_interp_dydx          ../engine/source/tools/curve/table_tools.F
       !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    seatbelt_mod      ../common_source/modules/seatbelt_mod.F
-      !||    sensor_mod        ../engine/share/modules/sensor_mod.F
+      !||    elbufdef_mod               ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    retractor_table_inv2_mod   ../engine/source/tools/seatbelts/retractor_table_inv2.F90
+      !||    retractor_table_inv_mod    ../engine/source/tools/seatbelts/retractor_table_inv.F90
+      !||    seatbelt_mod               ../common_source/modules/seatbelt_mod.F
+      !||    sensor_mod                 ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE MATERIAL_FLOW(DFS,DFS_OLD,ALDP,SLIPRING_STRAND,XK,
      1                         OFF,AL0,AL02,LMIN,UPDATE_FLAG,
@@ -51,6 +55,8 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE SEATBELT_MOD
       USE SENSOR_MOD
+      USE retractor_table_inv_mod
+      USE retractor_table_inv2_mod
 C----6---------------------------------------------------------------7---------8
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -89,12 +95,12 @@ C-----------------------------------------------
       INTEGER FLAG,NEW_NODE2,NEW_NODE1,FORCE_TENS_TYP,FLAG_NO_COUNT_PULL
       my_real DDFS,BETA,HH,HH2,FRIC,DELTAF,DDV,DT11,FB,F1,F2,DF
       my_real TENS,XSCAL,NORM,PRES,VREL,ALPHA,ALPHA2,VEC1(3),VEC2(3)
-      my_real FRICD,FRICS,XX,DXDY,YY,GET_U_FUNC,GET_U_FUNC_INV,FB2,ANGLE
+      my_real FRICD,FRICS,XX,DXDY,YY,GET_U_FUNC,FB2,ANGLE
       my_real DDX,DDX2,F_LOCK,F_UNLOCK,PRETENS,XX1,XX2,COS_BETA
       my_real OMEGA,EPS1,EPS2,EPSN,FACT
       DOUBLE PRECISION DELTA_LO
 C
-      EXTERNAL GET_U_FUNC,GET_U_FUNC_INV
+      EXTERNAL GET_U_FUNC
 C---------------------------------------------------------
 C
       DT11 = DT1
@@ -136,7 +142,7 @@ C         Computation of friction coefficient
 C
 C----     Effect of material flow --
 C
-          VREL = ABS(SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%MATERIAL_FLOW)
+          VREL = ABS(SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%MATERIAL_FLOW_OLD)
 C--       dynamic friction
           IF (SLIPRING(SLIPRING_ID(I))%IFUNC(1) == 0) THEN
             FRICD = SLIPRING(SLIPRING_ID(I))%FRIC
@@ -236,12 +242,19 @@ C
 C
           DFS(I) = DFS(I) + DDFS
           DELTAF = FB*(ONE-ONE/MAX(EM15,HH))
+C 
+C         Locking of slipring by sensor            
+          FLAG_SENSOR_LOCK = 0
+          IF (SLIPRING(SLIPRING_ID(I))%SENSID > 0) THEN
+             IF (TT > SENSOR_TAB(SLIPRING(SLIPRING_ID(I))%SENSID)%TSTART) FLAG_SENSOR_LOCK = 1
+          ENDIF       
 C
           IF ((ABS(DELTAF) >= ABS(DFS(I))).OR.
      .        ((SLIPRING(SLIPRING_ID(I))%FL_FLAG==1).AND.(DELTA_LO > 0)).OR.
      .        ((SLIPRING(SLIPRING_ID(I))%FL_FLAG==2).AND.(DELTA_LO < 0)).OR.
      .        ((SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%LOCKED==1).AND.(DELTA_LO > 0)).OR.
-     .        ((SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%LOCKED==2).AND.(DELTA_LO < 0))) THEN
+     .        ((SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%LOCKED==2).AND.(DELTA_LO < 0)).OR.
+     .        (FLAG_SENSOR_LOCK == 1)) THEN
 C--         adherence or 1 direction flow imposed by fl_flag or blocked because no more seatbelt
             ADHER(I) = 1
             DELTA_LO = 0
@@ -333,7 +346,7 @@ C
 C         Computation of friction coefficient
 C
 C----     Effect of material flow --
-          VREL = ABS(SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%MATERIAL_FLOW)
+          VREL = ABS(SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%MATERIAL_FLOW_OLD)
 C--       dynamic friction
           IF (SLIPRING(SLIPRING_ID(I))%IFUNC(1) == 0) THEN
             FRICD = SLIPRING(SLIPRING_ID(I))%FRIC
@@ -433,12 +446,19 @@ C
 C
           DFS(I) = DFS(I) + DDFS
           DELTAF = FB*(HH-ONE)
+C          
+C         Locking of slipring by sensor            
+          FLAG_SENSOR_LOCK = 0
+          IF (SLIPRING(SLIPRING_ID(I))%SENSID > 0) THEN
+             IF (TT > SENSOR_TAB(SLIPRING(SLIPRING_ID(I))%SENSID)%TSTART) FLAG_SENSOR_LOCK = 1
+          ENDIF          
 C
           IF ((ABS(DELTAF) >= ABS(DFS(I))).OR.
      .        ((SLIPRING(SLIPRING_ID(I))%FL_FLAG==1).AND.(DELTA_LO > 0)).OR.
      .        ((SLIPRING(SLIPRING_ID(I))%FL_FLAG==2).AND.(DELTA_LO < 0)).OR.
      .        ((SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%LOCKED==1).AND.(DELTA_LO > 0)).OR.
-     .        ((SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%LOCKED==2).AND.(DELTA_LO < 0))) THEN
+     .        ((SLIPRING(SLIPRING_ID(I))%FRAM(FR_ID(I))%LOCKED==2).AND.(DELTA_LO < 0)).OR.
+     .        (FLAG_SENSOR_LOCK ==1)) THEN
 C--         adherence or 1 direction flow imposed by fl_flag or blocked because no more seatbelt
             ADHER(I) = 1
             DELTA_LO = 0
@@ -527,8 +547,9 @@ C--             Pretensioning with pullin
 C--               Pretensioning deactivated when force is reached
                   IF (F_LOCK > RETRACTOR(RETRACTOR_ID(I))%FORCE) THEN
                     RETRACTOR(RETRACTOR_ID(I))%LOCKED = 1
-                    YY = F_LOCK/RETRACTOR(RETRACTOR_ID(I))%FAC(1)        
-                    XX = GET_U_FUNC_INV(RETRACTOR(RETRACTOR_ID(I))%IFUNC(1),YY)*RETRACTOR(RETRACTOR_ID(I))%FAC(2)
+                    YY = F_LOCK/RETRACTOR(RETRACTOR_ID(I))%FAC(1)
+                    CALL RETRACTOR_TABLE_INV(RETRACTOR(RETRACTOR_ID(I))%TABLE(1),XX,YY)
+                    XX = XX*RETRACTOR(RETRACTOR_ID(I))%FAC(2)
                     RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = RETRACTOR(RETRACTOR_ID(I))%FAC(2)*XX
                     RETRACTOR(RETRACTOR_ID(I))%PRETENS_ACTIV = -1
                     RETRACTOR(RETRACTOR_ID(I))%PRETENS_PULL = ZERO
@@ -544,8 +565,9 @@ C--             Pretensioning with force -> F = MAX(F_retractor,F_pretens) - sam
                 IF (RETRACTOR(RETRACTOR_ID(I))%PRETENS_PULL > RETRACTOR(RETRACTOR_ID(I))%PULLOUT) THEN
 C--               Pretensioning deactivated when pullout is reached
                   RETRACTOR(RETRACTOR_ID(I))%LOCKED = 1
-                  YY = F_LOCK/RETRACTOR(RETRACTOR_ID(I))%FAC(1)        
-                  XX = GET_U_FUNC_INV(RETRACTOR(RETRACTOR_ID(I))%IFUNC(1),YY)*RETRACTOR(RETRACTOR_ID(I))%FAC(2)
+                  YY = F_LOCK/RETRACTOR(RETRACTOR_ID(I))%FAC(1)
+                  CALL RETRACTOR_TABLE_INV(RETRACTOR(RETRACTOR_ID(I))%TABLE(1),XX,YY)
+                  XX = XX*RETRACTOR(RETRACTOR_ID(I))%FAC(2)
                   RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = RETRACTOR(RETRACTOR_ID(I))%FAC(2)*XX
                   RETRACTOR(RETRACTOR_ID(I))%PRETENS_ACTIV = -1
                   RETRACTOR(RETRACTOR_ID(I))%PRETENS_PULL = ZERO
@@ -562,9 +584,10 @@ C--             Pretensioning with pullin energy
 C--               Pretensioning deactivated when force is reached
                   IF (F_LOCK > RETRACTOR(RETRACTOR_ID(I))%FORCE) THEN
                     RETRACTOR(RETRACTOR_ID(I))%LOCKED = 1
-                    YY = F_LOCK/RETRACTOR(RETRACTOR_ID(I))%FAC(1)        
-                    XX = GET_U_FUNC_INV(RETRACTOR(RETRACTOR_ID(I))%IFUNC(1),YY)
-                    RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = RETRACTOR(RETRACTOR_ID(I))%FAC(2)*XX
+                    YY = F_LOCK/RETRACTOR(RETRACTOR_ID(I))%FAC(1)
+                    CALL RETRACTOR_TABLE_INV(RETRACTOR(RETRACTOR_ID(I))%TABLE(1),XX,YY)
+                    XX = XX*RETRACTOR(RETRACTOR_ID(I))%FAC(2)
+                    RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = XX
                     RETRACTOR(RETRACTOR_ID(I))%PRETENS_ACTIV = -1
                     RETRACTOR(RETRACTOR_ID(I))%PRETENS_PULL = ZERO
                   ENDIF
@@ -586,12 +609,12 @@ C--           Loading --
                 RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL_SAV = ZERO
               ENDIF  
               IF (RETRACTOR(RETRACTOR_ID(I))%LOCKED_FREEZE == 1) THEN
-                 RETRACTOR(RETRACTOR_ID(I))%LOCK_YIELD_FORCE = ZERO
                  FLAG_NO_COUNT_PULL = 1
               ELSEIF (F_LOCK > RETRACTOR(RETRACTOR_ID(I))%LOCK_YIELD_FORCE) THEN
 C--             Loading --  
                 XX = RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL/RETRACTOR(RETRACTOR_ID(I))%FAC(2)
-                YY = GET_U_FUNC(RETRACTOR(RETRACTOR_ID(I))%IFUNC(1),XX,DXDY)*RETRACTOR(RETRACTOR_ID(I))%FAC(1)
+                CALL TABLE_INTERP_DYDX(RETRACTOR(RETRACTOR_ID(I))%TABLE(1),XX,1,YY,DXDY)
+                YY = YY*RETRACTOR(RETRACTOR_ID(I))%FAC(1)
                 DXDY = DXDY * (RETRACTOR(RETRACTOR_ID(I))%FAC(2) / RETRACTOR(RETRACTOR_ID(I))%FAC(1))
                 IF ((FORCE_TENS_TYP == 2).AND.(PRETENS > YY)) THEN
                   YY = PRETENS
@@ -608,12 +631,13 @@ C--             Loading --
 C--             Unloading --
                 IF (RETRACTOR(RETRACTOR_ID(I))%LOCK_OFFSET == ZERO) THEN
                   YY = RETRACTOR(RETRACTOR_ID(I))%LOCK_YIELD_FORCE/RETRACTOR(RETRACTOR_ID(I))%FAC(1)
-                  XX1 = GET_U_FUNC_INV(RETRACTOR(RETRACTOR_ID(I))%IFUNC(1),YY)       
-                  XX2 = GET_U_FUNC_INV(RETRACTOR(RETRACTOR_ID(I))%IFUNC(2),YY)
+                  CALL RETRACTOR_TABLE_INV2(RETRACTOR(RETRACTOR_ID(I))%TABLE(1),XX1,YY,RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL)
+                  CALL RETRACTOR_TABLE_INV(RETRACTOR(RETRACTOR_ID(I))%TABLE(2),XX2,YY)
                   RETRACTOR(RETRACTOR_ID(I))%LOCK_OFFSET = RETRACTOR(RETRACTOR_ID(I))%FAC(2)*(XX1-XX2)
                 ENDIF
                 XX = (RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL-RETRACTOR(RETRACTOR_ID(I))%LOCK_OFFSET)/RETRACTOR(RETRACTOR_ID(I))%FAC(2)
-                YY = GET_U_FUNC(RETRACTOR(RETRACTOR_ID(I))%IFUNC(2),XX,DXDY)*RETRACTOR(RETRACTOR_ID(I))%FAC(1)
+                CALL TABLE_INTERP_DYDX(RETRACTOR(RETRACTOR_ID(I))%TABLE(2),XX,1,YY,DXDY)
+                YY = YY*RETRACTOR(RETRACTOR_ID(I))%FAC(1)
                 DXDY = DXDY * (RETRACTOR(RETRACTOR_ID(I))%FAC(2) / RETRACTOR(RETRACTOR_ID(I))%FAC(1))
                 IF ((FORCE_TENS_TYP == 2).AND.(PRETENS > YY)) THEN
                   YY = PRETENS
@@ -623,7 +647,7 @@ C--             Unloading --
                 ENDIF 
                 CALL SOLVE_DELTA_L02(DELTA_LO,DXDY,YY,XK(I),ALDP(I),AL0DP(I),LMIN(I),FB)
                 EPSN = (ALDP(I)-AL0DP(I)-DELTA_LO)/MAX(LMIN(I),AL0DP(I)+DELTA_LO)
-                FB = FX(I) + XK(I)*(EPSN-EPS1) 
+                FB = FX(I) + XK(I)*(EPSN-EPS1)
               ENDIF
             ENDIF
 C
@@ -682,7 +706,10 @@ C--                 rest of lockpull - counted from time of locking
             ENDIF
 C
             IF (FLAG_NO_COUNT_PULL == 0) THEN
-              IF ((RETRACTOR(RETRACTOR_ID(I))%LOCKED == 1).OR.(FLAG_SENSOR_LOCK == 1)) THEN
+              IF ((RETRACTOR(RETRACTOR_ID(I))%LOCKED == 0).AND.(FLAG_SENSOR_LOCK == 1)) THEN
+C--             Pullin after sensor activation and before locking not counted -> Lock_pull > 0                
+                RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = MAX(ZERO,RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL + DELTA_LO)
+              ELSEIF ((RETRACTOR(RETRACTOR_ID(I))%LOCKED == 1).OR.(FLAG_SENSOR_LOCK == 1)) THEN
                 RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL + DELTA_LO
               ELSE
                 RETRACTOR(RETRACTOR_ID(I))%LOCK_PULL = ZERO
@@ -866,17 +893,18 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      my_real  DD,SOL1,SOL2,AA,BB,CC,EE
+      DOUBLE PRECISION DD,SOL1,SOL2,AA,BB,CC,EE
 C-----------------------------------------------
 C
 C      Computation of Dl0 for locked retractor
 C
 C--    equation 1 -> l0 > lmin
+      IF (L0 > EM05) THEN
        AA = ALPHA
        BB = ALPHA*L0+BETA+XK*L/L0-FB
        CC = BETA*L0-FB*L0
        IF (ABS(AA) > EM20) THEN
-         DD = BB*BB-4*AA*CC
+           DD = MAX(EM20,BB*BB-4*AA*CC)
          SOL1 = (-BB+SQRT(DD))/(2*AA)
          SOL2 = (-BB-SQRT(DD))/(2*AA)
          DELTA_LO = SOL1
@@ -884,9 +912,14 @@ C--    equation 1 -> l0 > lmin
          EE = SIGN(MAX(EM20,ABS(BB)),BB)
          DELTA_LO = -CC / EE
        ENDIF
+      ELSE
+C--      computation will be done by equation 2           
+         DELTA_LO = ZERO
+       ENDIF
 C
        IF (L0 +  DELTA_LO < LMIN) THEN
 C--      equation 2 -> l0 < lmin
+         BETA = BETA -FB + XK*(L-L0)/MAX(LMIN,L0)
          LMIN = MAX(LMIN,L0)
          BB = ALPHA*LMIN + XK
          EE = SIGN(MAX(EM20,ABS(BB)),BB)

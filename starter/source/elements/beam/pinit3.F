@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,21 +21,21 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    pinit3         ../starter/source/elements/beam/pinit3.F
+      !||    pinit3           ../starter/source/elements/beam/pinit3.F
       !||--- called by ------------------------------------------------------
-      !||    initia         ../starter/source/elements/initia/initia.F
+      !||    initia           ../starter/source/elements/initia/initia.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg         ../starter/source/output/message/message.F
-      !||    bsigini        ../starter/source/elements/beam/bsigini.F
-      !||    buserini       ../starter/source/elements/beam/buserini.F
-      !||    dt1lawp        ../starter/source/elements/beam/dt1lawp.F
-      !||    pcoori         ../starter/source/elements/beam/pcoori.F
-      !||    peveci         ../starter/source/elements/beam/peveci.F
-      !||    pibuf3         ../starter/source/elements/beam/pibuf3.F
-      !||    pmass          ../starter/source/elements/beam/pmass.F
+      !||    ancmsg           ../starter/source/output/message/message.F
+      !||    bsigini          ../starter/source/elements/beam/bsigini.F
+      !||    buserini         ../starter/source/elements/beam/buserini.F
+      !||    dt1lawp          ../starter/source/elements/beam/dt1lawp.F
+      !||    pcoori           ../starter/source/elements/beam/pcoori.F
+      !||    peveci           ../starter/source/elements/beam/peveci.F
+      !||    pibuf3           ../starter/source/elements/beam/pibuf3.F
+      !||    pmass            ../starter/source/elements/beam/pmass.F
       !||--- uses       -----------------------------------------------------
-      !||    bpreload_mod   ../starter/share/modules1/bpreload_mod.F
-      !||    message_mod    ../starter/share/message_module/message_mod.F
+      !||    bpreload_mod     ../starter/share/modules1/bpreload_mod.F
+      !||    message_mod      ../starter/share/message_module/message_mod.F
       !||====================================================================
       SUBROUTINE PINIT3(ELBUF_STR,
      1                  STP      ,IC      ,PM      ,X       ,GEO   ,
@@ -43,13 +43,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      3                  STIFN    ,STIFR   ,PARTSAV ,V       ,IPART ,
      4                  MSP      ,INP     ,IGEO    ,STIFINT ,STRP  ,
      5                  NSIGBEAM ,SIGBEAM ,PTBEAM  ,IUSER   ,MCP   ,
-     6                  MCPP     ,TEMP    ,PRELOAD_A,IPRELD,NPRELOAD_A)
+     6                  MCPP     ,TEMP    ,PRELOAD_A,IPRELD,NPRELOAD_A,
+     7                  GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MESSAGE_MOD
       USE BPRELOAD_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -78,6 +80,7 @@ C-----------------------------------------------
 C
       TYPE(ELBUF_STRUCT_), TARGET :: ELBUF_STR
       TYPE(PREL1D_) ,DIMENSION(NPRELOAD_A),    TARGET :: PRELOAD_A
+      type (glob_therm_) ,intent(in)      :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -110,7 +113,7 @@ c
      .           MSP(NFT+1),INP(NFT+1),IGEO , STIFINT, STP(NFT+1),
      .           X1,X2, Y1,Y2, Z1,Z2,
      .           NC1,NC2,MXT,MXG,AREA,DELTAX,STRP(NFT+1),MCP   ,
-     .           MCPP(NFT+1) , TEMP )
+     .           MCPP(NFT+1) , TEMP ,GLOB_THERM%NINTEMP)
       CALL PIBUF3(GEO,GBUF%OFF,GBUF%LENGTH,DELTAX,MXG,IREL)
 C------------------------------------------
 C Beam initialization

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -74,7 +74,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
+      EBCS%title = TRIM(TITR)
 
+      EBCS%TITLE = TITR
       EBCS%IS_MULTIFLUID = .TRUE.
       EBCS%HAS_IELEM = .TRUE.             
       EBCS%FVM_INLET_DATA%FORMULATION = -1

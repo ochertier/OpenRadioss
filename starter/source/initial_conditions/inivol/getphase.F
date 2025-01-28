@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -188,7 +188,7 @@ C------------------------------------
         ! find the phase of the elements : based on the distance of each node to the surface
         ! to avoid to many computation, the space is divided in cells
         ! the phase of each cell without any nodes of the surface is found
-        ! then the cell's phase is applyed to the nodes belonging to the cell 
+        ! then the cell's phase is applied to the nodes belonging to the cell 
         SIZE_X2 = IX2
         ALLOCATE( CLOSEST_NODE_ID(NUMNOD) )
         CLOSEST_NODE_ID(1:NUMNOD) = -1

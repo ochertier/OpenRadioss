@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,26 +21,28 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    multi_nrf_ebcs    ../engine/source/multifluid/multi_nrf_ebcs.F
+      !||    multi_nrf_ebcs     ../engine/source/multifluid/multi_nrf_ebcs.F
       !||--- called by ------------------------------------------------------
-      !||    multi_ebcs        ../engine/source/multifluid/multi_ebcs.F
+      !||    multi_ebcs         ../engine/source/multifluid/multi_ebcs.F
       !||--- calls      -----------------------------------------------------
-      !||    arret             ../engine/source/system/arret.F
-      !||    multi_submatlaw   ../engine/source/multifluid/multi_submatlaw.F
+      !||    arret              ../engine/source/system/arret.F
+      !||    multi_submatlaw    ../engine/source/multifluid/multi_submatlaw.F
       !||--- uses       -----------------------------------------------------
-      !||    ebcs_mod          ../common_source/modules/boundary_conditions/ebcs_mod.F
-      !||    multi_fvm_mod     ../common_source/modules/ale/multi_fvm_mod.F
-      !||    th_surf_mod       ../common_source/modules/interfaces/th_surf_mod.F
+      !||    ebcs_mod           ../common_source/modules/boundary_conditions/ebcs_mod.F90
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||    multi_fvm_mod      ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    th_surf_mod        ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE MULTI_NRF_EBCS(ITASK, EBCS_ID, MULTI_FVM, NELEM, ELEM_LIST, FACE_LIST, 
      .                          FVM_INLET_DATA, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM, FUNC_VALUE,
-     .                          EBCS,NPF,TF,FSAVSURF,TIMESTEP)
+     .                          EBCS,NPF,TF,FSAVSURF,TIMESTEP,MATPARAM)
 C-----------------------------------------------
 C     M o d u l e s
 C-----------------------------------------------
       USE MULTI_FVM_MOD
       USE EBCS_MOD
       USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
+      USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
 C-----------------------------------------------
 C     I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,6 +76,7 @@ C-----------------------------------------------
       TYPE(t_ebcs_nrf), INTENT(INOUT) :: EBCS
       INTEGER, INTENT(IN) :: NPF(SNPC)
       my_real, INTENT(IN) :: TF(STF), TIMESTEP
+      TYPE(MATPARAM_STRUCT_),DIMENSION(NUMMAT), INTENT(IN) :: MATPARAM !material data structure
 C-----------------------------------------------
 C     L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -193,7 +196,7 @@ C     VE formulation
      4                  NPROPM,             NPROPMI,                      DUMMY,                   ONE,
      5                  DUMMY,              MULTI_FVM%BFRAC(IMAT,ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY,
      6                  DUMMY,              DUMMY,                        NPF,                     TF,
-     7                  DUMMY,              1)
+     7                  DUMMY,              1,                            MATPARAM(LOCAL_MATID(IMAT)))
                  SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) *  MAX(EM20, PHASE_SSPJJ(IMAT))
                  P_JJ = P_JJ + PHASE_PRESJJ(IMAT) * PHASE_ALPHAJJ(IMAT)
                  EINTJJ = EINTJJ + PHASE_ALPHAJJ(IMAT) * PHASE_EINTJJ(IMAT)

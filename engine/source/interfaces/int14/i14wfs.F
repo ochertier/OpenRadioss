@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    resol           ../engine/source/engine/resol.F
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
+      !||    output_mod      ../common_source/modules/output/output_mod.F90
       !||====================================================================
       SUBROUTINE I14WFS(IPARI,INTBUF_TAB,IGRSURF,FSAV)
 C-----------------------------------------------
@@ -33,6 +34,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD
+      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,7 +78,7 @@ C                  actuellement, NRTM == 1.
          KSURF=INTBUF_TAB(N)%KSURF(1)
          IF (IGRSURF(KSURF)%TYPE==100) THEN
 C          Travail des interfaces avec Madymo.
-           TFEXT=TFEXT+DE*DT2*HALF
+           WFEXT=WFEXT+DE*DT2*HALF
          ENDIF
 C-----------------------------------------------
  100  CONTINUE

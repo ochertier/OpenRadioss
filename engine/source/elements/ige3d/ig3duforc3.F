@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,19 +41,22 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    srho3                  ../engine/source/elements/solid/solide/srho3.F
       !||    srota3                 ../engine/source/elements/solid/solide/srota3.F
       !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE IG3DUFORC3(
+      SUBROUTINE IG3DUFORC3(TIMERS, 
      1   ELBUF_TAB,   NG,          LFT,         LLT,
      2   NFT,         NEL,         IXS,         PM,
      3   GEO,         IPM,         IGEO,        X,
@@ -75,11 +78,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      J   JEUL,        JLAG,        JCVT,        JPLASOL,
      K   JSPH,        SNPC,        STF,         SBUFMAT,
      L   SVIS,        NSVOIS,      IDTMINS,     IRESP,      
-     .   IDEL7NG,     IDEL7NOK,    USERL_AVAIL, heat_meca,
-     .   impl_s,      idyna,       DT         )
+     .   IDEL7NG,     IDEL7NOK,    USERL_AVAIL, 
+     .   impl_s,      idyna,       DT         , GLOB_THERM,
+     .   SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -88,6 +93,8 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -111,6 +118,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) ,INTENT(INOUT) :: TIMERS
       INTEGER, INTENT(INOUT) :: JPLASOL
       INTEGER, INTENT(INOUT) :: JSPH
       INTEGER, INTENT(IN) :: JCVT
@@ -129,7 +137,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IMPL_S
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
-      my_real, INTENT(INOUT) :: HEAT_MECA
 
       INTEGER LFT,LLT,NEL,NFT,MTN,IGTYP,IFAILURE,NPT,JSMS,
      .        NCTRL,NG,NELTST,ITYPTST,OFFSET,IEXPAN,ITASK,H3D_STRAIN
@@ -151,6 +158,8 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE(DT_) ,INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -516,8 +525,8 @@ C------------------------------------------------------
 C     CALCUL DES CONTRAINTES 
 C------------------------------------------------------
 
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
-       CALL MMAIN(
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
+       CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -545,13 +554,13 @@ C------------------------------------------------------
      P   BID,         IPARG(1,NG), IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        MVSIZ,
-     S                SNPC,        STF,         SBUFMAT,
+     S   SNPC,        STF,         SBUFMAT,     GLOB_THERM,   
      *   SVIS,        SZ_IX,       IRESP,
-     T   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     T   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL,  impl_s,
      .   idyna,       DT         ,BID   )
 
        CALL SSTRA3(
@@ -560,7 +569,7 @@ C------------------------------------------------------
      3   WYY,      WZZ,      OFF,      NEL,
      4   JCVT)
 
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 
 C------------------------------------------------------
 C     FORCES INTERNES
@@ -612,7 +621,8 @@ C------------------------------------------------------
            CALL IGE3DBILAN(PARTSAV,GBUF%EINT,GBUF%RHO,VOLG,
      .                     VX, VY, VZ,IPARTS,GBUF%VOL,
      .                     GRESAV,GRTH,IGRTH,
-     .                     XX, YY, ZZ, NCTRL,ITASK,IPARG(1,NG))
+     .                     XX, YY, ZZ, NCTRL,ITASK,IPARG(1,NG),
+     .                     SENSORS)
       ENDIF
 
 C--------------------------------------------

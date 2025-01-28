@@ -10,219 +10,12 @@ env:
   CLOSE_BRANCH: 0
   TEAM_RESTRICTIVE_CLOSED_BRANCH: ${{ secrets.TEAM_RESTRICTIVE_CLOSED_BRANCH }}
   FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
-  TO_EMAIL: ${{ secrets.TO_EMAIL }}
+  TO_EMAIL: "${{ secrets.TO_EMAIL }}"
   MAIL_RELAY: ${{ secrets.MAIL_RELAY }}
   QA_TIMEOUT_PER_TEST_LINUX: 150
   QA_TIMEOUT_PER_TEST_WIN: 500
 
 jobs:
-
-  build_tools_linux:
-    if: ${{ github.repository_owner == 'OpenRadioss' }}
-    # DEV ONLY # runs-on: ["linux64","dev_pmci"] 
-    runs-on: ["linux64","prmerge_ci"]
-    continue-on-error: true
-    container: 
-      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:cos8-ompi411-devts11
-      credentials: 
-        username: ${{secrets.DOCKER_REGISTRY_USER}}
-        password: ${{secrets.DOCKER_REGISTRY_PASSWD}}
-      volumes: 
-        - /etc/localtime:/etc/localtime:ro
- 
-    env:
-      STATUS_BUILD: 0
-      os: linux64
-
-    steps:
-
-      # Set the working dir suffixed with branch name
-      - name: Set workdir 
-        run: |
-          if [ "${{ github.base_ref }}" = "" ]
-          then
-            echo "WORKDIR=${{github.ref_name}}" >> $GITHUB_ENV
-          else
-            echo "WORKDIR=${{github.base_ref}}" >> $GITHUB_ENV
-          fi
-
-      - name: Create branch oriented WS directory & integration WS
-        run: |
-          mkdir -p ${{ env.WORKDIR }}
-
-      - name: Clean local exe dir
-        working-directory: ${{ env.WORKDIR }}
-        run: |
-          rm -rf exec
-          md5sum exec/* || echo "Nothing in exec/" 
-
-      # Get last git modifications, don't clean before (way to keep persistent obj files)
-      - name: Checkout git sources
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.WORKDIR }}
-          clean: 'false'
-          lfs: 'true'
-
-      - name: Running builds
-        working-directory: ${{ env.WORKDIR }}
-        run: |
-          mkdir exec
-          source /home/adminqa/.bashrc
-
-          cmd="./build.bash"
-          echo "========================================="
-          echo "--  BUILD tools for anim_to_vtk (${{ env.os }}) --"   
-          echo "--  $cmd --"   
-          echo "========================================="
-
-          cd tools/anim_to_vtk/${{ env.os }}
-          eval $cmd
-
-          cmd="./build.bash"
-          echo "========================================="
-          echo "--  BUILD tools for anim_to_vtk (${{ env.os }}) --"   
-          echo "--  $cmd --"   
-          echo "========================================="
-
-          cd ../../th_to_csv/${{ env.os }}
-          eval $cmd
-
-          # Set correct end of step status (if not an email will be sent)
-          echo "STATUS_BUILD=1" >> $GITHUB_ENV
-
-      - name: Managing step execution
-        if: ${{ always() }}
-        run: |
-
-          MAILMSG="Some error(s) has(ve) been raised during workflow execution:\n\n"
-          echo -e "\n#### STATUS_STEP_BUILD ${{ env.os }} ###"
-          if [ "$STATUS_BUILD" = 0 ]
-          then
-            echo -e "Status\t[ \033[31;2;1mFAILED\033[0m ]" 
-            MAILMSG="The build tools ${{ env.os }} has failed \n"
-
-            # Send email 
-
-            # Setting SMTP server (docker host)
-            DOCKER_HOST=`/sbin/ip route|awk '/default/ { print $3 }'`
-            echo "set smtp=smtp://${DOCKER_HOST}:25" >> /etc/mail.rc 
-
-            # Print message in log 
-            echo -e $MAILMSG
-
-            # Send email
-            echo -e "$MAILMSG" | Mail -r $FROM_EMAIL -s "Error in Github CI repo ${{ github.repository }} (${{github.sha}})" $TO_EMAIL
-
-          else
-            echo -e "Status\t[ \033[32;2;1mOK\033[0m ]"
-          fi
-
-      # Upload artifact
-      - name: Upload built artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: tools-${{ env.os }}
-          path: ${{ env.WORKDIR }}/exec
-
-  build_tools_windows_no_container:
-    if: ${{ github.repository_owner == 'OpenRadioss' }}
-    runs-on: ["win64","build","prmerge_ci"]
-    continue-on-error: true
- 
-    env:
-      STATUS_BUILD: 0
-      os: win64
-
-    steps:
-
-      # Set the working dir suffixed with branch name
-      - name: Set workdir 
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          if [ \"${{ github.base_ref }}\" = \"\" ]; 
-          then 
-          echo \"WORKDIR=${{github.ref_name}}\" >> $GITHUB_ENV;
-          else
-          echo \"WORKDIR=${{github.base_ref}}\" >> $GITHUB_ENV;
-          fi;  
-          "
-      - name: Create branch oriented WS directory & integration WS (WIN64)
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          cd %cd:\=/%;
-          mkdir -p ${{ env.WORKDIR }};
-          "
-
-      - name: Clean local exe dir
-        working-directory: ${{ env.WORKDIR }}
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          cd %cd:\=/%;
-          rm -rf exec;
-          "
-
-      # Get last git modifications, don't clean before (way to keep persistent obj files)
-      - name: Checkout git sources
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.WORKDIR }}
-          clean: 'false'
-          lfs: 'true'
-
-      - name: Running builds
-        working-directory: ${{ env.WORKDIR }}
-        shell: cmd
-        run: >
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019 && C:\cygwin64\bin\bash --login -c "
-          cd %cd:\=/%;
-          mkdir exec;
-          cmd=\"./build.bat\";
-          echo \"=========================================\";
-          echo \"--  BUILD tools for anim_to_vtk (${{ env.os }}) --\";
-          echo \"--  $cmd --\";
-          echo \"=========================================\";
-          cd tools/anim_to_vtk/${{ env.os }};
-          eval $cmd || exit 1;
-          cmd=\"./build.bat\";
-          echo \"=========================================\";
-          echo \"--  BUILD tools for anim_to_vtk (${{ env.os }}) --\";
-          echo \"--  $cmd --\";
-          echo \"=========================================\";
-          cd ../../th_to_csv/${{ env.os }};
-          eval $cmd || exit 1;
-          echo \"STATUS_BUILD=1\" >> $GITHUB_ENV;
-          "
-
-      - name: Managing step execution
-        if: ${{ always() }}
-        # Running cygwin from powershell or cmd => neither identation nor comment !
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          MAILMSG=\"Some error(s) has(ve) been raised during workflow execution:\n\n\";
-          echo -e \"\n#### STATUS_STEP_BUILD ${{ env.os }} ###\";
-          if [ ${{ env.STATUS_BUILD }} = 0 ];
-          then
-          echo -e \"Status\t[ \033[31;2;1mFAILED\033[0m ]\";
-          MAILMSG+=\"The build tools ${{ env.os }} has failed \n\";
-          echo -e $MAILMSG;
-          echo -e \"$MAILMSG\" | Email -f $FROM_EMAIL -s \"Error in Github CI repo ${{ github.repository }} (${{github.sha}})\" -r $MAIL_RELAY $TO_EMAIL;
-          exit 1;
-          else
-          echo -e \"Status\t[ \033[32;2;1mOK\033[0m ]\";
-          fi;   
-          "
-
-      # Upload artifact
-      - name: Upload built artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: tools-${{ env.os }}
-          path: ${{ env.WORKDIR }}/exec
 
   build_linux:
     if: ${{ github.repository_owner == 'OpenRadioss' }}
@@ -366,7 +159,7 @@ jobs:
             # Send email
             echo -e "$MAILMSG\nThe branch is closed" | Mail -r $FROM_EMAIL -s "Error in Github CI repo ${{ github.repository }} (${{github.sha}})" $TO_EMAIL
 
-            # Exit fail to see it as a failure
+            # Exit fail to see it as a failure 
             exit 1
 
           else
@@ -717,7 +510,8 @@ jobs:
             Write-Output "Status`t[ $([char]27)[31;2;1mFAILED$([char]27)[0m ]"
             $MAILMSG += "The build ${{ matrix.build }} has failed `r`n"
             Add-Content -Path $env:GITHUB_ENV -Value "CLOSE_BRANCH=1"
-            Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $env:TO_EMAIL -Subject "Error in Github CI repo ${{ github.repository }} (${{github.sha}})" -Body $MAILMSG -Port 25
+            $ALL_RECIPIENTS = $env:TO_EMAIL -split ","
+            Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $ALL_RECIPIENTS -Subject "Error in Github CI repo ${{ github.repository }} (${{github.sha}})" -Body $MAILMSG -Port 25
             exit 1
           }
           else {
@@ -753,7 +547,8 @@ jobs:
           $MAILMSG += "Return status API is : ${{ steps.close_branch_build.outputs.status }}`r`n`r`n"
           $MAILMSG += "Check more detailed datas in CI logs`r`n"
           Write-Output "`r`nClose return API is : ${{ steps.close_branch_build.outputs.status }} / ${{ steps.close_branch_build.outputs.data }}";
-          Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $env:TO_EMAIL -Subject "Error in Github CI repo ${{ github.repository }} (${{github.sha}}) on closing branch" -Body $MAILMSG -Port 25
+          $ALL_RECIPIENTS = $env:TO_EMAIL -split ","
+          Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $ALL_RECIPIENTS -Subject "Error in Github CI repo ${{ github.repository }} (${{github.sha}}) on closing branch" -Body $MAILMSG -Port 25
           exit 1
         if: ${{ always() && env.CLOSE_BRANCH == 1 && steps.close_branch_build.outputs.status != 200 }} 
 
@@ -927,7 +722,8 @@ jobs:
       TO_EMAIL: ${{ secrets.TO_EMAIL }} 
       GITLAB_PAT: "${{ secrets.GITLAB_PAT }}"
       GITLAB_REPO_URL: "${{ secrets.GITLAB_REPO_URL }}"
-      
+      GITLAB_SERVBOT_USER: ${{ secrets.GITLAB_SERVBOT_USER }}
+      GITLAB_SERVBOT_EMAIL: ${{ secrets.GITLAB_SERVBOT_EMAIL }}      
 
   update_counters:
     # DEV ONLY # runs-on: dev_delivery

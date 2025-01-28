@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@ C Computes AINV(NEL,3,3) which is the inverse of MAT(NEL,3,3)
       !||    kmatinv3    ../engine/source/materials/tools/kmatinv.F
       !||--- called by ------------------------------------------------------
       !||    calcmatb    ../engine/source/materials/mat/mat100/calcmatb.F
-      !||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps100   ../engine/source/materials/mat/mat100/sigeps100.F90
       !||    sigeps95    ../engine/source/materials/mat/mat095/sigeps95.F
       !||====================================================================
        SUBROUTINE KMATINV3(MAT, AINV  ,NEL)

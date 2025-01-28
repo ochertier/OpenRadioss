@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    fail_orthbiquad_c   ../engine/source/materials/fail/orthbiquad/fail_orthbiquad_c.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc              ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc              ../engine/source/materials/mat_share/mulawc.F90
       !||    usermat_shell       ../engine/source/materials/mat_share/usermat_shell.F
       !||--- calls      -----------------------------------------------------
       !||    finter              ../engine/source/tools/curve/finter.F
@@ -140,6 +140,7 @@ c
       CJC        = UPARAM(5)
       RATE_SCALE = UPARAM(6)
       NANGLE     = INT(UPARAM(7))
+      FRATE = -HUGE(FRATE)
       ! -> Allocation of factors
       ALLOCATE(Q_X11(NANGLE),Q_X12(NANGLE),Q_X13(NANGLE),
      .         Q_X21(NANGLE),Q_X22(NANGLE),Q_X23(NANGLE))

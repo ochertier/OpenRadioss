@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    strs_txt50        ../engine/source/output/sta/sta_txt.F
       !||====================================================================
       SUBROUTINE STAT_N_TEMP(X,NUMNOD,ITAB,ITABG,LENG,
-     .                    NODGLOB,WEIGHT,NODTAG,TEMP)
+     .                    NODGLOB,WEIGHT,NODTAG,TEMP,ITHERM_FE)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,6 +47,7 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER ITAB(*), NUMNOD,WEIGHT(*),ITABG(*),LENG,
      .        NODGLOB(*),NODTAG(*)
+      INTEGER ,intent(in) :: ITHERM_FE
       my_real
      .   X(3,*),TEMP(*)
 C-----------------------------------------------

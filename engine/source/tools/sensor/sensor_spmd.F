@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,11 +34,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_sd_sens        ../engine/source/mpi/output/spmd_sd_sens.F
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod        ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE SENSOR_SPMD(SENSOR_TAB,IPARI  ,NPRW   ,ISENSP  ,NSENSP    ,
      .                   XSENS     ,X      ,ACCELM ,IACCP   ,NACCP     ,
-     .                   GAUGE     ,IGAUP  ,NGAUP  ,PARTSAV2,NSENSOR   )
+     .                   GAUGE     ,IGAUP  ,NGAUP  ,PARTSAV2,NSENSOR,
+     .                   COMM_SENS14,SENSOR_STRUCT   )
 C-----------------------------------------------
 C   SPMD sensor update routine
 C-----------------------------------------------
@@ -68,6 +69,8 @@ C-----------------------------------------------
       my_real XSENS(12,*), X(3,*),
      .        ACCELM(LLACCELM,*), GAUGE(LLGAUGE,*),PARTSAV2(2,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
+      type(sensor_comm),INTENT(INOUT) :: COMM_SENS14
+      type(sensor_type),DIMENSION(NSENSOR),INTENT(INOUT) :: SENSOR_STRUCT(*)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------

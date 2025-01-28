@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat113           ../starter/source/materials/mat/mat113/hm_read_mat113.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
@@ -463,7 +463,7 @@ C     for interface stifness
       CHECK(11,2)  = XK
       CHECK(12,2)  = XC
       CHECK(13,2)  = IECROU+PUN
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
         UPARAM(4) = 6
       ENDIF
@@ -638,7 +638,7 @@ CC     for interface stifness
       CHECK(11,3)  = XK
       CHECK(12,3)  = XC
       CHECK(13,3)  = IECROU+PUN      
-C--   If H=6 - addditional internal variables must be stored in UVAR 
+C--   If H=6 - additional internal variables must be stored in UVAR 
       IF (IECROU == 6) THEN
        UPARAM(4) = 6
       ENDIF
@@ -814,7 +814,7 @@ C
       CHECK(11,4)  = XK
       CHECK(12,4)  = XC
       CHECK(13,4)  = IECROU+PUN
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
         UPARAM(4) = 6
       ENDIF
@@ -971,7 +971,7 @@ C----
       UPARAM(I11 + 5)  = XK
       UPARAM(I12 + 5)  = XC
       UPARAM(I13 + 5)  = IECROU+PUN  
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
          UPARAM(4) = 6
       ENDIF
@@ -1158,7 +1158,7 @@ C---
       CHECK(11,6)  = XK
       CHECK(12,6)  = XC
       CHECK(13,6)  = IECROU+PUN
-C--   If H=6 - addditional internal variables must be stored in UVAR - 
+C--   If H=6 - additional internal variables must be stored in UVAR - 
       IF (IECROU == 6) THEN
         UPARAM(4) = 6
       ENDIF

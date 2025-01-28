@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,15 +25,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    resol                           ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
-      !||    alloc_1d_array                  ../common_source/modules/array_mod.F
-      !||    dealloc_1d_array                ../common_source/modules/array_mod.F
       !||    find_edge_from_remote_proc      ../engine/source/interfaces/interf/find_edge_from_remote_proc.F
       !||    find_surface_from_remote_proc   ../engine/source/interfaces/interf/find_surface_from_remote_proc.F
       !||--- uses       -----------------------------------------------------
       !||    array_mod                       ../common_source/modules/array_mod.F
+      !||    nodal_arrays_mod                ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    shooting_node_mod               ../engine/share/modules/shooting_node_mod.F
       !||====================================================================
-        SUBROUTINE SPMD_EXCH_DELETED_SURF_EDGE( IAD_ELEM,ITABM1,SHOOT_STRUCT,INTBUF_TAB,NEWFRONT,
+        SUBROUTINE SPMD_EXCH_DELETED_SURF_EDGE( IAD_ELEM,NODES,SHOOT_STRUCT,INTBUF_TAB,NEWFRONT,
      .                                          IPARI,GEO,
      .                                          IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                                          ADDCNEL,CNEL,TAG_NODE,TAG_ELEM )
@@ -46,6 +45,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !           step 3 : exchange the list of edge and surface
 !           step 4 : deactivate the edge/surface
 !$ENDCOMMENT
+        USE nodal_arrays_mod
         USE ARRAY_MOD
         USE SHOOTING_NODE_MOD
         USE INTBUFDEF_MOD 
@@ -71,7 +71,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
         INTEGER, DIMENSION(2,NSPMD+1), INTENT(in) :: IAD_ELEM
-        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITABM1    ! array of global id
+        TYPE(nodal_arrays_), INTENT(INOUT) :: NODES
         TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo   
         TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data 
          INTEGER, DIMENSION(NINTER), INTENT(inout) :: NEWFRONT   ! array for sorting : 1 --> need to sort the interface NIN
@@ -239,13 +239,13 @@ C-----------------------------------------------
             NB_SURFACE = REMOTE_SURF_PER_PROC_2(1,K)
             ADDRESS = INDEX_BUFFER_R_2(K)
 
-            CALL FIND_SURFACE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_SURFACE,BUFFER_R(ADDRESS),INTBUF_TAB,ITABM1,
+            CALL FIND_SURFACE_FROM_REMOTE_PROC(SHOOT_STRUCT,NB_SURFACE,BUFFER_R(ADDRESS),INTBUF_TAB,NODES,
      .                                         IPARI,GEO,
      .                                         IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                                         ADDCNEL,CNEL,TAG_NODE,TAG_ELEM )
             NB_EDGE = REMOTE_SURF_PER_PROC_2(2,K)
             ADDRESS = INDEX_BUFFER_R_2(K)+4*NB_SURFACE  
-            CALL FIND_EDGE_FROM_REMOTE_PROC( SHOOT_STRUCT,NB_EDGE,BUFFER_R(ADDRESS),INTBUF_TAB,ITABM1,
+            CALL FIND_EDGE_FROM_REMOTE_PROC( SHOOT_STRUCT,NB_EDGE,BUFFER_R(ADDRESS),INTBUF_TAB,NODES,
      .                                       NEWFRONT,IPARI,GEO,
      .                                       IXS,IXC,IXT,IXP,IXR,IXTG,IXS10,
      .                                       ADDCNEL,CNEL,TAG_NODE,TAG_ELEM )

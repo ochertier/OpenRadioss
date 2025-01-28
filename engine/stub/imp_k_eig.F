@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    imp_glob_k      ../engine/source/implicit/imp_glob_k.F
       !||    my_barrier      ../engine/source/system/machine.F
       !||    pr_infok        ../engine/source/implicit/imp_solv.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
       !||    upd_fr_k        ../engine/source/mpi/implicit/imp_fri.F
       !||    upd_glob_k      ../engine/source/implicit/upd_glob_k.F
       !||--- uses       -----------------------------------------------------
@@ -152,7 +150,6 @@ C
       LI15 = LI14+LSIZE(15)
 C
       NGDONE = 1
-      IF (IMON>0) CALL STARTIME(31,ITASK+1)
       CALL IMP_GLOB_K(
      1   PM        ,GEO       ,IPM       ,IGEO      ,ELBUF     ,
      2   IXS       ,IXQ       ,IXC       ,IXT       ,IXP       ,
@@ -163,7 +160,6 @@ C
      7   WA        ,IDDL      ,NDOF      ,DIAG_K    ,LT_K      ,
      8   IADK      ,JDIK      ,IKG       ,ETAG      ,ELBUF_TAB ,
      9   STACK     ,DRAPE_SH4N, DRAPE_SH3N   ,DRAPEG     )
-C      IF (IMON>0) CALL STOPTIME(25,ITASK+1)
 C    /---------------/
       CALL MY_BARRIER
 C    /---------------/
@@ -186,7 +182,6 @@ C    /---------------/
      1    IADK     ,JDIK     ,NDOF      ,IKC      ,IDDL     ,
      2    INLOC    ,FR_ELEM  ,IAD_ELEM  ,NDDL     )
       ENDIF
-      IF (IMON>0) CALL STOPTIME(31,ITASK+1)
 C
       NNMAX=LSIZE(9)
       NKMAX=LSIZE(10)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,23 +76,26 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    cupdtn3p            ../engine/source/elements/shell/coque/cupdtn3.F
       !||    cupdtn3pinch        ../engine/source/elements/shell/coqueba/cupdtn3pinch.F
       !||    dtcba_reg           ../engine/source/elements/shell/coqueba/dtcba_reg.F
-      !||    dttherm             ../engine/source/elements/sh3n/coquedk/dttherm.F
+      !||    dttherm             ../engine/source/time_step/dttherm.F90
       !||    set_failwave_sh4n   ../engine/source/materials/fail/failwave/upd_failwave_sh4n.F
-      !||    startime            ../engine/source/system/timer.F
-      !||    stoptime            ../engine/source/system/timer.F
+      !||    startime            ../engine/source/system/timer_mod.F90
+      !||    stoptime            ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    drape_mod           ../engine/share/modules/drape_mod.F
       !||    dt_mod              ../engine/source/modules/dt_mod.F
+      !||    dttherm_mod         ../engine/source/time_step/dttherm.F90
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod        ../common_source/modules/failwave_mod.F
+      !||    glob_therm_mod      ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod      ../common_source/modules/nlocal_reg_mod.F
       !||    pinch_local_mod     ../engine/share/modules/pinch_local_mod.F
-      !||    sensor_mod          ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||    stack_mod           ../engine/share/modules/stack_mod.F
       !||    table_mod           ../engine/share/modules/table_mod.F
+      !||    timer_mod           ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE CBAFORC3(
+      SUBROUTINE CBAFORC3(TIMERS,
      1   ELBUF_STR,   JFT,         JLT,         NFT,
      2   NPT,         IPARI,       MTN,         IPRI,
      3   ITHK,        NELTST,      ITYPTST,     ITAB,
@@ -121,10 +124,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Q   CONDN,       CONDNSKY,    ISUBSTACK,   STACK,
      R   DRAPE_SH4N,  NEL,         NLOC_DMG,    VPINCH,
      S   FPINCH,      STIFPINCH,   INDX_DRAPE,  IGRE,
-     T   JTUR,        DT)
+     T   JTUR,        DT       ,    NCYCLE,     SNPC,
+     Y   STF ,        GLOB_THERM ,  NXLAYMAX,   IDEL7NOK,
+     U   USERL_AVAIL, MAXFUNC,     SBUFMAT)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE TIMER_MOD
       USE TABLE_MOD
       USE STACK_MOD
       USE FAILWAVE_MOD
@@ -135,6 +141,8 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
+      use dttherm_mod
 C-----------------------------------------------
 C   I M P L I C I T   T Y P E S
 C-----------------------------------------------
@@ -155,7 +163,15 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D U M M Y   A R G U M E N T S
 C-----------------------------------------------
-      INTEGER, INTENT(IN) :: IGRE,JTUR
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      INTEGER,INTENT(IN)    :: USERL_AVAIL ! Flag for User libraries availability
+      INTEGER,INTENT(IN)    :: MAXFUNC     ! Maximum number of functions
+      INTEGER,INTENT(INOUT) :: IDEL7NOK    ! Element deletion flag for IDEL flag in contact interfaces
+      INTEGER,INTENT(IN)    :: SBUFMAT     ! size of bufmat
+      INTEGER,INTENT(IN)    :: STF         ! size of STF
+      INTEGER,INTENT(IN)    :: SNPC        ! size of NPC
+      INTEGER, INTENT(IN) :: NXLAYMAX
+      INTEGER, INTENT(IN) :: IGRE,JTUR,NCYCLE
       INTEGER JFT,JLT,NFT,NPT,MTN,IPRI,ITHK,NELTST,
      .        ITYPTST ,ISTRAIN,IPLA ,OFFSET,NVC,
      .        IOFC ,IHBE ,KFTS,ISMSTR,IFAILURE,
@@ -190,8 +206,9 @@ C     REAL OU REAL*8
       TYPE (NLOCAL_STR_), TARGET :: NLOC_DMG 
       TYPE (DRAPE_)  :: DRAPE_SH4N(NUMELC_DRAPE)
       TYPE (MAT_ELEM_),INTENT(INOUT) :: MAT_ELEM
-      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
       TYPE (DT_) ,INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L O C A L   V A R I A B L E S
 C-----------------------------------------------
@@ -257,7 +274,7 @@ C-----------------------------------------------
      .   BPINCHDAMP(MVSIZ,8),VFPINCHDAMPX(MVSIZ,4),VFPINCHDAMPY(MVSIZ,4),
      .   EZZAVG(MVSIZ),AREAPINCH(MVSIZ),ZLA(MVSIZ)
       INTEGER 
-     .   NPLATT,PTW ,LENW,PTT,IPOUT
+     .   NPLATT,PTW ,LENW,PTT,IPOUT,IMAT
       INTEGER  IPLATT(MVSIZ)
       my_real 
      .   VCORET(MVSIZ,3*NNOD),BMT(MVSIZ,9*NNOD),VQGT(MVSIZ,9*NNOD),
@@ -291,7 +308,9 @@ C-------------------------------------
       TYPE(G_BUFEL_) ,POINTER :: GBUF 
       TYPE(L_BUFEL_) ,POINTER :: LBUF
       TYPE(L_BUFEL_DIR_) ,POINTER :: LBUF_DIR
-      TYPE(PINCH_LOCAL_STRUCT_) :: PINCH_LOCAL    
+      TYPE(PINCH_LOCAL_STRUCT_) :: PINCH_LOCAL
+      INTEGER SDIR_A    ! Size of DIR_A
+      INTEGER SDIR_B    ! Size of DIR_B
 C=======================================================================
 C     INITIALISATION
 C--------------------------
@@ -309,6 +328,8 @@ C--------------------------
       NUMEL_DRAPE = NUMELC_DRAPE
       TEMPEL(:) = ZERO
       FHEAT(: ) = ZERO
+      IMAT = MAT(1)
+
 C
       NLAY = ELBUF_STR%NLAY
       NPTR = ELBUF_STR%NPTR
@@ -379,9 +400,13 @@ c-------------------------------------
               NPTTOT = NPTTOT + NPTT
             ENDDO 
         ENDIF
+        SDIR_A = NPTTOT*NEL*L_DIRA
+        SDIR_B = NPTTOT*NEL*L_DIRB
         DIR_A => DIRA(1:NPTTOT*NEL*L_DIRA)
         DIR_B => DIRB(1:NPTTOT*NEL*L_DIRB)
       ELSE ! idrape
+        SDIR_A=NLAY*NEL*L_DIRA
+        SDIR_B=NLAY*NEL*L_DIRB
         ALLOCATE(DIRA(NLAY*NEL*L_DIRA))
         ALLOCATE(DIRB(NLAY*NEL*L_DIRB))
         DIRA=ZERO
@@ -395,6 +420,8 @@ c-------------------------------------
               DIRA(J1:J2) = ELBUF_STR%BUFLY(J)%DIRA(1:NEL*L_DIRA)
            ENDDO
          ENDIF
+         SDIR_A=NLAY*NEL*L_DIRA
+         SDIR_B=NLAY*NEL*L_DIRB
          DIR_A => DIRA(1:NLAY*NEL*L_DIRA)
          DIR_B => DIRB(1:NLAY*NEL*L_DIRB)
       ENDIF ! IDRAPE    
@@ -535,7 +562,7 @@ C
      .   CALL CBADEFSH_PLY(JFT,JLT,NPT,NPLAT,IPLAT,X13,X24,Y13,Y24,
      .                   PLY_VXYZ,DT1C ,PLY_EXY)        
 C-----------------------------------------------
-C     BOUCLE SUR POINTS D'INTEGRATION DE GAUSS
+C     BOUCLE SUR POINTS D INTEGRATION DE GAUSS
 C-----------------------------------------------
       LENF = NEL*GBUF%G_FORPG/NPG
       LENM = NEL*GBUF%G_MOMPG/NPG
@@ -721,7 +748,7 @@ C-----------------------------------------------------------------------
 C-----------------
 C       CONTRAINTES
 C-----------------
-        IF ((ITASK==0).AND.(IMON_MAT == 1)) CALL STARTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT == 1)) CALL STARTIME(TIMERS,35)
 C-----------------
         IF (NPINCH > 0) THEN
           CALL CMAIN3PINCH(
@@ -751,9 +778,9 @@ C-----------------
      O    IBID      ,IBID      ,ISUBSTACK ,STACK     ,
      P    F_DEF(1,1,NG),ITASK  ,DRAPE_SH4N     ,VAR_REG(1,1),
      Q    PINCH_LOCAL , GBUF%FORPGPINCH(PTFP), GBUF%MOMPGPINCH(PTMP),EZZAVG  ,
-     R    AREAPINCH   )
+     R    AREAPINCH  )
         ELSE
-          CALL CMAIN3(
+          CALL CMAIN3(TIMERS,
      1    ELBUF_STR ,JFT       ,JLT       ,NFT       ,IPARG      ,
      2    NEL       ,MTN       ,IPLA      ,ITHK      ,GROUP_PARAM,
      3    PM        ,GEO       ,NPF       ,TF        ,BUFMAT     ,
@@ -775,14 +802,17 @@ C-----------------
      J    R13       ,R21       ,R22       ,R23       ,R31       ,
      K    R32       ,R33       ,NG        ,TABLE     ,IBID      ,
      L    OFFI      ,SENSORS   ,A11_IPLY  ,IBID      ,
-     M    DIR1_CRK  ,DIR2_CRK  ,LC        ,
+     M    DIR1_CRK  ,DIR2_CRK  ,LC        ,GLOB_THERM%IDT_THERM ,GLOB_THERM%THEACCFACT,
      N    ISMSTR    ,IR        ,IS        ,NLAY      ,NPT       ,
      O    IBID      ,IBID      ,ISUBSTACK ,STACK     ,
-     P    F_DEF(1,1,NG),ITASK  ,DRAPE_SH4N     ,VAR_REG(1,1),NLOC_DMG ,
-     R    INDX_DRAPE ,THKE        ,SEDRAPE     ,NUMEL_DRAPE,DT   )        
+     P    F_DEF(1,1,NG),ITASK  ,DRAPE_SH4N,VAR_REG(1,1),NLOC_DMG ,
+     R    INDX_DRAPE ,THKE     ,SEDRAPE   ,NUMEL_DRAPE  ,DT   ,
+     Q    NCYCLE     ,SNPC     ,STF       ,NXLAYMAX,    IDEL7NOK    ,
+     S    USERL_AVAIL ,MAXFUNC ,NPTTOT    ,SBUFMAT,     SDIR_A      ,
+     T    SDIR_B     )        
         ENDIF
 C-----------------
-        IF ((ITASK==0).AND.(IMON_MAT == 1)) CALL STOPTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT == 1)) CALL STOPTIME(TIMERS,35)
 C      
         IF (IDRIL == 0) THEN
           CALL CBAENER(GBUF%FORPG(PTF),GBUF%EINT,JFT  ,JLT    ,OFF    ,
@@ -846,13 +876,13 @@ C--------------------------
 C
       IF (JTHE /= 0) THEN
         IF (MAT_ELEM%MAT_PARAM(MAT(1))%HEAT_FLAG == 1) THEN
-          CALL CBATHERM(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
-     .                  BM    ,AREA  ,DT1C   ,TEMP    ,TEMPEL,FHEAT   , 
-     .                  NPLAT ,IPLAT,THEM    ) 
+          CALL CBATHERM(JFT   ,JLT   ,PM(1,MAT(1))     ,THK0  ,IXC     ,
+     .                  BM    ,AREA  ,DT1C(1)   ,TEMP    ,TEMPEL,FHEAT   , 
+     .                  NPLAT ,IPLAT,THEM    ,GLOB_THERM%THEACCFACT) 
         ELSE
-          CALL CBATHERM(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
-     .                  BM    ,AREA  ,DT1C   ,TEMP    ,TEMPEL,DIE     , 
-     .                  NPLAT ,IPLAT,THEM    ) 
+          CALL CBATHERM(JFT   ,JLT   ,PM(1,MAT(1))     ,THK0  ,IXC     ,
+     .                  BM    ,AREA  ,DT1C(1)   ,TEMP    ,TEMPEL,DIE     , 
+     .                  NPLAT ,IPLAT,THEM    ,GLOB_THERM%THEACCFACT) 
         END IF
       ENDIF
 c-------------------------
@@ -971,7 +1001,7 @@ C--------------------------
      A   Y2G,        Y3G,        Y4G,        Z1G,
      B   Z2G,        Z3G,        Z4G,        IBID,
      C   IEXPAN,     GBUF%EINTTH,ITASK,      GBUF%VOL,
-     D   ACTIFXFEM,  IGRE)
+     D   ACTIFXFEM,  IGRE,SENSORS)
 C----------------------------
 C     CALCUL  DT
 C----------------------------
@@ -1014,12 +1044,10 @@ C
 C--------------------------
 C     THERMAL TIME STEP
 C--------------------------
-        IF(JTHE > 0.AND.IDT_THERM == 1)THEN
-           CALL DTTHERM(
-     1   JFT,     JLT,     PM,      TEMPEL,
-     2   GBUF%RE, RHO,     GBUF%RK, VOL0,
-     3   LC,      MAT,     DT_THERM,OFF,
-     4   CONDE,   JTUR)
+        IF (JTHE > 0.AND. GLOB_THERM%IDT_THERM == 1)THEN
+           call dttherm(nel     ,pm(1,mat(1))  ,npropm  ,glob_therm   ,
+     .                  jtur    ,tempel  ,vol0    ,rho       ,
+     .                  lc      ,off     ,conde   ,gbuf%re   ,gbuf%rk )
          ENDIF 
 C 
       IF(ISHPLYXFEM > 0) THEN                                     
@@ -1046,7 +1074,7 @@ C--------------------------
      6            F33    ,F34  ,M11 ,M12 ,M13  ,
      7            M14    ,M21  ,M22 ,M23 ,M24  ,
      8            M31    ,M32  ,M33 ,M34 ,GBUF%EINT,
-     9            PARTSAV,MAT ,IPARTC)
+     9            PARTSAV,MAT ,IPARTC,GLOB_THERM%NODADT_THERM)
       ELSEIF(IPARIT == 0)THEN
         CALL CUPDTN3(JFT   ,JLT  ,F   ,M   ,NVC  , 
      2            GBUF%OFF,OFF  ,STI ,STIR,STIFN,
@@ -1057,7 +1085,7 @@ C--------------------------
      7            M14    ,M21   ,M22 ,M23 ,M24  ,
      8            M31    ,M32   ,M33 ,M34 ,GBUF%EINT,
      A            PARTSAV,MAT   ,IPARTC ,FACN ,JTHE,
-     B            THEM , FTHE  ,CONDN  ,CONDE)
+     B            THEM , FTHE  ,CONDN  ,CONDE,GLOB_THERM%NODADT_THERM)
 C       
         IF(NPINCH > 0) THEN
           CALL CUPDTN3PINCH(
@@ -1075,7 +1103,7 @@ C
      8            M31    ,M32  ,M33    ,M34  ,IXC,
      A            GBUF%EINT,PARTSAV,MAT,IPARTC,PM  ,
      B            AREA   ,GBUF%THK,FACN ,JTHE,THEM ,
-     C            FTHESKY,CONDNSKY,CONDE )
+     C            FTHESKY,CONDNSKY,CONDE,GLOB_THERM%NODADT_THERM )
       ENDIF
 C     
       IF(ISHPLYXFEM > 0) THEN

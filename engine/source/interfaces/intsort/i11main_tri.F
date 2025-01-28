@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,24 +38,26 @@ C  |         I10XSAVE                        /intsort/i10xsave.F
       !||    spmd_tri11gat                ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri11vox                ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri11vox0               ../engine/source/mpi/interfaces/spmd_int.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
       !||    message_mod                  ../engine/share/message_module/message_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I11MAIN_TRI(
+      SUBROUTINE I11MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,V       ,
      2                  MS      ,NIN   ,ITASK   ,WEIGHT  ,ISENDTO ,
      3                  IRCVFROM,RETRI ,IAD_ELEM,FR_ELEM ,ITAB    ,
      4                  NRTM_T  ,ESHIFT,NODNX_SMS,RENUM,NSNFIOLD  ,
-     5                  INTBUF_TAB,TEMP)
+     5                  INTBUF_TAB,TEMP,NODADT_THERM)
 C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MESSAGE_MOD
       USE TRI7BOX
       USE INTBUFDEF_MOD
@@ -81,12 +83,14 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(IN) :: TIMERS
       INTEGER, INTENT(IN) :: ITASK
       INTEGER NIN , RETRI, NRTM_T, ESHIFT
       INTEGER IPARI(NPARI,NINTER),  ITAB(*),
      .        WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .        ISENDTO(NINTER+1,*),IRCVFROM(NINTER+1,*),NODNX_SMS(*), 
      .        RENUM(*),NSNFIOLD(NSPMD)
+      INTEGER ,INTENT(IN) :: NODADT_THERM
 C     REAL
       my_real 
      .   X(*), V(3,*), MS(*),TEMP(*)
@@ -244,7 +248,7 @@ C
 
         CALL MY_BARRIER
 
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,26)
 
         CALL SPMD_TRI11VOX0(
      1      X        ,BMINMA  ,IPARI(21,NIN),NRTM_T  , INTBUF_TAB%STFM(1+ESHIFT),
@@ -252,11 +256,12 @@ C
      3      INTBUF_TAB%VARIABLES(13) ,INTBUF_TAB%VARIABLES(7),DRAD,DGAPLOAD)
  
         CALL MY_BARRIER
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,26)
         IF(ITASK==0)THEN
 C
 C recuperation des noeuds remote NSNR stockes dans XREM
 C    
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,25)
           CALL SPMD_TRI11VOX(
      1 INTBUF_TAB%IRECTS,NRTS     ,X              ,V         ,MS           ,
      2 BMINMA           ,WEIGHT   ,INTBUF_TAB%STFS,NIN       ,ISENDTO      ,
@@ -265,6 +270,8 @@ C
      5 NODNX_SMS        ,INTBUF_TAB%GAP_SL,NSNFIOLD,IFORM        ,IPARI(47,NIN),
      6 INTBUF_TAB%IELEC,INTBUF_TAB%AREAS ,TEMP     ,IPARI(36,NIN),INTBUF_TAB%ADDSUBS,
      7 INTBUF_TAB%LISUBS,IPARI(72,NIN),INTBUF_TAB%IPARTFRICS,INTBUF_TAB%INFLG_SUBS)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,25)
+
 
 c 300      continue
 C
@@ -405,18 +412,18 @@ C--------------------------------------------------------------
       IF(NSPMD>1)THEN
 C mono tache
 !$OMP SINGLE
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
 C
         INTBUF_TAB%VARIABLES(5) = -INTBUF_TAB%VARIABLES(5)
         CALL SPMD_TRI11GAT(
      1    RESULT       ,NRTS ,INTBUF_TAB%CAND_N,INTBUF_TAB%I_STOK(1),NIN,
      2    IPARI(22,NIN),NRTSR,MULTIMP          ,IPARI(21,NIN),IPARI(47,NIN),
-     2    IPARI(36,NIN),IPARI(72,NIN))
+     2    IPARI(36,NIN),IPARI(72,NIN),NODADT_THERM)
 
 C sauvegarde des candidats additionnels dans IPARI(24)
         IPARI(24,NIN) = NRTSR
 C
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 !$OMP END SINGLE
       ENDIF
 

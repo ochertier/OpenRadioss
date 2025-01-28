@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -68,6 +68,8 @@ C        LLL(LAG_NKF)  : I = LLL(IK)
 C        JLL(LAG_NKF)  : J = JLL(IK)
 C======================================================================|
       KF = 0
+      NN = 0
+      S3 = -HUGE(S3)
       DO I=1,NUMMPC
         HH = ZERO
         R  = ZERO

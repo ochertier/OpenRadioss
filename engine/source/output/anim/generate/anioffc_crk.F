@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    crackxfem_mod     ../engine/share/modules/crackxfem_mod.F
       !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    my_alloc_mod      ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE ANIOFFC_CRK( 
      .                  XFEM_TAB ,IPARG  ,IPART,IPARTC,IPARTTG ,
@@ -41,6 +42,7 @@ C   M o d u l e s
 C-----------------------------------------------
       USE CRACKXFEM_MOD
       USE ELBUFDEF_MOD
+      use my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -66,10 +68,13 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,NG,NEL,NFT,ITY,LFT,LLT,N,ILEV,MLW,N_FA,IXFEM,NI,NLAY,
      .        ILAY,IXEL,CRKS,NEL_CRK,RBUF,ELCRK
-      INTEGER IOFFBUF(NBF_L),IE(NCRKPART),NELCRK(NCRKPART)
+      INTEGER IE(NCRKPART),NELCRK(NCRKPART)
+      INTEGER,DIMENSION(:),ALLOCATABLE::IOFFBUF
+
       my_real  OFFG
       my_real, DIMENSION(:) ,POINTER  ::  XOFF
 C=======================================================================
+      CALL MY_ALLOC(IOFFBUF,NBF_L)
       NEL_CRK = 0
 C
       DO CRKS = 1,NCRKPART
@@ -174,5 +179,6 @@ C
         END IF
       ENDIF
 C-----------
+      DEALLOCATE(IOFFBUF)
       RETURN
       END

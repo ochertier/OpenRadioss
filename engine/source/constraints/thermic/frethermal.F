@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,21 +21,23 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    frethermal    ../engine/source/constraints/thermic/frethermal.F
+      !||    frethermal       ../engine/source/constraints/thermic/frethermal.F
       !||--- called by ------------------------------------------------------
-      !||    freform       ../engine/source/input/freform.F
+      !||    freform          ../engine/source/input/freform.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg        ../engine/source/output/message/message.F
-      !||    arret         ../engine/source/system/arret.F
-      !||    wriusc2       ../engine/source/input/wriusc2.F
+      !||    ancmsg           ../engine/source/output/message/message.F
+      !||    arret            ../engine/source/system/arret.F
+      !||    wriusc2          ../engine/source/input/wriusc2.F
       !||--- uses       -----------------------------------------------------
-      !||    message_mod   ../engine/share/message_module/message_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    message_mod      ../engine/share/message_module/message_mod.F
       !||====================================================================
-      SUBROUTINE FRETHERMAL(IKAD,KEY0,KTHERMAL)
+      SUBROUTINE FRETHERMAL(IKAD,KEY0,KTHERMAL,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MESSAGE_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -45,15 +47,11 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IKAD(0:*),KTHERMAL
       CHARACTER KEY0(*)*5
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "units_c.inc"
-#include      "scr_thermal_c.inc"
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -63,12 +61,12 @@ C   D e s c r i p t i o n
 C
 C   THEACCFACT : factor to speed-up thermal analysis   
 C--------------------------------------------------
-      THEACCFACT=ONE
-      IKEY=KTHERMAL
+      GLOB_THERM%THEACCFACT = ONE
+      IKEY = KTHERMAL
       IF(IKAD(IKEY)/=IKAD(IKEY+1))THEN
        CALL WRIUSC2(IKAD(IKEY)+1,1,KEY0(IKEY))
-       READ(IUSC2,*,ERR=9990)  THEACCFACT
-       IF(THEACCFACT == ZERO)  THEACCFACT=ONE 
+       READ(IUSC2,*,ERR=9990)  GLOB_THERM%THEACCFACT
+       IF (GLOB_THERM%THEACCFACT == ZERO)  GLOB_THERM%THEACCFACT = ONE 
       ENDIF
 
       RETURN

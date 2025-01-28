@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -123,6 +123,9 @@ C        4 TRUSS,
 C        5 BEAM, 
 C        6 SPRINGS,
 C        7 SHELL_3N
+
+        ITYP = 0
+        IGR = 0
 
         IF (TYP(1:6) == 'GRBRIC') THEN
           ITYP = 1

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,41 +21,51 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    eosmain           ../common_source/eos/eosmain.F
+      !||    eosmain              ../common_source/eos/eosmain.F
       !||--- called by ------------------------------------------------------
-      !||    inigrav_eos       ../starter/source/initial_conditions/inigrav/inigrav_eos.F
-      !||    m12law            ../engine/source/materials/mat/mat012/m12law.F
-      !||    mmain             ../engine/source/materials/mat_share/mmain.F90
-      !||    multi_submatlaw   ../engine/source/multifluid/multi_submatlaw.F
-      !||    sigeps75          ../engine/source/materials/mat/mat075/sigeps75.F
-      !||    solve_eint        ../engine/source/multifluid/multi_inlet_ebcs.F
+      !||    inigrav_eos          ../starter/source/initial_conditions/inigrav/inigrav_eos.F
+      !||    m12law               ../engine/source/materials/mat/mat012/m12law.F
+      !||    mmain                ../engine/source/materials/mat_share/mmain.F90
+      !||    multi_submatlaw      ../engine/source/multifluid/multi_submatlaw.F
+      !||    sigeps75             ../engine/source/materials/mat/mat075/sigeps75.F
+      !||    solve_eint           ../engine/source/multifluid/multi_inlet_ebcs.F
       !||--- calls      -----------------------------------------------------
-      !||    compaction        ../common_source/eos/compaction.F
-      !||    eosexponential    ../common_source/eos/eosexponential.F90
-      !||    eoslinear         ../common_source/eos/eoslinear.F
-      !||    eospolyno         ../common_source/eos/eospolyno.F
-      !||    gruneisen         ../common_source/eos/gruneisen.F
-      !||    idealgas          ../common_source/eos/idealgas.F
-      !||    idealgas_vt       ../common_source/eos/idealgas_vt.F
-      !||    jwl               ../common_source/eos/jwl.F
-      !||    lszk              ../common_source/eos/lszk.F
-      !||    murnaghan         ../common_source/eos/murnaghan.F
-      !||    nasg              ../common_source/eos/nasg.F
-      !||    noble_abel        ../common_source/eos/noble_abel.F
-      !||    osborne           ../common_source/eos/osborne.F
-      !||    powder_burn       ../common_source/eos/powder_burn.F
-      !||    puff              ../common_source/eos/puff.F
-      !||    sesame            ../common_source/eos/sesame.F
-      !||    stiffgas          ../common_source/eos/stiffgas.F
-      !||    tabulated         ../common_source/eos/tabulated.F
-      !||    tillotson         ../common_source/eos/tillotson.F
+      !||    compaction           ../common_source/eos/compaction.F90
+      !||    compaction2          ../common_source/eos/compaction2.F90
+      !||    eosexponential       ../common_source/eos/eosexponential.F90
+      !||    eoslinear            ../common_source/eos/eoslinear.F
+      !||    eospolyno            ../common_source/eos/eospolyno.F
+      !||    gruneisen            ../common_source/eos/gruneisen.F
+      !||    idealgas             ../common_source/eos/idealgas.F
+      !||    idealgas_vt          ../common_source/eos/idealgas_vt.F
+      !||    jwl                  ../common_source/eos/jwl.F
+      !||    lszk                 ../common_source/eos/lszk.F
+      !||    murnaghan            ../common_source/eos/murnaghan.F
+      !||    nasg                 ../common_source/eos/nasg.F
+      !||    noble_abel           ../common_source/eos/noble_abel.F
+      !||    osborne              ../common_source/eos/osborne.F
+      !||    powder_burn          ../common_source/eos/powder_burn.F
+      !||    puff                 ../common_source/eos/puff.F
+      !||    sesame               ../common_source/eos/sesame.F
+      !||    stiffgas             ../common_source/eos/stiffgas.F
+      !||    tabulated            ../common_source/eos/tabulated.F
+      !||    tillotson            ../common_source/eos/tillotson.F
+      !||--- uses       -----------------------------------------------------
+      !||    compaction2_mod      ../common_source/eos/compaction2.F90
+      !||    compaction_mod       ../common_source/eos/compaction.F90
+      !||    matparam_def_mod     ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||    output_mod           ../common_source/modules/output/output_mod.F90
       !||====================================================================
-      SUBROUTINE EOSMAIN(IFLAG ,NEL   ,EOSTYP ,PM    ,OFF   ,EINT  ,
-     2                   RHO   ,RHO0  ,MU     ,MU2   ,ESPE  ,
-     3                   DVOL  ,DF    ,VNEW   ,MAT   ,PSH   ,
-     4                   PNEW  ,DPDM  ,DPDE   ,THETA ,ECOLD ,
-     5                   BUFMAT,SIG   ,MU_OLD ,MLW   ,POLD  ,
-     6                   NPF   ,TF    ,VAREOS ,NVAREOS)
+      SUBROUTINE EOSMAIN(IFLAG ,NEL   ,EOSTYP ,PM      ,OFF      ,EINT  ,
+     2                   RHO   ,RHO0  ,MU     ,MU2     ,ESPE     ,
+     3                   DVOL  ,DF    ,VNEW   ,MAT     ,PSH      ,
+     4                   PNEW  ,DPDM  ,DPDE   ,THETA   ,ECOLD    ,
+     5                   BUFMAT,SIG   ,MU_BAK ,MLW     ,POLD     ,
+     6                   NPF   ,TF    ,VAREOS ,NVAREOS ,MAT_PARAM,
+     7                   BFRAC)
+C-----------------------------------------------
+      use eosexponential_mod
+      use output_mod , only : wfext
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -89,7 +99,13 @@ C depending on EOSTYP(INTEGER) value.
 !                     rho.e.V (other laws, unit J)
 !
 ! output   EPSE(:) :  rho0.e (=E)   (all laws, used such as P_eos:=P(mu,E) )
-!     
+!
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      USE COMPACTION_MOD   , ONLY : COMPACTION
+      USE COMPACTION2_MOD  , ONLY : COMPACTION2
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -114,10 +130,12 @@ C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER MAT(NEL),IFLAG, EOSTYP, NEL, MLW, NVAREOS
       my_real PM(NPROPM,NUMMAT),BUFMAT(SBUFMAT),OFF(NEL),EINT(NEL),RHO(NEL),RHO0(NEL),MU(NEL),MU2(NEL),ESPE(NEL),DVOL(NEL), 
-     .        DF(NEL),VNEW(NEL),PSH(NEL),PNEW(NEL),DPDM(NEL),DPDE(NEL),THETA(NEL),ECOLD(NEL),MU_OLD(NEL),POLD(NEL),
+     .        DF(NEL),VNEW(NEL),PSH(NEL),PNEW(NEL),DPDM(NEL),DPDE(NEL),THETA(NEL),ECOLD(NEL),MU_BAK(NEL),POLD(NEL),
      .        SIG(NEL,6),VAREOS(NVAREOS*NEL)
+      my_real,INTENT(INOUT) :: BFRAC(NEL)
       INTEGER,INTENT(IN)::NPF(SNPC)
       my_real,INTENT(IN)::TF(STF)
+      TYPE(MATPARAM_STRUCT_), INTENT(IN) :: MAT_PARAM !material data structure
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -166,7 +184,8 @@ C-----------------------------------------------
          CALL GRUNEISEN(
      1                  IFLAG  ,NEL    ,PM     ,OFF    ,EINT  ,MU  ,MU2, 
      2                  ESPE   ,DVOL   ,DF     ,VNEW   ,MAT   ,RHO0,
-     3                  PNEW   ,DPDM   ,DPDE   ,THETA  ,ECOLD )
+     3                  PNEW   ,DPDM   ,DPDE   ,THETA  ,ECOLD ,PSH ,
+     4                  NUMMAT ,NPROPM)
 
        CASE (3)
          !--------------------------------------------------!
@@ -254,18 +273,20 @@ C-----------------------------------------------
          !         POWDER BURN EOS                          !
          !--------------------------------------------------!          
           CALL POWDER_BURN(
-     1                  IFLAG ,NEL  ,PM   ,OFF  ,EINT ,MU  ,MU2, 
-     2                  ESPE  ,DVOL ,DF   ,VNEW ,MAT  ,PSH ,
-     3                  PNEW  ,DPDM ,DPDE ,THETA,ECOLD) 
+     1                  IFLAG  ,NEL     ,PM    ,OFF    ,EINT  ,MU       ,MU2,
+     2                  ESPE   ,DVOL    ,DF    ,VNEW   ,MAT   ,PSH      ,
+     3                  PNEW   ,DPDM    ,DPDE  ,THETA  ,ECOLD ,MAT_PARAM,
+     4                  VAREOS ,NVAREOS ,NUMMAT,NPROPM ,DT1   ,RHO0 ,BFRAC)
 
        CASE(13)
          !--------------------------------------------------!
          !         COMPACTION EOS                           !
          !--------------------------------------------------!          
           CALL COMPACTION(
-     1                  IFLAG ,NEL  ,PM   ,OFF  ,EINT  ,MU  ,MU2, 
-     2                  ESPE  ,DVOL ,DF   ,VNEW ,MAT  ,PSH  ,POLD,
-     3                  PNEW  ,DPDM ,DPDE ,THETA,ECOLD,SIG  ,MU_OLD) 
+     1                  IFLAG ,NEL  ,PM   ,OFF   ,EINT  ,MU  ,MU2,
+     2                  DVOL  ,MAT  ,PSH  ,
+     3                  PNEW  ,DPDM ,DPDE ,MU_BAK,
+     4                  NPROPM,NUMMAT,WFEXT)
 
        CASE(14)
          !--------------------------------------------------!
@@ -309,8 +330,8 @@ C-----------------------------------------------
          !--------------------------------------------------!
          CALL EOSLINEAR(
      1                  IFLAG  ,NEL    ,PM     ,OFF    ,EINT  ,MU  ,MU2,
-     2                  DVOL   ,DF     ,VNEW   ,MAT    ,PNEW  ,DPDM,
-     3                  DPDE   ,THETA  ,ECOLD  )
+     2                  DVOL   ,VNEW   ,MAT    ,PNEW  ,DPDM,
+     3                  DPDE   ,ECOLD  )
 
        CASE (19)
          !--------------------------------------------------!
@@ -320,7 +341,18 @@ C-----------------------------------------------
      1                  IFLAG  ,NEL    ,PM     ,OFF    ,EINT  ,
      2                  DVOL   ,VNEW   ,MAT    ,PSH   ,
      3                  PNEW   ,DPDM   ,DPDE   ,THETA  ,TT    ,
-     4                  NPROPM ,NUMMAT ,TFEXT)
+     4                  NPROPM ,NUMMAT ,WFEXT)
+
+       CASE(20)
+         !--------------------------------------------------!
+         !         COMPACTION EOS                           !
+         !--------------------------------------------------!
+          CALL COMPACTION2(
+     1                  IFLAG ,NEL  ,PM   ,OFF   ,EINT  ,MU   ,
+     2                  DVOL  ,MAT  ,PSH  ,
+     3                  PNEW  ,DPDM ,DPDE ,MU_BAK,
+     4                  NPF   ,TF   ,SNPC ,STF   ,NPROPM,NUMMAT,WFEXT,
+     5                  MAT_PARAM%EOS)
 
        END SELECT
       

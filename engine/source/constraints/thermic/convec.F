@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,18 +26,21 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    resol                 ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
       !||    finter                ../engine/source/tools/curve/finter.F
+      !||    omp_get_thread_num    ../engine/source/engine/openmp_stub.F90
       !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE CONVEC (IBCV   ,FCONV    ,NPC   ,TF    , X      ,
      1                   TEMP   ,NSENSOR  ,SENSOR_TAB   ,FTHE    ,IAD ,
-     2                   FTHESKY, PYTHON)
+     2                   FTHESKY, PYTHON  ,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE PYTHON_FUNCT_MOD
       USE SENSOR_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -50,30 +53,25 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "parit_c.inc"
-#include      "scr_thermal_c.inc"
-#include      "thermal_c.inc"
 C-----------------------------------------------,
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type (glob_therm_) ,intent(inout)   :: glob_therm
       INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER NPC(*),IAD(4,*)
-      INTEGER IBCV(NICONV,*)
+      INTEGER IBCV(GLOB_THERM%NICONV,*)
 C     REAL
       my_real
-     .   FCONV(LFACTHER,*), TF(*), X(3,*), 
+     .   FCONV(GLOB_THERM%LFACTHER,*), TF(*), X(3,*), 
      .   FTHESKY(LSKY), TEMP(*), FTHE(*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE(PYTHON_) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER NL, N1, ISK, N2, N3, N4, N5, ISENS,K,LL,IERR,
-     .        ICODE,IFUNC_OLD,IFUNC,IAD1,IAD2,IAD3,IAD4,IFLAG
-C     REAL
-      my_real
-     .   NX, NY, NZ, AXI, AA, A0,  DYDX, TS,FLUX,
-     .   TS_OLD, F1, F2, FCX, FCY, T_INF, TE, AREA, H,
-     .    STARTT, STOPT, FCY_OLD, OFFG
+      INTEGER NL,N1,N2,N3,N4,ISENS,IFUNC_OLD,IFUNC,IAD1,IAD2,IAD3,IAD4,IFLAG
+      my_real :: NX, NY,NZ, DYDX,TS,FLUX,TS_OLD,FCX,FCY,T_INF,TE,AREA,H,
+     .           STARTT, STOPT, FCY_OLD, OFFG
       my_real :: HEAT_CONV_L ! thread-local
       my_real FINTER 
       EXTERNAL FINTER
@@ -95,7 +93,7 @@ C-----------------------------------------------------------
 C  CODE SPMD PARITH/OFF OU SMP NE PAS OUBLIER LE CODE P/ON !
 C-----------------------------------------------------------
 !$OMP DO SCHEDULE(GUIDED)
-       DO NL=1,NUMCONV
+       DO NL=1,GLOB_THERM%NUMCONV
          OFFG   = FCONV(6,NL)
          IF(OFFG <= ZERO) CYCLE 
 
@@ -104,15 +102,15 @@ C-----------------------------------------------------------
 C
          ISENS = IBCV(6,NL)
          IF(ISENS == 0)THEN
-            TS = TT*THEACCFACT - STARTT
+            TS = TT*GLOB_THERM%THEACCFACT - STARTT
          ELSE 
             STARTT = STARTT + SENSOR_TAB(ISENS)%TSTART
             STOPT  = STOPT  + SENSOR_TAB(ISENS)%TSTART       
-            TS = TT*THEACCFACT -(STARTT + SENSOR_TAB(ISENS)%TSTART)      
+            TS = TT*GLOB_THERM%THEACCFACT -(STARTT + SENSOR_TAB(ISENS)%TSTART)      
          ENDIF       
 C
-         IF(TT*THEACCFACT < STARTT) CYCLE
-         IF(TT*THEACCFACT > STOPT ) CYCLE 
+         IF(TT*GLOB_THERM%THEACCFACT < STARTT) CYCLE
+         IF(TT*GLOB_THERM%THEACCFACT > STOPT ) CYCLE 
          N1 = IBCV(1,NL)
          N2 = IBCV(2,NL)
          N3 = IBCV(3,NL)
@@ -150,7 +148,7 @@ C
 C
            TE = FOURTH*(TEMP(N1) + TEMP(N2) + TEMP(N3) + TEMP(N4))      
            AREA = HALF*SQRT( NX*NX + NY*NY + NZ*NZ)
-           FLUX = AREA*H*(T_INF - TE)*DT1*THEACCFACT 
+           FLUX = AREA*H*(T_INF - TE)*DT1*GLOB_THERM%THEACCFACT 
            HEAT_CONV_L = HEAT_CONV_L + FLUX
            FLUX = FOURTH*FLUX
 C
@@ -170,7 +168,7 @@ C
 C
           TE = THIRD*(TEMP(N1) + TEMP(N2) + TEMP(N3) )      
           AREA = HALF*SQRT( NX*NX + NY*NY + NZ*NZ)
-          FLUX = AREA*H*(T_INF - TE)*DT1*THEACCFACT
+          FLUX = AREA*H*(T_INF - TE)*DT1*GLOB_THERM%THEACCFACT
           HEAT_CONV_L = HEAT_CONV_L + FLUX
           FLUX = THIRD*FLUX
 C 
@@ -184,7 +182,7 @@ C
 C     
          TE = HALF*(TEMP(N1) + TEMP(N2) )      
          AREA = SQRT( NY*NY + NZ*NZ)
-         FLUX = AREA*H*(T_INF - TE)*DT1*THEACCFACT
+         FLUX = AREA*H*(T_INF - TE)*DT1*GLOB_THERM%THEACCFACT
          HEAT_CONV_L = HEAT_CONV_L + FLUX
          FLUX = HALF*FLUX
 C
@@ -196,7 +194,7 @@ C
 !$OMP END DO
 
 !$OMP CRITICAL
-        HEAT_CONV = HEAT_CONV + HEAT_CONV_L
+        GLOB_THERM%HEAT_CONV = GLOB_THERM%HEAT_CONV + HEAT_CONV_L
 !$OMP END CRITICAL
       ELSE
 C-------------------------
@@ -204,21 +202,21 @@ C CODE SPMD PARITH/ON
 C CODE NON VECTORIEL
 C-------------------------
 !$OMP DO SCHEDULE(GUIDED)
-        DO NL=1,NUMCONV
+        DO NL=1,GLOB_THERM%NUMCONV
           STARTT = FCONV(4,NL)
           STOPT  = FCONV(5,NL)
           OFFG   = FCONV(6,NL)
           ISENS  = IBCV(6,NL)
           IF(ISENS == 0)THEN
-             TS = TT*THEACCFACT - STARTT
+             TS = TT*GLOB_THERM%THEACCFACT - STARTT
           ELSE 
              STARTT = STARTT + SENSOR_TAB(ISENS)%TSTART
              STOPT  = STOPT  + SENSOR_TAB(ISENS)%TSTART      
-             TS = TT*THEACCFACT -(STARTT + SENSOR_TAB(ISENS)%TSTART)      
+             TS = TT*GLOB_THERM%THEACCFACT -(STARTT + SENSOR_TAB(ISENS)%TSTART)      
           ENDIF       
           IFLAG = 1
-          IF(TT*THEACCFACT < STARTT)  IFLAG = 0
-          IF(TT*THEACCFACT > STOPT )  IFLAG = 0
+          IF(TT*GLOB_THERM%THEACCFACT < STARTT)  IFLAG = 0
+          IF(TT*GLOB_THERM%THEACCFACT > STOPT )  IFLAG = 0
           IF(OFFG <= ZERO) IFLAG = 0
 C---------------------
 C     CONVECTION FLUX
@@ -255,7 +253,7 @@ C          ANALYSE 3D
 C
                TE = FOURTH*(TEMP(N1) + TEMP(N2) + TEMP(N3) + TEMP(N4))      
                AREA = HALF*SQRT( NX*NX + NY*NY + NZ*NZ)
-               FLUX = AREA*H*(T_INF - TE)*DT1*THEACCFACT
+               FLUX = AREA*H*(T_INF - TE)*DT1*GLOB_THERM%THEACCFACT
                HEAT_CONV_L = HEAT_CONV_L + FLUX
                FLUX = FOURTH*FLUX
 C
@@ -278,7 +276,7 @@ C
 C
                TE = THIRD*(TEMP(N1) + TEMP(N2) + TEMP(N3) )      
                AREA = HALF*SQRT( NX*NX + NY*NY + NZ*NZ)
-               FLUX = AREA*H*(T_INF - TE)*DT1*THEACCFACT 
+               FLUX = AREA*H*(T_INF - TE)*DT1*GLOB_THERM%THEACCFACT 
                HEAT_CONV_L = HEAT_CONV_L + FLUX
                FLUX = THIRD*FLUX
 C
@@ -297,7 +295,7 @@ C
 C 
                TE = HALF*(TEMP(N1) + TEMP(N2) )      
                AREA = SQRT( NY*NY + NZ*NZ)
-               FLUX = AREA*H*(T_INF - TE)*DT1*THEACCFACT
+               FLUX = AREA*H*(T_INF - TE)*DT1*GLOB_THERM%THEACCFACT
                HEAT_CONV_L = HEAT_CONV_L + FLUX
                FLUX = HALF*FLUX
 C
@@ -329,7 +327,7 @@ C
 !$OMP END DO
 
 !$OMP CRITICAL
-        HEAT_CONV = HEAT_CONV + HEAT_CONV_L
+        GLOB_THERM%HEAT_CONV = GLOB_THERM%HEAT_CONV + HEAT_CONV_L
 !$OMP END CRITICAL
 C
       ENDIF

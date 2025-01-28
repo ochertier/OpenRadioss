@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,17 +21,18 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    desacti        ../engine/source/elements/desacti.F
+      !||    desacti          ../engine/source/elements/desacti.F
       !||--- called by ------------------------------------------------------
-      !||    resol          ../engine/source/engine/resol.F
+      !||    resol            ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
-      !||    convecoff      ../engine/source/constraints/thermic/convecoff.F
-      !||    eloff          ../engine/source/elements/eloff.F
-      !||    radiatoff      ../engine/source/constraints/thermic/radiatoff.F
+      !||    convecoff        ../engine/source/constraints/thermic/convecoff.F
+      !||    eloff            ../engine/source/elements/eloff.F
+      !||    radiatoff        ../engine/source/constraints/thermic/radiatoff.F
       !||--- uses       -----------------------------------------------------
-      !||    elbufdef_mod   ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod     ../engine/share/modules/sensor_mod.F
+      !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE DESACTI(IXS      ,IXQ      ,IXC     ,IXP     ,IXT      ,
      .                   IXR      ,IXTG     ,IPARG   ,IACTIV  , 
@@ -39,13 +40,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                   IBCV     ,FCONV    ,IBCR    ,FRADIA  ,IGROUPS  ,
      .                   FACTIV   ,TEMP     ,MCP     ,PM      ,MCP_OFF  ,
      .                   IGRBRIC  ,IGRQUAD  ,IGRSH4N ,IGRSH3N ,IGRTRUSS ,
-     .                   IGRBEAM  ,IGRSPRING)
+     .                   IGRBEAM  ,IGRSPRING,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -58,7 +60,6 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "com08_c.inc"
 #include      "parit_c.inc"
-#include      "scr_thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
@@ -72,6 +73,7 @@ C-----------------------------------------------
       my_real MCP_OFF(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRBRIC) :: IGRBRIC
       TYPE (GROUP_)  , DIMENSION(NGRQUAD) :: IGRQUAD
@@ -84,9 +86,12 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I,N,IFLAG,ISENS,IGSH,IGSH3,IGBR,IGQU,IGBM,IGTR,IGSP,OFFCHANGE
+      INTEGER ITHERM_FE
       my_real STARTT, STOPT
 C======================================================================|
-      OFFCHANGE=0
+      OFFCHANGE = 0
+      ITHERM_FE = GLOB_THERM%ITHERM_FE
+!
       DO N = 1,NACTIV
         ISENS = IACTIV(2,N)
         IFLAG = IACTIV(1,N)
@@ -101,7 +106,7 @@ C----------------------------------------------------------------------
      .                 IACTIV  ,TT      ,IFLAG    ,N       ,ELBUF_TAB,
      .                 X       ,TEMP    ,MCP      ,PM      ,IGROUPS  ,
      .                 MCP_OFF ,IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N  ,
-     .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
+     .                 IGRTRUSS,IGRBEAM ,IGRSPRING,ITHERM_FE)
 
             IACTIV(1,N) = 0
             OFFCHANGE=1
@@ -119,7 +124,7 @@ C----------------------------------------------------------------------
      .                 IACTIV  ,TT      ,IFLAG    ,N       ,ELBUF_TAB,
      .                 X       ,TEMP    ,MCP      ,PM      ,IGROUPS  ,
      .                 MCP_OFF ,IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N  ,
-     .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
+     .                 IGRTRUSS,IGRBEAM ,IGRSPRING,ITHERM_FE)
 
             IACTIV(1,N) = 1
             OFFCHANGE=1
@@ -136,7 +141,7 @@ C----------------------------------------------------------------------
      .                 IACTIV  ,TT      ,1        ,N       ,ELBUF_TAB,
      .                 X       ,TEMP    ,MCP      ,PM      ,IGROUPS  ,
      .                 MCP_OFF ,IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N  ,
-     .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
+     .                 IGRTRUSS,IGRBEAM ,IGRSPRING,ITHERM_FE)
 
             IACTIV(1,N) = 0
             OFFCHANGE=1
@@ -148,8 +153,8 @@ C----------------------------------------------------------------------
           STOPT  = FACTIV(2,N)
           IFLAG  = IACTIV(1,N)
           IF(ITHERM_FE > 0) THEN
-             STARTT = STARTT / THEACCFACT
-             STOPT  = STOPT  / THEACCFACT
+             STARTT = STARTT / GLOB_THERM%THEACCFACT
+             STOPT  = STOPT  / GLOB_THERM%THEACCFACT
           ENDIF
           IF(IFLAG == 0 .AND. TT >= STARTT .AND. TT < STOPT) THEN
             CALL ELOFF(IXS     ,IXQ     ,IXC      ,IXP     ,IXT      ,
@@ -157,7 +162,7 @@ C----------------------------------------------------------------------
      .                 IACTIV  ,TT      ,IFLAG    ,N       ,ELBUF_TAB,
      .                 X       ,TEMP    ,MCP      ,PM      ,IGROUPS  ,
      .                 MCP_OFF ,IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N  ,
-     .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
+     .                 IGRTRUSS,IGRBEAM ,IGRSPRING,ITHERM_FE)
             IACTIV(1,N) = 1
             OFFCHANGE=1
           ENDIF
@@ -170,7 +175,7 @@ C----------------------------------------------------------------------
      .                 IACTIV  ,TT      ,1        ,N       ,ELBUF_TAB,
      .                 X       ,TEMP    ,MCP      ,PM      ,IGROUPS  ,
      .                 MCP_OFF ,IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N  ,
-     .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
+     .                 IGRTRUSS,IGRBEAM ,IGRSPRING,ITHERM_FE)
             IACTIV(1,N) = 0
             OFFCHANGE=1
           ENDIF      
@@ -178,8 +183,8 @@ C----------------------------------------------------------------------
       ENDDO ! N=1,NACTIV
 C
       IF(ITHERM_FE > 0 .AND. OFFCHANGE == 1) THEN
-         IF(NUMCONV > 0)  CALL CONVECOFF(IBCV, FCONV, IPARG, IGROUPS, IXS, ELBUF_TAB)
-         IF(NUMRADIA > 0) CALL RADIATOFF(IBCR, FRADIA,IPARG, IGROUPS, IXS, ELBUF_TAB)
+         IF(GLOB_THERM%NUMCONV > 0)  CALL CONVECOFF(IBCV, FCONV, IPARG, IGROUPS, ELBUF_TAB,GLOB_THERM)
+         IF(GLOB_THERM%NUMRADIA > 0) CALL RADIATOFF(IBCR, FRADIA,IPARG, IGROUPS, IXS, ELBUF_TAB,GLOB_THERM)
       ENDIF
 
       IF(ITHERM_FE > 0 .AND. TT == ZERO) THEN 
@@ -190,7 +195,7 @@ C     Final call to set MCP_OFF(i) = 0 if all nodes
      .                 IACTIV  ,TT      ,IFLAG    ,N       ,ELBUF_TAB,
      .                 X       ,TEMP    ,MCP      ,PM      ,IGROUPS  ,
      .                 MCP_OFF ,IGRBRIC ,IGRQUAD  ,IGRSH4N ,IGRSH3N  ,
-     .                 IGRTRUSS,IGRBEAM ,IGRSPRING)
+     .                 IGRTRUSS,IGRBEAM ,IGRSPRING,ITHERM_FE)
       ENDIF
 
 

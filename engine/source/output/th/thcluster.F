@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -70,6 +70,8 @@ C-----------------------------------------------
         my_real :: XM,YM,ZM,NORM,SX,SY,SZ,TX,TY,TZ,FS,FN,MB,MT
         my_real ,DIMENSION(3) :: VX,VY,VN,X1,FLOC,MLOC
 C=======================================================================
+      FLOC(1:3) = ZERO
+      MLOC(1:3) = ZERO
       II = -1
       WA(1:NN*NVAR) = ZERO
       DO J=IAD,IAD+NN-1

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -116,6 +116,7 @@
           ! - INITIALISATION OF COMPUTATION ON TIME STEP
           !=======================================================================
           ! Recovering integer model parameter
+          nindx = -huge(nindx)
           idel  = matparam%iparam(1)
           ! Recovering real model parameters
           g     = matparam%uparam(1)

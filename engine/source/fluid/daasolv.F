@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,14 +30,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    finter_smooth          ../engine/source/tools/curve/finter_smooth.F
       !||--- uses       -----------------------------------------------------
       !||    python_funct_mod       ../common_source/modules/python_mod.F90
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE DAASOLV(NDIM,   NNO,    NEL,   
      .                   IFLOW,  IBUF,   ELEM,  SHELL_GA,
      .                   RFLOW,  NORMAL, TA,    AREAF, COSG,  DIST,  
      .                   MFLE,   ACCF,   PM,    PTI,   X, V, A, NPC, TF, 
      .                   NBGAUGE,LGAUGE, GAUGE, NSENSOR, SENSOR_TAB, IGRV, AGRV,
-     .                   CBEM   ,IPIV  , NFUNCT, PYTHON)
+     .                   CBEM   ,IPIV  , NFUNCT, PYTHON,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
@@ -51,7 +51,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "param_c.inc"
-#include      "com06_c.inc"
+!#include      "com06_c.inc"
 #include      "com08_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -65,6 +65,7 @@ C-----------------------------------------------
       my_real CBEM(NEL,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
       TYPE (PYTHON_), INTENT(INOUT) :: PYTHON
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -595,7 +596,7 @@ C
              NRY= NORMAL(2,I)
              NRZ= NORMAL(3,I)
              FF = FAC1*THIRD*FEL(I)
-             TFEXT   = TFEXT-FEL(I)*VEL(I)*DT1
+             WFEXT   = WFEXT-FEL(I)*VEL(I)*DT1
              A(1,N1) = A(1,N1) + FF*NRX
              A(2,N1) = A(2,N1) + FF*NRY
              A(3,N1) = A(3,N1) + FF*NRZ
@@ -623,7 +624,7 @@ C
              NRY= NORMAL(2,I)
              NRZ= NORMAL(3,I)
              FF = WF(I5)*FEL(I)
-             TFEXT   = TFEXT-FEL(I)*VEL(I)*DT1
+             WFEXT   = WFEXT-FEL(I)*VEL(I)*DT1
              A(1,N1) = A(1,N1) + FF*NRX
              A(2,N1) = A(2,N1) + FF*NRY
              A(3,N1) = A(3,N1) + FF*NRZ

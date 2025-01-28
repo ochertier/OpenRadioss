@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +44,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    cstra3           ../engine/source/elements/shell/coque/cstra3.F
       !||    cupdt3_crk       ../engine/source/elements/xfem/xfemfsky.F
       !||    mhvis3           ../engine/source/airbag/mhvis3.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
+      !||    startime         ../engine/source/system/timer_mod.F90
+      !||    stoptime         ../engine/source/system/timer_mod.F90
       !||    tempcg           ../engine/source/materials/mat_share/tempcg.F
       !||    thermc           ../engine/source/materials/mat_share/thermc.F
       !||--- uses       -----------------------------------------------------
@@ -54,13 +54,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    dt_mod           ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod     ../common_source/modules/failwave_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||    stack_mod        ../engine/share/modules/stack_mod.F
       !||    table_mod        ../engine/share/modules/table_mod.F
+      !||    timer_mod        ../engine/source/system/timer_mod.F90
       !||====================================================================
-       SUBROUTINE CFORC3_CRK(XFEM_STR,
+       SUBROUTINE CFORC3_CRK(TIMERS, XFEM_STR,
      1            JFT    ,JLT    ,PM    ,IXC   ,X      ,
      2            F      ,M      ,V     ,VR    ,FAILWAVE,
      3            NVC    ,MTN    ,GEO   ,TF    ,NPF    ,
@@ -83,10 +85,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      M            SENSORS,IXEL ,STACK   ,
      N            ISUBSTACK,UXINT_MEAN,UYINT_MEAN,UZINT_MEAN,NLEVXF,
      O            NODEDGE,CRKEDGE,DRAPE_SH4N,IPRI  ,NLOC_DMG,INDX_DRAPE, IGRE,
-     P            DT     )
+     P            DT     ,SNPC      ,  STF   ,GLOB_THERM, 
+     Q            USERL_AVAIL,MAXFUNC,SBUFMAT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE CRACKXFEM_MOD
       USE MAT_ELEM_MOD
@@ -97,6 +101,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -121,6 +126,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      INTEGER,INTENT(IN)    :: USERL_AVAIL ! Flag for User libraries availability
+      INTEGER,INTENT(IN)    :: MAXFUNC     ! Maximum number of functions
+      INTEGER,INTENT(IN)    :: SBUFMAT     ! Size of BUFMAT
+      INTEGER,INTENT(IN)    :: STF         ! Size of TF
+      INTEGER,INTENT(IN)    :: SNPC        ! Size of NPC
       INTEGER, INTENT(IN) :: IGRE
       INTEGER JFT,JLT,NVC,MTN,NELTST,ITYPTST,OFFSET,
      .   NEL,ISTRAIN,IHBE,ITHK,IOFC,IPLA,NFT,
@@ -153,8 +164,9 @@ C     REAL
       TYPE (DRAPE_) , DIMENSION(NUMELC_DRAPE)  ::  DRAPE_SH4N
       TYPE (MAT_ELEM_)   ,INTENT(INOUT) :: MAT_ELEM
       TYPE (NLOCAL_STR_) :: NLOC_DMG 
-      TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -225,6 +237,9 @@ C---
      .  DIMENSION(:) ,POINTER  ::  SMSTRG
       my_real,
      .  DIMENSION(:,:), ALLOCATABLE :: VARNL
+      INTEGER NPTTOT
+      INTEGER SDIR_A    ! Size of DIR_A
+      INTEGER SDIR_B    ! Size of DIR_B
 C=======================================================================
       IBID = 0
       IUN  = 1
@@ -236,6 +251,7 @@ C=======================================================================
       IT   = 1
       SEDRAPE = SCDRAPE
       NUMEL_DRAPE = NUMELC_DRAPE
+      NPTTOT = 1
       ALLOCATE(VARNL(NEL,1))
       VARNL = ZERO
 C -----will put it in starter     
@@ -271,6 +287,8 @@ C
       ALLOCATE (DIRB(NXLAY*NEL*L_DIRB))
       DIRA=ZERO
       DIRB=ZERO
+      SDIR_A=NXLAY*NEL*L_DIRA
+      SDIR_B=NXLAY*NEL*L_DIRB
       DIR_A => DIRA(1:NXLAY*NEL*L_DIRA)
       DIR_B => DIRB(1:NXLAY*NEL*L_DIRB)
 C
@@ -421,9 +439,9 @@ C---+----1----+----2----+----3----+----4----+----5----+----6----+----7--
 C
         IF (JTHE > 0) CALL TEMPCG(NUMNOD, NEL  ,IXC ,TEMP ,TEMPEL)
 C-----------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
 C-----------------------------
-        CALL CMAIN3(
+        CALL CMAIN3(TIMERS,
      1    XFEM_STR  ,JFT       ,JLT       ,NFT       ,IPARG     ,
      2    NEL       ,MTN       ,IPLA      ,ITHK      ,GROUP_PARAM,
      3    PM        ,GEO       ,NPF       ,TF        ,BUFMAT    ,
@@ -445,13 +463,16 @@ C-----------------------------
      J    E1Z       ,E2X       ,E2Y       ,E2Z       ,E3X       ,
      K    E3Y       ,E3Z       ,IBID      ,TABLE     ,IXFEM     ,
      L    BID       ,SENSORS   ,BID       ,ELCRKINI  ,
-     M    DIR1_CRK  ,DIR2_CRK  ,ALDT      ,
+     M    DIR1_CRK  ,DIR2_CRK  ,ALDT      ,GLOB_THERM%IDT_THERM ,GLOB_THERM%THEACCFACT,
      N    ISMSTR    ,IR        ,IS        ,NLAYER    ,NPTT      ,
      O    IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P    BID       ,ITASK     ,DRAPE_SH4N  ,VARNL     ,NLOC_DMG ,
-     R    INDX_DRAPE ,THKE, SEDRAPE  ,NUMEL_DRAPE,DT   )
+     R    INDX_DRAPE ,THKE, SEDRAPE  ,NUMEL_DRAPE,DT   ,
+     Q    NCYCLE     ,SNPC      ,  STF,NXLAYMAX ,
+     S    IDEL7NOK   ,USERL_AVAIL ,MAXFUNC  ,NPTTOT    ,SBUFMAT,
+     T    SDIR_A     ,SDIR_B  )
 C-----------------------------
-        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+        IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C-----------------------------
 C       FORCES ANTI-SABLIER
 C-----------------------------
@@ -526,7 +547,7 @@ c        IFLAG = MOD(NCYCLE,NCPRI)
      A   Y2G,      Y3G,      Y4G,      Z1G,
      B   Z2G,      Z3G,      Z4G,      IXFEM,
      C   IEXPAN,   EINTTH,   ITASK,    GBUF%VOL,
-     D   ACTIFXFEM,IGRE)
+     D   ACTIFXFEM,IGRE,SENSORS)
        ENDIF
 C--------------------------
 C     PAS DE TEMPS
@@ -561,11 +582,11 @@ C--------------------------
           IF (MAT_ELEM%MAT_PARAM(MAT(1))%HEAT_FLAG == 1) THEN
             CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
      .                  PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
-     .                  TEMP  ,TEMPEL,FHEAT  ,THEM    ) 
+     .                  TEMP  ,TEMPEL,FHEAT  ,THEM    ,GLOB_THERM%THEACCFACT) 
           ELSE
             CALL THERMC(JFT   ,JLT   ,PM     ,MAT     ,THK0  ,IXC     ,
      .                  PX1   ,PX2   ,PY1    ,PY2     ,AREA  ,DT1C    ,
-     .                  TEMP  ,TEMPEL,DIE    ,THEM    ) 
+     .                  TEMP  ,TEMPEL,DIE    ,THEM    ,GLOB_THERM%THEACCFACT) 
           END IF
         ENDIF
 C--------------------------

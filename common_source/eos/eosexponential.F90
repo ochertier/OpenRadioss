@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,6 +20,8 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
+module eosexponential_mod
+      contains
 ! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
@@ -53,7 +55,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
       integer,intent(in) :: npropm , nummat          !< size for pm array
       integer,intent(in) :: mat(nel)                 !< material identifiers for elems 1 to nel
-      integer,intent(in) :: IFLAG                    !< flag mentionning what need to be computed
+      integer,intent(in) :: IFLAG                    !< flag mentioning what needs to be computed
       integer,intent(in) :: NEL                      !< number of elems in group (current group size)
       my_real, intent(in) :: time                    !< simulation current time
       my_real, intent(in) :: pm(npropm,nummat)       !< parameters of all materials
@@ -64,9 +66,9 @@
       my_real, intent(inout) :: dpdm(nel)            !< total derivative : mu = rho/rho0-1
       my_real, intent(inout) :: dpdE(nel)            !< partial derivative : E=rho0.e
       my_real, intent(inout) :: theta(nel)           !< temperature
-      my_real, intent(inout) :: wfext                !< work of external forces                
       my_real, intent(inout) :: psh(nel)             !< pressure shift
       my_real, intent(inout) :: eint(nel)            !< internal energy
+      double precision, intent(inout) :: wfext       !< work of external forces / Double Precision
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local variables
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -122,4 +124,5 @@
 
 !------------------------
       RETURN
-      END
+      END subroutine eosexponential
+end module eosexponential_mod

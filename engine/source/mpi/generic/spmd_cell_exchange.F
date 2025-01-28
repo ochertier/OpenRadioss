@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,17 +29,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    arret                      ../engine/source/system/arret.F
       !||    fill_voxel_local_partial   ../engine/source/interfaces/intsort/fill_voxel.F90
       !||    fill_voxel_remote          ../engine/source/interfaces/intsort/fill_voxel.F90
-      !||    startime                   ../engine/source/system/timer.F
-      !||    stoptime                   ../engine/source/system/timer.F
+      !||    startime                   ../engine/source/system/timer_mod.F90
+      !||    stoptime                   ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    fill_voxel_mod             ../engine/source/interfaces/intsort/fill_voxel.F90
       !||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
       !||    inter_struct_mod           ../engine/share/modules/inter_struct_mod.F
       !||    message_mod                ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod              ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    timer_mod                  ../engine/source/system/timer_mod.F90
       !||    tri7box                    ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE SPMD_CELL_EXCHANGE( NIN,ISENDTO,IRCVFROM,NSN,NSNR,IGAP,
+      SUBROUTINE SPMD_CELL_EXCHANGE(TIMERS, NIN,ISENDTO,IRCVFROM,NSN,NSNR,IGAP,
      1                               IFQ,INACTI,NSNFIOLD,INTTH,ITYP,STFNS, NSV,
      2                               NRTM, X,
      2                               ITIED,NMN,INTER_STRUCT,SORT_COMM, GOT_PREVIEW)
@@ -54,6 +55,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+        USE TIMER_MOD
         USE FILL_VOXEL_MOD
         USE TRI7BOX
         USE MESSAGE_MOD
@@ -80,6 +82,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        TYPE(TIMER_) :: TIMERS
         INTEGER NIN, IFQ, INACTI, IGAP,INTTH,NSN,NSNR,
      .        ITIED,
      .        NSNFIOLD(NSPMD),
@@ -146,7 +149,7 @@ C================================================================
 
       IF(.NOT. (IRCVFROM(NIN,LOC_PROC)==0.AND.ISENDTO(NIN,LOC_PROC)==0))  THEN
 
-      IF (IMONM > 0) CALL STARTIME(25,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,25)
 
       ! ---------------------------------------
       ! prepare the rcv --> local number of main node > 0
@@ -285,7 +288,7 @@ C================================================================
 
        ENDIF
 
-      IF (IMONM > 0) CALL STOPTIME(25,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,25)
 #endif
       RETURN
 

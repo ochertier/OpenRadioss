@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@ C Global detonation time is relevant when there are several explosive submateria
 C
 C GBUF%TB : global burning time (may not be allocated in case of JWL is not used, check GBUF%G_TB > 0)
 C LBUF%TB : local burning time of current layer
-C If iniital volume fraction is 0.0 then detonation time of current layer is not taken into account to calculate global detonation time.
+C If initial volume fraction is 0.0 then detonation time of current layer is not taken into account to calculate global detonation time.
 C
 C This subroutine must be called after INIVIOL treatment (INITIAL VOLUME FRACTION)
 C Precondition : MULTI_FVM%IS_USED=.TRUE.

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -201,6 +201,7 @@ C-----------------------------------------------
 C     GEO(I,J)  == LOCA(ISH3+I+(J-1)*NPROPG)
 C     BUFGEO(I) == LOCA(ISH4+I)
 C
+      GET_U_PNU = 0
       DEPLA=K-1+(IP-1)*NPROPG
       IF (IRESP==1) THEN
         CALL GET_VAR_USER_F_SP(3,DEPLA,NV)
@@ -477,7 +478,9 @@ C
       END
 C
       !||====================================================================
-      !||    get_u_task   ../engine/source/user_interface/upidmid.F
+      !||    get_u_task           ../engine/source/user_interface/upidmid.F
+      !||--- calls      -----------------------------------------------------
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
       !||====================================================================
       INTEGER FUNCTION GET_U_TASK()
 C-----------------------------------------------

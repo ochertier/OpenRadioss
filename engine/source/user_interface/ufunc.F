@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -150,7 +150,6 @@ C-----------------------------------------------
       !||    material_flow       ../engine/source/tools/seatbelts/material_flow.F
       !||    porfor4             ../engine/source/airbag/porfor4.F
       !||    porform4            ../engine/source/airbag/porfor4.F
-      !||    redef_seatbelt      ../engine/source/tools/seatbelts/redef_seatbelt.F
       !||    ruser32             ../engine/source/elements/spring/ruser32.F
       !||    ruser33             ../engine/source/elements/joint/ruser33.F
       !||    ruser35             ../engine/source/elements/spring/ruser35.F
@@ -181,6 +180,7 @@ C
       my_real 
      .    ABC,DERI,XX,DX1,DX2,TFI,TFI1,TFI2,TFIP,VAL
 C-----------------------------------------------
+        GET_U_FUNC = ZERO
         CALL GET_VAR_USER_I(5,IFUNC,NPFI)
         CALL GET_VAR_USER_I(5,IFUNC+1,NPFIP)
         IF (IRESP==1) THEN
@@ -301,8 +301,6 @@ C---
       END
       !||====================================================================
       !||    get_u_func_inv      ../engine/source/user_interface/ufunc.F
-      !||--- called by ------------------------------------------------------
-      !||    material_flow       ../engine/source/tools/seatbelts/material_flow.F
       !||--- calls      -----------------------------------------------------
       !||    get_var_user_f      ../engine/source/user_interface/eng_callback_c.c
       !||    get_var_user_f_sp   ../engine/source/user_interface/eng_callback_c.c
@@ -319,6 +317,7 @@ C
       my_real 
      .    ABC,YY,DERI,DY1,DY2,TFI,TFI1,TFI2,TFIP,VAL
 C-----------------------------------------------
+      GET_U_FUNC_INV = ZERO
       CALL GET_VAR_USER_I(5,IFUNC,NPFI)
       CALL GET_VAR_USER_I(5,IFUNC+1,NPFIP)
       IF (IRESP==1) THEN
@@ -344,7 +343,11 @@ C
         DY1 = -DY2
         DY2 = TFIP - YY
         IF(DY2>=ZERO.OR.I==NPFIP-2)THEN
-          DERI = (TFI - TFI2) / (TFIP - TFI1)
+          IF (TFIP-TFI1 == ZERO) THEN
+            DERI = ZERO
+          ELSE
+            DERI = (TFI - TFI2) / (TFIP-TFI1)
+          ENDIF  
           IF(DY1<=DY2)THEN
             GET_U_FUNC_INV = TFI2 + DY1 * DERI
           ELSE

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    fail_setoff_npg_c   ../engine/source/materials/fail/fail_setoff_npg_c.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc              ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc              ../engine/source/materials/mat_share/mulawc.F90
       !||    usermat_shell       ../engine/source/materials/mat_share/usermat_shell.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
@@ -98,6 +98,7 @@ c     THK_LY     Ratio of layer thickness / element thickness
 c     THK        Total element thickness
 C=======================================================================
 c 
+      IMAT = 1
       !=================================================================
       ! RECOVER PARAMETERS AND INITIALIZATION
       !=================================================================

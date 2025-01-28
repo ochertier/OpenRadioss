@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -134,8 +134,8 @@ C
          CALL INVOI2(X,INTBUF_TAB%IRECTM,INTBUF_TAB%NRT,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
      1   INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,INTBUF_TAB%NSEGM,NSN,NRTM)
          WRITE(IOUT,2200)
-         CALL I1TID2(X,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
-     1       INTBUF_TAB%ILOCS,INTBUF_TAB%IRTLM,NSN,ITAB ,ID,TITR)
+         CALL I1TID2(X, INTBUF_TAB%IRECTM, INTBUF_TAB%CSTS, INTBUF_TAB%MSR, INTBUF_TAB%NSV,
+     1       INTBUF_TAB%ILOCS, INTBUF_TAB%IRTLM, NSN, ITAB ,ID, TITR, NUMNOD)
           CALL I1BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB%NSV, SITAB, ITAB, NOINT, TITR, NTY)
 
       ELSEIF(NTY == 2)THEN
@@ -159,7 +159,7 @@ C
      1   INSCR(L16),INTBUF_TAB%IRTLM,INSCR(L21),NSN,NRTM)
          WRITE(IOUT,2200)
          CALL I1TID2(X,INTBUF_TAB%IRECTM,INTBUF_TAB%CSTS,INTBUF_TAB%MSR,INTBUF_TAB%NSV,
-     1       INSCR(L16),INTBUF_TAB%IRTLM,NSN,ITAB ,ID,TITR)
+     1       INSCR(L16), INTBUF_TAB%IRTLM, NSN, ITAB ,ID, TITR, NUMNOD)
 C Projection on edges is used only for the distribution of masses and inertia to avoid negative masses / inertia on MAIN nodes
          DO I=1,NSN
            INTBUF_TAB%CSTS_BIS(2*(I-1)+1)=MIN(ONE,MAX(-1*ONE,INTBUF_TAB%CSTS(2*(I-1)+1)))
@@ -323,8 +323,7 @@ C selecting relevant main nodes and recompating interface buffer
      2      INTBUF_TAB%IRTLS,NMN         ,INTBUF_TAB%CSTM,INTBUF_TAB%IRTLOS,INTBUF_TAB%FRICOM,
      3      INTBUF_TAB%VARIABLES(1),INTBUF_TAB%VARIABLES(2),IWPENE,ITAB      ,ID,TITR)
          ENDIF
-         CALL I9BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB%NSV, SITAB, ITAB, NOINT, TITR, NTY ,
-     2                    INTBUF_TAB%S_ILOCS, INTBUF_TAB%ILOCS  )
+         CALL I9BCS_CHECK(ICODE, SICODE, NSN, INTBUF_TAB%NSV, INTBUF_TAB%S_ILOCS, INTBUF_TAB%ILOCS  )
 
        ENDIF !NTY
 

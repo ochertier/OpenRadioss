@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -195,6 +195,7 @@
       !||    dynain_size_c                       ../engine/source/output/dynain/dynain_size.F
       !||    ebcs0                               ../engine/source/boundary_conditions/ebcs/ebcs0.F
       !||    ebcs10                              ../engine/source/boundary_conditions/ebcs/ebcs10.F
+      !||    ebcs11                              ../engine/source/boundary_conditions/ebcs/ebcs11.F90
       !||    ebcs_main                           ../engine/source/boundary_conditions/ebcs/ebcs_main.F
       !||    eflux3_int22_fvm                    ../engine/source/ale/alefvm/cut_cells/eflux3_int22_fvm.F
       !||    eig                                 ../engine/stub/eig.F
@@ -212,6 +213,7 @@
       !||    fail_setoff_c                       ../engine/source/materials/fail/fail_setoff_c.F
       !||    fail_setoff_npg_c                   ../engine/source/materials/fail/fail_setoff_npg_c.F
       !||    fail_setoff_wind_frwave             ../engine/source/materials/fail/fail_setoff_wind_frwave.F
+      !||    fail_windshield_init                ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
       !||    failini                             ../starter/source/elements/solid/solide/failini.F
       !||    forint                              ../engine/source/elements/forint.F
       !||    forintc                             ../engine/source/elements/forintc.F
@@ -246,7 +248,7 @@
       !||    h3d_nodal_tensor                    ../engine/source/output/h3d/h3d_results/h3d_nodal_tensor.F
       !||    h3d_nodal_vector                    ../engine/source/output/h3d/h3d_results/h3d_nodal_vector.F
       !||    h3d_oned_off                        ../engine/source/output/h3d/spmd/spmd_h3d_oned_off.F
-      !||    h3d_oned_scalar                     ../engine/source/output/h3d/h3d_results/h3d_oned_scalar.F
+      !||    h3d_oned_scalar                     ../engine/source/output/h3d/h3d_results/h3d_oned_scalar.F90
       !||    h3d_oned_tensor                     ../engine/source/output/h3d/h3d_results/h3d_oned_tensor.F
       !||    h3d_oned_vector                     ../engine/source/output/h3d/h3d_results/h3d_oned_vector.F
       !||    h3d_quad_off                        ../engine/source/output/h3d/spmd/spmd_h3d_quad_off.F
@@ -379,7 +381,7 @@
       !||    mmain8                              ../engine/source/materials/mat_share/mmain8.F
       !||    monvol0                             ../engine/source/airbag/monvol0.F
       !||    mulaw_ib                            ../engine/source/elements/beam/mulaw_ib.F
-      !||    mulawc                              ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc                              ../engine/source/materials/mat_share/mulawc.F90
       !||    mulawglc                            ../engine/source/materials/mat_share/mulawglc.F
       !||    mulawglcpinch                       ../engine/source/elements/shell/coqueba/mulawglcpinch.F
       !||    multi_buf2var                       ../engine/source/multifluid/multi_buf2var.F
@@ -389,7 +391,7 @@
       !||    multi_evolve_partial                ../engine/source/multifluid/multi_evolve_partial.F
       !||    multi_fluxes_computation            ../engine/source/multifluid/multi_fluxes_computation.F
       !||    multi_fvm2fem                       ../engine/source/multifluid/multi_fvm2fem.F
-      !||    multi_fvm_mod                       ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                       ../common_source/modules/ale/multi_fvm_mod.F90
       !||    multi_globalize                     ../engine/source/multifluid/multi_globalize.F
       !||    multi_i18_force_poff                ../engine/source/interfaces/int18/multi_i18_force_poff.F
       !||    multi_muscl_fluxes_computation      ../engine/source/multifluid/multi_muscl_fluxes_computation.F
@@ -539,7 +541,8 @@
       !||    sigeps122c                          ../engine/source/materials/mat/mat122/sigeps122c.F
       !||    sigeps22g                           ../engine/source/materials/mat/mat022/sigeps22g.F
       !||    sigeps37_single_cell                ../engine/source/interfaces/int22/sigeps37_single_cell.F
-      !||    sigeps51                            ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51                            ../engine/source/materials/mat/mat051/sigeps51.F90
+      !||    sigeps51_boundary_material          ../engine/source/materials/mat/mat051/sigeps51_boundary_material.F90
       !||    sigeps97                            ../engine/source/materials/mat/mat097/sigeps97.F
       !||    sigin3b                             ../starter/source/elements/solid/solid8p/sigin3b.F
       !||    sigrota                             ../engine/source/output/anim/generate/sigrota.F
@@ -1231,8 +1234,8 @@
         type (buf_eos_)  , dimension(:,:,:)  , pointer :: eos  
         type (buf_visc_) , dimension(:,:,:)  , pointer :: visc  
         type (buf_poro_) , dimension(:,:,:)  , pointer :: poro  
-        type (buf_xfem_) , dimension(:)      , pointer :: xfem        ! xfem (nxel)
-        type (l_bufel_dir_) , dimension(:)  , pointer :: lbuf_dir   ! local direction by int point in the tickness for slice)
+        type (buf_xfem_) , dimension(:)      , pointer :: xfem      ! xfem (nxel)
+        type (l_bufel_dir_) , dimension(:)  , pointer :: lbuf_dir   ! local direction by int point in the thickness for slice)
       end type buf_lay_
 !
 !--------------------       

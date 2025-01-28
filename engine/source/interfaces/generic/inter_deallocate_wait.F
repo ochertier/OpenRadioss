@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    inter_sorting_mod       ../engine/share/modules/inter_sorting_mod.F
       !||    inter_struct_mod        ../engine/share/modules/inter_struct_mod.F
       !||    metric_mod              ../common_source/modules/interfaces/metric_mod.F
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod              ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    sensor_mod              ../common_source/modules/sensor_mod.F90
       !||====================================================================
         SUBROUTINE INTER_DEALLOCATE_WAIT( ITASK,NB_INTER_SORTED,LIST_INTER_SORTED,IPARI,
      1                          NSENSOR,IRECVFROM,SENSOR_TAB,INTER_STRUCT,SORT_COMM )

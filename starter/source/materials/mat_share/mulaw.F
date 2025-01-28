@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    mmain              ../starter/source/materials/mat_share/mmain.F
       !||--- calls      -----------------------------------------------------
+      !||    sigeps01           ../starter/source/materials/mat/mat001/sigeps01.F90
       !||    sigeps35           ../starter/source/materials/mat/mat035/sigeps35.F
       !||    sigeps37           ../starter/source/materials/mat/mat037/sigeps37.F
       !||    sigeps38           ../starter/source/materials/mat/mat038/sigeps38.F
@@ -32,6 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sigeps70           ../starter/source/materials/mat/mat070/sigeps70.F
       !||    sigeps90           ../starter/source/materials/mat/mat090/sigeps90.F
       !||--- uses       -----------------------------------------------------
+      !||    sigeps01_mod       ../starter/source/materials/mat/mat001/sigeps01.F90
       !||====================================================================
       SUBROUTINE MULAW(LFT   ,LLT   ,NFT    ,MTN   ,JCVT   ,
      2                 PM    ,OFF   ,SIG    ,EINT  ,RHO    ,
@@ -53,6 +55,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MATPARAM_DEF_MOD
+      USE sigeps01_mod, only : sigeps01
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -215,7 +218,14 @@ C     .                   R21,R22,R23,
 C     .                   R31,R32,R33)
 C          ENDIF
 C ====================================================================
-      IF(MTN==35)THEN
+      IF(MTN==1)THEN
+          CALL SIGEPS01(LLT ,PM(1,IMAT),NPROPM, RHO,RHO0,ISMSTR,
+     .                  DE1 ,DE2 ,DE3 ,DE4  ,DE5  ,DE6 ,
+     .                  ES1 ,ES2 ,ES3 ,ES4  ,ES5  ,ES6 ,
+     .                  SO1 ,SO2 ,SO3 ,SO4  ,SO5  ,SO6 ,
+     .                  S1  ,S2  ,S3  ,S4   ,S5   ,S6  ,
+     .                  SSP ,VIS )
+      ELSEIF(MTN==35)THEN
           CALL SIGEPS35(LLT ,NPAR,NUVAR,NFUNC,IFUNC,
      .                  NPF ,TF  ,TIME,TIMESTEP,BUFMAT(IADBUF),
      .                  RHO0,RHO ,VOLN,EINT,

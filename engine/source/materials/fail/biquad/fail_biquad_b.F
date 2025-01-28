@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -84,6 +84,7 @@ C!-----------------------------------------------
 
 C!--------------------------------------------------------------
        IR    = 0
+       EPS_FAIL = -HUGE(EPS_FAIL)
        X_1(1) = UPARAM(1)
        X_1(2) = UPARAM(2)
        X_1(3) = UPARAM(3)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    daasolv               ../engine/source/fluid/daasolv.F
       !||    daasolvp              ../engine/source/fluid/daasolvp.F
+      !||    ebcs11                ../engine/source/boundary_conditions/ebcs/ebcs11.F90
       !||    force                 ../engine/source/loads/general/force.F90
       !||    forcefingeo           ../engine/source/loads/general/forcefingeo.F
       !||    forcepinch            ../engine/source/loads/general/forcepinch.F
@@ -47,6 +48,7 @@ C-----------------------------------------------
       my_real TF(*),DERI,XX,DX,DERI1,DERI2,DERI3,DX1,DX2,DIV0,DIV,
      . XX_FIRST,XX_LAST
 C-----------------------------------------------
+      FINTER_SMOOTH = ZERO
 !
 !  smooth interpolation
 !

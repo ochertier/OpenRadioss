@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    surface_buffer                ../starter/source/model/sets/surface_buffer.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod                   ../starter/share/message_module/message_mod.F
+      !||    surf_mod                      ../starter/share/modules1/surf_mod.F
       !||====================================================================
       SUBROUTINE CREATE_SURFACE_FROM_ELEMENT(
      .                       IXS       ,IXS10    ,SH4TREE   ,SH3TREE   ,IXC       ,
@@ -46,6 +47,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
+      USE SURF_MOD , ONLY : EXT_SURF,ALL_SURF
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -91,8 +93,9 @@ C=======================================================================
 !
       IAD_SURF = 1
 !------------------
-      IEXT = 1  ! par default (external surface)
-      IF ( OPT_A == 1 )  IEXT = 2 ! all surfaces (internal + external)
+      IEXT = EXT_SURF  ! par default (external surface)
+      IF ( OPT_A == 1 )  IEXT = ALL_SURF ! all surfaces (internal + external)
+      CLAUSE%EXT_ALL = IEXT
 !------------------
 
 !

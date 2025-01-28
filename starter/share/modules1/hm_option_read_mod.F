@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -202,7 +202,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_inistate_d00              ../starter/source/elements/initia/hm_read_inistate_d00.F
       !||    hm_read_initemp                   ../starter/source/initial_conditions/thermic/hm_read_initemp.F
       !||    hm_read_inivel                    ../starter/source/initial_conditions/general/inivel/hm_read_inivel.F
-      !||    hm_read_inivol                    ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                    ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_inject1                   ../starter/source/properties/injector/hm_read_inject1.F
       !||    hm_read_inject2                   ../starter/source/properties/injector/hm_read_inject2.F
       !||    hm_read_interfaces                ../starter/source/interfaces/reader/hm_read_interfaces.F
@@ -214,20 +214,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_link                      ../starter/source/constraints/rigidlink/hm_read_rlink.F
       !||    hm_read_load_centri               ../starter/source/loads/general/load_centri/hm_read_load_centri.F
       !||    hm_read_load_pressure             ../starter/source/loads/general/load_pressure/hm_read_load_pressure.F
-      !||    hm_read_mat                       ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                       ../starter/source/materials/mat/hm_read_mat.F90
       !||    hm_read_mat100                    ../starter/source/materials/mat/mat100/hm_read_mat100.F
       !||    hm_read_mat109                    ../starter/source/materials/mat/mat109/hm_read_mat109.F
       !||    hm_read_mat36                     ../starter/source/materials/mat/mat036/hm_read_mat36.F
       !||    hm_read_mat38                     ../starter/source/materials/mat/mat038/hm_read_mat38.F
       !||    hm_read_mat40                     ../starter/source/materials/mat/mat040/hm_read_mat40.F
       !||    hm_read_mat48                     ../starter/source/materials/mat/mat048/hm_read_mat48.F
-      !||    hm_read_mat57                     ../starter/source/materials/mat/mat057/hm_read_mat57.F
       !||    hm_read_mat63                     ../starter/source/materials/mat/mat063/hm_read_mat63.F
       !||    hm_read_mat66                     ../starter/source/materials/mat/mat066/hm_read_mat66.F
       !||    hm_read_mat71                     ../starter/source/materials/mat/mat071/hm_read_mat71.F
       !||    hm_read_mat76                     ../starter/source/materials/mat/mat076/hm_read_mat76.F
-      !||    hm_read_mat81                     ../starter/source/materials/mat/mat081/hm_read_mat81.F
-      !||    hm_read_mat87                     ../starter/source/materials/mat/mat087/hm_read_mat87.F
+      !||    hm_read_mat87                     ../starter/source/materials/mat/mat087/hm_read_mat87.F90
       !||    hm_read_mat95                     ../starter/source/materials/mat/mat095/hm_read_mat95.F
       !||    hm_read_matgas                    ../starter/source/materials/mat/matgas/hm_read_matgas.F
       !||    hm_read_merge                     ../starter/source/constraints/general/merge/hm_read_merge.F
@@ -293,7 +291,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_table2_0                  ../starter/source/tools/curve/hm_read_table2_0.F
       !||    hm_read_table2_1                  ../starter/source/tools/curve/hm_read_table2_1.F
       !||    hm_read_therm                     ../starter/source/materials/therm/hm_read_therm.F
-      !||    hm_read_therm_stress              ../starter/source/materials/therm/hm_read_therm_stress.F
+      !||    hm_read_therm_stress              ../starter/source/materials/therm/hm_read_therm_stress.F90
       !||    hm_read_thgrki                    ../starter/source/output/th/hm_read_thgrki.F
       !||    hm_read_thgrki_rbody              ../starter/source/output/th/hm_read_thgrki_rbody.F
       !||    hm_read_thgrne                    ../starter/source/output/th/hm_read_thgrne.F
@@ -382,6 +380,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    read_sensor_nic                   ../starter/source/tools/sensor/read_sensor_nic.F
       !||    read_sensor_not                   ../starter/source/tools/sensor/read_sensor_not.F
       !||    read_sensor_or                    ../starter/source/tools/sensor/read_sensor_or.F
+      !||    read_sensor_python                ../starter/source/tools/sensor/hm_read_sensor_python.F90
       !||    read_sensor_rbody                 ../starter/source/tools/sensor/read_sensor_rbody.F
       !||    read_sensor_rwall                 ../starter/source/tools/sensor/read_sensor_rwall.F
       !||    read_sensor_sect                  ../starter/source/tools/sensor/read_sensor_sect.F

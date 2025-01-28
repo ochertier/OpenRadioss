@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -100,6 +100,7 @@ C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
       RHON_OLD(1:NEL)=RHON(1:NEL)
+      RHO0 = ZERO
       IF(ALE%GLOBAL%INCOMP==1 .AND. JEUL+JALE==1)THEN
         MX        = MAT(1)
         RHO0      = PM(1,MX)

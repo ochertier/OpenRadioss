@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@
       !||====================================================================
       !||    hm_read_mat125_mod   ../starter/source/materials/mat/mat125/hm_read_mat125.F90
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat          ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat          ../starter/source/materials/mat/hm_read_mat.F90
       !||====================================================================
       module hm_read_mat125_mod
       contains
@@ -34,7 +34,7 @@
       !||====================================================================
       !||    hm_read_mat125           ../starter/source/materials/mat/mat125/hm_read_mat125.F90
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
@@ -90,12 +90,12 @@
          rho0,e1,e2,e3,g12,g23,g13,nu12,nu21,nu23,nu31,nu13,soft,     &
          em11t,em22t,em33t,em11c,em22c,em33c,ems,ems13,ems23,         &
          xc,xt,yc,yt,zc,zt,sc, sc23,sc13,gamma,tau,gamma2,tau2,       &
-         tau3,gamma3, erods,tsdm, gammar,gammaf,nu32,                 &
+         tau3,gamma3, erods,tsmd, gammar,gammaf,nu32,                 &
          slimt1,slimc1,slimt2,slimc2,slimt3,slimc3,slims,             &
          slims13,slims23, a11,a22,a12,c11,c22,c33,c12,c13,c23,        &
          detc, d11,d22,d33,d12,d13,d23,dmn,dmx,al1c,al1t,al2c,        &
          al2t,al3c,al3t,m1t,m2t,m1c,m2c,m3c,m3t,ef11t,ef11c,          &
-         ef22t,ef22c,ef33t,ef33c,fac,tsmd,g31,                  &
+         ef22t,ef22c,ef33t,ef33c,fac,g31,                             &
           fcut,efs,ms,als,                                            &
          c1,gmax,ssp,nu,young,asrate,ms13,efs13,als13,ms23,           &
          efs23,als23      
@@ -121,9 +121,9 @@
       call hm_get_floatv('LSD_MAT_GBC'   ,g23      ,is_available, lsubmodel, unitab)
       call hm_get_floatv('LSD_MAT_GCA'   ,g13      ,is_available, lsubmodel, unitab)
 !card4 -  poisson's ratio
-      call hm_get_floatv('LSD_MAT_PRBA'  ,nu12     ,is_available, lsubmodel, unitab)
-      call hm_get_floatv('LSD_MAT_PRBC'  ,nu23     ,is_available, lsubmodel, unitab)
-      call hm_get_floatv('LSD_MAT_PRAC'  ,nu13     ,is_available, lsubmodel, unitab) 
+      call hm_get_floatv('LSD_MAT_PRBA'  ,nu21     ,is_available, lsubmodel, unitab)
+      call hm_get_floatv('LSDYNA_PRCB'  ,nu32     ,is_available, lsubmodel, unitab)
+      call hm_get_floatv('LSDYNA_PRCA'  ,nu31     ,is_available, lsubmodel, unitab) 
 !card5 - dir 11 tention 
       call hm_get_floatv  ('LSD_M11T'        ,em11t      ,is_available, lsubmodel, unitab)
       call hm_get_floatv  ('LSD_MAT_XT'      ,xt         ,is_available, lsubmodel, unitab)
@@ -149,17 +149,17 @@
       call hm_get_intv  ('LSD_LCID13'  ,ifem22c   ,is_available, lsubmodel)
       call hm_get_intv  ('LSD_LCID3'   ,ifyc     ,is_available, lsubmodel) 
 !card9 - dir 33 tention  only for solid
-      call hm_get_floatv  ('LSD_M33T'    ,em33t      ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MAT_ZT'       ,zt         ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('MATL58_SLIMT3'   ,slimt3     ,is_available, lsubmodel, unitab)
-      call hm_get_intv ('LSD_LCID22'  ,ifem33t     ,is_available, lsubmodel)
-      call hm_get_intv ('LSD_LCID18'   ,ifzt       ,is_available, lsubmodel)
+      call hm_get_floatv  ('LSD_MAT_E33T'         ,em33t      ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_157_ZT'       ,zt         ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_SLIMT3'   ,slimt3     ,is_available, lsubmodel, unitab)
+      call hm_get_intv ('LSD_MAT_LCE33T'  ,ifem33t     ,is_available, lsubmodel)
+      call hm_get_intv ('LSD_MAT_LCZT'     ,ifzt       ,is_available, lsubmodel)
 ! card10- dir 33 compression only for solid
-      call hm_get_floatv  ('LSD_M33C'    ,em33c      ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MAT_ZC'       ,zc         ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('MATL58_SLIMC3'   ,slimc3     ,is_available, lsubmodel, unitab)
-      call hm_get_intv  ('LSD_LCID21'  ,ifem33c   ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID17'   ,ifzc     ,is_available, lsubmodel)   
+      call hm_get_floatv  ('LSD_MAT_E33C'     ,em33c      ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_157_ZC'       ,zc         ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_SLIMC3'   ,slimc3     ,is_available, lsubmodel, unitab)
+      call hm_get_intv  ('LSD_MAT_LCE33C'  ,ifem33c   ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCZC'   ,ifzc     ,is_available, lsubmodel)   
 !card11 - shear 12 
       call hm_get_floatv  ('MATL58_GAMMA1'   ,gamma     ,is_available, lsubmodel, unitab)
       call hm_get_floatv  ('MATL58_TAU1'     ,tau       ,is_available, lsubmodel, unitab)
@@ -172,36 +172,36 @@
       call hm_get_intv  ('LSD_LCID15'   ,ifems     ,is_available, lsubmodel)
       call hm_get_intv  ('LSD_LCID5'    ,ifsc     ,is_available, lsubmodel)
 !card13 - shear 13 for solid 
-      call hm_get_floatv  ('MATL58_GAMMA2'   ,gamma2     ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('MATL58_TAU2'     ,tau2       ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MS13'        ,ems13      ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MAT_SC13'    ,sc13       ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('MATL58_SLIMS13'  ,slims13    ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_GAMMA2'   ,gamma2     ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_TAU2'     ,tau2       ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_LCSC31'   ,ems13      ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_SC31'      ,sc13       ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_SLIMS31'  ,slims13    ,is_available, lsubmodel, unitab)
 !card14 - strain rate dependency (optional)
-      call hm_get_intv  ('LSD_LCID26'  ,ifgamma2   ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID25'    ,iftau2     ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID23'     ,ifems13     ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID20'      ,ifsc13      ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCGAM2'      ,ifgamma2   ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCTAU2'      ,iftau2     ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCGMS31'      ,ifems13     ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_GMS31'      ,ifsc13      ,is_available, lsubmodel)
 !card15- shear 13 for solid 
-      call hm_get_floatv  ('MATL58_GAMMA3'   ,gamma3     ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('MATL58_TAU3'     ,tau3       ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MS23'        ,ems23      ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_GAMMA3'   ,gamma3     ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_TAU3'     ,tau3       ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_GMS23'        ,ems23      ,is_available, lsubmodel, unitab)
       call hm_get_floatv  ('LSD_MAT_SC23'    ,sc23       ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('MATL58_SLIMS23'  ,slims23    ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('LSD_MAT_SLIMS23'  ,slims23    ,is_available, lsubmodel, unitab)
 !card16 - strain rate dependency (optional)
-      call hm_get_intv  ('LSD_LCID28'     ,ifgamma3   ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID27'      ,iftau3     ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID24'     ,ifems23     ,is_available, lsubmodel)
-      call hm_get_intv  ('LSD_LCID19'      ,ifsc23      ,is_available, lsubmodel)   
+      call hm_get_intv  ('LSD_MAT_LCGAM3'     ,ifgamma3   ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCTAU3'      ,iftau3     ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCGMS23'     ,ifems23     ,is_available, lsubmodel)
+      call hm_get_intv  ('LSD_MAT_LCSC23'      ,ifsc23      ,is_available, lsubmodel)   
 !card17    
       call hm_get_floatv  ('LSD_MAT_EPSF'   ,gammaf     ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MAT_EPSF'   ,gammar       ,is_available, lsubmodel, unitab)
-      call hm_get_floatv  ('LSD_MAT_EPSF'   ,tsmd      ,is_available, lsubmodel, unitab)       
+      call hm_get_floatv  ('LSD_MAT_EPSR'   ,gammar       ,is_available, lsubmodel, unitab)
+      call hm_get_floatv  ('MAT_LSD_MAT_TSMD'   ,tsmd      ,is_available, lsubmodel, unitab)       
 !card18
       call hm_get_intv  ('LSD_LCID16'        ,iferods  ,is_available, lsubmodel)  
       call hm_get_floatv  ('MATL58_ERODS'   ,erods       ,is_available, lsubmodel, unitab)       
 !card? - equivalent strain rate cutoff frequency 
-      call hm_get_floatv('fcut'      ,fcut     ,is_available, lsubmodel, unitab)
+      call hm_get_floatv('FCUT'      ,fcut     ,is_available, lsubmodel, unitab)
 
       ! young modulus initialization
       if (e2 == zero)  e2  = e1
@@ -209,62 +209,37 @@
       ! shear modulus
       if (g13 == zero) g13 = g12
       if (g23 == zero) g23 = g13
+
+      if(nu31 == zero) nu31 = nu21
+      if(nu32 == zero) nu32 = nu21
 !-----------------------------
  !     check and default values
  !-----------------------------
       ! poisson's ratio
-      if (nu12 < zero .or. nu12 >= half) then
-        call ancmsg(msgid=3032,                        &
+       nu12 = nu21*e1/e2 
+       nu23 = nu32*e2/e3
+       nu13 = nu31*e1/e3
+      ! checking poisson's ratio 
+      if(nu12*nu21 >= one ) then
+        call ancmsg(msgid=3068,                        &
                   msgtype=msgerror,                    &
                   anmode=aninfo_blind_2,               &
-                  r1=nu12,                             &
                   i1=mat_id,                           &
                   c1=titr)
-      endif    
-      nu21 = nu12*e2/e1
-      if (nu21 < zero .or. nu21 >= half) then
-        call ancmsg(msgid=3033,                      &                              
-                  msgtype=msgerror,                  &
-                  anmode=aninfo_blind_2,             &
-                  r1=nu21,                           &
-                  i1=mat_id,                         &
-                  c1=titr)   
-      endif
-      if (nu23 < zero .or. nu23 >= half) then
-        call ancmsg(msgid=3034,                        &
-                    msgtype=msgerror,                  &
-                    anmode=aninfo_blind_2,             &
-                    r1=nu23,                           &
-                    i1=mat_id,                         &
-                    c1=titr)
-      endif
-      nu32 = nu23*e3/e2
-      if (nu32 < zero .or. nu32 >= half) then
-        call ancmsg(msgid=3035,                     &
-                 msgtype=msgerror,                  &
-                 anmode=aninfo_blind_2,             &
-                 r1=nu32,                           &
-                 i1=mat_id,                         &
-                 c1=titr)
-      endif
-      if (nu13 < zero .or. nu13 >= half) then
-        call ancmsg(msgid=3036,                     &
-                 msgtype=msgerror,                  &
-                 anmode=aninfo_blind_2,             &
-                 r1=nu31,                           &
-                 i1=mat_id,                         &
-                 c1=titr)
-      endif 
-      nu31 = nu13*e3/e1
-      if (nu31 < zero .or. nu31 >= half) then
-        call ancmsg(msgid=3037,                     &
-                  msgtype=msgerror,                 &
-                  anmode=aninfo_blind_2,            &
-                  r1=nu13,                          &
-                  i1=mat_id,                        &
+      else if (nu13*nu31 >= one ) then
+        call ancmsg(msgid=3069,                        &
+                  msgtype=msgerror,                    &
+                  anmode=aninfo_blind_2,               &
+                  i1=mat_id,                           &
                   c1=titr)
-      endif 
-      ! checking poisson's ratio 
+      else if( nu23*nu32 >= one)then
+         call ancmsg(msgid=3070,                        &
+                  msgtype=msgerror,                    &
+                  anmode=aninfo_blind_2,               &
+                  i1=mat_id,                           &
+                  c1=titr)
+      endif
+      !  
       detc = one - nu12*nu21
       if (detc <= zero) then
         call ancmsg(msgid=307,                        &
@@ -332,6 +307,8 @@
       m1t = one 
       al1c = ep20
       m1c = one 
+      ef11t = zero
+      ef11c = -HUGE(ef11c)
       if(e1 > zero ) then
         if(xt > zero )then
           ef11t  = xt/e1
@@ -352,6 +329,9 @@
       m2t = one 
       al2c = ep20
       m2c = one 
+      ef22t = zero
+      ef22c = -HUGE(ef22c)
+      al2t = -HUGE(al2t)
       if(e2 > zero) then
         if(yt > zero )then
           ef22t  = yt/e2
@@ -370,7 +350,10 @@
       al3c = ep20
       m3t = one 
       al3c = ep20
-      m3c = one     
+      m3c = one  
+      ef33t = zero   
+      al3t = -HUGE(al3t)
+      ef33c = -HUGE(ef33c)
       if(e3 > zero) then
         if(zt  > zero )then
           ef33t  = zt/e3
@@ -387,9 +370,15 @@
           al3c = m3c*(em33c/ef33c)**m3c
         endif
       endif 
-       ms = one
-       als = ep20
-       efs = zero
+      ms = one
+      als = ep20
+      efs = zero
+      ms13 = -HUGE(ms13)
+      als13 = -HUGE(als13)
+      efs13 = -HUGE(efs13)
+      ms23 = -HUGE(ms23)
+      als23 = -HUGE(als23)
+      efs23 = -HUGE(efs23)
       if(fs == -1) then
          ! plane shear 
         if(g12 > zero ) then
@@ -399,7 +388,7 @@
             ms = -one/log(efs/gamma) ! one/ln(epsm/epsf)    
             als = ms*(gamma/efs)**ms
           else 
-           ! adding error messsage   
+           ! adding error message   
            fs = 1
           endif
          endif   
@@ -414,7 +403,7 @@
            ms13 = -one/log(efs13/gamma2) ! one/ln(epsm/epsf)    
            als13 = ms*(gamma2/efs13)**ms13
           else 
-           ! adding error messsage   
+           ! adding error message   
          endif
         endif   
         ! transverse shear 23 (only for solid)
@@ -428,7 +417,7 @@
            ms23 = -one/log(efs23/gamma3) ! one/ln(epsm/epsf)    
            als23 = ms23*(gamma3/efs23)**ms23
          else 
-           ! adding error messsage   
+           ! adding error message   
          endif 
        endif  
 
@@ -501,7 +490,7 @@
 
       matparam%uparam(44)  = gammaf
       matparam%uparam(45)  = gammar
-      matparam%uparam(46)  = tsdm
+      matparam%uparam(46)  = tsmd
       !
       matparam%uparam(47)  = erods
       !
@@ -667,7 +656,7 @@
         write(iout,'(5x,a,//)')'confidential data'
       else
         write(iout,1200) rho0
-        write(iout,1300) e1,e2,e3,g12,g23,g13,nu12,nu23,nu13
+        write(iout,1300) e1,e2,e3,g12,g23,g13,nu21,nu32,nu31
         write(iout,1400)  em11t, xt,slimt1,em11c,xc,slimc1
         write(iout,1500)  em22t, yt,slimt2,em22c,yt,slimc2
         write(iout,1600)  em33t, zt,slimt3,em33c,zt,slimc3
@@ -682,7 +671,7 @@
         write(iout,2300) ifgamma, iftau,ifems, ifsc
         write(iout,2400) ifgamma2, iftau2,ifems13, ifsc13
         write(iout,2500) ifgamma3, iftau3,ifems23, ifsc23
-        write(iout,2600) gammaf, gammar, tsdm, erods, iferods
+        write(iout,2600) gammaf, gammar, tsmd, erods, iferods
 
         write(iout,2800) fcut
       endif     
@@ -704,10 +693,10 @@
        5x,'young modulus in dir. 3 (matrix) e3 . . . . . . .=',1pg20.13/     &
        5x,'shear modulus in plane 12 g12 . . . . . . . . . .=',1pg20.13/     &
        5x,'shear modulus in plane 23 g23 . . . . . . . . . .=',1pg20.13/     &
-       5x,'shear modulus in plane 31 g13 . . . . . . . . . .=',1pg20.13/     &
-       5x,'poisson ratio in plane 12 nu12. . . . . . . . . .=',1pg20.13/     &
-       5x,'poisson ratio in plane 23 nu23. . . . . . . . . .=',1pg20.13/     &
-       5x,'poisson ratio in plane 31 nu13. . . . . . . . . .=',1pg20.13)
+       5x,'shear modulus in plane 31 g31 . . . . . . . . . .=',1pg20.13/     &
+       5x,'poisson ratio in plane 21 nu21. . . . . . . . . .=',1pg20.13/     &
+       5x,'poisson ratio in plane 32 nu32. . . . . . . . . .=',1pg20.13/     &
+       5x,'poisson ratio in plane 31 nu31. . . . . . . . . .=',1pg20.13)
  1400 format(                                                                     &
        5x,' fiber (dir. 1) parameters   :                            ',/          &
        5x,'---------------------------                               ',/          &

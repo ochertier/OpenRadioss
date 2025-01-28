@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,6 +28,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    anim_mod       ../common_source/modules/output/anim_mod.F
       !||    groupdef_mod   ../common_source/modules/groupdef_mod.F
       !||    h3d_mod        ../engine/share/modules/h3d_mod.F
+      !||    output_mod     ../common_source/modules/output/output_mod.F90
       !||====================================================================
       SUBROUTINE I15ASS(AF    ,X     ,V    ,KSURF ,IGRSURF ,
      2                  BUFSF ,STIFN ,FS   ,FCONT ,FSKYI ,
@@ -40,6 +41,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE GROUPDEF_MOD
       USE ANIM_MOD
+      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,7 +63,6 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER KSURF,ISKY(*),NNC,KNC(*)
-C     REAL
       my_real
      .  AF(*) , X(3,*), V(3,*),BUFSF(*),
      .  STIFN(*), FS(NTHVKI), 
@@ -229,7 +230,7 @@ C---------------------------------
       IF (IGRSURF(KSURF)%TYPE==100) THEN
 C     Sorties Ellipdoides Madymo.
 #include "atomic.inc"
-          TFEXT=TFEXT+DE*DT1*HALF
+          WFEXT=WFEXT+DE*DT1*HALF
 #include "atomend.inc"
       ENDIF
 C----------------------------------

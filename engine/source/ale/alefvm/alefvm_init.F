@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -93,7 +93,7 @@ C-----------------------------------------------
       ALEFVM_Param%IOUTP_EPSDOT =  0     ; NVAR=NVAR+1; FLAG(NVAR)%ptr => ALEFVM_Param%IOUTP_EPSDOT
       ALEFVM_Param%IOUTP_SCHEME = -1     ; NVAR=NVAR+1; FLAG(NVAR)%ptr => ALEFVM_Param%IOUTP_SCHEME
       ALEFVM_Param%IOUTP_BCS    =  0     ; NVAR=NVAR+1; FLAG(NVAR)%ptr => ALEFVM_Param%IOUTP_BCS
-      ALEFVM_Param%IOUTP_TFEXT  =  0     ; NVAR=NVAR+1; FLAG(NVAR)%ptr => ALEFVM_Param%IOUTP_TFEXT      
+      ALEFVM_Param%IOUTP_WFEXT  =  0     ; NVAR=NVAR+1; FLAG(NVAR)%ptr => ALEFVM_Param%IOUTP_WFEXT
 
       DO I=1,NVAR
         FLAG(I)%ptr =FLAG(I)%ptr * ALEFVM_Param%IOUTP

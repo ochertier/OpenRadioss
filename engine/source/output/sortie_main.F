@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,33 +58,33 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    crackxfem_mod            ../engine/share/modules/crackxfem_mod.F
       !||    drape_mod                ../engine/share/modules/drape_mod.F
       !||    dt_mod                   ../engine/source/modules/dt_mod.F
-      !||    ebcs_mod                 ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    ebcs_mod                 ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||    ecnd_mod                 ../engine/share/modules/ecdn_mod.F
       !||    elbufdef_mod             ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    fpcont2_max_output_mod   ../engine/source/output/h3d/h3d_results/fpcont2_max_output.F90
       !||    fpcont2_min_output_mod   ../engine/source/output/h3d/h3d_results/fpcont2_min_output.F90
       !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
       !||    fvmbag_meshcontrol_mod   ../common_source/modules/airbag/fvmbag_meshcontrol_mod.F
-      !||    genani_mod               ../engine/source/output/anim/generate/genani.F
+      !||    glob_therm_mod           ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod             ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                  ../engine/share/modules/h3d_mod.F
       !||    inoutfile_mod            ../common_source/modules/inoutfile_mod.F
-      !||    loads_mod                ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod             ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod              ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod            ../common_source/modules/ale/multi_fvm_mod.F90
       !||    outmax_mod               ../common_source/modules/outmax_mod.F
       !||    output_mod               ../common_source/modules/output/output_mod.F90
       !||    outputs_mod              ../common_source/modules/outputs_mod.F
       !||    pinchtype_mod            ../common_source/modules/pinchtype_mod.F
-      !||    sensor_mod               ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod               ../common_source/modules/sensor_mod.F90
       !||    stack_mod                ../engine/share/modules/stack_mod.F
       !||    state_mod                ../common_source/modules/state_mod.F
       !||    table_mod                ../engine/share/modules/table_mod.F
       !||    th_surf_mod              ../common_source/modules/interfaces/th_surf_mod.F
+      !||    timer_mod                ../engine/source/system/timer_mod.F90
       !||    user_windows_mod         ../common_source/modules/user_windows_mod.F
       !||====================================================================
-      SUBROUTINE SORTIE_MAIN(
+      SUBROUTINE SORTIE_MAIN(TIMERS,
      1            PM        ,D           ,V          ,ALE_CONNECT,W        ,
      2            ELBUF     ,IPARG       ,IXS        ,IXQ       ,IXC      ,         
      3            IXT       ,IXP         ,IXR        ,IXTG      ,WA       ,         
@@ -131,13 +131,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      q            TF        ,NPC         ,DYNAIN_DATA,FCONT_MAX,MDS_MATID,
      r            FNCONTP2  ,FTCONTP2    ,IBCL        ,ILOADP   ,LLOADP   ,
      s            LOADP     ,TAGNCONT    ,LOADP_HYD_INTER,FORC  ,DRAPEG,USER_WINDOWS,
-     t            OUTPUT    ,DT          ,FSAVSURF    ,TABLE   ,
+     t            OUTPUT    ,DT          ,FSAVSURF    ,TABLE    ,
      u            LOADS     ,SFANI       ,IPARIT      ,X_C      ,
-     v            SZ_NPCONT2,NPCONT2)
+     v            SZ_NPCONT2,NPCONT2     ,GLOB_THERM  ,PBLAST   ,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE GENANI_MOD
+      USE TIMER_MOD
       USE MAT_ELEM_MOD         
       USE CLUSTER_MOD
       USE INTBUFDEF_MOD  
@@ -162,7 +162,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE STATE_MOD
       USE USER_WINDOWS_MOD
-      USE OUTPUT_MOD
+      USE OUTPUT_MOD , ONLY : OUTPUT_
       USE DT_MOD
       USE TABLE_MOD
       USE LOADS_MOD
@@ -171,6 +171,8 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       use FPCONT2_MAX_OUTPUT_MOD
       use FPCONT2_MIN_OUTPUT_MOD
+      use glob_therm_mod
+      use PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -207,6 +209,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS 
       TYPE(t_ebcs_tab), TARGET, INTENT(IN) :: EBCS_TAB
       LOGICAL LOUT
       INTEGER, INTENT(IN) :: SFANI
@@ -235,35 +238,30 @@ C-----------------------------------------------
      .   IXIG3D(*),NERCVOIS(*),NESDVOIS(*),LERCVOIS(*),LESDVOIS(*),
      .   ISPHIO(NISPHIO,*),ICODE(*),SPH2SOL(*),SEGQUADFR(*),
      .   ISKEW(*),TAG_SKINS6(*),IRUNN_BIS
-       my_real
-     .   BUFNOIS(*),PARTSAV(NPSAV,*),RBY(NRBY,*),CRFLSW(*),FLSW(*),
-     .   FSAV(NTHVKI,*),SKEW(LSKEW,*), VR(3,*), IN(*), DMAS,
-     .   ACCELM(LLACCELM,*),BUFSF(*),RDATA(*),BUFMAT(*),BUFGEO(*),
-     .   SPBUF(*),RIVET(*),XFRAME(NXFRAME,*),ZI_PLY(*),VGAZ(*)
-      my_real
-     .   PM(NPROPM,*),D(*),V(*),W(*),ELBUF(*),WA(*),X(*),GEO(*),
-     .   MS(*), A(3,*), CONT(3,*),XCUT(*),FINT(*),EANI(*),
-     .   FEXT(3,*) ,FOPT(6,*),ANIN(*),RWBUF(*),TANI(*),
-     .   AR(3,*),TF(*),FCONT_MAX(*)
-      my_real
-     .   FSAVD(NTHVKI,*),
-     .   DR(3,*),VOLMON(*),
-     .   FXBRPM(*),FXBDEP(*),FXBVIT(*),FXBACC(*), RFLOW(*),
-     .   FNCONT(3,*),FTCONT(3,*),TEMP(*),THKE(*),DXANCG(3,*),
-     .   ERR_THK_SH4(*),ERR_THK_SH3(*),FTHREAC(*),
-     .   GRESAV(*), DIAG_SMS(*), FNCONT2(3,*), XMOM_SMS(3,*),
-     .   FCONTG(*), FNCONTG(*), FTCONTG(*),FANREAC(*),PDAMA2(*),
-     .   RES_SMS(*),QFRICINT(*), GAUGE(*),
-     .   FCLUSTER(*),MCLUSTER(*),RTHBUF(*),WIGE(*),KNOT(*),VSPHIO(*),
-     .   STIFN(*),STIFR(*),MS_2D(*),PSKIDS(*),KNOTLOCPC(*),KNOTLOCEL(*),
-     .   FNCONTP2(3,*)  ,FTCONTP2(3,*)  
-      INTEGER FR_SEC(NSPMD+1,*),FR_RBY2(3,*),IAD_RBY2(4,*),FR_WALL(*),
-     .   NODREAC(*),IAD_RBE2(4,*),INDEXCONT(*),NCONT,ITY
+       my_real  BUFNOIS(*),PARTSAV(NPSAV,*),RBY(NRBY,*),CRFLSW(*),FLSW(*),
+     .          FSAV(NTHVKI,*),SKEW(LSKEW,*), VR(3,*), IN(*), DMAS,
+     .          ACCELM(LLACCELM,*),BUFSF(*),RDATA(*),BUFMAT(*),BUFGEO(*),
+     .          SPBUF(*),RIVET(*),XFRAME(NXFRAME,*),ZI_PLY(*),VGAZ(*)
+      my_real PM(NPROPM,*),D(3,NUMNOD),V(*),W(*),ELBUF(*),WA(*),X(3,*),GEO(*),
+     .        MS(*), A(3,*), CONT(3,*),XCUT(*),FINT(*),EANI(*),
+     .        FEXT(3,*) ,FOPT(6,*),ANIN(*),RWBUF(*),TANI(*),
+     .        AR(3,*),TF(*),FCONT_MAX(*)
+      my_real FSAVD(NTHVKI,*),
+     .        DR(3,*),VOLMON(*),
+     .        FXBRPM(*),FXBDEP(*),FXBVIT(*),FXBACC(*), RFLOW(*),
+     .        FNCONT(3,*),FTCONT(3,*),TEMP(*),THKE(*),DXANCG(3,*),
+     .        ERR_THK_SH4(*),ERR_THK_SH3(*),FTHREAC(*),
+     .        GRESAV(*), DIAG_SMS(*), FNCONT2(3,*), XMOM_SMS(3,*),
+     .        FCONTG(*), FNCONTG(*), FTCONTG(*),FANREAC(*),PDAMA2(*),
+     .        RES_SMS(*),QFRICINT(*), GAUGE(*),
+     .        FCLUSTER(*),MCLUSTER(*),RTHBUF(*),WIGE(*),KNOT(*),VSPHIO(*),
+     .        STIFN(*),STIFR(*),MS_2D(*),PSKIDS(*),KNOTLOCPC(*),KNOTLOCEL(*),
+     .        FNCONTP2(3,*)  ,FTCONTP2(3,*)
+      INTEGER FR_SEC(NSPMD+1,*),FR_RBY2(3,*),IAD_RBY2(4,*),FR_WALL(*),NODREAC(*),IAD_RBE2(4,*),INDEXCONT(*),NCONT,ITY
       INTEGER NPC(*),MDS_MATID(*)
       INTEGER LLOADP(*),ILOADP(SIZLOADP,*),IBCL(NIBCLD,*)
       INTEGER TAGNCONT(NLOADP_HYD_INTER,NUMNOD),LOADP_HYD_INTER(NLOADP_HYD)
-      my_real
-     .       LOADP(LFACCLD,*),FORC(*)
+      my_real :: LOADP(LFACCLD,*),FORC(*)
 
       INTEGER, DIMENSION(*), INTENT(IN) :: ISKWP
       INTEGER, INTENT(IN) :: SZ_NPCONT2
@@ -294,7 +292,10 @@ C-----------------------------------------------
       TYPE (LOADS_)   , INTENT(IN)          :: LOADS
       TYPE (TTABLE),DIMENSION(NTABLE)  ,INTENT(IN) :: TABLE
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
-      INTEGER,INTENT(IN)::  IPARIT
+      type (glob_therm_) ,intent(in)        :: glob_therm
+      type (PBLAST_) ,intent(in)            :: PBLAST
+      INTEGER,INTENT(IN) ::  IPARIT
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -303,24 +304,18 @@ C-----------------------------------------------
      .        NEL1D,NEL2D,NEL3D, L1, IFIL, CPTFILE,IFILABF,
      .        IAD, J, THUPDT,IFLAG, IFV,ITHFLAG,NSENSOR
       INTEGER :: IFLAG_ANIPCONT
-      INTEGER
-     .  SN1,SN2,SN3,SN4,SN5,SN6,SN7,SN8,SN9,NELG,
-     .  SKUIX, SKXUSR ,SKFACPTX,SKXEDGE,SKXFACET,SKXSOLID,SKNUMX1,
-     .  SKNUMX2,SKNUMX3,SKOFFX1,SKOFFX2,SKOFFX3,SKMASS1,SKMASS2,
-     .  SKMASS3,SKFUNC1,SKFUNC2,SKFUNC3,SKFIN,SIG3DSOLID
-      INTEGER
-     .  LENR,LENG,LENGC,LENGTG,LENGS,LENGT,LENGR,LENGP,LENGQ,LENGSPH
+      INTEGER :: SN1,SN2,SN3,SN4,SN5,SN6,SN7,SN8,SN9,NELG,
+     .           SKUIX, SKXUSR ,SKFACPTX,SKXEDGE,SKXFACET,SKXSOLID,SKNUMX1,
+     .           SKNUMX2,SKNUMX3,SKOFFX1,SKOFFX2,SKOFFX3,SKMASS1,SKMASS2,
+     .           SKMASS3,SKFUNC1,SKFUNC2,SKFUNC3,SKFIN,SIG3DSOLID
+      INTEGER LENR,LENG,LENGC,LENGTG,LENGS,LENGT,LENGR,LENGP,LENGQ,LENGSPH
       INTEGER SIZE_MES,LONG,LONG_TMP,N
       INTEGER IFILNAM(2148),IFILNAM_TMP(2148)
-      my_real
-     .   TFEXTH,ENINTOT,EKINTOT
 
-      my_real
-     .   TABFWR0(10),BID
-      my_real
-     .      ,  DIMENSION(:),ALLOCATABLE :: VMCDN
-      my_real
-     .      ,  DIMENSION(:),ALLOCATABLE :: CSEFRIC,CSEFRIC_STAMP,CSEFRICG,CSEFRICG_STAMP
+      my_real WFEXTH,ENINTOT,EKINTOT
+      my_real TABFWR0(10),BID
+      my_real,  DIMENSION(:),ALLOCATABLE :: VMCDN
+      my_real,  DIMENSION(:),ALLOCATABLE :: CSEFRIC,CSEFRIC_STAMP,CSEFRICG,CSEFRICG_STAMP
 
       INTEGER :: LEN_TMP_NAME,LEN_TMP_NAME2
       CHARACTER(len=100) :: TMP_NAME,TMP_NAME2   
@@ -353,20 +348,20 @@ c
         CALL S10MVND(ICNDS10 ,VND   ,VMCDN    )
         CALL CNDMASI2(ICNDS10,NKEND,IMAP2ND,MASI2ND0,MS ,V  ,A   ,
      1                WEIGHT ,MAS_ND ,KEND  )
-        CALL ECRIT(PARTSAV  ,MS      ,VMCDN  ,IN       ,VR     , 
+        CALL ECRIT(TIMERS,PARTSAV  ,MS      ,VMCDN  ,IN       ,VR     , 
      2             DMAS     ,WEIGHT  ,ENINTOT  ,EKINTOT,
      3             A        ,AR      ,FXBIPM ,FXBRPM   ,MONVOL ,
      4             XMOM_SMS ,SENSORS ,QFRICINT ,IPARI  ,
-     5             WEIGHT_MD,TFEXTH ,IFLAG   ,MS_2D, MULTI_FVM ,
+     5             WEIGHT_MD,WFEXTH ,IFLAG   ,MS_2D, MULTI_FVM ,
      6             MAS_ND   ,KEND   ,H3D_DATA,DYNAIN_DATA,USER_WINDOWS%USREINT,OUTPUT)
         DEALLOCATE(VMCDN)
       ELSE
         BID = ZERO
-        CALL ECRIT(PARTSAV  ,MS      ,V      ,IN       ,VR     , 
+        CALL ECRIT(TIMERS,PARTSAV  ,MS      ,V      ,IN       ,VR     , 
      2             DMAS     ,WEIGHT  ,ENINTOT  ,EKINTOT,
      3             A        ,AR      ,FXBIPM ,FXBRPM   ,MONVOL ,
      4             XMOM_SMS ,SENSORS ,QFRICINT ,IPARI  ,
-     5             WEIGHT_MD,TFEXTH  ,IFLAG  ,MS_2D, MULTI_FVM ,
+     5             WEIGHT_MD,WFEXTH  ,IFLAG  ,MS_2D, MULTI_FVM ,
      6             BID      ,BID     ,H3D_DATA,DYNAIN_DATA,USER_WINDOWS%USREINT,OUTPUT)
       ENDIF
 C-----------------------
@@ -650,7 +645,7 @@ c
      Y         LESDVOIS   ,CRKEDGE   ,INDX_CRK    ,XEDGE4N     ,XEDGE3N   ,
      Z         STACK      ,SPH2SOL   ,STIFN       ,STIFR       ,IGRNOD    ,
      1         H3D_DATA   ,SUBSET    ,MULTI_FVM   ,KNOTLOCPC   ,KNOTLOCEL ,
-     2         FCONT_MAX  ,FNCONTP2  ,FTCONTP2    )
+     2         FCONT_MAX  ,FNCONTP2  ,FTCONTP2    ,GLOB_THERM  )
 c
        ENDIF
       IF((TT>=TANIM .AND. TT<=TANIM_STOP))TANIM=TANIM+DTANIM
@@ -760,7 +755,7 @@ C
          K12=K11+NUMELIG3D
          L1=1+6*(NUMELC+NUMELTG)*IEPSDOT
 c
-         CALL GENH3D(
+         CALL GENH3D(TIMERS,
      1             X          ,D         ,V           ,A           ,ELBUF     ,
      2             IXS        ,IXQ       ,IXC         ,IXT         ,IXP       ,
      3             IXR        ,IXTG      ,SN1         ,SN2         ,SN3       ,
@@ -801,7 +796,7 @@ c
      4             LLOADP     ,LOADP     ,SENSORS     ,TAGNCONT    ,LOADP_HYD_INTER,
      5             XFRAME     ,FORC      ,AR          ,CSEFRIC     ,CSEFRICG  ,
      6             CSEFRIC_STAMP,CSEFRICG_STAMP,TABLE ,IFRAME      ,LOADS   ,
-     7             DRAPE_SH4N, DRAPE_SH3N, DRAPEG     ,X_C         )
+     7             DRAPE_SH4N, DRAPE_SH3N, DRAPEG     ,X_C         ,GLOB_THERM,PBLAST)
       ENDIF
       IF(ALLOCATED(CSEFRIC)) DEALLOCATE(CSEFRIC)
       IF(ALLOCATED(CSEFRICG)) DEALLOCATE(CSEFRICG)
@@ -833,7 +828,7 @@ C
      7             IPM   ,KXSP      ,SPBUF  ,NODGLOB,LENG  ,
      8             FOPT  ,NOM_OPT   ,NPBY   ,FNCONT ,FTCONT ,
      9             GEO   ,THKE      ,STACK  ,DRAPE_SH4N, DRAPE_SH3N,
-     A             DRAPEG)
+     A             DRAPEG,OUTPUT)
        IF(TT>=TOUTP)TOUTP=TOUTP+DTOUTP
        IF ((TSTOP<TOUTP).AND.(TOUTP<TSTOP+EM06*TSTOP)
      .     .AND.(TSTOP+EM06*TSTOP<TOUTP+DTOUTP)) THEN
@@ -902,7 +897,7 @@ C
      B             LENGT    ,ISKEW  ,V     ,VR    ,LENGQ  ,
      C             MULTI_FVM,BUFMAT ,NPBY  ,LPBY  ,STACK  ,
      D             DRAPE_SH4N, DRAPE_SH3N,DR,DRAPEG   ,MAT_PARAM,
-     E             IPART(K10),OUTPUT,LENGSPH,NUMSPHG)
+     E             IPART(K10),OUTPUT,LENGSPH,NUMSPHG,GLOB_THERM%ITHERM_FE)
        IF(TT>=TSTAT)TSTAT=TSTAT+DTSTAT
        IF ((TSTOP<TSTAT).AND.(TSTAT<TSTOP+EM06*TSTOP)
      .     .AND.(TSTOP+EM06*TSTOP<TSTAT+DTSTAT)) THEN
@@ -943,7 +938,7 @@ C
      3                PM       ,GEO      , IPART(K3),IPART(K8),LENG   ,
      4                LENGC    ,LENGTG   , WEIGHT ,NODGLOB  ,THKE     ,               
      5                NPBY     ,LPBY     , STACK  ,DRAPE_SH4N ,DRAPE_SH3N , 
-     6                DYNAIN_DATA,DRAPEG) 
+     6                DYNAIN_DATA,DRAPEG ,MAT_PARAM) 
              
        IF(TT>=DYNAIN_DATA%TDYNAIN)DYNAIN_DATA%TDYNAIN=DYNAIN_DATA%TDYNAIN+DYNAIN_DATA%DTDYNAIN
        IF ((TSTOP<DYNAIN_DATA%TDYNAIN).AND.(DYNAIN_DATA%TDYNAIN<TSTOP+EM06*TSTOP)
@@ -969,7 +964,7 @@ C----------------------
         ENDIF
         IF(NINTER+NEXMAD/=0.AND.ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT > 0)THEN
             IF(SFANI >0)CALL ANICON0(CONT,NUMNOD)
-            !law151 reaction forces can be output only with H3D (not ANIM files since vectores are at element centroids)
+            !law151 reaction forces can be output only with H3D (not ANIM files since vectors are at element centroids)
             IF (MULTI_FVM%IS_USED .AND. H3D_DATA%N_VECT_CONT > 0)CALL ANICON0(FANI_CELL%F18,NUMELS+NUMELQ) !/H3D/ELEM/VECT/CONT
         ENDIF
         IF(NINTSTAMP/=0.AND.ANIM_V(4)+OUTP_V(4)+H3D_DATA%N_VECT_CONT >0)THEN
@@ -1053,7 +1048,7 @@ C         to avoid double points
      L                 IGAUP  ,NGAUP ,AFORM(1),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFA,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
             IF (SIZE_MES==1 .AND.AFORM(1)==3 .AND.ISPMD==0 ) 
      *          CALL file_size(MULTITHFILESIZE(1))
@@ -1148,7 +1143,7 @@ C
      L                 IGAUP  ,NGAUP, AFORM(2),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFB,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
             IF (SIZE_MES==1 .AND.AFORM(2)==3 .AND.ISPMD==0 )
      *        CALL file_size(MULTITHFILESIZE(2))
@@ -1243,7 +1238,7 @@ C
      L                 IGAUP  ,NGAUP ,AFORM(3),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      n                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFC,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(3)==3   .AND.
@@ -1334,7 +1329,7 @@ C
      L                 IGAUP  ,NGAUP ,AFORM(4),SIZE_MES,
      M                 RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                 ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFD,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
          IF(SIZE_MES==1 .AND.
      *     AFORM(4)==3   .AND.
@@ -1426,7 +1421,7 @@ C
      L                IGAUP  ,NGAUP ,AFORM(5),SIZE_MES,
      M                RTHBUF  ,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFE,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(5)==3   .AND.
@@ -1517,7 +1512,7 @@ C
      L                IGAUP,NGAUP ,AFORM(6),SIZE_MES,
      M                RTHBUF,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFF,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(6)==3   .AND.
@@ -1609,7 +1604,7 @@ C
      L                IGAUP,NGAUP ,AFORM(7),SIZE_MES,
      M                RTHBUF,THKE ,STACK  ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUFG,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(7)==3   .AND.
@@ -1701,7 +1696,7 @@ C
      L                IGAUP  ,NGAUP ,AFORM(8),SIZE_MES,
      M                RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%ITHBUFH,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(8)==3   .AND.
@@ -1792,7 +1787,7 @@ C
      L                IGAUP,NGAUP ,AFORM(9),SIZE_MES,
      M                RTHBUF ,THKE ,STACK ,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%ITHBUFI,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     AFORM(9)==3   .AND.
@@ -1881,7 +1876,7 @@ C
      L                IGAUP,NGAUP,ITFORM,SIZE_MES,
      M                RTHBUF ,THKE ,STACK,ISPHIO  ,VSPHIO,
      N                ITHFLAG,PINCH_DATA,MULTI_FVM,W,OUTPUT%TH%SITHBUF,
-     Q                FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                FSAVSURF,NEED_TO_REINIT_FSAV,GLOB_THERM,OUTPUT)
 
         IF(SIZE_MES==1 .AND.
      *     ITFORM==3   .AND.
@@ -1945,7 +1940,7 @@ C     to avoid double points (end of ilastanim/=2)
 C----------------------------------------------
 C     Driver to QAPRINT 
 C----------------------------------------------
-      CALL ENG_QAPRINT_DRIVER(IRUNN_BIS ,SENSORS,DT,OUTPUT,IPARIT)
+      CALL ENG_QAPRINT_DRIVER(IRUNN_BIS ,SENSORS,DT,OUTPUT,IPARIT,GLOB_THERM)
 C-------------------------------------------------------
 C     TRAITEMENT SUR FSAV NON CUMULE
 C-------------------------------------------------------
@@ -1989,7 +1984,7 @@ C /TH/SURF quantities reset to 0 expect for massflow (airbags)
       ENDIF 
       
       ! -----------------------
-      ! need to re-initialize PARTSAV array after any th/abf file writting
+      ! need to re-initialize PARTSAV array after any th/abf file writing
       IF(ISPMD==0) THEN
         ! ---------
         ! check if an abf file was written
@@ -2015,7 +2010,7 @@ C /TH/SURF quantities reset to 0 expect for massflow (airbags)
       ENDIF
       ! -----------------------
 
-      IF (ISPMD==0.AND.IFLAG==1) TFEXT  = TFEXT- TFEXTH
+      IF (ISPMD==0.AND.IFLAG==1) WFEXT  = WFEXT- WFEXTH
 C-----------
       RETURN
       END

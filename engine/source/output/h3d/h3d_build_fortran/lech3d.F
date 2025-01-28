@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,6 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    create_h3d_1d_torsor      ../engine/source/output/h3d/h3d_build_fortran/create_h3d_1d_torsor.F
       !||    create_h3d_1d_vector      ../engine/source/output/h3d/h3d_build_fortran/create_h3d_1d_vector.F
       !||    create_h3d_arg_keyword    ../engine/source/output/h3d/h3d_build_fortran/create_h3d_arg_keyword.F
+      !||    create_h3d_input          ../engine/source/output/h3d/h3d_build_fortran/create_h3d_input.F
       !||    create_h3d_nodal_scalar   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_nodal_scalar.F
       !||    create_h3d_nodal_tensor   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_nodal_tensor.F
       !||    create_h3d_nodal_vector   ../engine/source/output/h3d/h3d_build_fortran/create_h3d_nodal_vector.F
@@ -77,16 +78,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_inc_mod               ../engine/share/modules/h3d_inc_mod.F
       !||    h3d_mod                   ../engine/share/modules/h3d_mod.F
       !||    initbuf_mod               ../engine/share/resol/initbuf.F
-      !||    loads_mod                 ../common_source/modules/loads/loads_mod.F
       !||    matparam_def_mod          ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    message_mod               ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod             ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod             ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod      ../common_source/modules/names_and_titles_mod.F
       !||    stack_mod                 ../engine/share/modules/stack_mod.F
+      !||    tri7box                   ../engine/share/modules/tri7box.F
       !||====================================================================
       SUBROUTINE LECH3D(GEO,IGEO,IPM,IPART,H3D_DATA,MULTI_FVM,IPARI,IPARG,TAG_SKINS6,
      .                  MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,MDS_NDEPSVAR,
-     .                  ELBUF_STR,STACK,IBCL,ILOADP,LLOADP,LOADS,MAT_PARAM)
+     .                  ELBUF_STR,STACK,IBCL,ILOADP,LLOADP,LOADS,MAT_PARAM,PBLAST)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -101,6 +102,8 @@ C-----------------------------------------------
         USE LOADS_MOD
         USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100,NCHARKEY
         USE MATPARAM_DEF_MOD
+        USE TRI7BOX
+        USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -130,6 +133,7 @@ C-----------------------------------------------
         TYPE (STACK_PLY) :: STACK
         TYPE (LOADS_), INTENT(IN)    :: LOADS
         TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(INOUT) :: MAT_PARAM
+        TYPE (PBLAST_) :: PBLAST
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -156,11 +160,17 @@ C-----------------------------------------------
      .          IS_MDSVAR_DEF,NMDSVAR_MAX,IS_MDSVAR,IS_MDSVAR_ALL,IMDSVAR,
      .          IS_MODEL_NPT,IS_MODEL_PLY,IS_MODEL_LAYER,ISKIND,IOUTER,IPEXT,
      .          IS_ID,ID,ID_MAX,IS_ID_ALL,NINEFRIC,N19,IFAIL,CPT_IRUP,CPT_IRUP2,
-     .          IS_MODE,MODE,MODE_MAX,IS_MODE_ALL,NFAIL,NIP_PLY_MAX,NIP_ELEM_MAX
+     .          IS_MODE,MODE,MODE_MAX,IS_MODE_ALL,NFAIL,NIP_PLY_MAX,NIP_ELEM_MAX,
+     .          ITYP,ID_DEF,NBC,DUM,NDEF
         INTEGER MLW,NEL,NG,JTURB,NLAY,NUVAR,IPLY,IMAT,ISUBSTACK,ID_PLY_TMP
         INTEGER CPT_MOD,NMOD,CPT_LAWID
+        INTEGER IERROR  ! Error value from Allocate
+        INTEGER LENS    ! Size of Remote interface send values
+        INTEGER LENR    ! Size of Remote interface receive values
+
         INTEGER IBID1,IBID2,IBID3
 
+        CHARACTER(LEN=NCHARKEY)::KEY0
         CHARACTER(LEN=NCHARKEY)::KEY2
         CHARACTER(LEN=NCHARKEY)::KEY3
         CHARACTER(LEN=NCHARKEY)::KEY4
@@ -226,7 +236,22 @@ C=========================================================================
         IBID1 = 0
         IBID2 = 0
         IBID3 = 0
-        
+        CPT_LAWID = 0
+        CPT_MOD = 0
+        ID_MAX = 0
+        IR_MAX = 0
+        IS_MAX = 0
+        IT_MAX = 0
+        MODE_MAX = 0
+        NIP_MAX = 0
+        NIP_ELEM_MAX = 0
+        NPLY_MAX = 0
+        NMDSVAR_MAX = 0
+        NUVAR_MAX = 0
+        ALLOCATE(MODNAME(1,1))
+        MODNAME(1,1) = ' '
+        ISH_NPT0 = 0
+
 c
         H3D_DATA%IPART_SELECT = 0
         IS_SCALAR = 0
@@ -401,6 +426,33 @@ C
         CALL H3D_LIST_QUAD_TENSOR(H3D_KEYWORD_QUAD_TENSOR, GEO, IGEO, H3D_NUM_KEY%QUAD_TENSOR)
 C
         CALL H3D_LIST_QUAD_VECTOR(H3D_KEYWORD_QUAD_VECTOR, GEO, IGEO, H3D_NUM_KEY%QUAD_VECTOR)
+C--------------------------------------------------
+C BUILD DEFAULT OUTPUTS FOR SPH
+C--------------------------------------------------
+        IF ((NUMSPHG > 0).and.(H3D_DATA%DTH3D0 > ZERO)) THEN
+          NDEF = 2    
+C         Check if /H3D/SPH/DIAMETER is already defined in input file         
+          DO ID_INPUT=1,H3D_DATA%N_INPUT_H3D
+            KEY2 = H3D_DATA%INPUT_LIST(ID_INPUT)%KEY2
+            KEY3 = H3D_DATA%INPUT_LIST(ID_INPUT)%KEY3
+            IF ((KEY2=='ELEM').or.(KEY2=='SPH').AND.(KEY3=='DIAMETER')) NDEF = 1
+          ENDDO
+          DO ID_DEF=1,NDEF
+            NBC = 0
+            KEY2 = 'SPH'
+            IF (ID_DEF==1) THEN
+              KEY3 = 'NEIGHBOURS'
+            ELSEIF (ID_DEF==2) THEN
+              KEY3 = 'DIAMETER'
+            ENDIF 
+            KEY4 =''
+            KEY5 =''
+            KEY6 =''
+            KEY7 =''
+            KEY8 =''
+            CALL CREATE_H3D_INPUT(H3D_DATA,DUM,DUM,DUM,NBC,KEY0,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8)
+          ENDDO  
+        ENDIF
 C--------------------------------------------------
 C BUILD OUTPUTS
 C--------------------------------------------------
@@ -2480,7 +2532,7 @@ C=========================================================================
           IF (IPEXT==1) ISKIND=ISKIND+2
           CALL H3D_SKIN_DIM(IPARG   ,NUMSKIN, NUMSKING,TAG_SKINS6,
      .                      IBCL    ,ILOADP ,LLOADP   ,LOADS  ,
-     .                      NUMSKINP0,NUMSKINP,ISKIND )
+     .                      NUMSKINP0,NUMSKINP,ISKIND,PBLAST )
         END IF
 c For debug purpose
 c      DO I=1,H3D_DATA%N_OUTP_H3D
@@ -2488,6 +2540,32 @@ c        DO J=1,H3D_DATA%OUTPUT_LIST(I)%N_H3D_PART_LIST
 c          print *,'liste des parts',H3D_DATA%OUTPUT_LIST(I)%H3D_PART_LIST(J)
 c        ENDDO
 c      ENDDO
+
+        IF (H3D_DATA%N_SCAL_CSE_FRICINT > 0)THEN
+          ! Allocate INTERFACE Remote EFRICFI Array
+          DO I=1,NINTER
+            ITYP = IPARI(7,I)
+            IF(ITYP==7.OR.ITYP==10.OR.ITYP==11.OR.
+     +        (ITYP==17.AND.IPARI(33,I)==0).OR.ITYP==20.OR.
+     +         ITYP==22.OR.ITYP==23.OR.ITYP==24.OR.
+     +         ITYP==25)THEN
+
+               IF(H3D_DATA%N_CSE_FRIC_INTER(I) >0) THEN
+                 LENR=0
+                 DO P = 1, NSPMD
+                     LENR = LENR + NSNFI(I)%P(P)
+                 ENDDO
+                 IERROR = 0
+                 ALLOCATE(EFRICFI(I)%P(LENR),STAT=IERROR)
+                 IF(IERROR/=0) THEN
+                    CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+                    CALL ARRET(2)
+                 ENDIF
+                 EFRICFI(I)%P(1:LENR)=ZERO
+               ENDIF
+            ENDIF
+          ENDDO
+        ENDIF
 C
         DEALLOCATE(H3D_KEYWORD_NODAL_SCALAR)
         DEALLOCATE(H3D_KEYWORD_NODAL_VECTOR)

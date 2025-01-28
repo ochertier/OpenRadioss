@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,16 +30,18 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_barrier    ../engine/source/mpi/generic/spmd_barrier.F
       !||    spmd_sphvox     ../engine/source/mpi/sph/spmd_sphvox.F
       !||    spmd_sphvox0    ../engine/source/mpi/elements/spmd_sph.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
+      !||    startime        ../engine/source/system/timer_mod.F90
+      !||    stoptime        ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
+      !||    timer_mod       ../engine/source/system/timer_mod.F90
       !||    tri7box         ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE SPHTRI0(X   , SPBUF, KXSP, WSP2SORT,BMINMA , DMAX,
+      SUBROUTINE SPHTRI0(TIMERS, X   , SPBUF, KXSP, WSP2SORT,BMINMA , DMAX,
      2                 NSP2SORTF,NSP2SORTL,NMN,ITASK, DBUC)  
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TRI7BOX
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -56,6 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER KXSP(NISP,*), WSP2SORT(*),NSP2SORTF,NSP2SORTL,ITASK,NMN
       my_real X(3,*),SPBUF(NSPBUF,*), BMINMA(12),  DMAX, DBUC
 C-----------------------------------------------
@@ -197,17 +200,17 @@ C
         IF(ITASK==0)THEN
 C
          IF(IMONM == 2)THEN
-           CALL STARTIME(95,1)
+           CALL STARTIME(TIMERS,95)
            CALL SPMD_BARRIER()
-           CALL STOPTIME(95,1)
+           CALL STOPTIME(TIMERS,95)
          END IF
-         CALL STARTIME(91,1)
+         CALL STARTIME(TIMERS,91)
 C Recuperation des cellules SPH remotes NSPHR stockees dans XSPHR
 C 
          CALL SPMD_SPHVOX(KXSP ,SPBUF,WSP2SORT,BMINMA,X)
          CALL SPMD_ALL_DMAX(DMAX,1)
 C
-         CALL STOPTIME(91,1)
+         CALL STOPTIME(TIMERS,91)
         ENDIF
 
       END IF 

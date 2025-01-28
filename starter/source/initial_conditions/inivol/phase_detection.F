@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -55,7 +55,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !                       * if the pseudo distance of at least 1 node is known --> apply it to the other nodes
 !                       * if the pseudo distance of all nodes is unknown --> need to compute the pseudo distance &
 !                                                                            apply it to the other nodes   
-!                   * if at least one nead is near a surface --> need to compute the real distance
+!                   * if at least one node is near a surface --> need to compute the real distance
 !$ENDCOMMENT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -120,7 +120,7 @@ C-----------------------------------------------
 
         ! ----------------------      
         ! sort the node of the surface according a direction
-        ! this sorting is usefull to reduce the elapsed time of the 
+        ! this sorting is useful to reduce the elapsed time of the 
         ! NNS algo
         DO J=1,4
             DO I=1,NSEG
@@ -179,6 +179,10 @@ C-----------------------------------------------
                 FIRST = 2
                 NODE_NUMBER = 3
                 IXP => IXTG(1:NODE_NUMBER+1,NFT+1:NFT+NEL)
+            ELSE
+                FIRST = -HUGE(FIRST)
+                NODE_NUMBER = -HUGE(NODE_NUMBER)
+                IXP => NULL()
             ENDIF
             ! ---------------
 
@@ -250,7 +254,7 @@ C-----------------------------------------------
                 !   * at least 1 node is in a tagged cell --> apply the phase to the element & the adjacent cells
 
                     ! -------------
-                    ! i found a phase, apply it to the ndoes
+                    ! i found a phase, apply it to the nodes
                     IF(MY_PHASE /= 0) THEN
                         DO I=1,NODE_NUMBER
                             NODE_ID = IXP(1+I,J)

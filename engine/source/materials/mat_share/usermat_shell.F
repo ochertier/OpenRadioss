@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -73,8 +73,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    putsignorc3                  ../engine/source/elements/shell/coqueba/cmatc3.F
       !||    rotos4                       ../engine/source/materials/mat_share/rotos4.F
       !||    rotov                        ../engine/source/airbag/roto.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    urotov                       ../engine/source/airbag/uroto.F
       !||    xfem_crk_dir                 ../engine/source/elements/xfem/xfem_crk_dir.F
       !||--- uses       -----------------------------------------------------
@@ -88,8 +88,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    nlocal_reg_mod               ../common_source/modules/nlocal_reg_mod.F
       !||    stack_mod                    ../engine/share/modules/stack_mod.F
       !||    table_mod                    ../engine/share/modules/table_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE USERMAT_SHELL (ELBUF_STR ,MAT_ELEM  ,
+      SUBROUTINE USERMAT_SHELL (TIMERS, ELBUF_STR ,MAT_ELEM  ,
      1       JFT      ,JLT      ,NEL      ,PM        ,FOR      ,MOM      ,    
      2       GSTR     ,THK      ,EINT     ,OFF       ,DIR_A    ,DIR_B    ,    
      3       MAT      ,AREA     ,EXX      ,EYY       ,EXY      ,EXZ      ,    
@@ -111,6 +112,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARLINE100
       USE LAW_USERSH
       USE TABLE_MOD
@@ -145,6 +147,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER IR,IS,IPT,JFT,JLT,NEL,NPT,MTN,IPLA,IOFC,NG,NLAY,
      .  ISMSTR,IXFEM,IFAILURE,JHBE,IXLAY,IXEL,ITHK,JTHE,
      .  IREP,ISUBSTACK,ITASK,ISHPLYXFEM,NUMTABL
@@ -285,7 +288,7 @@ C
         IF (IXFEM == 1 .AND. IXLAY > 0) ILAYER = IXLAY  ! xfem  multilayer
         ILAW = ELBUF_STR%BUFLY(ILAYER)%ILAW
         IMAT = ELBUF_STR%BUFLY(ILAYER)%IMAT
-        IF(IPM(222,IMAT) > 0) IPRONY=1
+        IF (MAT_ELEM%MAT_PARAM(IMAT)%IVISC > 0) IPRONY=1
       ENDDO
 C
 !     ZCFAC computation is only useful for CZFORC3 and CZFORC3_CRK routines
@@ -1203,7 +1206,7 @@ C-----------------------------------------------
 C         Failure models
 C-----------------------------------------------
           IF (IFAILURE == 1) THEN   
-            IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(121,1)
+            IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(TIMERS,121)
 c
             IF (IXFEM > 0) THEN                              
               DO I=JFT,JLT                                                    
@@ -1602,7 +1605,7 @@ c
      3            UELR       ,UELR1      ,OFF        ,OFFLY      ,FOFF       ,
      4            SIGNXX     ,SIGNYY     ,SIGNXY     ,DFMAX      ,NGL        ,
      5            ILAYER     ,IPT        ,NPTT       ,CRKDIR     ,DADV       ,
-     6            DMG_FLAG   ,TRELAX     ,THK0       )
+     6            DMG_FLAG   ,TRELAX     )
                 ENDIF
 c
               CASE (30)     !    Biquadratic failure model
@@ -1703,7 +1706,7 @@ c
      5            SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   , 
      6            EL_TEMP  ,DFMAX    ,ALDT     ,TABLE    ,TDEL     ,
      7            THK0     ,IPT      ,FOFF     ,THKLYL   ,NTABL_FAIL,
-     8            ITABL_FAIL,LF_DAMMX,NIPAR    ,IPARAMF  )
+     8            ITABL_FAIL,LF_DAMMX,NIPAR    ,IPARAMF  ,DT)
 c
               CASE (40)     !    RTCL
 c
@@ -1809,7 +1812,7 @@ c                    SIGOFF(I) = OFFL(I)
               ENDIF                                              
 c-------------
             ENDDO     !  NFAIL
-            IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(121,1)
+            IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,121)
           ENDIF  ! IF (IFAILURE == 1)
 c-----------------------------------
 c         END of FAILURE MODELS

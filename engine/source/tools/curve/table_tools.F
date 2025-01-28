@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -406,6 +406,7 @@ C-----
       !||    table_interp_dydx      ../engine/source/tools/curve/table_tools.F
       !||--- called by ------------------------------------------------------
       !||    get_table_value_dydx   ../engine/source/user_interface/utable.F
+      !||    material_flow          ../engine/source/tools/seatbelts/material_flow.F
       !||    press_seg3             ../engine/source/loads/general/load_pcyl/press_seg3.F
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                 ../engine/source/output/message/message.F
@@ -905,6 +906,7 @@ C-----------------------------------------------
       my_real 
      .       DX1,DX,R(2),UNR(2)
 C-----------------------------------------------
+      R(1:2) = HUGE(R(1))
       NDIM=TABLE%NDIM
       IF( SIZE(XX) < NDIM )THEN
         CALL ANCMSG(MSGID=36,ANMODE=ANINFO,

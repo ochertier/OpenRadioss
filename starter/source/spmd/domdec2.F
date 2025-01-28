@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,7 +37,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    front_mod                   ../starter/share/modules1/front_mod.F
       !||    message_mod                 ../starter/share/message_module/message_mod.F
       !||    monvol_struct_mod           ../starter/share/modules1/monvol_struct_mod.F
-      !||    sensor_mod                  ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE DOMDEC2(
@@ -56,7 +55,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D   LGAUGE ,IGAUP  ,NGAUP  ,INTBUF_TAB,IBFFLUX,
      E   ICNDS10,ITAGND ,IGEO   ,TAG_SKN,MULTIPLE_SKEW,
      F   IBFV   ,IBCSCYC,LBCSCYC,R_SKEW,IPM     ,
-     G   SENSORS, LEN_CEP,EBCS_TAB,LOADS,IFRAME)
+     G   SENSORS, LEN_CEP,EBCS_TAB,LOADS,IFRAME,
+     H   NICONV ,NIRADIA ,NITFLUX,NUMCONV,NUMRADIA,NFXFLUX,
+     I   SENSOR_USER_STRUCT)
 C
 C-----------------------------------------------
 C   M o d u l e s
@@ -83,10 +84,15 @@ C-----------------------------------------------
 #include      "com04_c.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
-#include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NICONV
+      INTEGER ,INTENT(IN) :: NIRADIA
+      INTEGER ,INTENT(IN) :: NITFLUX
+      INTEGER ,INTENT(IN) :: NUMCONV
+      INTEGER ,INTENT(IN) :: NUMRADIA
+      INTEGER ,INTENT(IN) :: NFXFLUX
       INTEGER IPARI(NPARI,NINTER),
      .        DD_IAD(NSPMD+1,NSPGROUP), NPRW(*), LPRW(*),
      .        NPBY(NNPBY,*), LPBY(*), IXRI(4,*),
@@ -126,6 +132,8 @@ C-----------------------------------------------
       TYPE(T_EBCS_TAB), INTENT(INOUT) :: EBCS_TAB ! ebcs data structure
       TYPE (LOADS_), INTENT(INOUT) :: LOADS ! load data structure
       INTEGER ,DIMENSION(LISKN,NUMFRAM+1)   ,INTENT(IN) :: IFRAME ! frame data structure
+      LOGICAL IS_EBCS_PARALLEL
+      TYPE(SENSOR_USER_STRUCT_) ,INTENT(INOUT) :: SENSOR_USER_STRUCT
 C-----------------------------------------------
 C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
@@ -1561,21 +1569,23 @@ C--------------------------------------
 !   ------------
       IF(NEBCS>0) THEN
         DO I=1,NEBCS
-            IF(EBCS_TAB%tab(I)%poly%type==10) THEN
-                SURF_ID = EBCS_TAB%tab(I)%poly%surf_id ! surface id
-                NUMBER_NODE = 4
-                IF(N2D/=0) NUMBER_NODE = 2
-                ! ------------
-                ! loop over the elements of the EBCS
-                DO J=1,EBCS_TAB%tab(I)%poly%nb_elem
-                    ! loop over the 4 nodes of the surfaces
-                    DO IJK=1,NUMBER_NODE
-                        NODE_ID = IGRSURF(SURF_ID)%NODES(J,IJK) + 1 
-                        ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
-                    ENDDO
+          IS_EBCS_PARALLEL = .FALSE.
+          IF(EBCS_TAB%tab(I)%poly%type == 10 .or. EBCS_TAB%tab(I)%poly%type == 11)IS_EBCS_PARALLEL=.TRUE.
+          IF(IS_EBCS_PARALLEL) THEN
+            SURF_ID = EBCS_TAB%tab(I)%poly%surf_id ! surface id
+            NUMBER_NODE = 4
+            IF(N2D/=0) NUMBER_NODE = 2
+            ! ------------
+            ! loop over the elements of the EBCS
+            DO J=1,EBCS_TAB%tab(I)%poly%nb_elem
+                ! loop over the 4 nodes of the surfaces
+                DO IJK=1,NUMBER_NODE
+                    NODE_ID = IGRSURF(SURF_ID)%NODES(J,IJK) + 1
+                    ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
                 ENDDO
-                ! ------------
-            ENDIF
+            ENDDO
+            ! ------------
+          ENDIF
         ENDDO
       ENDIF
 !   -------------------------------------
@@ -2025,7 +2035,8 @@ C
      3   IXR    ,IXTG ,IXTG6  ,T_MONVOL ,
      4   IGRSURF,IB   ,ADDCNE ,CEP    ,
      5   ILEN   ,GEO    ,IBCV ,IBCR   ,IBFFLUX,
-     6   ILOADP ,LLOADP ,CEL  ,EBCS_TAB,LOADS)
+     6   ILOADP ,LLOADP ,CEL  ,EBCS_TAB,LOADS,
+     7   NICONV ,NIRADIA ,NITFLUX,NUMCONV,NUMRADIA,NFXFLUX)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------    
@@ -2044,10 +2055,15 @@ C-----------------------------------------------
 #include      "com01_c.inc"
 #include      "com04_c.inc"
 #include      "param_c.inc"
-#include      "thermal_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NICONV
+      INTEGER ,INTENT(IN) :: NIRADIA
+      INTEGER ,INTENT(IN) :: NITFLUX
+      INTEGER ,INTENT(IN) :: NUMCONV
+      INTEGER ,INTENT(IN) :: NUMRADIA
+      INTEGER ,INTENT(IN) :: NFXFLUX
       INTEGER IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*),IXTG(NIXTG,*),
      .        IXT(NIXT,*),IXP(NIXP,*),IXR(NIXR,*),CEP(*),
      .        IXS10(6,*),IXS20(12,*),IXS16(8,*),IXTG6(4,*),
@@ -2080,6 +2096,7 @@ C-----------------------------------------------
       INTEGER :: SURF_ID ! surface id
       INTEGER :: LOCAL_SEGMENT,NUMBER_SEGMENT ! number of segment for /LOAD
       INTEGER :: PROC_ID ! processor id
+      LOGICAL :: IS_EBCS_PARALLEL
 C-----------------------------------------------
 C   S o u r c e  L i n e s
 C-----------------------------------------------
@@ -2744,24 +2761,26 @@ C-----------------------------------------------
 !   ------------
       IF(NEBCS>0) THEN
         DO I=1,NEBCS
-            IF(EBCS_TAB%tab(I)%poly%type==10) THEN
-                SURF_ID = EBCS_TAB%tab(I)%poly%surf_id ! surface id
-                NUMBER_NODE = 4
-                IF(N2D/=0) NUMBER_NODE = 2
-                
-                ! ------------
-                ! loop over the elements of the EBCS
-                DO J=1,EBCS_TAB%tab(I)%poly%nb_elem
-                    ! loop over the 4 nodes of the surfaces
-                    ELEM_ID = EBCS_TAB%tab(I)%poly%ielem(J) ! element id
-                    DO IJK=1,NUMBER_NODE
-                        NODE_ID = IGRSURF(SURF_ID)%NODES(J,IJK) ! node id
-                        CNE(ADSKY(NODE_ID)) = ELEM_ID ! element id
-                        ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
-                    ENDDO
+          IS_EBCS_PARALLEL = .FALSE.
+          IF(EBCS_TAB%tab(I)%poly%type == 10 .or. EBCS_TAB%tab(I)%poly%type == 11)IS_EBCS_PARALLEL=.TRUE.
+          IF(IS_EBCS_PARALLEL) THEN
+            SURF_ID = EBCS_TAB%tab(I)%poly%surf_id ! surface id
+            NUMBER_NODE = 4
+            IF(N2D /= 0) NUMBER_NODE = 2
+
+            ! ------------
+            ! loop over the elements of the EBCS
+            DO J=1,EBCS_TAB%tab(I)%poly%nb_elem
+                ! loop over the 4 nodes of the surfaces
+                ELEM_ID = EBCS_TAB%tab(I)%poly%ielem(J) ! element id
+                DO IJK=1,NUMBER_NODE
+                    NODE_ID = IGRSURF(SURF_ID)%NODES(J,IJK) ! node id
+                    CNE(ADSKY(NODE_ID)) = ELEM_ID ! element id
+                    ADSKY(NODE_ID) = ADSKY(NODE_ID) + 1
                 ENDDO
-                ! ------------
-            ENDIF
+            ENDDO
+            ! ------------
+          ENDIF
         ENDDO
       ENDIF
 !   -------------------------------------

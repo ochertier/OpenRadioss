@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -44,8 +44,9 @@
       !||    elbufdef_mod                   ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    h3d_quad_scalar_1_mod          ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
       !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
+      !||    nodal_arrays_mod               ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    python_funct_mod               ../common_source/modules/python_mod.F90
       !||    python_spmd_mod                ../engine/source/mpi/python_spmd_mod.F90
       !||    stack_mod                      ../engine/share/modules/stack_mod.F
@@ -60,12 +61,12 @@
         &   ixc         ,ixtg,     ixs, ixq, pm          ,bufmat     , &
         &   ehour       , &
         &   ipm         ,igeo      ,thke      ,err_thk_sh4 ,err_thk_sh3, &
-        &   x         ,v         ,w           ,ale_connect, &
+        &   nodes        ,w           ,ale_connect, &
         &   nercvois  ,nesdvois  ,lercvois    ,lesdvois, &
         &   n0phas, nvphas,stack       ,          &
         &   ipartc, iparts, iparttg, ipartq, &
-        &   d           , multi_fvm , &
-        &   mat_param, fani_cell)
+        &   multi_fvm , &
+        &   mat_param, fani_cell    ,itherm)
 
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Module
@@ -80,6 +81,7 @@
           use matparam_def_mod, only: MATPARAM_STRUCT_
           use aleanim_mod  , only : fani_cell_
           use h3d_quad_scalar_1_mod, only : h3d_quad_scalar_1
+          use nodal_arrays_mod, only : nodal_arrays_
 
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     implicit none
@@ -122,10 +124,9 @@
           integer, intent(in) :: npart !< number of partitions
           integer, intent(in) :: n0phas !< law 51 phases
           integer, intent(in) :: nvphas !< law 51 phases
-          my_real, intent(inout) :: x(3,numnod) !< node coordinates
-          my_real, intent(inout) :: v(3,numnod) !< node velocities
-          my_real, intent(inout) :: w(3,numnod) !< node momenta?
-          my_real, intent(inout) :: d(3,numnod) !< node displacements
+          integer, intent(in) :: itherm
+          TYPE(nodal_arrays_) :: nodes
+          my_real, intent(inout) :: w(3,numnod) !< for ALE?
           my_real, intent(inout) :: thke(sthke) !< thickness of shell elements ?
           my_real, intent(inout) :: ehour(seani) !< working array ?
           my_real, intent(inout) :: geo(npropg,numgeo) !< property array
@@ -216,7 +217,7 @@
                 !-------------------------------------------------------!
                 ! /TRIA are 2d solid elements (new entity type derived from SH3N buffer, it is currently managed from h3d_shell_* subroutines. It will change in the future.
                 if(keyword == 'SCHLIEREN' .and. n2d > 0)then
-                  call schlieren_buffer_gathering(nercvois ,nesdvois ,lercvois ,lesdvois, iparg, elbuf_tab, multi_fvm)
+                  call schlieren_buffer_gathering(nercvois ,nesdvois ,lercvois ,lesdvois, iparg, elbuf_tab, multi_fvm,itherm)
                 endif
 
                 call h3d_shell_scalar_1(.true.,                                                     &
@@ -224,11 +225,11 @@
                 &       ixc       ,ixtg      ,pm          ,bufmat     ,                    &
                 &       ehour       ,                                                      &
                 &       ipm         ,igeo      ,thke      ,err_thk_sh4 ,err_thk_sh3,       &
-                &       x         ,v         ,w           ,ale_connect      ,              &
+                &       nodes%x     ,nodes%v         ,w           ,ale_connect      ,              &
                 &       stack       ,id_elem   ,ity_elem  ,                                &
                 &       is_written,ipartc,iparttg   ,layer_input ,ipt_input  ,       &
                 &       ply_input   ,iuvar_input,h3d_part  ,keyword    ,                   &
-                &       d           ,ng         ,multi_fvm,idmds       ,imdsvar    ,       &
+                &       nodes%d     ,ng         ,multi_fvm,idmds       ,imdsvar    ,       &
                 &       mds_matid   ,id         ,mode     ,mat_param   )
               elseif (ity == 1) then ! solid
                 call h3d_solid_scalar_1(.true.,                                              &
@@ -236,7 +237,7 @@
                 &         ixs          ,pm          ,bufmat      ,                            &
                 &         ehour        ,                                                      &
                 &         ipm             ,                                                   &
-                &         x            ,v         ,w           ,ale_connect,                  &
+                &         nodes%x        ,nodes%v         ,w           ,ale_connect,                  &
                 &         id_elem      ,ity_elem  ,iparts      ,layer_input ,                 &
                 &         -1 ,-1 ,-1,iuvar_input ,h3d_part   , &
                 &         is_written,0 ,keyword   ,fani_cell   ,             &
@@ -250,7 +251,7 @@
                 &       ixq           ,NIXQ          ,pm          ,                                           &
                 &       ehour         ,                                                          &
                 &       ipm           ,                                                        &
-                &       x             ,v             ,w           ,ale_connect      ,                &
+                &       nodes%x       ,nodes%v          ,w           ,ale_connect      ,                &
                 &       id_elem       ,                                                          &
                 &       is_written    ,ipartq        ,layer_input , npart,                               &
                 &       iuvar_input   ,h3d_part      ,keyword     ,                                   &

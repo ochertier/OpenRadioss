@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,11 +20,11 @@
 !Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-!hd|====================================================================
-!hd|  random_walk_dmg
-!hd|-- called by -----------
-!hd|-- calls ---------------
-!hd|====================================================================
+!|====================================================================
+!|  random_walk_dmg
+!|-- called by -----------
+!|-- calls ---------------
+!|====================================================================
       !||====================================================================
       !||    random_walk_dmg_mod   ../starter/source/materials/fail/fractal/random_walk_dmg.F90
       !||--- called by ------------------------------------------------------
@@ -48,10 +48,12 @@
       !||--- uses       -----------------------------------------------------
       !||    fractal_element_neighbor_mod   ../starter/source/materials/fail/fractal/fractal_element_neighbor.F90
       !||    message_mod                    ../starter/share/message_module/message_mod.F
+      !||    stack_mod                      ../starter/share/modules1/stack_mod.F
       !||====================================================================
         subroutine random_walk_dmg(fractal,fail ,                     &
-          ngrshel,ngrsh3n,igrsh4n,igrsh3n,                            &
-          imat   ,nixc   ,ixc    ,nixtg  ,ixtg  ,numelc ,numeltg)
+                   ngrshel,ngrsh3n,igrsh4n,igrsh3n,                   &
+                   nixc   ,ixc    ,nixtg  ,ixtg  ,numelc ,numeltg,    &
+                   iworksh,stack  ,igeo   ,npropgi,numgeo )
 !-----------------------------------------------
 !   M o d u l e s
 !-----------------------------------------------
@@ -60,6 +62,7 @@
           use groupdef_mod
           use random_walk_def_mod
           use fractal_element_neighbor_mod
+          use stack_mod
           use constant_mod ,only : zero,one
 ! ---------------------------------------------------------------------------------------------
           implicit none
@@ -72,19 +75,23 @@
 !-----------------------------------------------
 !   D u m m y   a r g u m e n t s
 !-----------------------------------------------
-      integer             ,intent(in)    :: numelc         !< total number of 4n shell elements
-      integer             ,intent(in)    :: numeltg        !< total number of 3n shell elements
-      integer             ,intent(in)    :: ngrshel        !< number of 4n shell element groups
-      integer             ,intent(in)    :: ngrsh3n        !< number of 3n shell element groups
-      integer             ,intent(in)    :: nixc           !< size of 4n shell connectivity table
-      integer             ,intent(in)    :: nixtg          !< size of 3n shell connectivity table
-      integer             ,intent(in)    :: imat           !< material model number
-      integer ,dimension(nixc,numelc)  ,intent(in) :: ixc  !< 4n shell connectivity table
-      integer ,dimension(nixtg,numeltg),intent(in) :: ixtg !< 3n shell connectivity table
-      type (group_)      ,intent(in) :: igrsh4n(ngrshel)   !< 4n shell group structure
-      type (group_)      ,intent(in) :: igrsh3n(ngrsh3n)   !< 3n shell group structure
-      type (fail_param_) ,intent(inout) :: fail            !< failure model data structure
-      type (fractal_)    ,intent(inout) :: fractal         !< fractal model structure
+      integer             ,intent(in)    :: numelc          !< total number of 4n shell elements
+      integer             ,intent(in)    :: numeltg         !< total number of 3n shell elements
+      integer             ,intent(in)    :: ngrshel         !< number of 4n shell element groups
+      integer             ,intent(in)    :: ngrsh3n         !< number of 3n shell element groups
+      integer             ,intent(in)    :: nixc            !< size of 4n shell connectivity table
+      integer             ,intent(in)    :: nixtg           !< size of 3n shell connectivity table
+      integer             ,intent(in)    :: numgeo          !< total number of element properties
+      integer             ,intent(in)    :: npropgi         !< parameter size of numgeo
+      integer ,dimension(npropgi,numgeo),intent(in) :: igeo !< property parameter table
+      integer ,dimension(nixc,numelc)   ,intent(in) :: ixc  !< 4n shell connectivity table
+      integer ,dimension(nixtg,numeltg) ,intent(in) :: ixtg !< 3n shell connectivity table
+      integer ,dimension(3,numelc+numeltg),intent(in) :: iworksh !< 
+      type (group_)      ,intent(in) :: igrsh4n(ngrshel)    !< 4n shell group structure
+      type (group_)      ,intent(in) :: igrsh3n(ngrsh3n)    !< 3n shell group structure
+      type (fail_param_) ,intent(inout) :: fail             !< failure model data structure
+      type (fractal_)    ,intent(inout) :: fractal          !< fractal model structure
+      type (stack_ply)                  :: stack            !< element stack structure
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
@@ -118,8 +125,6 @@
 !
       dmg            = fail%uparam(1)
       probability    = fail%uparam(2)
-
-      fractal%imat = imat
 !
       if (seed == 0) then
         call random_seed()
@@ -135,7 +140,8 @@
 !     create element - edge connectivity for all elements in material
 !------------------------------------------------------------------------------------
 
-      call fractal_element_neighbor(fractal,nixc,ixc,nixtg,ixtg,numelc,numeltg)
+      call fractal_element_neighbor(fractal,nixc  ,ixc  ,nixtg   ,ixtg,numelc,numeltg  ,  &
+                                    iworksh,stack ,igeo ,npropgi ,numgeo )
 
 !------------------------------------------------------------------------------------
 !     build starting element list
@@ -143,7 +149,7 @@
       nb_sh4 = 0
       nb_sh3 = 0
       if (start_gsh4_id + start_gsh3_id == 0) then  ! empty starting element groups
-        ! starting elements are choosen randomly for each random walker
+        ! starting elements are chosen randomly for each random walker
         random_start = .true.
         nstart = fractal%nelem
         allocate (start_group(nstart))
@@ -216,9 +222,11 @@
         if (debug==1) print*,'    ',fractal%random_walk(iel)%id
       else
         random_target = .false.
+        igr4n_target = -HUGE(igr4n_target)
         if (target_gsh4_id > 0) then
           igr4n_target = ngr2usrn(target_gsh4_id,igrsh4n,ngrshel,nb_sh4)
         end if
+        igr3n_target = -HUGE(igr3n_target)
         if (target_gsh3_id > 0) then
           igr3n_target = ngr2usrn(target_gsh3_id,igrsh3n,ngrsh3n,nb_sh3)
         end if

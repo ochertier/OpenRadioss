@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,11 +21,12 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    meint     ../engine/source/materials/mat_share/meint.F
+      !||    meint        ../engine/source/materials/mat_share/meint.F
       !||--- called by ------------------------------------------------------
-      !||    mmain     ../engine/source/materials/mat_share/mmain.F90
+      !||    mmain        ../engine/source/materials/mat_share/mmain.F90
       !||--- uses       -----------------------------------------------------
-      !||    ale_mod   ../common_source/modules/ale/ale_mod.F
+      !||    ale_mod      ../common_source/modules/ale/ale_mod.F
+      !||    output_mod   ../common_source/modules/output/output_mod.F90
       !||====================================================================
       SUBROUTINE MEINT(
      1   OFF,     SNEW,    QOLD,    EINT,
@@ -40,6 +41,7 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ALE_MOD
+      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -74,7 +76,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I
-      my_real POLD(MVSIZ), VAVG, E1, E2, E3, E4, E5, E6, DTA, TFEXTT   
+      my_real POLD(MVSIZ), VAVG, E1, E2, E3, E4, E5, E6, DTA, WFEXTT   
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------
@@ -123,13 +125,13 @@ C
 C      
       !NO NEED TO UPDATE PRESSURE CALLING EOSMAIN SUBROUTINE FOR THESE TWO MATERIAL LAWS SINCE PRESSURE IS NOT ENERGY DEPENDANT.
       IF(MLN==21)THEN
-        TFEXTT = ZERO
+        WFEXTT = ZERO
         DO I=1,NEL
           EINT(I) = EINT(I) - HALF*DVOL(I)*(PNEW(I)+PSH(I))  
-          TFEXTT=TFEXTT-DVOL(I)*PSH(I)                                
+          WFEXTT=WFEXTT-DVOL(I)*PSH(I)                                
         ENDDO
 #include "atomic.inc"
-        TFEXT = TFEXT + TFEXTT
+        WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
         
       ENDIF      

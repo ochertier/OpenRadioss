@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    fail_wind_xfem   ../engine/source/materials/fail/alter/fail_wind_xfem.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
       !||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
       !||====================================================================
       SUBROUTINE FAIL_WIND_XFEM(
@@ -47,6 +47,7 @@ C-----------------------------------------------
 #include "units_c.inc"
 #include "comlock.inc"
 #include "com_xfem1.inc"
+#include "mvsiz_p.inc"
 C---------+---------+---+---+--------------------------------------------
 C VAR     | SIZE    |TYP| RW| DEFINITION
 C---------+---------+---+---+--------------------------------------------
@@ -75,7 +76,7 @@ C-----------------------------------------------
       my_real TIME,TIMESTEP
       my_real, DIMENSION(NEL) :: SSP,ALDT,TDEL,CRKLEN,
      .   SIGNXX,SIGNYY,SIGNZZ,SIGNXY,SIGNYZ,SIGNZX
-      my_real UPARAM(NUPARAM),DIR_A(NEL,2),CRKDIR(NEL,2),DIR1_CRK(NXLAYMAX,NEL),
+      my_real UPARAM(NUPARAM),DIR_A(NEL,2),CRKDIR(NEL,2),DIR1_CRK(NXLAYMAX,MVSIZ),
      .   DIR2_CRK(NXLAYMAX,NEL)
       TARGET :: DIR1_CRK,DIR2_CRK
 C-----------------------------------------------

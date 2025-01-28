@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat16            ../starter/source/materials/mat/mat016/hm_read_mat16.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat              ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                   ../starter/source/output/message/message.F
       !||    hm_get_floatv            ../starter/source/devtools/hm_reader/hm_get_floatv.F
@@ -367,7 +367,7 @@ C--------------------
      & 5X,40HDS ENTROPY OF MELTING . . . . . . . . .=,1PG20.13/,
      & 5X,40HTM0 MELTING TEMPERATURE PARAMETER . . .=,1PG20.13/,
      & 5X,40HVJ VOLUME WHERE EOS ARE JOINED. . . . .=,1PG20.13/,
-     & 5X,40HVB EXCLUED VOLUME FOR VAPOR PHASE . . .=,1PG20.13//)
+     & 5X,40HVB EXCLUDED VOLUME FOR VAPOR PHASE. . .=,1PG20.13//)
  1800 FORMAT(
      & 5X,40HUNIT (1. MBAR CM3)(1E5 SI). . . . . . .=,1PG20.13/,
      & 5X,40HE0H ENERGY AT V=V0 T=300K P=0 . . . . .=,1PG20.13/,

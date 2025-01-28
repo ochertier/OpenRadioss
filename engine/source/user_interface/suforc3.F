@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,8 +37,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod         ../engine/share/message_module/message_mod.F
       !||    table_mod           ../engine/share/modules/table_mod.F
+      !||    timer_mod           ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SUFORC3(ELBUF_STR,
+      SUBROUTINE SUFORC3(TIMERS, ELBUF_STR,
      1           LFT      ,LLT      ,NFT     ,NEL     ,IXS     ,       
      2           PM       ,GEO      ,IPM     ,IGEO    ,X       ,       
      3           A        ,AR       ,V       ,VR      ,W       ,       
@@ -52,6 +53,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD
       USE MESSAGE_MOD
@@ -78,6 +80,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER LFT, LLT,NEL,NFT,MTN,IGTYP,IFAILURE,NPT, JSMS,IOUTPRT,JTHE
       INTEGER IXS(NIXS,*), IPARG(*), NPF(*),IADS(8,*),
      .        IPARTS(*), IGEO(NPROPGI,*), IPM(NPROPMI,*),ITASK
@@ -395,7 +398,7 @@ C-----------
         MX = ZERO
         MY = ZERO
         MZ = ZERO
-        CALL SUSER43(
+        CALL SUSER43(TIMERS,
      1  ELBUF_STR ,IOUT   ,IPROP(1),IMAT(1),SID  ,TT     ,DT1  ,FR_W_E,       
      2  XX(1,1),XX(1,2),XX(1,3),XX(1,4),XX(1,5),XX(1,6),XX(1,7),XX(1,8), 
      3  YY(1,1),YY(1,2),YY(1,3),YY(1,4),YY(1,5),YY(1,6),YY(1,7),YY(1,8),     

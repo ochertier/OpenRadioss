@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,14 +58,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    output_mod             ../common_source/modules/output/output_mod.F90
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE BFORC2(ELBUF_TAB   ,NG        ,
+      SUBROUTINE BFORC2(TIMERS, ELBUF_TAB   ,NG        ,
      1                   PM         ,GEO       ,IC         ,X       ,
      2                   A          ,V         ,MS         ,W       ,FLUX    ,
      3                   FLU1       ,VEUL      ,ALE_CONNECT,IPARG   ,
@@ -79,10 +82,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B                   H3D_STRAIN ,OUTPUT    ,SZ_BUFVOIS ,SNPC   ,STF      ,SBUFMAT, SVIS,
      C                   NSVOIS     , IRESP    ,IDEL7NOK   ,
      D                   IDTMIN     , MAXFUNC  ,IMON_MAT   ,
-     E                   USERL_AVAIL, heat_meca,impl_s     ,idyna  ,DT       )
+     E                   USERL_AVAIL, impl_s     ,idyna  ,DT       ,
+     F                   GLOB_THERM,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s 
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MESSAGE_MOD
@@ -92,6 +97,8 @@ C-----------------------------------------------
       USE OUTPUT_MOD
       USE MAT_ELEM_MOD
       USE DT_MOD
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -114,6 +121,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER OFFSET,NEL,NG,NSVOIS
       INTEGER,INTENT(IN) :: SZ_BUFVOIS
       INTEGER,INTENT(IN) :: SNPC
@@ -127,7 +135,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IC(*), IPARG(NPARG,NGROUP), JPARG(*), IMS(*), NPF(*),IPARTQ(NUMELQ),IPM(*),IGEO(*),ITASK,H3D_STRAIN
       INTEGER NELTST,ITYPTST, IADQ(4,*),GRTH(*),IGRTH(*)
       my_real DT2T
@@ -143,6 +150,8 @@ C-----------------------------------------------
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -335,7 +344,7 @@ C-----------------------------------------------------
 C-----------------------------------------------------
 C     STRESS TENSOR
 C-----------------------------------------------------
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -363,12 +372,13 @@ C-----------------------------------------------------
      P   BID,         IPARG(1,NG), IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
-     T           SNPC,STF,SBUFMAT,SVIS,          SZ_IX,
-     U   IRESP,       N2D,         TH_STRAIN,   NGROUP,TT, 
+     T   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
+     .   SVIS,        SZ_IX,       IRESP,
+     .   N2D,         th_strain,   NGROUP       ,TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT         ,BID     )
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & ALE MASSES
@@ -429,7 +439,7 @@ C--------------------------
      5   EHOU,     BID,      BID,      BID,
      6   BID,      GRESAV,   GRTH,     IGRTH,
      7   IBID,     BID,      ITASK,    NEL,
-     8   JTUR,     JCVT,     IGRE)
+     8   JTUR,     JCVT,     IGRE,     SENSORS)
 C
 C--------------------
 C     INTERNAL FORCES
@@ -553,7 +563,7 @@ C-----------------------------------------------------
 C-----------------------------------------------------
 C     STREE TENSOR
 C-----------------------------------------------------
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -580,14 +590,14 @@ C-----------------------------------------------------
      O   TABLE,       BID,         BID,         BID,
      P   BID,         NPARG_BID,       IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
-     R   TH_STRAIN,   JPLASOL,     JSPH,        SZ_BUFVOIS,
-     S                SNPC,        STF,         SBUFMAT, 
+     R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
+     S   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
      *   SVIS,        SZ_IX,       IRESP,
-     T   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     T   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT         ,BID )
 C----------------------------------
 C     PETROV-GALERKIN PSEUDO MASSES & MASSES ALE
@@ -649,7 +659,7 @@ c
      5   EHOU,     BID,      BID,      BID,
      6   BID,      GRESAV,   GRTH,     IGRTH,
      7   IBID,     BID,      ITASK,    NEL,
-     8   JTUR,     JCVT,     IGRE)
+     8   JTUR,     JCVT,     IGRE,     SENSORS)
 C--------------------
 C       INTERNAL FORCES
 C--------------------

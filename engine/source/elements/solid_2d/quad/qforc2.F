@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -57,12 +57,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE QFORC2(ELBUF_TAB  ,NG          ,
+      SUBROUTINE QFORC2(TIMERS, ELBUF_TAB  ,NG          ,
      1                  PM         ,GEO         ,IC          ,X        ,A           ,
      2                  V          ,MS          ,W           ,FLUX     ,FLU1        ,
      3                  VEUL       ,ALE_CONNECT ,IPARG       ,NLOC_DMG ,
@@ -75,8 +78,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      C                  MAT_ELEM   ,H3D_STRAIN  ,SZ_BUFVOIS  ,SNPC     ,STF         ,SBUFMAT ,
      D                  SVIS       ,NSVOIS      ,IRESP       ,TT       ,DT1         ,
      .                  IDEL7NOK   ,IDTMIN      ,MAXFUNC     ,
-     .                  IMON_MAT   ,USERL_AVAIL ,heat_meca   ,impl_s   ,idyna       ,
-     .                  DT         )
+     .                  IMON_MAT   ,USERL_AVAIL ,impl_s   ,idyna       ,
+     .                  DT         ,GLOB_THERM,SENSORS)
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -116,6 +119,7 @@ c  I   IGEO                geometrical property integer data
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD
@@ -124,6 +128,8 @@ C-----------------------------------------------
       USE ALE_MOD , ONLY : ALE
       USE ELBUFDEF_MOD
       USE DT_MOD
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -138,6 +144,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       my_real, INTENT(IN) :: DT1
       my_real, INTENT(IN) :: TT
       INTEGER,INTENT(IN) :: SNPC
@@ -152,7 +159,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IC(*), IPARG(NPARG,NGROUP), NPF(*),IPARTQ(NUMELQ),
      .        IPM(*), GRTH(*),IGRTH(*),IGEO(*), IADQ(4,*), ITASK
       INTEGER, INTENT(IN) :: SZ_BUFVOIS
@@ -169,6 +175,8 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE (DT_), INTENT(IN) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
@@ -403,7 +411,7 @@ c
       IPTS = 1
       IPTT = 1
 c
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IC,          IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -431,13 +439,13 @@ c
      P   BID,         DUMMY_IPARG1,IGEO,        BID,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
-     S                SNPC,        STF,         SBUFMAT,
+     S   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
      T   SVIS,        SZ_IX,       IRESP,
-     U   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     U   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,            
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT         , BID      )
 C--------------------------
 C       SYNTHESIS PER MATERIAL (thermics)
@@ -459,7 +467,7 @@ c
      5   EHOU,       R22,        R23,        R32,
      6   R33,        GRESAV,     GRTH,       IGRTH,
      7   IBIDON(1),  GBUF%EINTTH,ITASK,      NEL,
-     8   JTUR,       JCVT,       IGRE)
+     8   JTUR,       JCVT,       IGRE,SENSORS)
         ENDIF
         RETURN
       ENDIF
@@ -552,7 +560,7 @@ c
      5   EHOU,       R22,        R23,        R32,
      6   R33,        GRESAV,     GRTH,       IGRTH,
      7   IBIDON(1),  GBUF%EINTTH,ITASK,      NEL,
-     8   JTUR,       JCVT,       IGRE)
+     8   JTUR,       JCVT,       IGRE,SENSORS)
       ENDIF
 C
 C------------------------

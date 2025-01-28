@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -74,7 +74,7 @@
           integer,                                   intent(in) :: lipart1                     !< size for array definition part array
           integer,                                   intent(inout) :: stat_numelsph            !< number of sphcell written
           integer,                                   intent(inout) :: stat_numelsph_g          !< global number of sphcell written
-          integer,                                   intent(in) :: lengsph                     !< lenght of work array
+          integer,                                   intent(in) :: lengsph                     !< length of work array
           integer,                                   intent(inout) :: nspmd                    !< number of mpi domains
           integer,                                   intent(in) :: itab(numnod)                !< array for user nodes Ids
           integer,                                   intent(in) :: ipart(lipart1,npart)        !< array for parts

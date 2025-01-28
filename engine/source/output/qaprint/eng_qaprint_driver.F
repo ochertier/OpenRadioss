@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -30,11 +30,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    eng_qaprint_generalcontrolsinput   ../engine/source/output/qaprint/eng_qaprint_generalcontrolsinput.F
       !||--- uses       -----------------------------------------------------
       !||    dt_mod                             ../engine/source/modules/dt_mod.F
+      !||    glob_therm_mod                     ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    output_mod                         ../common_source/modules/output/output_mod.F90
       !||    qa_out_mod                         ../common_source/qa/qa_out_mod.F
-      !||    sensor_mod                         ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod                         ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE ENG_QAPRINT_DRIVER(IRUNN_BIS ,SENSORS,DT,OUTPUT,IPARIT)
+      SUBROUTINE ENG_QAPRINT_DRIVER(IRUNN_BIS ,SENSORS,DT,OUTPUT,IPARIT,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -42,6 +43,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE DT_MOD
       USE OUTPUT_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -54,6 +56,7 @@ C-----------------------------------------------
       TYPE (SENSORS_) ,INTENT(IN) :: SENSORS
       TYPE (DT_)  , INTENT(INOUT) :: DT
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      type (glob_therm_) ,intent(in) :: glob_therm
       INTEGER,INTENT(IN)::  IPARIT
 C=======================================================================
 
@@ -64,7 +67,7 @@ C=======================================================================
       IF(NCYCLE == 0) THEN ! ECRITURE QAPRINT AU CYCLE 0 ENGINE
         CALL ENG_QAPRINT_GENERALCONTROLSINPUT(IRUNN_BIS,OUTPUT,IPARIT,SENSORS)
 
-        CALL ENG_QAPRINT_DTINPUT(DT)
+        CALL ENG_QAPRINT_DTINPUT(DT,GLOB_THERM)
 
         CALL ENG_QAPRINT_ANIMINPUT(SENSORS)
       ENDIF

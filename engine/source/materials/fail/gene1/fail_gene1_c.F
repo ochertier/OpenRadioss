@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,30 +23,32 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    fail_gene1_c          ../engine/source/materials/fail/gene1/fail_gene1_c.F
       !||--- called by ------------------------------------------------------
-      !||    mulawc                ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc                ../engine/source/materials/mat_share/mulawc.F90
       !||    usermat_shell         ../engine/source/materials/mat_share/usermat_shell.F
       !||--- calls      -----------------------------------------------------
       !||    finter                ../engine/source/tools/curve/finter.F
       !||    table2d_vinterp_log   ../engine/source/tools/curve/table2d_vinterp_log.F
       !||    table_vinterp         ../engine/source/tools/curve/table_tools.F
       !||--- uses       -----------------------------------------------------
+      !||    dt_mod                ../engine/source/modules/dt_mod.F
       !||    interface_table_mod   ../engine/share/modules/table_mod.F
       !||    table_mod             ../engine/share/modules/table_mod.F
       !||====================================================================
       SUBROUTINE FAIL_GENE1_C (
      1     NEL      ,NUPARAM  ,NUVAR    ,NFUNC    ,IFUNC    ,
      2     NPF      ,TF       ,TIME     ,TIMESTEP ,UPARAM   ,IPG      ,
-     3     NGL      ,DT       ,EPSP     ,UVAR     ,OFF      ,
+     3     NGL      ,GBUF_DT  ,EPSP     ,UVAR     ,OFF      ,
      4     EPSXX    ,EPSYY    ,EPSXY    ,AREA     ,THKN     ,
      5     SIGNXX   ,SIGNYY   ,SIGNXY   ,SIGNYZ   ,SIGNZX   ,
      6     TEMP     ,DFMAX    ,ALDT     ,TABLE    ,TDELE    ,
      7     THK0     ,IPT      ,FOFF     ,THKLYL   ,NTABLF   ,ITABLF   ,
-     8     LF_DAMMX ,NIPARAM  ,IPARAM   )
+     8     LF_DAMMX ,NIPARAM  ,IPARAM   ,DT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE TABLE_MOD
       USE INTERFACE_TABLE_MOD
+      USE DT_MOD
 C!-----------------------------------------------
 C!   I m p l i c i t   T y p e s
 C!-----------------------------------------------
@@ -70,13 +72,14 @@ C!-----------------------------------------------
       my_real, INTENT(IN) :: TIME,TIMESTEP
       my_real, DIMENSION(NUPARAM), INTENT(IN) :: UPARAM
       my_real, DIMENSION(NEL), INTENT(IN) :: EPSXX,EPSYY,EPSXY,
-     .   DT,EPSP,OFF,ALDT,TEMP,AREA,THKN,THK0,THKLYL
+     .   GBUF_DT,EPSP,OFF,ALDT,TEMP,AREA,THKN,THK0,THKLYL
       INTEGER, DIMENSION(NEL), INTENT(INOUT) :: FOFF
       my_real, DIMENSION(NEL), INTENT(INOUT) :: SIGNXX,SIGNYY,SIGNXY,
      .   SIGNYZ,SIGNZX,TDELE
       my_real, DIMENSION(NEL,LF_DAMMX), INTENT(INOUT) :: DFMAX
       my_real, DIMENSION(NEL,NUVAR), INTENT(INOUT) :: UVAR
-      TYPE (TTABLE), DIMENSION(NTABLE), INTENT(IN) :: TABLE 
+      TYPE (TTABLE), DIMENSION(NTABLE), INTENT(IN) :: TABLE
+      TYPE (DT_), INTENT(IN) :: DT
 C!-----------------------------------------------
 C!   VARIABLES FOR FUNCTION INTERPOLATION 
 C!-----------------------------------------------
@@ -208,57 +211,72 @@ c
       ! - LOOP OVER THE ELEMENT TO COMPUTE THE STRESSES AND STRAINS
       !====================================================================       
       DO I=1,NEL
-c       
-        ! ----------------------------------------------------------------------------------------
-        ! Computation of volumetric strain, effective strain, shear strain and principal strains
-        ! ----------------------------------------------------------------------------------------
-        !  -> computation of principal strains
-        E12 = HALF*EPSXY(I)
-        S1  = HALF*(EPSXX(I) + EPSYY(I))
-        S2  = HALF*(EPSXX(I) - EPSYY(I))
-        Q   = SQRT(S2**2 + E12**2)
-        E11(I) = S1 + Q
-        E22(I) = S1 - Q
-        IF (E22(I) >= E11(I)) THEN
-          R_INTER = E22(I)
-          E22(I)  = E11(I)
-          E11(I)  = R_INTER
-        ENDIF
-        !  -> computation of volumetric strain
-        VOL_STRAIN(I) = E11(I) + E22(I)
-        !  -> computation of effective strain
-        DAV = (EPSXX(I)+EPSYY(I))*THIRD
-        E1D = EPSXX(I) - DAV
-        E2D = EPSYY(I) - DAV
-        E3D = - DAV
-        E4D = HALF*EPSXY(I)
-        EFF_STRAIN(I) = E1D**2 + E2D**2 + E3D**3 + TWO*(E4D**2)
-        EFF_STRAIN(I) = SQRT(TWO_THIRD*EFF_STRAIN(I))
 c
-        ! --------------------------------------------------------------------------
-        ! Computation of hydrostatic stress, Von Mises stress and principal stresses
-        ! --------------------------------------------------------------------------
-        !  -> pressure stress (positive in compression)
-        P(I)   = -THIRD*(SIGNXX(I) + SIGNYY(I))
-        !  -> equivalent stress of Von Mises
-        SXX    = SIGNXX(I) + P(I)
-        SYY    = SIGNYY(I) + P(I)
-        SZZ    = P(I)
-        SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I)
-     .           - SIGNXX(I)*SIGNYY(I) + THREE*SIGNXY(I)*SIGNXY(I))
-        TRIAX(I) = -P(I)/MAX(SVM(I),EM20)
-        !  -> computing the principal stresses
-        S1     = HALF*(SIGNXX(I) + SIGNYY(I))
-        S2     = HALF*(SIGNXX(I) - SIGNYY(I))
-        Q      = SQRT(S2**2 + SIGNXY(I)**2)
-        S11(I) = S1 + Q
-        S22(I) = S1 - Q 
-        IF (S22(I) >= S11(I)) THEN
-          R_INTER = S22(I)
-          S22(I)  = S11(I)
-          S11(I)  = R_INTER
+        ! For active element or Gauss point
+        IF ((UVAR(I,5) == ONE).AND.(OFF(I)==ONE)) THEN
+          ! ----------------------------------------------------------------------------------------
+          ! Computation of volumetric strain, effective strain, shear strain and principal strains
+          ! ----------------------------------------------------------------------------------------
+          !  -> computation of principal strains
+          E12 = HALF*EPSXY(I)
+          S1  = HALF*(EPSXX(I) + EPSYY(I))
+          S2  = HALF*(EPSXX(I) - EPSYY(I))
+          Q   = SQRT(S2**2 + E12**2)
+          E11(I) = S1 + Q
+          E22(I) = S1 - Q
+          IF (E22(I) >= E11(I)) THEN
+            R_INTER = E22(I)
+            E22(I)  = E11(I)
+            E11(I)  = R_INTER
+          ENDIF
+          !  -> computation of volumetric strain
+          VOL_STRAIN(I) = E11(I) + E22(I)
+          !  -> computation of effective strain
+          DAV = (EPSXX(I)+EPSYY(I))*THIRD
+          E1D = EPSXX(I) - DAV
+          E2D = EPSYY(I) - DAV
+          E3D = - DAV
+          E4D = HALF*EPSXY(I)
+          EFF_STRAIN(I) = E1D**2 + E2D**2 + E3D**3 + TWO*(E4D**2)
+          EFF_STRAIN(I) = SQRT(TWO_THIRD*EFF_STRAIN(I))
+c
+          ! --------------------------------------------------------------------------
+          ! Computation of hydrostatic stress, Von Mises stress and principal stresses
+          ! --------------------------------------------------------------------------
+          !  -> pressure stress (positive in compression)
+          P(I)   = -THIRD*(SIGNXX(I) + SIGNYY(I))
+          !  -> equivalent stress of Von Mises
+          SXX    = SIGNXX(I) + P(I)
+          SYY    = SIGNYY(I) + P(I)
+          SZZ    = P(I)
+          SVM(I) = SQRT(SIGNXX(I)*SIGNXX(I) + SIGNYY(I)*SIGNYY(I)
+     .             - SIGNXX(I)*SIGNYY(I) + THREE*SIGNXY(I)*SIGNXY(I))
+          TRIAX(I) = -P(I)/MAX(SVM(I),EM20)
+          !  -> computing the principal stresses
+          S1     = HALF*(SIGNXX(I) + SIGNYY(I))
+          S2     = HALF*(SIGNXX(I) - SIGNYY(I))
+          Q      = SQRT(S2**2 + SIGNXY(I)**2)
+          S11(I) = S1 + Q
+          S22(I) = S1 - Q 
+          IF (S22(I) >= S11(I)) THEN
+            R_INTER = S22(I)
+            S22(I)  = S11(I)
+            S11(I)  = R_INTER
+          ENDIF
+c
+        ! For broken element or Gauss point
+        ELSE
+          E11(I) = ZERO
+          E22(I) = ZERO
+          VOL_STRAIN(I) = ZERO
+          EFF_STRAIN(I) = ZERO
+          P(I) = ZERO
+          SVM(I) = ZERO
+          TRIAX(I) = ZERO
+          S11(I) = ZERO
+          S22(I) = ZERO
         ENDIF
-c       
+c
       ENDDO
 c
       !  -> Forming limit diagram
@@ -367,9 +385,9 @@ c
           IF (BTEST(CRIT,5)) THEN 
             NMOD = NMOD + 1
             IF (TIME > ZERO) THEN 
-              DFMAX(I,1+NMOD) = MAX(DTMIN/(DT(I)*DTFAC1(1)),DFMAX(I,1+NMOD))
+              DFMAX(I,1+NMOD) = MAX(DTMIN/(GBUF_DT(I)*DTFAC1(1)),DFMAX(I,1+NMOD))
               DFMAX(I,1+NMOD) = MIN(DFMAX(I,1+NMOD),ONE)   
-              IF (DT(I)*DTFAC1(1) <= DTMIN) THEN 
+              IF (GBUF_DT(I)*DTFAC1(1) <= DTMIN) THEN 
                 NCRIT(I)  = NCRIT(I) + 1
                 IMINDT(I) = 1
               ENDIF 
@@ -617,8 +635,8 @@ c------------------------
             WRITE(ISTDO,1005) TIME,TMAX    
           ENDIF
           IF (IMINDT(I) == 1) THEN 
-            WRITE(IOUT, 1006) DT(I)*DTFAC1(1),DTMIN
-            WRITE(ISTDO,1006) DT(I)*DTFAC1(1),DTMIN        
+            WRITE(IOUT, 1006) GBUF_DT(I)*DTFAC1(1),DTMIN
+            WRITE(ISTDO,1006) GBUF_DT(I)*DTFAC1(1),DTMIN        
           ENDIF
           IF (ISIGMAX(I) == 1) THEN 
             WRITE(IOUT, 1007) SVM(I),SIGMAX(I)*FACL(I)

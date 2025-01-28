@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ C=======================================================================
       !||--- called by ------------------------------------------------------
       !||    sensor_base    ../engine/source/tools/sensor/sensor_base.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod     ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod     ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE SENSOR_RWALL(SENSOR ,
      .           NPRW    ,DIMFB   ,STABS   ,TABS   ,FBSAV6)
@@ -71,6 +71,10 @@ c
       FMAX  = SENSOR%RPARAM(2) 
       ICRIT = 0
       ACTI  = 0
+      FF = ZERO
+      FX = ZERO
+      FY = ZERO
+      FZ = ZERO
 c
       ISECT = TABS(NSECT+RW_ID+1)-TABS(NSECT+RW_ID)
       N5 = RW_ID + 4*NRWALL
@@ -115,6 +119,7 @@ c
      .         FBSAV6(6,5,ISECT)+FBSAV6(6,6,ISECT)
           FF = SQRT(FX*FX + FY*FY + FZ*FZ) 
         ENDIF
+        SENSOR%RESULTS(1) = FF
 c
         IF (FF < FMIN .OR. FF > FMAX .OR. IDIR == 0) ICRIT = 1
 c  

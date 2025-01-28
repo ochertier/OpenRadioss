@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,9 +26,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sensor_base     ../engine/source/tools/sensor/sensor_base.F
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE SENSOR_ENERGY(SENSOR   ,ISENS    ,SUBSET   ,PARTSAV2 )
+      SUBROUTINE SENSOR_ENERGY(SENSOR   ,ISENS    ,SUBSET   ,PARTSAV2 ,
+     *                         NSENSOR  ,SENSOR_STRUCT)
 c-----------------------------------------------------------------------
 !$COMMENT
 !       SENSOR_ENERGY description
@@ -57,10 +58,12 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NSENSOR
       INTEGER ,INTENT(IN) :: ISENS
       my_real ,INTENT(IN) :: PARTSAV2(2,*)
       TYPE (SUBSET_) ,DIMENSION(NSUBS) ,INTENT(IN) :: SUBSET
       TYPE (SENSOR_STR_) ,INTENT(INOUT) :: SENSOR
+      TYPE (SENSOR_TYPE), DIMENSION(NSENSOR), INTENT(INOUT) :: SENSOR_STRUCT
 C----------------------------------------------------------
 C Local Variables
 C----------------------------------------------------------
@@ -178,6 +181,8 @@ c---------------------------------------------------------
         ICRIT = 1                   
         IFLAG = 4               
       ENDIF
+      SENSOR%RESULTS(1) = EINT
+      SENSOR%RESULTS(2) = EKIN
 c      
       IF (SENSOR%TCRIT + TMIN > TT) THEN
         IF (ICRIT == 0) THEN

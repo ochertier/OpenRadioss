@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -316,7 +316,9 @@ C     ==============
            WRITE(IOUT, 2026)TRIM(FILENAME)
            CALL LEC_INIMAP2D_FILE(INIMAP2D(KK), FILENAME, ID, TITR )
         ENDIF
-
+        LNODID1 = 0
+        LNODID2 = 0
+        LNODID3 = 0
          IF (INIMAP2D(KK)%NODEID1 > 0) THEN
             LNODID1 = USR2SYS(INIMAP2D(KK)%NODEID1, ITABM1, MESS, INIMAP2D(KK)%NODEID1)
             INIMAP2D(KK)%NODEID1 = LNODID1

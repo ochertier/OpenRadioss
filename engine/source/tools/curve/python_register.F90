@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -58,7 +58,7 @@
           use python_spmd_mod, only : python_element_init
           use python_element_mod, only : python_get_number_elemental_entities, python_get_elemental_entity
           use python_funct_mod, only : python_, max_code_length, max_line_length, NAME_LEN, python_create_node_mapping, &
-          & python_register_function, python_initialize
+          & python_register_function, python_initialize, python_load_environment
           use user_id_mod, only : element_user_id
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                     Implicit None
@@ -114,7 +114,7 @@
           allocate(group_id(nelem))
           allocate(character(kind=c_char, len=max_code_length) :: code)
 
-          ierror = 0 ! if python error = 1 => python_initialize will do nothing, because python is not avaiable
+          ierror = 0 ! if python error = 1 => python_initialize will do nothing, because python is not available
           ! i.e. starter without -python option
           if(py%nb_functs>0) call python_initialize(ierror)
 
@@ -168,6 +168,7 @@
           enddo
 
           call python_element_init(py%elements, n, group_id, local_id, user_id)
+          if(py%nb_functs >0 )  call python_load_environment()
           deallocate(code)
           deallocate(user_id)
           deallocate(local_id)

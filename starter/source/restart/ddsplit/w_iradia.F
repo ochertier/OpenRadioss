@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,7 @@ CCgw|============================================================
       !||--- calls      -----------------------------------------------------
       !||====================================================================
       SUBROUTINE W_IRADIA(IBCR,CEP,PROC,NODLOCAL,NRADIA_L,LEN_IA,
-     .                   CEL,IPARG,NUMLOCGROUP)
+     .                   CEL,IPARG,NUMLOCGROUP,NUMCONV,NUMRADIA,NIRADIA)
 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -43,6 +43,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER ,INTENT(IN) :: NUMCONV
+      INTEGER ,INTENT(IN) :: NUMRADIA
+      INTEGER ,INTENT(IN) :: NIRADIA
       INTEGER LEN_IA, PROC, NRADIA_L, IBCR(NIRADIA,*),CEP(*),
      .        NODLOCAL(*)
       INTEGER IPARG(NPARG,*),NUMLOCGROUP(NGROUP),CEL(*)
@@ -51,6 +54,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, J, IBTMP(NIRADIA,NRADIA_L), N1, N2, N3, N4, OFF, NB_L
+C-----------------------------------------------
 C
       OFF = NUMELC+NUMELTG+NUMELS+NUMELQ+NUMELT+NUMELP+NUMELR
      +    + NUMELX + NCONLD + NUMCONV

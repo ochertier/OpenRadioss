@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -180,10 +180,10 @@ C--------------------------------------------------
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'DIAMETER')THEN
 C--------------------------------------------------
-          DO I=1,NEL
-            VALUE(I) = SPBUF(1,NFT+I)  
+                DO I=1,NEL
+                  VALUE(I) = SPBUF(1,NFT+I)  
                   IS_WRITTEN_VALUE(I) = 1  
-          ENDDO
+                ENDDO
 C--------------------------------------------------
               ELSEIF(KEYWORD == 'EPSP')THEN
 C--------------------------------------------------
@@ -581,12 +581,29 @@ C--------------------------------------------------
                      VALUE(I) = EBUF%VAR(I)                   
                      IS_WRITTEN_VALUE(I) = 1                  
                    ENDDO                                      
-                 ENDIF                                                       
+                 ENDIF
+C--------------------------------------------------
+              ELSEIF(KEYWORD == 'NEIGHBOURS')THEN
+C--------------------------------------------------
+                 DO I=1,NEL
+                   VALUE(I) = KXSP(4,NFT+I) 
+                   IS_WRITTEN_VALUE(I) = 1  
+                 ENDDO
+!--------------------------------------------------
+              ELSEIF(KEYWORD == 'VSTRAIN') then
+!--------------------------------------------------
+                DO I=1,NEL
+                  IPRT = IPARTSP(N)
+                  MT = IPART(1,IPRT)
+                  IF(PM(89,MT) > ZERO)THEN
+                    VALUE(I) = GBUF%RHO(I) / PM(89,MT) - ONE
+                    IS_WRITTEN_VALUE(I) = 1
+                  END IF
+                ENDDO
 C-------------------------------------------------- 
               ENDIF   ! IFUNC
 C-------------------------------------------------- 
-              CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SPH,SPH_SCALAR,NEL,OFFSET,NFT,
-     .           VALUE,IS_WRITTEN_VALUE)
+              CALL H3D_WRITE_SCALAR(IOK_PART,IS_WRITTEN_SPH,SPH_SCALAR,NEL,OFFSET,NFT,VALUE,IS_WRITTEN_VALUE)
             ENDIF
           ENDIF
        ENDIF

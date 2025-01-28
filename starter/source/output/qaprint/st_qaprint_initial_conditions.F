@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -226,7 +226,7 @@ C-----------------------------------------------
 C      
         IF (NINIGRAV > 0) THEN 
 C          
-!         Sort by ID to ensure internal order independant output
+!         Sort by ID to ensure internal order independent output
           DO I = 1, NINIGRAV
             IDS(I)    = INIGRV(4,I)
             IDX(I)    = I
@@ -283,7 +283,7 @@ C-----------------------------------------------
 C      
         IF (NINICRACK > 0) THEN
 C        
-!         Sort by ID to ensure internal order independant output
+!         Sort by ID to ensure internal order independent output
           DO I = 1, NINICRACK
             IDS2(I) = INICRACK(I)%ID
             IDX2(I) = I

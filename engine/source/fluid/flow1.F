@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,6 +51,8 @@ C-----------------------------------------------
 C
       IADI=0
       IADR=0
+      II4 = 0
+      II6 = 0
       DO N=1,NFLOW
          ITYP=IFLOW(IADI+2)
          IF (ITYP==3) THEN

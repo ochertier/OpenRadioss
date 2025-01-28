@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,10 +22,10 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.    
 C.../SCR11/
       COMMON /SCR11/ ENINT, ENCIN, XMOMT, YMOMT, ZMOMT, XMASS, ENROT, ECONT, 
-     .               MASS0, ENTOT0, DMF ,  DEF, ENCIN2, ENROT2, DELTAE, TFEXT_MD, 
+     .               MASS0, ENTOT0, DMF ,  DEF, ENCIN2, ENROT2, DELTAE,
      .               EAMS     
 C     REAL ou REAL*8
       my_real
      .    ENINT, ENCIN, XMOMT, YMOMT, ZMOMT, XMASS, ENROT, ECONT,
-     .    MASS0, ENTOT0 , DMF ,  DEF, ENCIN2, ENROT2, DELTAE,TFEXT_MD, 
+     .    MASS0, ENTOT0 , DMF ,  DEF, ENCIN2, ENROT2, DELTAE,
      .    EAMS   

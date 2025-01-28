@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,16 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    i7cor3       ../starter/source/interfaces/inter3d1/i7cor3.F
+      !||    i7cor3      ../starter/source/interfaces/inter3d1/i7cor3.F
       !||--- called by ------------------------------------------------------
-      !||    i20ini3      ../starter/source/interfaces/inter3d1/i20ini3.F
-      !||    i24buc1      ../starter/source/interfaces/inter3d1/i24buc1.F
-      !||    i24tri       ../starter/source/interfaces/inter3d1/i24tri.F
-      !||    i7buc1       ../starter/source/interfaces/inter3d1/i7buc1.F
-      !||    i7buc_vox1   ../starter/source/interfaces/inter3d1/i7buc_vox1.F
-      !||    i7tri        ../starter/source/interfaces/inter3d1/i7tri.F
-      !||    i7trivox1    ../starter/source/interfaces/inter3d1/i7trivox1.F
-      !||    inint3       ../starter/source/interfaces/inter3d1/inint3.F
+      !||    i20ini3     ../starter/source/interfaces/inter3d1/i20ini3.F
+      !||    i24buc1     ../starter/source/interfaces/inter3d1/i24buc1.F
+      !||    i24tri      ../starter/source/interfaces/inter3d1/i24tri.F
+      !||    i7buc1      ../starter/source/interfaces/inter3d1/i7buc1.F
+      !||    i7tri       ../starter/source/interfaces/inter3d1/i7tri.F
+      !||    i7trivox1   ../starter/source/interfaces/inter3d1/i7trivox1.F
+      !||    inint3      ../starter/source/interfaces/inter3d1/inint3.F
       !||====================================================================
       SUBROUTINE I7COR3(X     ,IRECT ,NSV   ,CAND_E  ,CAND_N,
      2                  STF   ,STFN  ,GAPV  ,IGAP    ,GAP   ,
@@ -39,7 +38,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5                  IX3    ,IX4    ,NSVG,X1      ,X2    ,
      6                  X3     ,X4     ,Y1  ,Y2      ,Y3    ,
      7                  Y4     ,Z1     ,Z2  ,Z3      ,Z4    ,
-     8                  XI     ,YI     ,ZI  ,STIF    ,DGAPLOAD)
+     8                  XI     ,YI     ,ZI  ,STIF    ,DGAPLOAD,
+     9                  LAST)
 C============================================================================
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -53,6 +53,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER IGAP, IRECT(4,*), NSV(*), CAND_E(*), CAND_N(*),ISTF
+      INTEGER, INTENT(IN) :: LAST !< last candidat
 C     REAL
       my_real
      .        GAP, GAPMIN, GAPMAX,DRAD
@@ -67,17 +68,13 @@ C     REAL
       my_real, DIMENSION(MVSIZ), INTENT(OUT) :: XI,YI,ZI
       my_real, DIMENSION(MVSIZ), INTENT(INOUT) :: STIF
 C-----------------------------------------------
-C   C o m m o n   B l o c k s
-C-----------------------------------------------
-#include      "vect07_c.inc"
-C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, IL, L, NN, IG
 C     REAL
 C-----------------------------------------------
 C
-      DO I=LFT,LLT
+      DO I=1,LAST
        IG = NSV(CAND_N(I))
        NSVG(I) = IG
        XI(I) = X(1,IG)
@@ -86,11 +83,11 @@ C
       ENDDO
 C
       IF(IGAP==0)THEN
-        DO I=LFT,LLT
+        DO I=1,LAST
          GAPV(I) = MAX(GAP+DGAPLOAD,DRAD)         
         ENDDO
       ELSE
-        DO I=LFT,LLT
+        DO I=1,LAST
          GAPV(I) = GAP_S(CAND_N(I))+GAP_M(CAND_E(I))
          IF(IGAP == 3)  
      .      GAPV(I)=MIN(GAP_S_L(CAND_N(I))+GAP_M_L(CAND_E(I)),GAPV(I))
@@ -102,12 +99,12 @@ C
       ENDIF
 C
       IF(ISTF/=0)THEN
-        DO I=LFT,LLT
+        DO I=1,LAST
           STIF(I)=STF(CAND_E(I))*STFN(CAND_N(I))
         ENDDO
       ENDIF
 C
-      DO I=LFT,LLT
+      DO I=1,LAST
 C
         L  = CAND_E(I)
 C
@@ -118,7 +115,7 @@ C
 C
       ENDDO
 C
-      DO I=LFT,LLT
+      DO I=1,LAST
 C
         NN=IX1(I)
         X1(I)=X(1,NN)

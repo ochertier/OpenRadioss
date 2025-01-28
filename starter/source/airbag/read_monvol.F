@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,7 +46,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    message_mod             ../starter/share/message_module/message_mod.F
       !||    monvol_struct_mod       ../starter/share/modules1/monvol_struct_mod.F
       !||    r2r_mod                 ../starter/share/modules1/r2r_mod.F
-      !||    sensor_mod              ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod            ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE READ_MONVOL(T_MONVOL, T_MONVOL_METADATA, ITAB, ITABM1, IPM, IGEO, 

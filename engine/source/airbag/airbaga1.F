@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,12 +27,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    finter       ../engine/source/tools/curve/finter.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod   ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod   ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE AIRBAGA1(IVOLU  ,NJET    ,IBAGJET ,NVENT   ,IBAGHOL ,
-     2                    ICBAG  ,RVOLU   ,RBAGJET ,RBAGHOL ,RCBAG   ,
+      SUBROUTINE AIRBAGA1(IVOLU  ,NJET    ,IBAGJET ,NVENT   ,IBAGHOL    ,
+     2                    ICBAG  ,RVOLU   ,RBAGJET ,RBAGHOL ,RCBAG      ,
      3                    RVOLUV ,NPC     ,TF      ,NSENSOR ,SENSOR_TAB ,
-     4                    VOL    ,PMAIN ,GEO     ,IGEO    ,PM      )
+     4                    VOL    ,PMAIN   ,GEO     ,IGEO    ,PM         ,
+     5                    WFEXT )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------  
@@ -61,12 +62,12 @@ C-----------------------------------------------
       INTEGER NPC(*),IVOLU(*),NJET,IBAGJET(NIBJET,*),
      .        NVENT,IBAGHOL(NIBHOL,*),ICBAG(NICBAG,*),PMAIN,
      .        IGEO(NPROPGI,*)
-C     REAL
       my_real
      .   TF(*),RVOLU(*),RBAGJET(NRBJET,*),
      .   RBAGHOL(NRBHOL,*),RCBAG(NRCBAG,*),RVOLUV(NRVOLU,*),VOL,
      .   GEO(NPROPG,*),PM(NPROPM,*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -93,9 +94,18 @@ C-----------------------------------------------
       my_real FINTER 
       EXTERNAL FINTER
 C-----------------------------------------------
+      FTEMP = ZERO
       PEXT     =RVOLU(3)
       POLD     =RVOLU(12)
       R_IGC1   =PM(27,IVOLU(66))
+      TBAG_OLD = ZERO
+      FMASS = ZERO
+      AREA = ZERO
+      DV = ZERO 
+      I_GAS = 0
+      QOLD = ZERO
+      VOLD = ZERO
+      ROT = ZERO
 C------------------------
       DO IV=1,NVENT
         IDEF   = IBAGHOL(1,IV)
@@ -549,7 +559,7 @@ C------
         Q=-AMU*SQRT(P*AREA*ROT/VOL)*DV/AREA/DT1
        ENDIF
        IF (IMACH/=3.OR.ISPMD+1==PMAIN) THEN
-        TFEXT=TFEXT+(HALF*(P+POLD+Q+QOLD)-PEXT)*DV
+        WFEXT=WFEXT+(HALF*(P+POLD+Q+QOLD)-PEXT)*DV
         RVOLU(32)=RVOLU(32) + (HALF*(P+POLD)-PEXT)*DV
        ENDIF
 C------

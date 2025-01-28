@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,18 +29,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    set_merge_simple        ../starter/source/model/sets/set_merge_simple.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||    set_mod                 ../starter/share/modules1/set_mod.F
       !||====================================================================
       SUBROUTINE FILL_CLAUSE_RBODY_BOX( IBOX   ,X  ,SKEW  ,SET_TITLE ,KEYSET,
      *                                 BOXLIST, BOXLIST_SIZE,
      *                                 BOXNDS, SZ_BOXNDS     ,RBY_MSN)
 
-#include      "set_def.inc"
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
+      USE SET_MOD , ONLY : SET_ADD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -111,6 +112,7 @@ C-------
       !||    simple_rbody_box        ../starter/source/model/sets/simple_rbody_box.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod             ../starter/share/message_module/message_mod.F
+      !||    set_mod                 ../starter/share/modules1/set_mod.F
       !||====================================================================
       RECURSIVE SUBROUTINE RBODY_BOX( IB  ,
      *                     IBOX ,X  ,SKEW  ,SET_TITLE ,KEYSET,
@@ -140,6 +142,7 @@ C-----------------------------------------------
       USE OPTIONDEF_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARTITLE, NCHARFIELD
+      USE SET_MOD , ONLY : SET_ADD,SET_DELETE
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

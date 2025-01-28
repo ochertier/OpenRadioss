@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -1855,7 +1855,7 @@ C
                     I = LPBY(J+K)
                     DO IJK = ADSKY(I),ADSKY(I+1)-1
                         CC2 = IJK
-                        NUMG2 = CNE(CC2)
+                        NUMG2 = ABS(CNE(CC2))
                         NUMBER_OF_ELEMENT_RBODY = NUMBER_OF_ELEMENT_RBODY + 1
                         LIST_ELEMENT_RBODY( NUMBER_OF_ELEMENT_RBODY ) = NUMG2
                         BOOL_RBODY=.TRUE.
@@ -1865,7 +1865,7 @@ C
                 !   main node
                 DO IJK = ADSKY(M),ADSKY(M+1)-1
                     CC2 = IJK
-                    NUMG2 = CNE(CC2)
+                    NUMG2 = ABS(CNE(CC2))
                     NUMBER_OF_ELEMENT_RBODY = NUMBER_OF_ELEMENT_RBODY + 1
                     LIST_ELEMENT_RBODY( NUMBER_OF_ELEMENT_RBODY ) = NUMG2
                 ENDDO
@@ -2187,7 +2187,7 @@ C RSB METIS
       
 
       IF(ICFSI > 0 .AND.  ICFSI < ICELEM) THEN 
-! the order in DMIN,DMAX is independant of the order of constraints
+! the order in DMIN,DMAX is independent of the order of constraints
         MAIN_TARGET = 7
       ELSE
         MAIN_TARGET = 1

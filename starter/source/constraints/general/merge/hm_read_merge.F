@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,49 +21,6 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    rbmerge_mod     ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||--- called by ------------------------------------------------------
-      !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    rb_explore      ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    rbleveldown     ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    rbtag2down      ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    retrirby        ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||    trirbmerge      ../starter/source/constraints/general/merge/hm_read_merge.F
-      !||====================================================================
-      MODULE RBMERGE_MOD
-c=======================================================================   
-!                           RIGID BODY MERGE
-c=======================================================================   
-C-----------------------------------------------------------------------
-      TYPE RBMERGE_
-        INTEGER   :: ID ! - RIGID BODY identifier
-        INTEGER   :: NBSECONDARY   ! Number of SECONDARY rigid body
-        INTEGER, DIMENSION(:) , ALLOCATABLE :: IDSECONDARY ! SECONDARY rigid bodys attached to the MAIN
-        INTEGER   :: IMAIN   ! 0 if this rigid body doesn't have a MAIN
-!                              ! The Rigid body's MAIN 
-        INTEGER   :: LEVEL   ! Rigid body level
-!                                 = 0  ! if the rigid body is only a MAIN
-!                                 = -1 ! if the rigid body has a MAIN
-!                                 = -2 ! if the MAIN of the rigid body has a MAIN
-!                                 = -3 ! and again
-        INTEGER   :: FLAG_MAIN   ! Flag relating the rigid option merge to the MAIN
-!                                 = -1 ! if the rigid body is only a MAIN
-!                                 =  0 ! default value
-!                                 =  1 ! option 1
-!                                 =  2 ! option 2
-!                                 =  3 ! option 3
-        INTEGER   :: NNODE   ! Number of SECONDARY node
-        INTEGER, DIMENSION(:) , ALLOCATABLE :: NODE ! SECONDARY node attached to the MAIN
-        INTEGER, DIMENSION(:) , ALLOCATABLE :: FLAG_NODE ! Flag relating the rigid option merge to the MAIN
-!                                 =  0 ! default value
-!                                 =  1 ! option 1
-!                                 =  2 ! option 2
-!                                 =  3 ! option 3
-!--------------
-      END TYPE RBMERGE_
-      END MODULE RBMERGE_MOD
-C
-      !||====================================================================
       !||    hm_read_merge            ../starter/source/constraints/general/merge/hm_read_merge.F
       !||--- called by ------------------------------------------------------
       !||    lectur                   ../starter/source/starter/lectur.F
@@ -84,7 +41,7 @@ C
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod       ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod              ../starter/share/message_module/message_mod.F
-      !||    rbmerge_mod              ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbmerge_mod              ../starter/source/constraints/general/merge/rbmerge_type.F90
       !||    submodel_mod             ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_MERGE(
@@ -618,7 +575,7 @@ C-----------------------------------------------
       !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
       !||--- calls      -----------------------------------------------------
       !||--- uses       -----------------------------------------------------
-      !||    rbmerge_mod     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbmerge_mod     ../starter/source/constraints/general/merge/rbmerge_type.F90
       !||====================================================================
       RECURSIVE SUBROUTINE RBTAG2DOWN(IDRB,TAG2,RBMERGE,
      .                                FLAG_BOUCLE,TABBOUCLE,IDBOUCLE)
@@ -678,7 +635,7 @@ C-----------------------------------------------
       !||    hm_read_merge   ../starter/source/constraints/general/merge/hm_read_merge.F
       !||--- calls      -----------------------------------------------------
       !||--- uses       -----------------------------------------------------
-      !||    rbmerge_mod     ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbmerge_mod     ../starter/source/constraints/general/merge/rbmerge_type.F90
       !||====================================================================
       RECURSIVE SUBROUTINE RBLEVELDOWN(NPBY,RBMERGE,IDRB,LEVEL)
 C-----------------------------------------------
@@ -739,7 +696,7 @@ C
       !||    spmdset                ../starter/source/constraints/general/rbody/spmdset.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    rbmerge_mod            ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbmerge_mod            ../starter/source/constraints/general/merge/rbmerge_type.F90
       !||====================================================================
       SUBROUTINE TRIRBMERGE(RBMERGE,NPBY   ,LPBY    ,SLRBODY,
      .                      RBY    ,NOM_OPT,ITAB    ,IBGR   ,IGRV   )
@@ -1034,7 +991,7 @@ C
       !||    trirbmerge    ../starter/source/constraints/general/merge/hm_read_merge.F
       !||--- calls      -----------------------------------------------------
       !||--- uses       -----------------------------------------------------
-      !||    rbmerge_mod   ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbmerge_mod   ../starter/source/constraints/general/merge/rbmerge_type.F90
       !||====================================================================
       RECURSIVE SUBROUTINE RB_EXPLORE(IDRB,RBMERGE,PILE,IDPILE)
 C-----------------------------------------------
@@ -1087,7 +1044,7 @@ C
       !||--- calls      -----------------------------------------------------
       !||--- uses       -----------------------------------------------------
       !||    message_mod    ../starter/share/message_module/message_mod.F
-      !||    rbmerge_mod    ../starter/source/constraints/general/merge/hm_read_merge.F
+      !||    rbmerge_mod    ../starter/source/constraints/general/merge/rbmerge_type.F90
       !||====================================================================
       SUBROUTINE RETRIRBY(NPBY ,LPBY ,RBY ,NOM_OPT)
 C-----------------------------------------------

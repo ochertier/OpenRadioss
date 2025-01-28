@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,12 +21,14 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    sboltlaw   ../engine/source/elements/solid/solide/sboltlaw.F
+      !||    sboltlaw         ../engine/source/elements/solid/solide/sboltlaw.F
       !||--- called by ------------------------------------------------------
-      !||    mmain      ../engine/source/materials/mat_share/mmain.F90
+      !||    mmain            ../engine/source/materials/mat_share/mmain.F90
       !||--- calls      -----------------------------------------------------
-      !||    mdtsph     ../engine/source/materials/mat_share/mdtsph.F
-      !||    mqviscb    ../engine/source/materials/mat_share/mqviscb.F
+      !||    mdtsph           ../engine/source/materials/mat_share/mdtsph.F
+      !||    mqviscb          ../engine/source/materials/mat_share/mqviscb.F
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
       SUBROUTINE SBOLTLAW(
      1   PM,      SIG,     MAT,     D1,
@@ -43,7 +45,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      C   AMU,     VOL_AVG, DTEL,    G_DT,
      D   OFF,     IPM,     RHOREF,  RHOSP,
      E   VOL0DP,  ISMSTR,  JSPH,    JTUR,
-     F   ITY,     JTHE,    JSMS,    NPG )
+     F   ITY,     JTHE,    JSMS,    NPG ,
+     G   glob_therm)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -88,6 +95,7 @@ C
      .   MSSA(*), DMELS(*),CONDE(*),AMU(*),VOL_AVG(*),DTEL(*),
      .   RHOREF(*)  ,RHOSP(*) 
       DOUBLE PRECISION VOL0DP(*) 
+      type (glob_therm_) ,intent(inout) :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -142,7 +150,7 @@ C
      9   FACQ0,   CONDE,   DTEL,    G_DT,
      A   IPM,     RHOREF,  RHOSP,   NEL,
      B   ITY,     ISMSTR,  JTUR,    JTHE,
-     C   JSMS,    NPG )
+     C   JSMS,    NPG   ,  glob_therm)
       ELSE
        CALL MDTSPH(
      1   PM,      OFF,     RHO,     BID1,

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,12 +50,15 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE S16FORC3(ELBUF_TAB,NG      ,
+      SUBROUTINE S16FORC3(TIMERS, ELBUF_TAB,NG      ,
      1                    PM       ,GEO     ,IXS    ,X       ,
      2                    A        ,V       ,MS     ,W       ,FLUX    ,
      3                    FLU1     ,VEUL    ,FV     ,ALE_CONNECT   ,IPARG   ,
@@ -76,11 +79,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      I                    IOUTPRT  ,MAT_ELEM,H3D_STRAIN  ,DT  ,SNPC  ,
      J                    STF      ,SBUFMAT,SVIS,NSVOIS,IDTMINS,IRESP,      
      .                    IDEL7NG,     IDEL7NOK,    IDTMIN,     MAXFUNC, 
-     .                    IMON_MAT ,USERL_AVAIL, heat_meca,     impl_s,
-     V                    idyna)
+     .                    IMON_MAT ,USERL_AVAIL, GLOB_THERM,     impl_s,
+     V                    idyna,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -88,6 +92,8 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE DT_MOD
       USE ELBUFDEF_MOD
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -114,6 +120,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER,INTENT(IN) :: SNPC
       INTEGER,INTENT(IN) :: STF
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -128,7 +135,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IXS(NIXS,*), IPARG(NPARG,NGROUP),NPF(*),
      .        IPARTS(*),IXS16(8,*),IADS16(8,*),IPM(*),GRTH(*),IGRTH(*),
      .        IGEO(*),IADS(8,*),ITASK,IOUTPRT
@@ -160,6 +166,8 @@ C-----------------------------------------------
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE(DT_), INTENT(INOUT) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -600,7 +608,7 @@ C
       !------------------------------------------------------
       !     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
       !------------------------------------------------------
-         CALL MMAIN(
+         CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -628,13 +636,13 @@ C
      P   BID,         IPARG(1,NG), IGEO,        CONDE,
      Q   ITASK,       NLOC_DMG,    VARNL,       MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        MVSIZ, 
-     *                SNPC,        STF,         SBUFMAT,
+     *   SNPC,        STF,         SBUFMAT,     GLOB_THERM,
      *   SVIS,        SZ_IX,       IRESP,
-     *   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     *   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT,         fheat   , OPT_MTN=MTN, OPT_JCVT=JCVT,
      .   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 c
@@ -672,7 +680,7 @@ C
      6   GBUF%EINT, GBUF%RHO,  GBUF%QVIS, GBUF%PLA,
      7   WI,        VOLG,      LBUF%VOL,  GBUF%VOL,
      8   L_PLA,     NEL,       CONDE,     DELTAX,
-     9   CONDEG,    ISRAT,     SVIS)
+     9   CONDEG,    ISRAT,     SVIS      ,GLOB_THERM%NODADT_THERM)
       !-------------------------
       !    finite element heat transfert  
       !--------------------------
@@ -685,14 +693,14 @@ C
      2            VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
      3            NI(1,IP),  DT1,       TEMP,      TEMPEL,
      4            FHEAT,     THEM,      GBUF%OFF,  LBUF%OFF,
-     5            NEL)
+     5            NEL        ,GLOB_THERM%THEACCFACT)
            ELSE
              CALL S20THERM(
      1            NPE,       PM,       IMAT,       NC,
      2            VOLN,      PX(1,1,IP),PY(1,1,IP),PZ(1,1,IP),
      3            NI(1,IP),  DT1,       TEMP,      TEMPEL,
      4            DIE,      THEM,      GBUF%OFF,  LBUF%OFF,
-     5            NEL)
+     5            NEL      ,GLOB_THERM%THEACCFACT)
            END IF
           ENDIF
         ENDDO   ! IL=1,NLAY
@@ -719,7 +727,7 @@ C
      .             VX     ,VY       ,VZ      ,IPARTS     ,GRESAV    ,
      .             GRTH   ,IGRTH    ,IEXPAN  ,GBUF%EINTTH, GBUF%FILL,
      .             XX     ,YY       ,ZZ      ,ITASK      ,IPARG(1,NG),
-     .             GBUF%OFF)
+     .             GBUF%OFF,SENSORS)
       ENDIF
 C
 c-----------------------------
@@ -733,14 +741,15 @@ c-----------------------------
      2   STIG,    FX,      FY,      FZ,
      3   IPERM1,  IPERM2,  NPE,     THEM,
      4   FTHE,    CONDN,   CONDEG,  NEL,
-     5   JTHE)
+     5   JTHE,    GLOB_THERM%NODADT_THERM)
       ELSE
         CALL S20CUMU3P(
      1   GBUF%OFF,     STIG,         FSKY,         FSKY,
      2   IADS(1,NF1),  FX,           FY,           FZ,
      3   IADS16(1,NF2),NC,           IPERM1,       IPERM2,
      4   NPE,          THEM,         FTHESKY,      CONDNSKY,
-     5   CONDEG,       NEL,          NFT,          JTHE)
+     5   CONDEG,       NEL,          NFT,          JTHE,
+     6   GLOB_THERM%NODADT_THERM)
       ENDIF
 C-----------
       RETURN

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,26 +36,29 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_tri24gat                ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri24vox                ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri24vox0               ../engine/source/mpi/interfaces/spmd_int.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
       !||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I24MAIN_TRI( 
+      SUBROUTINE I24MAIN_TRI(TIMERS, 
      1                  IPARI   ,X       ,V       ,INTBUF_TAB,
      2                  MS      ,NIN     ,ITASK   ,MWAG    ,WEIGHT  ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM ,
      4                  ITAB    ,KINET   ,TEMP    ,NRTM_T  ,RENUM   ,
      5                  NSNFIOLD,ESHIFT  ,NUM_IMP ,IND_IMP ,NODNX_SMS,
-     6                  H3D_DATA,T2MAIN_SMS,FORNEQS,T2FAC_SMS,PARAMETERS)
+     6                  H3D_DATA,T2MAIN_SMS,FORNEQS,T2FAC_SMS,PARAMETERS,
+     7                  INTHEAT,IDT_THERM,NODADT_THERM)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TRI7BOX
       USE MESSAGE_MOD
       USE IMP_INTBUF
@@ -63,6 +66,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE PARAMETERS_MOD
       use check_sorting_criteria_mod , only : check_sorting_criteria
+      USE TIMER_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,6 +90,7 @@ C common pour variable globale en memoire partagee
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER NIN ,ITASK, RETRI, NRTM_T,ESHIFT,
      .        NUM_IMP ,IND_IMP(*),
      .        ITAB(*), KINET(*),
@@ -93,6 +98,9 @@ C-----------------------------------------------
      .        ISENDTO(NINTER+1,*),IRCVFROM(NINTER+1,*),
      .        WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .        RENUM(NUMNOD), NSNFIOLD(NSPMD), NODNX_SMS(*), T2MAIN_SMS(6,*)
+      INTEGER, INTENT(IN) :: INTHEAT
+      INTEGER, INTENT(IN) :: IDT_THERM
+      INTEGER , INTENT(IN) :: NODADT_THERM
 C     REAL
       my_real 
      .    X(3,*), V(*), MS(*),TEMP(*),T2FAC_SMS(*)
@@ -284,7 +292,7 @@ C
         IF(ITASK==0) CRVOXEL(0:LRVOXEL,0:LRVOXEL,LOC_PROC)=0
 c        goto 150
         CALL MY_BARRIER
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,26)
 
         CALL SPMD_TRI24VOX0(
      1      X           ,BMINMA  ,NRTM_T,INTBUF_TAB%STFM(1+ESHIFT),MARGE ,
@@ -293,7 +301,7 @@ c        goto 150
      3      PMAX_GAP,VMAXDT      ,DGAPLOAD )
  
         CALL MY_BARRIER
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,26)
 
         IF(ITASK==0)THEN
 C
@@ -301,6 +309,8 @@ C recuperation des noeuds remote NSNR stockes dans XREM
 C
 
           INACTI=0
+          IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,25)
+        
           CALL SPMD_TRI24VOX(
      1      INTBUF_TAB%NSV,NSN     ,X            ,V            ,MS     ,
      2      BMINMA       ,WEIGHT  ,INTBUF_TAB%STFNS,NIN        ,ISENDTO,
@@ -315,6 +325,8 @@ C
      B      INTBUF_TAB%IS2ID,INTBUF_TAB%ISPT2,IPARI(72,NIN),INTBUF_TAB%IPARTFRICS,T2MAIN_SMS,
      C      INTNITSCHE      ,FORNEQS         ,T2FAC_SMS    ,IPARI(97,NIN)        ,INTBUF_TAB%STIFMSDT_S,
      D      IFSUB_CAREA     ,PARAMETERS%INTAREAN)
+           IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,25)
+       
 C
 C renumerotation locale des anciens candidats
 C
@@ -336,7 +348,7 @@ C Barrier comm spmd_tri7vox + BMINMA + Retour I7BUCE
 C      
  50   CALL MY_BARRIER
 C
-      IF (IMONM > 0) CALL STARTIME(30,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,30)
 C
       CALL I24BUCE(
      1 X      ,V           ,INTBUF_TAB%IRECTM(1+4*ESHIFT),INTBUF_TAB%NSV,
@@ -349,7 +361,8 @@ C
      7 I_MEM  ,INTBUF_TAB%PENE_OLD,ITAB          ,INTBUF_TAB%NBINFLG,INTBUF_TAB%MBINFLG,
      8 ILEV   ,INTBUF_TAB%MSEGTYP24,INTBUF_TAB%EDGE8L2 ,IEDGE        ,INTBUF_TAB%ISEADD,
      9 INTBUF_TAB%ISEDGE,INTBUF_TAB%CAND_T,FLAGREMN,INTBUF_TAB%KREMNODE(1+2*ESHIFT),INTBUF_TAB%REMNODE ,
-     A CAND_A,RENUM,NSNROLD,INTBUF_TAB%IRTSE,INTBUF_TAB%IS2SE,NSNE   ,DGAPLOAD)
+     A CAND_A,RENUM,NSNROLD,INTBUF_TAB%IRTSE,INTBUF_TAB%IS2SE,NSNE   ,DGAPLOAD,
+     B INTHEAT,IDT_THERM,NODADT_THERM)
 C
 C Upgrade MultiMP
       IF (I_MEM == 2)THEN
@@ -376,7 +389,7 @@ C        UPGRADE_MULTIMP routine !!!!
         GOTO 40
       ENDIF
 
-      IF (IMONM > 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,30)
 C
 #include "lockon.inc"
       RESULT        = RESULT + ILD
@@ -399,21 +412,21 @@ C mise a - de dist temporairement pour reperage dans partie frontiere
       IF(NSPMD>1)THEN
 C mono tache
 !$OMP SINGLE
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
         INTBUF_TAB%VARIABLES(distance_index) = - ONE
 C
         CALL SPMD_TRI24GAT(
      1      RESULT       ,NSN ,INTBUF_TAB%CAND_N,INTBUF_TAB%I_STOK(1),NIN,
      2      IPARI(21,NIN),NSNR,MULTIMP      ,NTY,IPARI(47,NIN),
      3      ILEV  ,IPARI(59,NIN) ,H3D_DATA  ,IPARI(72,NIN)    ,INTNITSCHE,
-     4      IPARI(97,NIN) ,IFSUB_CAREA)
+     4      IPARI(97,NIN) ,IFSUB_CAREA,NODADT_THERM)
         IPARI(24,NIN) = NSNR
 C
         IF (NTY==24.AND.RESULT==0.AND.IMPL_S>0.AND.IGSTI==6) THEN 
           STIF_OLDFI(NIN)%P(1,1:NSNR)=STIF_OLDFI(NIN)%P(2,1:NSNR)
         END IF
 C
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 !$OMP END SINGLE
       END IF
       IF(ITASK==0)DEALLOCATE(CAND_A)

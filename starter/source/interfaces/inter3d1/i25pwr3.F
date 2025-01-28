@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -115,7 +115,7 @@ C    .           'INACTI=3 IS NOT AVAILABLE FOR INTERFACE TYPE25'
 C            ELSE IF(INACTI==4) THEN
 C              CHANGE LES COORDONNEES DES NOEUDS MAIN
 C              WRITE(IOUT,'(A)')
-C    .           'INACTI=4 IS NOT AVAILABLE FOOR INTERFACE TYPE25'
+C    .           'INACTI=4 IS NOT AVAILABLE FOR INTERFACE TYPE25'
              ELSE IF(INACTI==5) THEN
 C              REDUCTION DU GAP
              ELSE IF(INACTI==-1) THEN

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -88,8 +88,26 @@
         integer        ,dimension(:) ,allocatable :: iparam  !< int  value viscosity parameter table
         integer        ,dimension(:) ,allocatable :: func    !< function table in viscosity models
         type(table_4d_),dimension(:) ,allocatable :: table   !< local function tables
-      
-      end type visc_param_   
+
+        contains
+          procedure :: destruct => destruct_visc_param
+
+      end type visc_param_
+
+
+      contains
+
+      !||====================================================================
+      !||    destruct_visc_param   ../common_source/modules/mat_elem/visc_param_mod.F90
+      !||====================================================================
+        subroutine destruct_visc_param(this)
+          implicit none
+          class(visc_param_) ,intent(inout) :: this
+          if(allocated(this%uparam)) deallocate(this%uparam)
+          if(allocated(this%iparam)) deallocate(this%iparam)
+          if(allocated(this%func)) deallocate  (this%func)
+          if(allocated(this%table)) deallocate (this%table)
+        end subroutine destruct_visc_param
 !
 !---------------
       end module visc_param_mod

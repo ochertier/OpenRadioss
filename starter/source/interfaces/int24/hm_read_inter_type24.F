@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,14 +36,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    format_mod             ../starter/share/modules1/format_mod.F90
       !||    message_mod            ../starter/share/message_module/message_mod.F
       !||    reader_old_mod         ../starter/share/modules1/reader_old_mod.F90
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE HM_READ_INTER_TYPE24(
      1        IPARI      ,STFAC           ,FRIGAP     ,NOINT      ,NI         ,
      2        IGRNOD     ,IGRSURF         ,XFILTR     ,FRIC_P     ,DEF_INTER ,
      3        SENSORS    ,NOM_OPT         ,UNITAB     ,LSUBMODEL  ,TITR      ,
-     4        NOM_OPTFRIC,INTBUF_FRIC_TAB ,PARAMETERS ,NPARI      ,NPARIR    )
+     4        NOM_OPTFRIC,INTBUF_FRIC_TAB ,PARAMETERS ,NPARI      ,NPARIR    ,
+     5        ITHERM_FE  ,INTHEAT)
 C============================================================================
 C     
 C-----------------------------------------------
@@ -76,7 +76,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,INTENT(IN) :: NPARI,NPARIR !< array size
+      INTEGER,INTENT(IN)    :: NPARI,NPARIR !< array size
+      INTEGER,INTENT(IN)    :: ITHERM_FE
+      INTEGER,INTENT(INOUT) :: INTHEAT
       INTEGER NOM_OPT(LNOPT1,*), NOM_OPTFRIC(LNOPT1,*)
       INTEGER ISU1,ISU2,NI
       INTEGER IPARI(NPARI),DEF_INTER(100)
@@ -567,9 +569,8 @@ c        IF (BCFLAGM(LFIELD-1:LFIELD-1)== '1') IBC2M = 1
 c        IF (BCFLAGM(LFIELD  :LFIELD  )== '1') IBC3M = 1
 
         IF (IIMPLICIT>0.AND.INACTI==0) INACTI=-1
-        IF (INACTI/=0.AND.INACTI/=1.AND.INACTI/=-1.AND.INACTI/=3
-     .      .AND.INACTI/=5) THEN
-            IF (INACTI==6) THEN
+        IF (INACTI/=0.AND.INACTI/=-1.AND.INACTI/=5) THEN
+            IF (INACTI>0) THEN
                INACTI = 5
             ELSE
                INACTI = 0

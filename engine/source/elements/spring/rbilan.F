@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
       !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+      !||--- uses       -----------------------------------------------------
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE RBILAN(
      1   EINT,    PARTSAV, IXR,     GEO,
      2   V,       IPARTR,  AL0,     GRESAV,
      3   GRTH,    IGRTH,   OFF_DUM, NC1,
      4   NC2,     X,       VR,      ITASK,
-     5   NEL,     IGRE)
+     5   NEL,     IGRE,    SENSORS)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,6 +65,7 @@ C     REAL
       my_real
      .   GEO(NPROPG,*),EINT(*),PARTSAV(NPSAV,*),V(3,*), AL0(*),
      .   GRESAV(*),OFF_DUM(*),X(3,*),VR(3,*)
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -220,7 +227,7 @@ C
       ENDDO
 
       OFF(1:MVSIZ) = ONE
-      CALL SENSOR_ENERGY_BILAN(1,NEL,EINT,EK,OFF,IPARTR,ITASK) 
+      CALL SENSOR_ENERGY_BILAN(1,NEL,EINT,EK,OFF,IPARTR,ITASK,SENSORS) 
 C
       RETURN
       END

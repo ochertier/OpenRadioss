@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -36,11 +36,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    delamination     ../engine/source/properties/composite_options/stack/delamination.F
       !||    finter           ../engine/source/tools/curve/finter.F
       !||    layini           ../engine/source/elements/shell/coque/layini.F
-      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc           ../engine/source/materials/mat_share/mulawc.F90
       !||    mulawglc         ../engine/source/materials/mat_share/mulawglc.F
       !||    put_etfac        ../engine/source/elements/solid/solide8z/put_etfac.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
       !||    thermexpc        ../engine/source/materials/mat_share/thermexpc.F
       !||    usermat_shell    ../engine/source/materials/mat_share/usermat_shell.F
       !||--- uses       -----------------------------------------------------
@@ -49,13 +47,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod     ../common_source/modules/failwave_mod.F
       !||    mat_elem_mod     ../common_source/modules/mat_elem/mat_elem_mod.F90
-      !||    mulawc_mod       ../engine/source/materials/mat_share/mulawc.F
+      !||    mulawc_mod       ../engine/source/materials/mat_share/mulawc.F90
       !||    nlocal_reg_mod   ../common_source/modules/nlocal_reg_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||    stack_mod        ../engine/share/modules/stack_mod.F
       !||    table_mod        ../engine/share/modules/table_mod.F
+      !||    timer_mod        ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE CMAIN3 (
+      SUBROUTINE CMAIN3 (TIMERS,
      1           ELBUF_STR ,JFT       ,JLT       ,NFT       ,IPARG      ,
      2           NEL       ,MTN       ,IPLA      ,ITHK      ,GROUP_PARAM,
      3           PM        ,GEO       ,NPF       ,TF        ,BUFMAT     ,
@@ -68,7 +67,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A           G         ,A11       ,A12       ,VOL0      ,INDXDEL    ,
      B           NGL       ,ZCFAC     ,SHF       ,GS        ,EPSP       ,
      C           KFTS      ,JHBE      ,ALPE      ,
-     D           DIR_A     ,DIR_B     ,IGEO      ,
+     D           DIR_A     ,DIR_B     ,IGEO      ,  
      E           IPM       ,IFAILURE  ,NPG       ,FHEAT     ,
      F           TEMPEL    ,DIE       ,JTHE      ,IEXPAN    ,TEMPEL0    ,
      G           ISHPLYXFEM,PLY_EXX   ,
@@ -76,15 +75,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      I           DEL_PLY   ,TH_IPLY   ,SIG_IPLY  ,E1X       ,E1Y        ,
      J           E1Z       ,E2X       ,E2Y       ,E2Z       ,E3X        ,
      K           E3Y       ,E3Z       ,NG        ,TABLE     ,IXFEM      ,
-     L           OFFI      ,SENSORS   ,A11_IPLY  ,ELCRKINI   ,
-     M           DIR1_CRK  ,DIR2_CRK  ,ALDT      ,
+     L           OFFI      ,SENSORS   ,A11_IPLY  ,ELCRKINI  ,
+     M           DIR1_CRK  ,DIR2_CRK  ,ALDT      ,IDT_THERM ,THEACCFACT ,
      N           ISMSTR    ,IR        ,IS        ,NLAY      ,NPT        ,
      O           IXLAY     ,IXEL      ,ISUBSTACK ,STACK     ,
      P           F_DEF     ,ITASK     ,DRAPE     ,VARNL     ,NLOC_DMG   ,
-     R           INDX_DRAPE,THKE      ,SEDRAPE   ,NUMEL_DRAPE,DT        )
+     R           INDX_DRAPE,THKE      ,SEDRAPE   ,NUMEL_DRAPE,DT        ,
+     Q           NCYCLE    , SNPC     ,STF       ,NXLAYMAX  ,IDEL7NOK   ,
+     S           USERL_AVAIL, MAXFUNC ,VARNL_NPTTOT, SBUFMAT   ,SDIR_A    ,
+     T          SDIR_B  )
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
+      USE TIMER_MOD
       USE MULAWC_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD
@@ -115,14 +118,27 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
+      INTEGER,INTENT(IN)    :: USERL_AVAIL ! Flag for User libraries availability
+      INTEGER,INTENT(IN)    :: MAXFUNC     ! Maximum number of functions
+      INTEGER,INTENT(INOUT) :: IDEL7NOK    ! Element deletion flag for IDEL flag in contact interfaces
+      INTEGER,INTENT(IN) :: NXLAYMAX       ! XFEM : maximum number of layers
+      INTEGER,INTENT(IN) :: VARNL_NPTTOT   ! Total number of integration points
+      INTEGER,INTENT(IN) :: SBUFMAT        ! Size of BUFMAT
+      INTEGER,INTENT(IN) :: SDIR_A         ! Size of DIR_A
+      INTEGER,INTENT(IN) :: SDIR_B         ! Size of DIR_B
+      INTEGER,INTENT(IN) :: STF            ! Size of TF
+      INTEGER,INTENT(IN) :: SNPC           ! Size of NPF
       INTEGER JFT,JLT,NFT,IR,IS,NPT,NG,NPG,NLAY,NEL,MTN,IPLA,IOFC,ITHK,
      .   KFTS,JHBE,IFAILURE,JTHE,IEXPAN,ISHPLYXFEM,ISMSTR,
-     .   IXLAY,IXEL,IXFEM,ISUBSTACK,ITASK  
+     .   IXLAY,IXEL,IXFEM,ISUBSTACK,ITASK , NCYCLE
       INTEGER ,    INTENT(IN)     ::        SEDRAPE,NUMEL_DRAPE
       INTEGER MAT(MVSIZ), PID(MVSIZ), INDXDEL(MVSIZ), NGL(MVSIZ),NPF(*), 
      .   IGEO(NPROPGI,*),IPM(NPROPMI,*),IPARG(*),
      .   A11_IPLY(MVSIZ,*),ELCRKINI(*),FWAVE_EL(NEL)
       INTEGER , DIMENSION(SEDRAPE) :: INDX_DRAPE
+      INTEGER, INTENT(IN) :: IDT_THERM
+      my_real ,intent(in) :: THEACCFACT
       my_real
      .   PM(NPROPM,*), GEO(NPROPG,*),TF(*),THK(*),EINT(JLT,*),FOR(NEL,5), 
      .   MOM(NEL,3),EPSP(*),GSTR(NEL,8),BUFMAT(*),G(*),A11(*),A12(*),VOL0(*),
@@ -130,7 +146,7 @@ C-----------------------------------------------
      .   OFF(MVSIZ) ,THK0(MVSIZ) ,NU(MVSIZ),DT1C(MVSIZ),
      .   EXX(MVSIZ), EYY(MVSIZ), EXY(MVSIZ), EXZ(MVSIZ), EYZ(MVSIZ),
      .   KXX(MVSIZ), KYY(MVSIZ), KXY(MVSIZ), AREA(MVSIZ),
-     .   ZCFAC(MVSIZ,2),ALPE(MVSIZ),DIR_A(*),DIR_B(*),TEMPEL(*),DIE(*),
+     .   ZCFAC(MVSIZ,2),ALPE(MVSIZ),DIR_A(SDIR_A),DIR_B(SDIR_B),TEMPEL(*),DIE(*),
      .   TEMPEL0(MVSIZ), PLY_F(MVSIZ,5,*),
      .   PLY_EXX(MVSIZ,*),PLY_EYY(MVSIZ,*),PLY_EXY(MVSIZ,*), 
      .   PLY_EXZ(MVSIZ,*),PLY_EYZ(MVSIZ,*),DEL_PLY(MVSIZ,3,*) ,
@@ -261,7 +277,7 @@ c
      .              ISUBSTACK,STACK    ,DRAPE    ,NFT      ,THKE      ,
      .              NEL      ,THK_LY   ,INDX_DRAPE,SEDRAPE ,NUMEL_DRAPE)
 c
-        CALL USERMAT_SHELL (ELBUF_STR  ,MAT_ELEM,
+        CALL USERMAT_SHELL (TIMERS, ELBUF_STR  ,MAT_ELEM,
      1       JFT     ,JLT     ,NEL     ,PM      ,FOR     ,MOM     ,
      2       GSTR    ,THK     ,EINT    ,OFF     ,DIR_A   ,DIR_B   ,
      3       MAT     ,AREA    ,EXX     ,EYY     ,EXY     ,EXZ     ,
@@ -292,7 +308,7 @@ c----------------------------
      .              ISUBSTACK,STACK    ,DRAPE    ,NFT     ,THKE       ,
      .              NEL      ,THK_LY   ,INDX_DRAPE, SEDRAPE,NUMEL_DRAPE)
 c 
-        CALL MULAWC(ELBUF_STR ,
+        CALL MULAWC(TIMERS,ELBUF_STR ,
      1       JFT     ,JLT     ,NEL     ,PM      ,FOR     ,MOM     ,
      2       GSTR    ,THK     ,EINT    ,OFF     ,DIR_A   ,DIR_B   ,
      3       MAT     ,AREA    ,EXX     ,EYY     ,EXY     ,EXZ     ,
@@ -303,15 +319,19 @@ c
      8       SHF     ,GS      ,SIGY    ,THK0    ,EPSP    ,
      9       POSLY   ,IGEO    ,IPM     ,FAILWAVE,FWAVE_EL,
      A       IFAILURE,ALDT    ,TEMPEL  ,DIE     ,FHEAT   ,
-     B       E1X     ,E1Y     ,E1Z     ,E2X     ,E2Y     ,E2Z     ,
-     C       E3X     ,E3Y     ,E3Z     ,TABLE   ,IXFEM   ,ELCRKINI,
-     D       SENSORS ,NG      ,
+     B       TABLE   ,IXFEM   ,ELCRKINI,
+     D       SENSORS ,NG      ,IDT_THERM,THEACCFACT,  
      E       DIR1_CRK,DIR2_CRK,IPARG   ,JHBE    ,ISMSTR  ,JTHE    ,
      F       TENS    ,IR      ,IS      ,NLAY    ,NPT     ,IXLAY   ,
      G       IXEL    ,ITHK    ,F_DEF   ,ISHPLYXFEM,
-     H       ITASK   ,STACK%PM ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
+     H       ITASK   ,ISUBSTACK,STACK ,TSTAR   ,ALPE    ,
      I       PLY_EXX ,PLY_EYY ,PLY_EXY ,PLY_EXZ ,PLY_EYZ ,PLY_F   ,
-     J       VARNL   ,ETIMP   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX,DT    )
+     J       VARNL   ,ETIMP   ,NLOC_DMG,NLAY_MAX,LAYNPT_MAX ,DT,
+     K       NCYCLE  ,SNPC    ,STF,IMPL_S  ,IMCONV  ,NPROPGI,
+     *       NPROPMI ,NPROPM  ,NPROPG,IMON_MAT,NUMGEO  ,
+     *       NUMSTACK, DT1    ,TT  ,NXLAYMAX ,IDEL7NOK,USERL_AVAIL,
+     *       MAXFUNC,NUMMAT,VARNL_NPTTOT,    SBUFMAT ,SDIR_A  ,SDIR_B  ,NPARG,
+     *       NTABLE  )
       ENDIF ! IF (NPT == 0) 
 C----------------------------------------------------------------------
       IF (IEXPAN > 0 .AND. JTHE > 0. AND. IDT_THERM==0) THEN
@@ -331,12 +351,6 @@ C----------------------------------------------------------------------
          ENDDO  
        ENDIF  
 C-------------------------------------------------------------------
-      IF ((ITASK==0).AND.(IMON_MAT==1))CALL STARTIME(121,1)
-C----------------------------------------------------------------------
-c     old failure calls cleaned - now obsolete
-C-----------------------------------------------
-      IF ((ITASK==0).AND.(IMON_MAT==1))CALL STOPTIME(121,1)
-C-----------------------------------------------
 C     delamination  for new formulation of shells 
 C-----------------------------------------------
       IF (ISHPLYXFEM > 0) THEN

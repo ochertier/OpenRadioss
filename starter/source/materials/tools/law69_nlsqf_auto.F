@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -91,7 +91,7 @@ C-----------------------------------------------
       !!     we don't want to check, because invalid initial point
       !!     could converge to valid point
       ICHECK_GUESS = 0
-      !!    if enforce mu(i) < mu(i+1) in generating initial gess
+      !!    if enforce mu(i) < mu(i+1) in generating initial guess
       !!    we don't need this anymore since we are using random numbers 
       !!    instead of loop through all
       !!    the combinations
@@ -130,6 +130,7 @@ C=======================================================================
       JCHECK = 2  ! stating Criteria 
       IFUNCS = 1
       LMSTOP =0
+      ERRAVE_MIN = HUGE(ERRAVE_MIN)
       DO WHILE(IFIT_SUCCESS == 0 )  ! f
         IF(IEND_ITER <= 1) THEN
           DO I=1,NMUAL 

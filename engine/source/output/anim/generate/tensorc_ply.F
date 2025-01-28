@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,20 +31,24 @@ C available just with ply/xfem formulation
       !||    write_r_c          ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    matparam_def_mod   ../common_source/modules/mat_elem/matparam_def_mod.F90
+      !||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
       !||    plyxfem_mod        ../engine/share/modules/plyxfem_mod.F
       !||    stack_mod          ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE TENSORC_PLY(IPLY,  NEL_PLY, ELBUF_TAB, IPARG,
      1                       ITENS, INVERT,  EL2FA, NBF,
      2                       TENS,  EPSDOT,  IADP,  NBF_L,
-     3                       NBPART,IADG,    X,     IXC,
+     3                       NBPART,IADG,    X,     IXC,MAT_PARAM,
      4                       IGEO,  IXTG, NBF_PXFEMG, IPM  ,STACK)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE ELBUFDEF_MOD
+      USE MATPARAM_DEF_MOD
       USE PLYXFEM_MOD
       USE STACK_MOD
+      USE my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -70,6 +74,7 @@ C     REAL
       my_real
      .   TENS(3,*),EPSDOT(6,*), X(3,*)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
       TYPE (STACK_PLY) :: STACK
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -88,11 +93,12 @@ C     REAL
      .        ELC,PLYELEMS(NUMELC),PLYS,IFAILURE,IVISC,NUVARV,
      .        MAT(MVSIZ),PID(MVSIZ),IGTYP,IADR,MATLY,IPMAT,
      .        IIGEO,IADI,ISUBSTACK,IPMAT_IPLY
-      REAL WA(3,NBF_L)
+      REAL,DIMENSION(:,:),ALLOCATABLE:: WA
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF
 C-----------------------------------------------
+      CALL MY_ALLOC(WA,3,NBF_L)
 !
       NEL_PLY = 0
 
@@ -386,8 +392,10 @@ c------------
                      IADR = (N-1)*NEL                       
                       DO I=1,NEL                          
                         MATLY   = STACK%IGEO(IPMAT+N,ISUBSTACK)
-                        NUVARV =  MAX(NUVARV, IPM(225,MATLY)) 
-                        IF(IPM(222,MATLY) > 0 ) IVISC = 1
+                        IF (MAT_PARAM(MATLY)%IVISC > 0) THEN
+                          IVISC  = 1
+                          NUVARV =  MAX(NUVARV, MAT_PARAM(MATLY)%VISC%NUVAR) 
+                        END IF
                       END DO                                
                   END DO                                       
               END IF  
@@ -578,5 +586,6 @@ C
          CALL SPMD_R4GET_PARTN(3,3*NBF_L,NPLYPART,IADG,WA,BUF)
       ENDIF
 
+      DEALLOCATE(WA)
       RETURN
       END

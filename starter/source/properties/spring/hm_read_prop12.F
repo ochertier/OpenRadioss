@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -273,7 +273,7 @@ C----
       GEO(139) = FMAX
       GEO(140) = YSCALEF
       IGEO(3) = ISENS
-C--   If H=6 - addditional internal variables must be stored in UVAR -  - GEO(25) = NUVAR
+C--   If H=6 - additional internal variables must be stored in UVAR -  - GEO(25) = NUVAR
       IF (IECROU == 6) THEN
         GEO(25) = 1
       ENDIF

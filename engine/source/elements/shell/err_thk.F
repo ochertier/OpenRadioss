@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,48 +21,29 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    err_thk_mod   ../engine/source/elements/shell/err_thk.F
-      !||--- called by ------------------------------------------------------
-      !||    err_thk       ../engine/source/elements/shell/err_thk.F
-      !||====================================================================
-      MODULE ERR_THK_MOD
-#include "my_real.inc"
-
-        my_real , 
-     .    DIMENSION(:), ALLOCATABLE :: 
-     .      THICK_SH4, THICK_SH3,
-     .      THICK_NOD, AREA_NOD
-        my_real , 
-     .    DIMENSION(:), ALLOCATABLE :: 
-     .      AREA_SH4, AREA_SH3
-
-      END MODULE ERR_THK_MOD
-      !||====================================================================
       !||    err_thk             ../engine/source/elements/shell/err_thk.F
       !||--- called by ------------------------------------------------------
       !||    resol               ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
       !||    admthke             ../engine/source/model/remesh/admthke.F
-      !||    ancmsg              ../engine/source/output/message/message.F
-      !||    arret               ../engine/source/system/arret.F
       !||    my_barrier          ../engine/source/system/machine.F
       !||    spmd_exch_nodarea   ../engine/source/mpi/anim/spmd_exch_nodarea.F
       !||    startimeg           ../engine/source/system/timer.F
       !||    stoptimeg           ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod        ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    err_thk_mod         ../engine/source/elements/shell/err_thk.F
       !||    message_mod         ../engine/share/message_module/message_mod.F
       !||====================================================================
       SUBROUTINE ERR_THK(
      .             IXC     ,IXTG    ,IPARG   ,IAD_ELEM,FR_ELEM ,
      .             WEIGHT  ,X       ,ELBUF_TAB,IPART   ,IPARTC  ,
      .             IPARTTG ,ITASK   ,NODFT   ,NODLT   ,ERR_THK_SH4,
-     .             ERR_THK_SH3,SH4TREE,SH3TREE)
+     .             ERR_THK_SH3,SH4TREE,SH3TREE,
+     .             AREA_SH4,  AREA_SH3,  AREA_NOD,
+     .             THICK_SH4, THICK_SH3, THICK_NOD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ERR_THK_MOD
       USE MESSAGE_MOD
       USE ELBUFDEF_MOD
 C-----------------------------------------------
@@ -93,6 +74,12 @@ C     REAL
       my_real
      .   X(3,*), ERR_THK_SH4(*), ERR_THK_SH3(*)
       TYPE(ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
+      my_real, INTENT(INOUT),DIMENSION(NUMELC) :: AREA_SH4
+      my_real, INTENT(INOUT),DIMENSION(NUMELTG) :: AREA_SH3
+      my_real, INTENT(INOUT),DIMENSION(NUMNOD) :: AREA_NOD
+      my_real, INTENT(INOUT),DIMENSION(NUMELC) :: THICK_SH4
+      my_real, INTENT(INOUT),DIMENSION(NUMELTG) :: THICK_SH3
+      my_real, INTENT(INOUT),DIMENSION(NUMNOD) :: THICK_NOD
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -105,22 +92,8 @@ C     REAL
      .     X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,X4,Y4,Z4,
      .     X31,Y31,Z31,X42,Y42,Z42,X32,Y32,Z32,E3X,E3Y,E3Z,
      .     TN1,TN2,TN3,TN4,TPG1,TPG2,TPG3,TPG4,UNT
-      TYPE(G_BUFEL_) ,POINTER :: GBUF     
+      TYPE(G_BUFEL_) ,POINTER :: GBUF
 C-----------------------------------------------
-      IF(ITASK==0)THEN
-        ALLOCATE(
-     .   AREA_SH4(NUMELC), AREA_SH3(NUMELTG), AREA_NOD(NUMNOD),
-     .   THICK_SH4(NUMELC), THICK_SH3(NUMELTG), THICK_NOD(NUMNOD),
-     .   STAT=IERROR)
-C
-        IF(IERROR/=0) THEN
-          CALL ANCMSG(MSGID=71,ANMODE=ANINFO_BLIND,
-     .                I1=IERROR)
-          CALL ARRET(2)
-        END IF
-      END IF
-C
-      CALL MY_BARRIER
 C
       SH4FT = 1+ITASK*NUMELC/ NTHREAD
       SH4LT = (ITASK+1)*NUMELC/NTHREAD
@@ -364,13 +337,6 @@ C
  250  CONTINUE
       END DO
 C
-      CALL MY_BARRIER
-C
-
-      IF(ITASK==0)
-     .   DEALLOCATE(AREA_SH4, AREA_SH3, AREA_NOD,
-     .   THICK_SH4, THICK_SH3, THICK_NOD)
-
       RETURN
       END
 

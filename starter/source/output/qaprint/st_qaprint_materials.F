@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -66,6 +66,7 @@ C-----------------------------------------------
       IF (OK_QA) THEN
         DO MY_MAT=1,NUMMAT-1 ! Do not write global material
           CALL FRETITL2(TITR,IPM(NPROPMI-LTITR+1,MY_MAT),LTITR)
+          TITR = MAT_ELEM%MAT_PARAM(MY_MAT)%TITLE
 
 C         Le Titr du MAT sert de nom de la variable dans le ref.extract , suivi de l'ID du MAT 
 C         2 MATs peuvent avoir le meme titre
@@ -191,7 +192,6 @@ c         MULTIMAT
 c-----------------------------
           NBMAT = MAT_ELEM%MAT_PARAM(MY_MAT)%MULTIMAT%NB
           IF (NBMAT > 0) THEN
-            CALL QAPRINT('** MULTIMAT PARAM',I,0.0_8)
             DO J=1,NBMAT
               MID   = MAT_ELEM%MAT_PARAM(MY_MAT)%MULTIMAT%MID(J)
               TEMP_DOUBLE = MAT_ELEM%MAT_PARAM(MY_MAT)%MULTIMAT%VFRAC(J)

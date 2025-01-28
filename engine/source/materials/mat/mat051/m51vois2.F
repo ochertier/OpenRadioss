@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,13 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    m51vois2               ../engine/source/materials/mat/mat051/m51vois2.F
+      !||    m51vois2                     ../engine/source/materials/mat/mat051/m51vois2.F
       !||--- called by ------------------------------------------------------
-      !||    sigeps51               ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51_boundary_material   ../engine/source/materials/mat/mat051/sigeps51_boundary_material.F90
       !||--- uses       -----------------------------------------------------
-      !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
-      !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
-      !||    multimat_param_mod     ../common_source/modules/multimat_param_mod.F90
+      !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
+      !||    elbufdef_mod                 ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
       !||====================================================================
       SUBROUTINE M51VOIS2(PM     ,IPARG  ,IXQ    ,ALE_CONNECT ,ELBUF_TAB,V     ,
      2                    X      ,VN     ,W      ,VEL         ,VD2   ,
@@ -85,6 +85,13 @@ C-----------------------------------------------
       DATA ICF/1,2,2,3,3,4,4,1/
       ILAY = 1
 C-----------------------------------------------
+      IFORM = -HUGE(IFORM)
+      ML = 0
+      IVOI = -HUGE(IVOI)
+      ISUB_BIJ(1:4) = -HUGE(ISUB_BIJ(1))
+      KTY = -HUGE(KTY)
+      KLT = -HUGE(KLT)
+      MFT = -HUGE(MFT)
       DO I=1,NEL
        II     = I+NFT
        IAD2 = ALE_CONNECT%ee_connect%iad_connect(II)
@@ -121,7 +128,7 @@ C-----------------------------------------------
        ENDDO
 
        IF(ML == 51 .AND. IFORM<=1)THEN
-         IX1 = IXQ(ICF(1,J)+1,II)
+         IX1 = IXQ(ICF(1,J)+1,II) 
          IX2 = IXQ(ICF(2,J)+1,II)
          XN   = ZERO
          YN   = (-X(3,IX2)+X(3,IX1))

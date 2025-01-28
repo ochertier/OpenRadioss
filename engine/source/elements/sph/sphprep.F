@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,26 +20,11 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-
-
-      !||====================================================================
-      !||    mod_sphprep   ../engine/source/elements/sph/sphprep.F
-      !||--- called by ------------------------------------------------------
-      !||    sphprep       ../engine/source/elements/sph/sphprep.F
-      !||====================================================================
-      module MOD_SPHPREP
-      implicit none
-      INTEGER, DIMENSION(:), ALLOCATABLE :: WREDUCE
-      END MODULE MOD_SPHPREP
-
-
       !||====================================================================
       !||    sphprep              ../engine/source/elements/sph/sphprep.F
       !||--- called by ------------------------------------------------------
       !||    resol                ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
-      !||    ancmsg               ../engine/source/output/message/message.F
-      !||    arret                ../engine/source/system/arret.F
       !||    my_barrier           ../engine/source/system/machine.F
       !||    soltosph_on1         ../engine/source/elements/sph/soltosph_on1.F
       !||    soltosph_on12        ../engine/source/elements/sph/soltosph_on1.F
@@ -63,16 +48,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sponof2              ../engine/source/elements/sph/sponof2.F
       !||    spsym_alloc          ../engine/source/elements/sph/spsym_alloc.F
       !||    spsymp               ../engine/source/elements/sph/spsym.F
-      !||    startime             ../engine/source/system/timer.F
-      !||    stoptime             ../engine/source/system/timer.F
+      !||    startime             ../engine/source/system/timer_mod.F90
+      !||    stoptime             ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    groupdef_mod         ../common_source/modules/groupdef_mod.F
       !||    message_mod          ../engine/share/message_module/message_mod.F
-      !||    mod_sphprep          ../engine/source/elements/sph/sphprep.F
       !||    sph_struct_mod       ../engine/share/modules/sph_struct_mod.F
+      !||    sph_work_mod         ../common_source/modules/mat_elem/sph_work.F90
+      !||    timer_mod            ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SPHPREP(
+      SUBROUTINE SPHPREP(TIMERS,
      1    PM      ,GEO     ,X       ,V       ,MS      ,
      2    ELBUF_TAB,WA      ,PLD     ,BUFMAT  ,PARTSAV ,
      3    IPARG   ,NPC     ,IPART   ,ITAB    ,BUFGEO  ,
@@ -84,12 +70,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9    GAUGE   ,NGROUNC ,IGROUNC ,SOL2SPH ,SPH2SOL ,
      A    IXS     ,IADS    ,ADDCNE  ,FSKYD   ,DMSPH   ,
      B    WASPACT ,ICONTACT,OFF_SPH_R2R,WSMCOMP,IRUNN_BIS,
-     C    SPH_IORD1)
+     C    SPH_IORD1,SPH_WORK,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
+      USE SPH_WORK_MOD
       USE ELBUFDEF_MOD            
-      USE MOD_SPHPREP
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SPH_STRUCT_MOD
@@ -117,6 +104,7 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER IPART(LIPART1,*),NPC(*),IPARG(NPARG,*),IPARTSP(*),ITAB(*),
      .    KXSP(NISP,*),IXSP(KVOISPH,*),NOD2SP(*),
      .    ISPCOND(NISPCOND,*),ISPSYM(NSPCOND,*),
@@ -143,6 +131,8 @@ C     REAL
       END TYPE SPSYM_STRUCT
       TYPE (SPSYM_STRUCT) :: XSPSYM,VSPSYM,WSMCOMP
       TYPE (SURF_)   , DIMENSION(NSURF)   :: IGRSURF
+      TYPE (SPH_WORK_)  :: SPH_WORK
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -176,16 +166,10 @@ C      /---------------/
       END IF
 
       IF(ITASK==0)THEN
-        ALLOCATE(WREDUCE(NUMSPH),STAT=IERROR)
         IF(.NOT.ALLOCATED(BOOL_SPH_SORT)) THEN
             ALLOCATE( BOOL_SPH_SORT(NUMSPH) )
             BOOL_SPH_SORT(1:NUMSPH) = .FALSE.
         ENDIF
-        IF(IERROR/=0) THEN
-          CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .                C1='(SPH)')
-          CALL ARRET(2)
-        END IF
 
         IF(NSPHIO==0)THEN
           NSP2SORT=0
@@ -202,7 +186,7 @@ C         Traitement des INLETS.
      3           PLD     ,IPARG   ,ELBUF_TAB,ISPHIO  ,VSPHIO  ,
      4           PM      ,IPART   ,IPARTSP ,IGRSURF ,
      5           LPRTSPH ,LONFSPH ,WA ,WA(NUMSPH+1),WASPH(KVNORM),
-     6           XDP,IBUFSSG_IO, OFF_SPH_R2R)
+     6           XDP,IBUFSSG_IO, OFF_SPH_R2R,WFEXT)
           NSP2SORT=0
           DO IPRT=1,NPART
             DO K=LPRTSPH(2,IPRT-1)+1,LPRTSPH(1,IPRT)
@@ -337,12 +321,12 @@ C    /---------------/
 
       IF (ITASK/= 0) ISORTSP = ISORTSPG
 
-      WREDUCE(1+ITASK*NUMSPH/NTHREAD:(ITASK+1)*NUMSPH/NTHREAD)=0
+      SPH_WORK%WREDUCE(1+ITASK*NUMSPH/NTHREAD:(ITASK+1)*NUMSPH/NTHREAD)=0
       
 C    /---------------/
       CALL MY_BARRIER
 C    /---------------/
-      IF(ITASK==0)CALL STARTIME(90,1)
+      IF(ITASK==0)CALL STARTIME(TIMERS,90)
       IF(ISORTSP==1)THEN
           IF(ISPMD==0.and.ITASK == 0)THEN
             WRITE(ISTDO,*)
@@ -358,7 +342,7 @@ C
           SPATRUE=SPASORT
 C
 C init DBUC, MIN/MAX + recherche cell remote si spmd 
-          CALL SPHTRI0(X   ,SPBUF,KXSP,WSP2SORT,BMINMA ,DMAX,
+          CALL SPHTRI0(TIMERS, X   ,SPBUF,KXSP,WSP2SORT,BMINMA ,DMAX,
      2                 NSP2SORTF,NSP2SORTL,NSP2SORT,ITASK, DBUC)
 C
 C         Tri + Recherche des voisins non nuls
@@ -366,7 +350,7 @@ C
           IF(NSP2SORT>0)
      1      CALL SPHTRI(X       ,SPBUF   ,KXSP   ,IXSP  ,NOD2SP,
      2                  IREDUCE ,WSP2SORT ,BMINMA ,NSP2SORTF,NSP2SORTL,
-     3                  ITASK   ,WREDUCE ,LGAUGE ,GAUGE    )
+     3                  ITASK   ,SPH_WORK%WREDUCE ,LGAUGE ,GAUGE    )
 C barriere a la fin de sptrivox (necessaire pour IREDUCE global)
 
 #include "lockon.inc"
@@ -380,22 +364,22 @@ C         /---------------/
             IF(ITASK==0)THEN
 C
               IF(IMONM == 2)THEN
-                CALL STARTIME(95,1)
+                CALL STARTIME(TIMERS,95)
                 CALL SPMD_BARRIER()
-                CALL STOPTIME(95,1)
+                CALL STOPTIME(TIMERS,95)
               END IF
-              CALL STARTIME(91,1)
+              CALL STARTIME(TIMERS,91)
 C Compactage des structures spmd pour cell remote + renumerotation IXSP + maj IREDUCE
 C            
               CALL SPMD_SPHGAT(KXSP,IXSP,WSP2SORT,ISPHRED,LGAUGE)
-              CALL STOPTIME(91,1)
+              CALL STOPTIME(TIMERS,91)
             END IF
           ENDIF
       ENDIF
 C    /---------------/
       CALL MY_BARRIER
 C    /---------------/
-      IF(ITASK==0)CALL STOPTIME(90,1)
+      IF(ITASK==0)CALL STOPTIME(TIMERS,90)
       ISPHBUC=ISORTSP
       IREDUCE=ISPHRED
 C
@@ -411,7 +395,7 @@ C
       ISORTSP=ISPHBUC
       IF(ISORTSP==1)THEN
 C
-        IF(ITASK==0) CALL STARTIME(90,1)
+        IF(ITASK==0) CALL STARTIME(TIMERS,90)
 C
         IREDUCE  =ISPHRED
         MYSPATRUE=SPATRUE
@@ -419,17 +403,17 @@ C
         IF(NSPMD>1) THEN
           IF(ITASK==0)THEN
             IF(IMONM == 2)THEN
-              CALL STARTIME(95,1)
+              CALL STARTIME(TIMERS,95)
               CALL SPMD_BARRIER()
-              CALL STOPTIME(95,1)
+              CALL STOPTIME(TIMERS,95)
             END IF
-            CALL STARTIME(91,1)
+            CALL STARTIME(TIMERS,91)
 C
 C Envoi liste des cellules remotes actives courantes et reception V, M, RHO pour cellules remotes actives
 C
             CALL SPMD_SPHGETV(KXSP ,SPBUF, V, MS, ISORTSP ,IPARTSP)
 C
-            CALL STOPTIME(91,1)
+            CALL STOPTIME(TIMERS,91)
           END IF
         END IF
 C
@@ -447,7 +431,7 @@ C    /---------------/
      1    X       ,V        ,MS      ,SPBUF   ,ITAB    ,
      2    KXSP    ,IXSP     ,NOD2SP  ,ISPCOND ,ISPSYM  ,
      3    XFRAME  ,XSPSYM%BUF   ,VSPSYM%BUF  ,IREDUCE ,
-     4    WSP2SORT ,MYSPATRUE,DMAX    ,ITASK   ,WREDUCE ,
+     4    WSP2SORT ,MYSPATRUE,DMAX    ,ITASK   ,SPH_WORK%WREDUCE ,
      5    LGAUGE  ,GAUGE)
 
 #include "lockon.inc"
@@ -464,16 +448,16 @@ C        /---------------/
           IF(ITASK==0) THEN
 C
             IF(IMONM == 2)THEN
-              CALL STARTIME(95,1)
+              CALL STARTIME(TIMERS,95)
               CALL SPMD_BARRIER()
-              CALL STOPTIME(95,1)
+              CALL STOPTIME(TIMERS,95)
             END IF
-            CALL STARTIME(91,1)
+            CALL STARTIME(TIMERS,91)
 C Maj globale de ISPHRED et SPATRUE apres SPSYMP (SPATRUE inutile)
 C
             CALL SPMD_SPAMAJ(ISPHRED,SPATRUE)
 C
-            CALL STOPTIME(91,1)
+            CALL STOPTIME(TIMERS,91)
           END IF          
         END IF          
 C      /---------------/
@@ -485,7 +469,7 @@ C
 C       re-tri voisins (voisins vrais, voisins dans la zone de securite).
         CALL SPCLASV(X     ,SPBUF ,KXSP    ,IXSP   ,NOD2SP   ,
      1         ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
-     2         IREDUCE,WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
+     2         IREDUCE,SPH_WORK%WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
 C
 C      /---------------/
         CALL MY_BARRIER
@@ -493,14 +477,14 @@ C      /---------------/
 C
         IF(NSPMD>1)THEN
           IF(IMONM == 2.AND.ITASK==0)THEN
-            CALL STARTIME(95,1)
+            CALL STARTIME(TIMERS,95)
             CALL SPMD_BARRIER()
-            CALL STOPTIME(95,1)
+            CALL STOPTIME(TIMERS,95)
           END IF
           IF(ITASK==0) THEN
-            CALL STARTIME(91,1)
+            CALL STARTIME(TIMERS,91)
             CALL SPMD_SPHGETISPH()
-            CALL STOPTIME(91,1)
+            CALL STOPTIME(TIMERS,91)
           END IF 
         ENDIF
 C      /---------------/
@@ -521,36 +505,36 @@ C        /---------------/
           IF(ITASK==0) THEN
 C
             IF(IMONM == 2)THEN
-              CALL STARTIME(95,1)
+              CALL STARTIME(TIMERS,95)
               CALL SPMD_BARRIER()
-              CALL STOPTIME(95,1)
+              CALL STOPTIME(TIMERS,95)
             END IF
-            CALL STARTIME(91,1)
+            CALL STARTIME(TIMERS,91)
 C Maj globale de ISPHRED et SPATRUE apres SPCLASV (ISPHRED inutile) 
 C
             CALL SPMD_SPAMAJ(ISPHRED,SPATRUE)
 C
-            CALL STOPTIME(91,1)
+            CALL STOPTIME(TIMERS,91)
           END IF
         ENDIF
 C       /---------------/
         CALL MY_BARRIER
 C       /---------------/
-        IF(ITASK==0) CALL STOPTIME(90,1)
+        IF(ITASK==0) CALL STOPTIME(TIMERS,90)
 
       ELSE
 C
-        IF(ITASK==0)CALL STARTIME(94,1)
+        IF(ITASK==0)CALL STARTIME(TIMERS,94)
 C
         IF(NSPMD>1)THEN
           IF(ITASK==0) THEN
 C
-            CALL STARTIME(92,1)
+            CALL STARTIME(TIMERS,92)
 C Reception X cellules remotes
 C
             CALL SPMD_SPHGETX(KXSP, SPBUF ,X ,IPARTSP)
 C
-            CALL STOPTIME(92,1)
+            CALL STOPTIME(TIMERS,92)
           END IF 
 C Synchro sur echange SPMD
 C         /---------------/
@@ -589,7 +573,7 @@ C       re-tri voisins (voisins vrais, voisins dans la zone de securite).
         MYSPATRUE=ZERO
         CALL SPCLASV(X     ,SPBUF ,KXSP    ,IXSP   ,NOD2SP  ,
      1               ISPSYM,XSPSYM%BUF,WSP2SORT ,ITASK  ,MYSPATRUE,
-     2         IREDUCE,WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
+     2         IREDUCE,SPH_WORK%WREDUCE,LGAUGE ,GAUGE ,ISORTSP)
 C      /---------------/
         CALL MY_BARRIER
 C      /---------------/
@@ -597,12 +581,12 @@ C
         IF(NSPMD>1)THEN
           IF(ITASK==0) THEN
 C
-            CALL STARTIME(92,1)
+            CALL STARTIME(TIMERS,92)
 C Envoi liste des cellules remotes actives courantes et reception V, M, RHO pour cellules remotes actives
 C
             CALL SPMD_SPHGETV(KXSP ,SPBUF, V, MS, ISORTSP ,IPARTSP)
 C
-            CALL STOPTIME(92,1)
+            CALL STOPTIME(TIMERS,92)
           END IF 
 C Synchro echange SPMD
 C        /---------------/
@@ -620,7 +604,7 @@ C       /---------------/
         CALL MY_BARRIER
 C       /---------------/
 C
-        IF(ITASK==0)CALL STOPTIME(94,1)
+        IF(ITASK==0)CALL STOPTIME(TIMERS,94)
 C
       ENDIF
 C
@@ -634,7 +618,8 @@ C-----------------------------------------------
      3            PLD     ,IPARG   ,ELBUF_TAB,ISPHIO  ,VSPHIO  ,
      4            PM      ,IPART   ,IPARTSP ,IGRSURF ,
      5            LPRTSPH ,LONFSPH ,WA ,WA(NUMSPH+1) ,WA(2*NUMSPH+1) ,
-     6            WASPH(KVNORM),SPHVELN,XDP, IBUFSSG_IO, OFF_SPH_R2R)
+     6            WASPH(KVNORM),SPHVELN,XDP, IBUFSSG_IO, OFF_SPH_R2R,
+     7            WFEXT)
          NSP2SORT=0
          DO IPRT=1,NPART
           DO K=LPRTSPH(2,IPRT-1)+1,LPRTSPH(1,IPRT)
@@ -693,6 +678,5 @@ C-----------------------------------------------
      6    MCHECK)
 C-----------------------------------------------
 C
-      IF(ITASK==0) DEALLOCATE(WREDUCE)
       RETURN
       END

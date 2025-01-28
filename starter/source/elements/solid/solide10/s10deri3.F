@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -89,6 +89,10 @@ C-----------------------------------------------
         ALPH = HALF
         BETA  = ONE_OVER_6
         W = NINE_OVER_20
+      ELSE
+        ALPH = -HUGE(ALPH)
+        BETA  = -HUGE(BETA)
+        W = -HUGE(W)
       ENDIF
       A4 = FOUR * ALPH
       B4 = FOUR * BETA

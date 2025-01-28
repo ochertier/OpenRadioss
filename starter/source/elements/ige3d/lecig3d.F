@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -145,6 +145,7 @@ c
         IREC=KOPTAD(KCUR)-1 
         I = 0
         INOD_IGE = FIRSTNOD_ISOGEO
+        IDS=0
         DO WHILE( I < NUMELIG3D0 )              
          IREC=IREC+1                        
          READ(IIN,REC=IREC,ERR=999,FMT='(A)')LINE

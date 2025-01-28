@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -100,7 +100,7 @@ C
       my_real :: XMIN,YMIN,ZMIN,XTMP
       my_real :: BMINMA(6)
       my_real :: DD,DX1,DY1,DZ1,DD1,MARGE_ST,TZINF_ST
-C Initializeing constant
+C Initializing constant
       IONE=1
       IHUNDRED=100
 C-----------------------------------------------

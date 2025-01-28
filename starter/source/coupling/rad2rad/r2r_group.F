@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -453,7 +453,7 @@ C-----------Storage inside buffer------------------------------------C
                   ENDIF
                 ENDDO
               ELSE
-C-----------Nodes in link type 4 + nlocal dof -> aditional link------C
+C-----------Nodes in link type 4 + nlocal dof -> additional link-----C
 C-----------Node coupled only if nl material on both sides ----------C
                 DO J=1,NUMNOD
                   IF ((TAG_NLOCAL(J)==1).AND.(TAGNO(J+NPART+NUMNOD) == N+1)) THEN

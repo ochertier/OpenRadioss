@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,6 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    calc_uniax                ../starter/source/materials/mat/mat098/lossfun_98.F
       !||    calc_uniax_2              ../starter/source/materials/mat/mat098/lossfun_98.F
       !||    ddsplit                   ../starter/source/restart/ddsplit/ddsplit.F
+      !||    eosfun_usr2sys            ../starter/source/materials/tools/eosfun_usr2sys.F90
       !||    fail_tab2sys              ../starter/source/materials/tools/fail_tab2sys.F
       !||    fct_fiber                 ../starter/source/materials/mat/mat098/lossfun_98.F
       !||    fct_fiber_2               ../starter/source/materials/mat/mat098/lossfun_98.F
@@ -38,8 +39,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    hm_read_fail              ../starter/source/materials/fail/hm_read_fail.F
       !||    hm_read_fail_tab1         ../starter/source/materials/fail/tabulated/hm_read_fail_tab1.F
       !||    hm_read_funct             ../starter/source/tools/curve/hm_read_funct.F
-      !||    hm_read_mat               ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_funct_python      ../starter/source/tools/curve/hm_read_funct_python.F90
+      !||    hm_read_mat               ../starter/source/materials/mat/hm_read_mat.F90
+      !||    hm_read_mat128            ../starter/source/materials/mat/mat128/hm_read_mat128.F90
       !||    hm_read_mat190            ../starter/source/materials/mat/mat190/hm_read_mat190.F
+      !||    hm_read_mat50             ../starter/source/materials/mat/mat050/hm_read_mat50.F90
+      !||    hm_read_mat57             ../starter/source/materials/mat/mat057/hm_read_mat57.F90
       !||    hm_read_mat76             ../starter/source/materials/mat/mat076/hm_read_mat76.F
       !||    hm_read_mat80             ../starter/source/materials/mat/mat080/hm_read_mat80.F
       !||    hm_read_mat90             ../starter/source/materials/mat/mat090/hm_read_mat90.F
@@ -70,7 +75,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    law62_upd                 ../starter/source/materials/mat/mat062/law62_upd.F
       !||    law69_upd                 ../starter/source/materials/mat/mat069/law69_upd.F
       !||    law77_upd                 ../starter/source/materials/mat/mat077/law77_upd.F
-      !||    law87_upd                 ../starter/source/materials/mat/mat087/law87_upd.F
+      !||    law87_upd                 ../starter/source/materials/mat/mat087/law87_upd.F90
       !||    law88_upd                 ../starter/source/materials/mat/mat088/law88_upd.F
       !||    law90_upd                 ../starter/source/materials/mat/mat090/law90_upd.F
       !||    law92_upd                 ../starter/source/materials/mat/mat092/law92_upd.F

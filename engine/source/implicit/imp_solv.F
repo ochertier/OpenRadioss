@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -109,8 +109,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_min_i       ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_min_s       ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_sumf_a      ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
+      !||    startime         ../engine/source/system/timer_mod.F90
+      !||    stoptime         ../engine/source/system/timer_mod.F90
       !||    upd_fr_k         ../engine/source/mpi/implicit/imp_fri.F
       !||    upd_glob_k       ../engine/source/implicit/upd_glob_k.F
       !||    upd_rhs          ../engine/source/implicit/upd_glob_k.F
@@ -123,6 +123,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    drape_mod        ../engine/share/modules/drape_mod.F
       !||    dsgraph_mod      ../engine/share/modules/dsgraph_mod.F
       !||    elbufdef_mod     ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod     ../common_source/modules/groupdef_mod.F
       !||    h3d_mod          ../engine/share/modules/h3d_mod.F
       !||    imp_lintf        ../engine/share/modules/impbufdef_mod.F
@@ -130,13 +131,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    imp_worki        ../engine/share/modules/impbufdef_mod.F
       !||    impbufdef_mod    ../engine/share/modules/impbufdef_mod.F
       !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    multi_fvm_mod    ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||    skew_mod         ../common_source/modules/skew_mod.F90
       !||    stack_mod        ../engine/share/modules/stack_mod.F
       !||    th_surf_mod      ../common_source/modules/interfaces/th_surf_mod.F
+      !||    timer_mod        ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE IMP_SOLV(
+      SUBROUTINE IMP_SOLV(TIMERS,
      1  ICODE  ,ISKEW  ,ISKWN  ,IPART  ,IXTG   ,IXS    ,IXQ    ,
      2  IXC    ,IXT    ,IXP    ,IXR    ,IXTG1          ,ITAB   ,ITABM1 ,
      3  NPC    ,IBCL   ,IBFV   ,SENSOR_TAB,NNLINK ,LNLINK ,IPARG  ,IGRV   ,
@@ -149,7 +151,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A  ELBUF  ,RBY    ,RIVET  ,FR_ELEM,IAD_ELEM,
      B  WA             ,A      ,AR     ,STIFN  ,STIFR  ,PARTSAV,FSKY   ,
      C  FSKYI  ,IFRAME ,XFRAME ,W16    ,IACTIV ,FSKYM  ,IGEO   ,IPM    ,
-     D  TFEXT  ,NODFT  ,NODLT  ,NINT7  ,NUM_IMP,NS_IMP ,NE_IMP ,IND_IMP,
+     D  WFEXT  ,NODFT  ,NODLT  ,NINT7  ,NUM_IMP,NS_IMP ,NE_IMP ,IND_IMP,
      L  IT     ,RWBUF  ,LPRW   ,FR_WALL,NBINTC ,INTLIST,FOPT   ,RWSAV  ,
      M          FSAVD  ,GRAPHE ,FAC_K  ,IPIV_K ,NKCOND ,NSENSOR,
      N  MONVOL ,IGRSURF,FR_MV  ,VOLMON ,DIRUL  ,
@@ -164,10 +166,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      Y  DIMFB  ,FBSAV6 ,STABSEN,TABSENSOR,DRAPE_SH4N, DRAPE_SH3N,
      Z  H3D_DATA,MULTI_FVM,IGRBRIC,IGRSH4N,IGRSH3N,IGRBEAM,FORNEQS,MAXDGAP,
      A  NDDL0   ,NNZK0 ,IT_T    ,IMPBUF_TAB,CPTREAC,FTHREAC,NODREAC, DRAPEG,
-     B  INTERFACES,TH_SURF,DPL0CLD,VEL0CLD,SNPC,STF)
+     B  INTERFACES,TH_SURF,DPL0CLD,VEL0CLD,SNPC,STF,GLOB_THERM, WFEXT_MD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+        USE TIMER_MOD
         USE DSGRAPH_MOD
         USE IMP_LINTF
         USE IMP_WORKI
@@ -185,6 +188,7 @@ C-----------------------------------------------
         USE INTERFACES_MOD
         USE TH_SURF_MOD , ONLY : TH_SURF_
         USE SKEW_MOD
+        use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -212,6 +216,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        TYPE(TIMER_) :: TIMERS
         INTEGER ,INTENT(IN) :: NSENSOR
         INTEGER ,INTENT(IN) :: SNPC
         INTEGER ,INTENT(IN) :: STF
@@ -238,7 +243,7 @@ C-----------------------------------------------
      .     MS(*)   ,IN(*)   ,PM(NPROPM,*),GEO(NPROPG,*),
      .     BUFMAT(*) ,TF(*) ,FORC(*)  ,VEL(*),FSAV(NTHVKI,*) ,ELBUF(*) ,
      .     RWBUF(NRWLP,*),RWSAV(*),RBY(NRBY,*),
-     .     RIVET(*),WA(*), A(3,*) ,AR(3,*),PARTSAV(*) ,TFEXT,
+     .     RIVET(*),WA(*), A(3,*) ,AR(3,*),PARTSAV(*) ,
      .     STIFN(*) ,STIFR(*),FSKY(*),FSKYI(*),DR(3,*),
      .     EANI(*),AGRV(*), THKE(*),FR_WAVE(*),PARTS0(*),BUFGEO(*),
      .     XFRAME(NXFRAME,*),W16(*),FBVEL(*),FSKYM(*),BUFSF(*),
@@ -253,10 +258,8 @@ C-----------------------------------------------
       my_real, INTENT(IN) :: DPL0CLD(6,NCONLD),VEL0CLD(6,NCONLD)
         my_real DT2PREV,VOLMON(*) ,TEMP(*), WAINT(*),FRBE3(*)
         TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB, ELBUF_IMP
-        DOUBLE PRECISION
-     .          FRWL6(*), XDP(3,*)
-        DOUBLE PRECISION
-     .          FBSAV6(12,6,DIMFB)
+        DOUBLE PRECISION FRWL6(*), XDP(3,*)
+        DOUBLE PRECISION FBSAV6(12,6,DIMFB)
 C
         TYPE(PRGRAPH) :: GRAPHE(*)
 C
@@ -283,6 +286,8 @@ C
         TYPE (INTERFACES_)    ,INTENT(IN)     :: INTERFACES
         TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
         TYPE(SKEW_),INTENT(INOUT) :: SKEWS
+        type (glob_therm_) , INTENT(INOUT) :: GLOB_THERM
+        DOUBLE PRECISION,INTENT(INOUT) :: WFEXT, WFEXT_MD
 C
 C---D_IMP: dUn+1,i,DD : ddU,i+1
 C---R_IMP[1:R02,2:RRR(R_OLD),3:RU0,4:E02,5:DE_OLD,6:EIMP,7,8,9:pour line-search]
@@ -431,7 +436,7 @@ C
         NSL=0
         ICONTA = 0
 C
-        WE_IMP = TFEXT
+        WE_IMP = WFEXT
         IF (IMCONV==1) THEN
           ITER_NL=0
         ELSE
@@ -521,7 +526,8 @@ C
      7                     I_IMP(5)   ,H3D_DATA ,CPTREAC         ,FTHREAC ,NODREAC,
      8                     NSENSOR    ,TH_SURF  ,DPL0CLD ,
      9                     VEL0CLD    ,D        ,DR              ,NUMNOD  ,NSURF  ,
-     A                     NFUNCT     ,NCONLD   ,NGRAV           ,NINVEL  ,STF    ,NUMSKW)
+     A                     NFUNCT     ,NCONLD   ,NGRAV           ,NINVEL  ,STF    ,NUMSKW,
+     B                     WFEXT)
 C
 C----------------------------------
 C       EXTERNAL FORCES A=Fext-Fint
@@ -529,7 +535,7 @@ C----------------------------------
 C
           NCL_MAX=0
           IF(NCONLD/=0) THEN
-            IF (IMON>0) CALL STARTIME(4,1)
+            IF (IMON>0) CALL STARTIME(TIMERS,4)
 C         --spmd : force treated like elements ---
             CALL FORCE_IMP( IBCL    ,FORC       ,SNPC       ,NPC        ,TF         ,
      2                      AC      ,V          ,X          ,SKEWS      ,
@@ -537,7 +543,7 @@ C         --spmd : force treated like elements ---
      4                      IADS_F  ,FSKY       ,DUMMY_FEXT ,H3D_DATA   ,CPTREAC    ,
      5                      FTHREAC ,NODREAC    ,TH_SURF    ,
      6                      DPL0CLD ,VEL0CLD    ,D          ,DR         ,NCONLD     ,
-     7                      NUMNOD  ,NFUNCT     ,STF )
+     7                      NUMNOD  ,NFUNCT     ,STF        ,WFEXT)
 C
             IF (IMACH==3.AND.NSPMD>1) THEN
               DO I=IAD_ELEM(1,1),IAD_ELEM(1,NSPMD+1)-1
@@ -551,7 +557,7 @@ C
               ENDDO
             ENDIF
 C
-            IF (IMON>0) CALL STOPTIME(4,1)
+            IF (IMON>0) CALL STOPTIME(TIMERS,4)
           ENDIF
 C
           IF (IMACH==3.AND.NSPMD>1) THEN
@@ -568,43 +574,43 @@ C
           ENDIF
 C---------no //SMP for the moment, add it after----
           IF(NGRAV/=0) THEN
-            IF (IMON>0) CALL STARTIME(4,1)
+            IF (IMON>0) CALL STARTIME(TIMERS,4)
             CALL GRAVIT_IMP(IGRV  ,AGRV  ,NPC   ,TF    ,AC,
      2                      V     ,X     ,SKEWS%SKEW  ,MS,TFEXC,
      3                      NSENSOR,SENSOR_TAB,WEIGHT,
      4                      LGRAV ,ITASK,
      5                      NRBYAC,IRBYAC,NPBY  ,RBY    )
-            IF (IMON>0) CALL STOPTIME(4,1)
+            IF (IMON>0) CALL STOPTIME(TIMERS,4)
           ENDIF
 C---------no //SMP for the moment, add it after----
           IF(NLOADC/=0) THEN
-            IF (IMON>0) CALL STARTIME(4,1)
+            IF (IMON>0) CALL STARTIME(TIMERS,4)
             CALL CFIELD_IMP(ICFIELD  ,CFIELD,NPC   ,TF    ,AC,
      2                      V     ,X     ,XFRAME  ,MS,TFEXC,
      3                      NSENSOR,SENSOR_TAB,WEIGHT,IFRAME,
      4                      LCFIELD ,ITASK,
      5                      NRBYAC,IRBYAC,NPBY  ,RBY,ISKEW    )
-            IF (IMON>0) CALL STOPTIME(4,1)
+            IF (IMON>0) CALL STOPTIME(TIMERS,4)
           ENDIF
 
 
-          TFEXT = WE_IMP
+          WFEXT = WE_IMP
 C END IF (IMCONV==1)
         ENDIF
 C-------------dU_d---------------------------------
         IF(NFXVEL/=0.AND.(IMCONV==1.OR.IMCONV==3)) THEN
-          IF (IMON>0) CALL STARTIME(4,1)
+          IF (IMON>0) CALL STARTIME(TIMERS,4)
           CALL FV_IMP(IBFV  ,NPC    ,TF     ,VEL   ,SENSOR_TAB,
      1                D_IMP  ,DR_IMP ,IKC   ,IDDL  ,NSENSOR   ,
      2                SKEWS%SKEW  ,IFRAME ,XFRAME ,V     ,VR    ,
      3                X     ,DIRUL  ,NDOF   ,A     ,AR    )
-          IF (IMON>0) CALL STOPTIME(4,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,4)
         ENDIF
 C-------------RGWAL0_IMP peut suivre-ISETK=1, mais il faut changer-FV_IMP1
 C-------------(IKC(I)=4->IMCONV=1 pour eviter le rebond-------
         NT_RW=0
         IF (NRWALL>0) THEN
-          IF (IMON>0) CALL STARTIME(4,1)
+          IF (IMON>0) CALL STARTIME(TIMERS,4)
           DO I=1,NDDL0
             IF (IKC(I)==3.OR.IKC(I)==10) IKC(I)=0
           ENDDO
@@ -620,20 +626,20 @@ C-------------(IKC(I)=4->IMCONV=1 pour eviter le rebond-------
      2       NPRW        ,MS       ,FSAV(1,NINTER+1),FR_WALL ,
      3       FOPT        ,RWSAV    ,WEIGHT ,FSAVD(1,NINTER+1),
      4       NT_RW       ,IDDL     ,IKC    ,IMCONV,NDOF,FRWL6,
-     5       WEIGHT_MD   ,DIMFB    , FBSAV6,STABSEN,TABSENSOR)
+     5       WEIGHT_MD   ,DIMFB    , FBSAV6,STABSEN,TABSENSOR, WFEXT, WFEXT_MD)
           ELSE
             CALL RGWAL0_IMP(
      1       X           ,D_IMP    ,V      ,RWBUF   ,LPRW    ,
      2       NPRW        ,MS       ,FSAV(1,NINTER+1),FR_WALL ,
      3       FOPT        ,RWSAV    ,WEIGHT ,FSAVD(1,NINTER+1),
      4       NT_RW       ,IDDL     ,IKC    ,IMCONV,NDOF,FRWL6,
-     5       WEIGHT_MD   ,DIMFB    , FBSAV6,STABSEN,TABSENSOR)
+     5       WEIGHT_MD   ,DIMFB    , FBSAV6,STABSEN,TABSENSOR, WFEXT, WFEXT_MD)
           ENDIF
 C
           IF(NT_RW>0) THEN
             CALL FV_RW(IDDL   ,IKC   ,NDOF  ,D_IMP  ,V )
           ENDIF
-          IF (IMON>0) CALL STOPTIME(4,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,4)
         ENDIF
 C
         IFDIS=NT_RW+NFXV_G
@@ -691,7 +697,7 @@ C----------------------------------
 C       MATRICE DE RIGIDITE
 C----------------------------------
         IF (ISETK ==1 ) THEN
-          IF (IMON>0 .AND. ITASK ==0) CALL STARTIME(31,1)
+          IF (IMON>0 .AND. ITASK ==0) CALL STARTIME(TIMERS,31)
           L1 = 1+NIXS*NUMELS
           L2 = L1+6*NUMELS10
           L3 = L2+12*NUMELS20
@@ -886,7 +892,7 @@ C
      .     CALL IMP_CHECK(ITAB  ,NDDL  ,IDDL  ,DIAG_K  ,NDOF  ,
      .                    IKC   ,INLOC ,NDDL0 )
 C
-          IF (IMON>0) CALL STOPTIME(31,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,31)
 !         IF(IMACH/=3.OR.ISPMD==0) THEN
 c          IF (NCYCLE==1.AND.IMCONV==1)THEN
 c           IF (ILINE/=1)THEN
@@ -930,7 +936,7 @@ C----------------------------------
           L2=LSIZE(2)
           LNSS2=0
           LNSS=0
-          IF (IMON>0) CALL STARTIME(31,1)
+          IF (IMON>0) CALL STARTIME(TIMERS,31)
           CALL SAV_INTTD(NINT7,NUM_IMP,NS_IMP(1+NT_IMP5),
      1                   NE_IMP(1+NT_IMP5),IND_IMP,NUM_IMP1)
 C
@@ -1033,7 +1039,7 @@ Ctmp-------A n'est pas modifie ici -------------------
      D      NSS3      ,ISS3      ,IRBE2     ,LRBE2     ,NSB2      ,
      E      ISB2      )
           ENDIF
-          IF (IMON>0) CALL STOPTIME(31,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,31)
 C
           DEALLOCATE(NSS2,NSS3,NSB2)
           DEALLOCATE(ISS2,ISS3,ISB2)
@@ -1417,7 +1423,7 @@ c     5                  D_IMP ,DR_IMP,1      ,W_DDL  ,AC     ,
 c     6                  ACR   ,A     ,AR     ,R2     ,0  ,NODGLOB)
 c         END IF
           IF (ILINTF>0.AND.NCYCLE<ILINTF) THEN
-            CALL IMP_INTTD0(
+            CALL IMP_INTTD0(TIMERS,
      1         IPARI ,INTBUF_TAB    ,X_A     ,D       ,
      2         MS    ,ITAB   ,IN    ,D_IMP   ,DR_IMP  ,
      3         IMSCH ,I2MSCH ,ISIZXV,ILENXV  ,IGRBRIC ,
@@ -1430,7 +1436,7 @@ c         END IF
      A         IRLEN20T,ISLEN20T,IRLEN20E,ISLEN20E,
      B         IKINE,DIAG_SMS,COUNT_REMSLV,COUNT_REMSLVE,
      C         NSENSOR,SENSOR_TAB,XDP,H3D_DATA,MULTI_FVM,
-     D         FORNEQS,MAXDGAP,INTERFACES)
+     D         FORNEQS,MAXDGAP,INTERFACES,GLOB_THERM)
 
             TT=MAX(ZERO,TT-DT2)
             ISETK =0
@@ -1908,7 +1914,7 @@ C
           IF(IDYNA>0.AND.IMCONV==1)  THEN
             CALL DYNA_WEX(IBCL  ,FORC   ,SNPC,NPC   ,TF    ,AC    ,
      2                    V     ,X      ,SKEWS  ,ACR   ,VR    ,
-     3                    SENSOR_TAB,WEIGHT,TFEXT ,IADS_F,
+     3                    SENSOR_TAB,WEIGHT,WFEXT ,IADS_F,
      4                    FSKY  ,IGRV   ,AGRV  ,MS    ,IN    ,
      5                    LGRAV ,ITASK ,NRBYAC,IRBYAC ,
      6                    NPBY  ,RBY   ,IBFV    ,VEL   ,D_IMP  ,
@@ -3091,8 +3097,8 @@ C------------------------------------------
       !||    spmd_max_i      ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_min_s      ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_sumf_a     ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
+      !||    startime        ../engine/source/system/timer_mod.F90
+      !||    stoptime        ../engine/source/system/timer_mod.F90
       !||    upd_fr_k        ../engine/source/mpi/implicit/imp_fri.F
       !||    upd_glob_k      ../engine/source/implicit/upd_glob_k.F
       !||    upd_rhs         ../engine/source/implicit/upd_glob_k.F
@@ -3106,12 +3112,13 @@ C------------------------------------------
       !||    h3d_mod         ../engine/share/modules/h3d_mod.F
       !||    imp_worki       ../engine/share/modules/impbufdef_mod.F
       !||    impbufdef_mod   ../engine/share/modules/impbufdef_mod.F
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||    skew_mod        ../common_source/modules/skew_mod.F90
       !||    stack_mod       ../engine/share/modules/stack_mod.F
       !||    th_surf_mod     ../common_source/modules/interfaces/th_surf_mod.F
+      !||    timer_mod       ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE IMP_CHKM(
+      SUBROUTINE IMP_CHKM(TIMERS,
      1  ICODE  ,ISKEW  ,ISKWN  ,IPART  ,IXTG   ,IXS    ,IXQ    ,
      2  IXC    ,IXT    ,IXP    ,IXR    ,IXTG1          ,ITAB   ,ITABM1 ,
      3  NPC    ,IBCL   ,IBFV   ,SENSOR_TAB,NNLINK ,LNLINK ,IPARG  ,IGRV   ,
@@ -3124,16 +3131,17 @@ C------------------------------------------
      A  ELBUF  ,RBY    ,RIVET  ,FR_ELEM,IAD_ELEM,NSENSOR,
      B  WA            ,A      ,AR     ,STIFN  ,STIFR  ,PARTSAV,FSKY   ,
      C  FSKYI  ,IFRAME ,XFRAME ,W16    ,IACTIV ,FSKYM  ,IGEO   ,IPM    ,
-     D  TFEXT  ,NODFT  ,NODLT  ,NINT7  ,NUM_IMP,NS_IMP ,NE_IMP ,IND_IMP,
+     D  WFEXT  ,NODFT  ,NODLT  ,NINT7  ,NUM_IMP,NS_IMP ,NE_IMP ,IND_IMP,
      L  IT     ,RWBUF  ,LPRW   ,FR_WALL,NBINTC ,INTLIST,FOPT   ,RWSAV  ,
      M  FSAVD  ,DIRUL  ,LGRAV  ,IRBE3  ,LRBE3  ,FRBE3  ,
      N  FRWL6  ,IRBE2  ,LRBE2  ,ICFIELD,LCFIELD,CFIELD,ELBUF_TAB,WEIGHT_MD,
      O  STACK  ,DIMFB  ,FBSAV6 ,STABSEN,TABSENSOR,DRAPE_SH4N,DRAPE_SH3N,H3D_DATA,
      P  NDDL0  ,NNZK0  ,IMPBUF_TAB,CPTREAC,FTHREAC,NODREAC,DRAPEG,TH_SURF ,
-     Q  DPL0CLD,VEL0CLD,SNPC,STF)
+     Q  DPL0CLD,VEL0CLD,SNPC,STF, WFEXT_MD)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+        USE TIMER_MOD
         USE DSGRAPH_MOD
         USE IMP_WORKI
         USE ELBUFDEF_MOD
@@ -3167,6 +3175,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        TYPE(TIMER_), INTENT(INOUT) :: TIMERS
         INTEGER ,INTENT(IN) :: SNPC    !< size of NPC
         INTEGER ,INTENT(IN) :: STF     !< size of TF / Tabulated function array
         INTEGER ,INTENT(IN) :: NSENSOR
@@ -3187,7 +3196,7 @@ C-----------------------------------------------
      .           MS(*)   ,IN(*)   ,PM(NPROPM,*),GEO(NPROPG,*),
      .           BUFMAT(*) ,TF(*) ,FORC(*)  ,VEL(*),FSAV(NTHVKI,*) ,ELBUF(*) ,
      .           RWBUF(NRWLP,*),RWSAV(*),RBY(NRBY,*),
-     .           RIVET(*),WA(*), A(3,*) ,AR(3,*),PARTSAV(*) ,TFEXT,
+     .           RIVET(*),WA(*), A(3,*) ,AR(3,*),PARTSAV(*) ,
      .           STIFN(*) ,STIFR(*),FSKY(*),FSKYI(*),DR(3,*),
      .           EANI(*),AGRV(*), THKE(*),FR_WAVE(*),PARTS0(*),BUFGEO(*),
      .           XFRAME(NXFRAME,*),W16(*),FBVEL(*),FSKYM(*),BUFSF(*),
@@ -3208,6 +3217,7 @@ C-----------------------------------------------
         TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) :: SENSOR_TAB
         TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
         TYPE(SKEW_),INTENT(INOUT) :: SKEWS
+        DOUBLE PRECISION,INTENT(INOUT) :: WFEXT, WFEXT_MD
 #if defined(MUMPS5)
 C----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -3325,7 +3335,7 @@ C----------------------------------
      4                   IADS_F  ,FSKY    ,DUMMY_FEXT ,H3D_DATA   ,CPTREAC    ,
      5                   FTHREAC ,NODREAC ,TH_SURF    ,
      6                   DPL0CLD ,VEL0CLD ,D          ,DR         ,NCONLD     ,
-     7                   NUMNOD  ,NFUNCT  ,STF)
+     7                   NUMNOD  ,NFUNCT  ,STF        ,WFEXT)
           IF (IMACH==3.AND.NSPMD>1) THEN
             DO I=IAD_ELEM(1,1),IAD_ELEM(1,NSPMD+1)-1
               J = FR_ELEM(I)
@@ -3380,7 +3390,7 @@ C-------------U_d--> rigid wall-------------------------------
      3      FOPT        ,RWSAV    ,WEIGHT ,FSAVD(1,NINTER+1),
      4      NT_RW       ,IDDL     ,IKC    ,IMCONV,NDOF,FRWL6,
      5      WEIGHT_MD   ,DIMFB    , FBSAV6,STABSEN,TABSENSOR)
-          IF(NT_RW>0) CALL FV_RW(IDDL   ,IKC   ,NDOF  ,D_IMP  ,V )
+          IF(NT_RW>0) CALL FV_RW(IDDL   ,IKC   ,NDOF  ,D_IMP  ,V , WFEXT, WFEXT_MD)
         ENDIF
         IFDIS=NT_RW+NFXVEL
         IF(IFDIS>0.AND.IMCONV==1) THEN
@@ -3440,7 +3450,7 @@ C----------------------------------
             WRITE(IOUT,*)' ** FINIT ELEMENT CHECKING **'
             WRITE(IOUT,*)
           ENDIF
-          IF (IMON>0 .AND. ITASK ==0) CALL STARTIME(31,1)
+          IF (IMON>0 .AND. ITASK ==0) CALL STARTIME(TIMERS,31)
           NDDL = NDDL0
           NNZK = NNZK0
           NNMAX=LSIZE(9)
@@ -3529,7 +3539,7 @@ C------ 1er VP: for dt check
           ENDIF
 
           CALL INI_K0H(NDDL,NNZK,NNZK,IADK,JDIK)
-          IF (IMON>0) CALL STOPTIME(31,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,31)
         ENDIF
 
 C----------------------------------
@@ -3541,7 +3551,7 @@ C----------------------------------
           L2=LSIZE(2)
           LNSS2=0
           LNSS=0
-          IF (IMON>0) CALL STARTIME(31,1)
+          IF (IMON>0) CALL STARTIME(TIMERS,31)
           IF (IMP_INT==1) CALL IDEL_INT(
      1    IPARI     ,INTBUF_TAB,NUM_IMP   ,NS_IMP    ,NE_IMP    ,
      2    IND_IMP   ,NDOF      ,NINT7     )
@@ -3606,7 +3616,7 @@ C
             WRITE(IOUT,1007)NDDLI,NNZI,NNMAX
             WRITE(IOUT,*)
           ENDIF
-          IF (IMON>0) CALL STOPTIME(31,1)
+          IF (IMON>0) CALL STOPTIME(TIMERS,31)
         ENDIF
 C----------------------------------
         IF (NFXVEL/=0.AND.IMCONV==1) THEN
@@ -3729,7 +3739,7 @@ C    /---------------/
       !||--- called by ------------------------------------------------------
       !||    imp_chkm        ../engine/source/implicit/imp_solv.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE IMP_COMPAB(
      1    ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
@@ -4125,7 +4135,7 @@ C--------rwall---------
       !||    spmd_send_vi    ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_sum_s      ../engine/source/mpi/implicit/imp_spmd.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod      ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod      ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE IMP_COMPABP(
      1    ICODT     ,ICODR     ,ISKEW     ,IBFV      ,NPC       ,
@@ -6859,26 +6869,28 @@ C------------------------------------------
         RETURN
       END
       !||====================================================================
-      !||    imp_smpini       ../engine/source/implicit/imp_solv.F
+      !||    imp_smpini           ../engine/source/implicit/imp_solv.F
       !||--- called by ------------------------------------------------------
-      !||    b_correct_hp     ../engine/source/implicit/nl_solv.F
-      !||    cp_int_hp        ../engine/source/implicit/produt_v.F
-      !||    cp_real_hp       ../engine/source/implicit/produt_v.F
-      !||    du_ini_hp        ../engine/source/implicit/imp_solv.F
-      !||    frac_d_hp        ../engine/source/implicit/integrator.F
-      !||    frac_dd_hp       ../engine/source/implicit/integrator.F
-      !||    integrator1_hp   ../engine/source/implicit/integrator.F
-      !||    integrator2_hp   ../engine/source/implicit/integrator.F
-      !||    integrator_hp    ../engine/source/implicit/integrator.F
-      !||    integratorl_hp   ../engine/source/implicit/integrator.F
-      !||    lin_solv         ../engine/source/implicit/lin_solv.F
-      !||    mumpslb_hp       ../engine/source/implicit/lin_solv.F
-      !||    produt_hp        ../engine/source/implicit/produt_v.F
-      !||    produt_uhp0      ../engine/source/implicit/produt_v.F
-      !||    vaxpy_hp         ../engine/source/implicit/produt_v.F
-      !||    vscal_hp         ../engine/source/implicit/produt_v.F
-      !||    vscaly_hp        ../engine/source/implicit/produt_v.F
-      !||    zeror_hp         ../engine/source/implicit/produt_v.F
+      !||    b_correct_hp         ../engine/source/implicit/nl_solv.F
+      !||    cp_int_hp            ../engine/source/implicit/produt_v.F
+      !||    cp_real_hp           ../engine/source/implicit/produt_v.F
+      !||    du_ini_hp            ../engine/source/implicit/imp_solv.F
+      !||    frac_d_hp            ../engine/source/implicit/integrator.F
+      !||    frac_dd_hp           ../engine/source/implicit/integrator.F
+      !||    integrator1_hp       ../engine/source/implicit/integrator.F
+      !||    integrator2_hp       ../engine/source/implicit/integrator.F
+      !||    integrator_hp        ../engine/source/implicit/integrator.F
+      !||    integratorl_hp       ../engine/source/implicit/integrator.F
+      !||    lin_solv             ../engine/source/implicit/lin_solv.F
+      !||    mumpslb_hp           ../engine/source/implicit/lin_solv.F
+      !||    produt_hp            ../engine/source/implicit/produt_v.F
+      !||    produt_uhp0          ../engine/source/implicit/produt_v.F
+      !||    vaxpy_hp             ../engine/source/implicit/produt_v.F
+      !||    vscal_hp             ../engine/source/implicit/produt_v.F
+      !||    vscaly_hp            ../engine/source/implicit/produt_v.F
+      !||    zeror_hp             ../engine/source/implicit/produt_v.F
+      !||--- calls      -----------------------------------------------------
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
       !||====================================================================
       SUBROUTINE IMP_SMPINI(
      1   ITSK   ,N1FTSK ,N1LTSK ,N1   )
@@ -9123,3 +9135,4 @@ C
         RETURN
       END
 
+      

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,8 +31,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i22for3            ../engine/source/interfaces/int22/i22for3.F
       !||    i22wetsurf         ../engine/source/interfaces/int22/i22wetsurf.F
       !||    my_barrier         ../engine/source/system/machine.F
-      !||    startime           ../engine/source/system/timer.F
-      !||    stoptime           ../engine/source/system/timer.F
+      !||    startime           ../engine/source/system/timer_mod.F90
+      !||    stoptime           ../engine/source/system/timer_mod.F90
       !||    sum_6_float_sens   ../engine/source/system/parit.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
@@ -40,8 +40,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_mod            ../engine/share/modules/h3d_mod.F
       !||    i22tri_mod         ../common_source/modules/interfaces/cut-cell-search_mod.F
       !||    message_mod        ../engine/share/message_module/message_mod.F
+      !||    timer_mod          ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I22MAINF(
+      SUBROUTINE I22MAINF(TIMERS,
      1                   IPARI     ,INTBUF_TAB ,X          ,A      ,
      2                   ICODT     ,FSAV       ,V          ,MS        ,DT2T     ,  
      3                   NELTST    ,ITYPTST    ,ITAB       ,STIFN     ,FSKYI    ,  
@@ -67,6 +68,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE ELBUFDEF_MOD 
       USE I22TRI_MOD
       USE INTBUFDEF_MOD
@@ -96,7 +98,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
-      
+      TYPE(TIMER_), INTENT(IN) :: TIMERS 
       INTEGER NELTST,ITYPTST,NIN,NEWFRONT,NSTRF(*),
      .        NRTMDIM, IAD17,NV46, ISENSINT(*), DIMFB
       INTEGER IPARI(NPARI,NINTER), ICODT(*),ICONTACT(*),
@@ -359,7 +361,7 @@ C
         JLT_NEW =1
         !-------!
         
-        IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+        IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
         IF(JLT_NEW/=0) THEN
           IPARI(29,NIN) = 1
           IF (DEBUG(3)>=1)NB_JLT_NEW = NB_JLT_NEW + JLT_NEW
@@ -393,7 +395,7 @@ C
      4    Z2                 ,Z3                ,Z4                ,IXS               ,NV46               ,
      5    Delta              ,ISENSINT          ,pFSAVparit        ,IPARG             ,H3D_DATA           )                 
         ENDIF
-        IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+        IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
       ENDDO
 c
 c

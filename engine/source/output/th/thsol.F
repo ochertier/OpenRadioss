@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,12 +35,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alefvm_mod      ../common_source/modules/ale/alefvm_mod.F
       !||    elbufdef_mod    ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod     ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod   ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
       SUBROUTINE THSOL(ELBUF_TAB, NTHGRP2, ITHGRP ,
      .                 IPARG    , ITHBUF , WA     ,
      .                 IXS      , X      , IPM    , PM    , IGEO,
-     .                 MULTI_FVM, V      , W      ,
+     .                 MULTI_FVM, V      , W      ,ITHERM ,
      .                 NUMELS   , NUMMAT , NUMGEO , NUMNOD, SITHBUF)
 C-----------------------------------------------
 C   D e s c r i p t i o n
@@ -103,7 +103,7 @@ C  239549     VZ     Z-VELOCITY (MEAN VALUE FOR STAGGERED SCHEME, CELL VALUE FOR
 C  239550     SSP    SOUND SPEED
 C  239551     MACH   MACH NUMBER
 C
-C  labels are detialed in Reader subroutine : hm_read_thgrou.F
+C  labels are detailed in Reader subroutine : hm_read_thgrou.F
 C
 C-----------------------------------------------
 C   M o d u l e s
@@ -131,6 +131,7 @@ C-----------------------------------------------
       INTEGER,INTENT(IN) :: IPARG(NPARG,NGROUP),IXS(NIXS,NUMELS), IPM(NPROPMI,NUMMAT),IGEO(NPROPGI,NUMGEO)
       INTEGER,INTENT(IN) :: NTHGRP2, NUMELS, NUMMAT, NUMGEO, NUMNOD, SITHBUF
       INTEGER,INTENT(IN) :: ITHBUF(SITHBUF)
+      INTEGER, INTENT(IN):: ITHERM
       INTEGER, DIMENSION(NITHGR,*), INTENT(IN) :: ITHGRP
       my_real,INTENT(INOUT) :: WA(*)
       my_real,INTENT(IN) :: X(3,NUMNOD)  ,PM(NPROPM,NUMMAT)
@@ -931,7 +932,7 @@ c
               ENDIF
 C------------------------------------------------------------------------------
 C                 2- TH tab filling with stresses  and stain in element
-C                           and per intergation point
+C                           and per integration point
 C                    *** Property Type22: output SIG_IK_J =>  WA(120338)
 C                                                EPS_IK_J =>  WA(1646)
 C                    *** Solid 16 nodes, 20nodes, 8 nodes (KHBE 14,17), 8 nodes and 6 nodes

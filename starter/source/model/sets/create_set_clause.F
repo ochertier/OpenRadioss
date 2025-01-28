@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -341,6 +341,7 @@ C=======================================================================
       !||--- calls      -----------------------------------------------------
       !||    insert_clause_in_set   ../starter/source/model/sets/insert_clause_in_set.F
       !||--- uses       -----------------------------------------------------
+      !||    set_mod                ../starter/share/modules1/set_mod.F
       !||====================================================================
       SUBROUTINE CREATE_SET_CLAUSE(SET,
      .                             SETL,SETL_SIZE,
@@ -375,11 +376,11 @@ C-----------------------------------------------
       USE SETDEF_MOD
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
+      USE SET_MOD , ONLY : SET_ADD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
-#include      "set_def.inc"
 #include      "param_c.inc"
 #include      "sphcom.inc"
 #include      "scr17_c.inc"

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -118,6 +118,12 @@ C--                 start of the secondary branch is saved
             ENDIF
           ENDIF
         ENDDO
+C       Exit loop if node is a connection between 1D and 2D seatblet
+        IF (NRES_FOUND > 0) THEN
+          DO K=1,N_COMN_1D2D
+            IF (NODE_NEXT == COMN_1D2D(K)) NRES_FOUND=0
+          ENDDO 
+        ENDIF  
 C
         IF (NRES_FOUND > 0) THEN
           IF (FLAG == 0) THEN
@@ -138,7 +144,7 @@ C
             TAG_NOD(IXR(3,ELEM_NEXT)) = ID
           ENDIF
         ENDIF
-C 
+C       
         ELEM_CUR = ELEM_NEXT
         NODE_CUR = NODE_NEXT
       ENDDO                      

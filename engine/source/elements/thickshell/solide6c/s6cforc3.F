@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,11 +33,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    s6cfint3               ../engine/source/elements/thickshell/solide6c/s6cfint3.F
       !||    s6cfint_reg            ../engine/source/elements/thickshell/solide6c/s6cfint_reg.F
       !||    s6chour3               ../engine/source/elements/thickshell/solide6c/s6chourg3.F
+      !||    s6chour_ctl            ../engine/source/elements/thickshell/solide6c/s6chour_ctl.F90
       !||    s6ctherm               ../engine/source/elements/thickshell/solide6c/s6ctherm.F
       !||    s6cumu3                ../engine/source/elements/thickshell/solide6c/s6cumu3.F
       !||    s6cumu3p               ../engine/source/elements/thickshell/solide6c/s6cumu3p.F
       !||    s6czero3               ../engine/source/elements/thickshell/solide6c/s6czero3.F
       !||    s6fillopt              ../engine/source/elements/thickshell/solide6c/s6fillopt.F
+      !||    s6for_distor           ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
+      !||    s6get_xv               ../engine/source/elements/thickshell/solide6c/s6get_xv.F90
       !||    s6proj3                ../engine/source/elements/thickshell/solide6c/s6proj3.F
       !||    s6rcoor3               ../engine/source/elements/thickshell/solide6c/s6rcoor3.F
       !||    s6sav3                 ../engine/source/elements/thickshell/solide6c/s6sav3.F
@@ -46,6 +49,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    scordef3               ../engine/source/elements/thickshell/solidec/scordef3.F
       !||    scroto_sig             ../engine/source/elements/thickshell/solidec/scroto_sig.F
       !||    scumualpha6            ../engine/source/elements/thickshell/solidec/scumualpha6.F
+      !||    sdistor_ini            ../engine/source/elements/solid/solide/sdistror_ini.F90
       !||    sdlen3                 ../engine/source/elements/solid/solide/sdlen3.F
       !||    sdlensh3n              ../engine/source/elements/thickshell/solidec/sdlensh3n.F
       !||    sdlensh3n2             ../engine/source/elements/thickshell/solide6c/sdlensh3n2.F
@@ -60,12 +64,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
+      !||    s6chour_ctl_mod        ../engine/source/elements/thickshell/solide6c/s6chour_ctl.F90
+      !||    s6for_distor_mod       ../engine/source/elements/thickshell/solide6c/s6for_distor.F90
+      !||    s6get_xv_mod           ../engine/source/elements/thickshell/solide6c/s6get_xv.F90
+      !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE S6CFORC3(ELBUF_TAB,NG     , 
+      SUBROUTINE S6CFORC3(TIMERS, ELBUF_TAB,NG     , 
      1                   PM       ,GEO     ,IXS     ,X      ,
      2                   A        ,V       ,MS      ,W      ,FLUX   ,
      3                   FLU1     ,VEUL    ,FV      ,ALE_CONNECT  ,IPARG  ,
@@ -84,10 +95,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G                   IEXPAN   ,IFTHE   ,ICONDN  ,DT     ,SNPC,STF,
      H                   SBUFMAT  ,SVIS    ,NSVOIS  ,IDTMINS,IRESP,
      I                   IDEL7NG  ,IDEL7NOK,MAXFUNC, IMON_MAT, USERL_AVAIL, 
-     J                   heat_meca)
+     J                   GLOB_THERM,XDP,SENSORS    )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD            
@@ -95,6 +107,12 @@ C-----------------------------------------------
       USE ALE_CONNECTIVITY_MOD
       USE DT_MOD
       USE ELBUFDEF_MOD
+      USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
+      USE S6GET_XV_MOD,    ONLY : S6GET_XV
+      USE S6FOR_DISTOR_MOD,ONLY : S6FOR_DISTOR
+      USE S6CHOUR_CTL_MOD ,ONLY : S6CHOUR_CTL
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -118,6 +136,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(inout) :: TIMERS
       INTEGER,INTENT(IN):: SNPC
       INTEGER,INTENT(IN):: STF
       INTEGER, INTENT(IN) :: SBUFMAT
@@ -129,7 +148,6 @@ C-----------------------------------------------
       INTEGER ,INTENT(IN) :: MAXFUNC
       INTEGER, INTENT(IN) :: USERL_AVAIL
       INTEGER, INTENT(IN) :: IMON_MAT
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IXS(NIXS,*),IPARG(NPARG,NGROUP),NPF(*),IADS(8,*),GRTH(*),
      .  IPARTS(*),IPM(NPROPMI,*),IGEO(NPROPGI,*),IGRTH(*), ITASK,IOUTPRT
       INTEGER NELTST,ITYPTST,OFFSET,NG,NEL,ICP,ICSIG,ISTRAIN,H3D_STRAIN
@@ -151,12 +169,15 @@ C-----------------------------------------------
       my_real, INTENT(INOUT) :: TEMP(NUMNOD),FTHE(IFTHE),FTHESKY(LSKY),
      .   CONDN(ICONDN),CONDNSKY(LSKY)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
+      DOUBLE PRECISION, DIMENSION(3,NUMNOD), INTENT(IN   ) :: XDP
       TYPE (TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_)  , TARGET                    :: NLOC_DMG 
       TYPE(t_ale_connectivity), INTENT(IN)            :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
       TYPE(DT_)  , INTENT(INOUT)                      :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -238,7 +259,7 @@ C                                                                     12
      .   STIN(MVSIZ),BID(MVSIZ),DSV(MVSIZ),ALPHA_E(MVSIZ),LLSH(MVSIZ)
 C     
       INTEGER PID,MTN0,IPTHK,IPPOS,IPMAT,NLYMAX,MID,IPANG,IOFFS
-      INTEGER MXT0(MVSIZ),NN_DEL,IPRES
+      INTEGER MXT0(MVSIZ),NN_DEL,IPRES,ISCTL,ISTAB(MVSIZ)
       my_real
      .   DIR(MVSIZ,2),SIGN(NEL,6),SHF(MVSIZ),ZT,WT,OFFS(MVSIZ),
      .   RX(MVSIZ), RY(MVSIZ), RZ(MVSIZ),NU1(MVSIZ),FAC(MVSIZ),
@@ -258,6 +279,8 @@ C
       iNTEGER SZ_R1_FREE,SZ_IX
       my_real, DIMENSION(:,:), ALLOCATABLE :: VAR_REG
       my_real, DIMENSION(:), POINTER :: DNL
+      my_real :: STI_C(MVSIZ),LL(MVSIZ),FLD(MVSIZ),
+     .           CNS2,FQMAX,DN
 C-----
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(L_BUFEL_) ,POINTER :: LBUF     
@@ -381,6 +404,7 @@ C
       MX = MXT(1)
       C1 =PM(32,MX)
       IPRES = MAT_ELEM%MAT_PARAM(MX)%IPRES
+      ISCTL = IGEO(97,PID)
       DO I=1,NEL
         SIGZM(I) = ZERO
         VOLM(I) = ZERO
@@ -438,7 +462,7 @@ C
      A   N5Y,     N6Y,     N1Z,     N2Z,
      B   N3Z,     N4Z,     N5Z,     N6Z,
      C   NEL,     MTN,     JALE,    JEUL)
-      IF (NTSHEG > 0) THEN
+      IF (NTSHEG > 0.AND.ISCTL == 0) THEN
          CALL SDLENSH3N(VOLG,LLSH,AREA , 
      .                  X1, X2, X3, X4, X5, X6,
      .                  Y1, Y2, Y3, Y4, Y5, Y6,
@@ -647,7 +671,7 @@ C------------------------------------------------------
 C Compute new stresses according to constitutive laws
 C------------------------------------------------------
         CURRENT_LAYER=ILAY         ! one treatment pass LAY to negative
-        CALL MMAIN(
+        CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -675,13 +699,13 @@ C------------------------------------------------------
      P   BID,         IPARG(1,NG), IGEO,        CONDE,
      Q   ITASK,       NLOC_DMG,    VAR_REG(1,ILAY),MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_R1_FREE,
-     *                SNPC,        STF,         SBUFMAT    ,
+     *   SNPC,        STF,         SBUFMAT      ,GLOB_THERM, 
      *   SVIS,        SZ_IX,       IRESP,       
      *   N2D,         TH_STRAIN,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT,         fheat  , OPT_MTN=MTN,OPT_JCVT=JCVT, 
      .   OPT_ISORTH=ISORTH,OPT_ISORTHG=ISORTHG)
 C
@@ -689,7 +713,7 @@ C
           STIN(I) = STIN(I)+STI(I)
         ENDDO
 C
-        IF(NODADT_THERM == 1) THEN
+        IF(GLOB_THERM%NODADT_THERM == 1) THEN
           DO I=1,NEL
             CONDEN(I)= CONDEN(I)+ CONDE(I)
           ENDDO
@@ -770,7 +794,7 @@ C--------------------------
      5           PY4      ,PZ1     ,PZ2      ,PZ3      ,
      6           PZ4      ,DT1     ,TEMP     ,TEMPEL   ,
      7           FHEAT    ,THEM    ,GBUF%OFF ,LBUF%OFF ,
-     8           NEL      )
+     8           NEL      ,GLOB_THERM%THEACCFACT)
           ELSE
           END IF
             CALL S6CTHERM(
@@ -781,7 +805,7 @@ C--------------------------
      5           PY4      ,PZ1     ,PZ2      ,PZ3      ,
      6           PZ4      ,DT1     ,TEMP     ,TEMPEL   ,
      7           DIE      ,THEM    ,GBUF%OFF ,LBUF%OFF ,
-     8           NEL      )
+     8           NEL      ,GLOB_THERM%THEACCFACT)
         ENDIF 
         DO I=1,NEL                                        
           OFFG(I)=MIN(OFFG(I),OFF(I))                        
@@ -850,13 +874,30 @@ C-----------------------------
 C Hourglass
 C-----------------------------
       IF ( IMPL_S == 0) THEN
-        CALL S6CHOUR3(GBUF%RHO,VOLG,CXX,
-     .   X1, X2, X3, X3, X4, X5, X6, X6,
-     .   Y1, Y2, Y3, Y3, Y4, Y5, Y6, Y6,
-     .   Z1, Z2, Z3, Z3, Z4, Z5, Z6, Z6,
-     .   VZ1, VZ2, VZ3, VZ3, VZ4, VZ5, VZ6, VZ6,
-     .   F31,F32,F33,F34,F35,F36,
-     .   NU,GBUF%HOURG,OFF,GBUF%VOL,GBUF%EINT,NEL)
+        IF (ISCTL > 0) THEN
+          DN = GEO(13,PID)
+          CALL S6CHOUR_CTL(
+     .      X1,  X2,  X3,  X4,  X5,  X6, 
+     .      Y1,  Y2,  Y3,  Y4,  Y5,  Y6, 
+     .      Z1,  Z2,  Z3,  Z4,  Z5,  Z6, 
+     .     VX1, VX2, VX3, VX4, VX5, VX6,
+     .     VY1, VY2, VY3, VY4, VY5, VY6,
+     .     VZ1, VZ2, VZ3, VZ4, VZ5, VZ6,
+     .     F11, F12, F13, F14, F15, F16,
+     .     F21, F22, F23, F24, F25, F26,
+     .     F31, F32, F33, F34, F35, F36,
+     .     PM,NPROPM, NUMMAT,MTN,MXT,DN,
+     .     GBUF%RHO,VOLG,CXX,GBUF%HOURG,
+     .     OFF,GBUF%VOL,GBUF%EINT,DT1,STIN,NEL)
+        ELSE
+          CALL S6CHOUR3(GBUF%RHO,VOLG,CXX,
+     .     X1, X2, X3, X3, X4, X5, X6, X6,
+     .     Y1, Y2, Y3, Y3, Y4, Y5, Y6, Y6,
+     .     Z1, Z2, Z3, Z3, Z4, Z5, Z6, Z6,
+     .     VZ1, VZ2, VZ3, VZ3, VZ4, VZ5, VZ6, VZ6,
+     .     F31,F32,F33,F34,F35,F36,
+     .     NU,GBUF%HOURG,OFF,GBUF%VOL,GBUF%EINT,NEL)
+        END IF !(ISCTL > 0) THEN
       ENDIF
 C-----------------------------
 C Small strain
@@ -872,7 +913,8 @@ C--------------------------------------
      .       VGXA, VGYA, VGZA, VGA2, VOLG,IPARTS,
      .       GRESAV,GRTH,IGRTH,GBUF%OFF,IEXPAN,GBUF%EINTTH,
      .       GBUF%FILL, XGXA, XGYA, XGZA,XGXA2,XGYA2,XGZA2,
-     .       XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),GBUF%OFF)
+     .       XGXYA,XGYZA,XGZXA,ITASK,IPARG(1,NG),GBUF%OFF,
+     .       SENSORS)
       ENDIF
 C--------------------------------
 C Convected frame to global frame
@@ -919,6 +961,59 @@ C--------------------------------
      3   R33,     F16,     F26,     F36,
      4   NEL)
 C----------------------------
+C     distortion control  
+C----------------------------
+      IF (ISCTL > 0) THEN
+         ALPHA_E(1:NEL) = ONE  
+         CALL SDISTOR_INI(                                      
+     1                NEL      ,STI_C    ,NPROPM     ,NUMMAT  ,       
+     2                ISMSTR   ,MXT      ,ISTAB      ,PM      ,       
+     3                GBUF%SIG ,GBUF%RHO ,CXX        ,OFFG    ,       
+     4                GBUF%OFF ,LL       ,VOLN       ,FLD     ,       
+     5                CNS2     ,FQMAX    )
+!      all in global system 
+        CALL S6GET_XV(                            
+     .                 NC1,      NC2,      NC3,                                
+     .                 NC4,      NC5,      NC6,         
+     .                  X1,       X2,       X3,               
+     .                  X4,       X5,       X6,               
+     .                  Y1,       Y2,       Y3,               
+     .                  Y4,       Y5,       Y6,               
+     .                  Z1,       Z2,       Z3,               
+     .                  Z4,       Z5,       Z6,               
+     .                 VX1,      VX2,      VX3,               
+     .                 VX4,      VX5,      VX6,               
+     .                 VY1,      VY2,      VY3,               
+     .                 VY4,      VY5,      VY6,               
+     .                 VZ1,      VZ2,      VZ3,               
+     .                 VZ4,      VZ5,      VZ6,               
+     .                   X,      XDP,        V,         
+     .              NUMNOD,   ISMSTR,     NEL )
+         CALL S6FOR_DISTOR(
+     .             X1,       X2,       X3,        
+     .             X4,       X5,       X6,        
+     .             Y1,       Y2,       Y3,        
+     .             Y4,       Y5,       Y6,        
+     .             Z1,       Z2,       Z3,        
+     .             Z4,       Z5,       Z6,        
+     .            VX1,      VX2,       X3,        
+     .            VX4,      VX5,       X6,        
+     .            VY1,      VY2,       Y3,        
+     .            VY4,      VY5,       Y6,        
+     .            VZ1,      VZ2,       Z3,        
+     .            VZ4,      VZ5,       Z6,        
+     .            F11,      F12,      F13,       
+     .            F14,      F15,      F16,       
+     .            F21,      F22,      F23,       
+     .            F24,      F25,      F26,       
+     .            F31,      F32,      F33,       
+     .            F34,      F35,      F36,       
+     .           STIN,    STI_C,      FLD,      
+     .           CNS2,      LL ,    ISTAB,   
+     .          FQMAX,GBUF%EINT_DISTOR,DT1,   
+     .           NEL )
+      ENDIF
+C----------------------------
       IF(NFILSOL/=0) CALL S6FILLOPT(
      1   GBUF%FILL,STI,      F11,      F21,
      2   F31,      F12,      F22,      F32,
@@ -939,7 +1034,8 @@ C----------------------------
      6   F24,     F34,     F15,     F25,
      7   F35,     F16,     F26,     F36,
      8   NEL,    JTHE,    FTHE,    THEM,
-     9   CONDN,CONDEN,   IFTHE,  ICONDN)
+     9   CONDN,CONDEN,   IFTHE,  ICONDN,
+     .   GLOB_THERM%NODADT_THERM)
       ELSE
         CALL S6CUMU3P(
      1   GBUF%OFF,STIN,    FSKY,    FSKY,
@@ -949,7 +1045,8 @@ C----------------------------
      5   F34,     F15,     F25,     F35,
      6   F16,     F26,     F36,     NEL,
      7   NFT,    JTHE, FTHESKY,    THEM,
-     8   CONDNSKY,CONDEN)
+     8   CONDNSKY,CONDEN,
+     .   GLOB_THERM%NODADT_THERM)
       ENDIF
       IF (NTSHEG > 0)
      +  CALL SCUMUALPHA6(

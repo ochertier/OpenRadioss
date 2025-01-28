@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,13 +34,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    message_mod                 ../starter/share/message_module/message_mod.F
       !||    submodel_mod                ../starter/share/modules1/submodel_mod.F
       !||====================================================================
-      SUBROUTINE CREATE_SEG_CLAUSE(
-     .               CLAUSE,  ITABM1  ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
+      SUBROUTINE CREATE_SEG_CLAUSE(CLAUSE,  ITABM1  ,JCLAUSE ,IS_AVAILABLE ,LSUBMODEL)
 C-----------------------------------------------
-C   ROUTINE DESCRIPTION :
+C   D e s c r i p t i o n
+C-----------------------------------------------
 C   ===================
 C   Create PART Clause from LIST
-C------------------------------------------------------------------
+C-----------------------------------------------
 C   DUMMY ARGUMENTS DESCRIPTION:
 C   ===================
 C
@@ -51,7 +51,6 @@ C     IPARTM1       MAP Table UID -> LocalID
 C     JCLAUSE       parameter with HM_READER (current clause read)
 C     IS_AVAILABLE  Bool / Result of HM_interface
 C     LSUBMODEL     SUBMODEL Structure.
-C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -73,45 +72,34 @@ C-----------------------------------------------
       INTEGER JCLAUSE
       LOGICAL :: IS_AVAILABLE
       INTEGER, INTENT(IN), DIMENSION(NUMNOD,2) :: ITABM1
-!
       TYPE (SET_) ::  CLAUSE
-      TYPE(SUBMODEL_DATA),INTENT(IN):: LSUBMODEL(*)
+      TYPE(SUBMODEL_DATA),INTENT(IN):: LSUBMODEL(NSUBMOD)
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,NINDX,SEG_MAX,NOD_1,NOD_2,NOD_3,NOD_4,
-     . NODSYS_1,NODSYS_2,NODSYS_3,NODSYS_4,SEG_ID,LINE_SEG
-!
+      INTEGER I,J,NINDX,SEG_MAX,NOD_1,NOD_2,NOD_3,NOD_4,NODSYS_1,NODSYS_2,NODSYS_3,NODSYS_4,SEG_ID,LINE_SEG
       INTEGER, ALLOCATABLE, DIMENSION(:,:) :: BUFSURF
-!
-      INTEGER SET_USRTOS
-      EXTERNAL SET_USRTOS
-C=======================================================================
-
+      INTEGER,EXTERNAL :: SET_USRTOS
+C-----------------------------------------------
+C   S o u r c e  L i n e s
+C-----------------------------------------------
       LINE_SEG = 0
-
       CALL HM_GET_INT_ARRAY_INDEX('segmax' ,SEG_MAX ,JCLAUSE,IS_AVAILABLE,LSUBMODEL)
-
       ALLOCATE(BUFSURF(4,SEG_MAX))
-
       NINDX = 0
 !
       ! Read & convert Segs
       ! ---------------------
       DO I=1,SEG_MAX  ! always = 1 for clause 'SEG'
-
         CALL HM_GET_INT_ARRAY_2INDEXES('segid',SEG_ID,JCLAUSE ,I,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INT_ARRAY_2INDEXES('ids1' ,NOD_1 ,JCLAUSE ,I,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INT_ARRAY_2INDEXES('ids2' ,NOD_2 ,JCLAUSE ,I,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INT_ARRAY_2INDEXES('ids3' ,NOD_3 ,JCLAUSE ,I,IS_AVAILABLE,LSUBMODEL)
         CALL HM_GET_INT_ARRAY_2INDEXES('ids4' ,NOD_4 ,JCLAUSE ,I,IS_AVAILABLE,LSUBMODEL)
-
-
         NODSYS_1 = SET_USRTOS(NOD_1,ITABM1,NUMNOD)
         IF (NODSYS_1 == 0) THEN
-           ! Node was not found. Issue a Warning & Skip.
-           CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
+           ! Node was not found. Issue an error.
+           CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                             I1 = CLAUSE%SET_ID,
      .                             I2=SEG_ID,
      .                             I3=NOD_1,
@@ -120,13 +108,11 @@ C=======================================================================
         ELSE
           NODSYS_1 = ITABM1(NODSYS_1,2)
         ENDIF
-        
 
         NODSYS_2 = SET_USRTOS(NOD_2,ITABM1,NUMNOD)
         IF (NODSYS_2 == 0) THEN
-           ! Node was not found. Issue a Warning & Skip.
-           CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
+          ! Node was not found. Issue an error.
+           CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                             I1 = CLAUSE%SET_ID,
      .                             I2=SEG_ID,
      .                             I3=NOD_2,
@@ -135,48 +121,48 @@ C=======================================================================
         ELSE
           NODSYS_2 = ITABM1(NODSYS_2,2)
         ENDIF
-
-
-        NODSYS_3 = SET_USRTOS(NOD_3,ITABM1,NUMNOD)
-        NODSYS_4 = SET_USRTOS(NOD_4,ITABM1,NUMNOD)
-
-        IF (NODSYS_3 == 0 .AND. NODSYS_4 == 0) LINE_SEG = 1 ! Line SEG
-
-
+        
+        LINE_SEG = 0
+        IF (NOD_3 == 0 .AND. NOD_4 == 0) THEN
+          LINE_SEG = 1 ! Line SEG
+          NODSYS_3 = 0
+          NODSYS_4 = 0
+        ELSE
+          NODSYS_3 = SET_USRTOS(NOD_3,ITABM1,NUMNOD)
+          NODSYS_4 = SET_USRTOS(NOD_4,ITABM1,NUMNOD)
+        ENDIF
 
         IF (LINE_SEG == 0) THEN! Surf SEG --> continue Node check existence
           IF (NODSYS_3 == 0) THEN
-            ! Node was not found. Issue a Warning & Skip.
-            CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,
-     .                             MSGTYPE=MSGERROR,
+            ! Node was not found. Issue an error.
+            CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,MSGTYPE=MSGERROR,
      .                             I1 = CLAUSE%SET_ID,
      .                             I2=SEG_ID,
      .                             I3=NOD_3,
      .                             C1=TRIM(CLAUSE%TITLE),
      .                             C2='NODE')
           ELSE
+            ! Node found
             NODSYS_3 = ITABM1(NODSYS_3,2)
           ENDIF
 
-!         correction to allow for 3 noded surface (triangle)
-          IF (NODSYS_4 == 0) NODSYS_4 = NODSYS_3
-!
-!          IF (NODSYS_4 == 0) THEN
-!            ! Node was not found. Issue a Warning & Skip.
-!            CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,
-!     .                             MSGTYPE=MSGERROR,
-!     .                             I1 = CLAUSE%SET_ID,
-!     .                             I2=SEG_ID,
-!     .                             I3=NOD_4,
-!     .                             C1=TRIM(CLAUSE%TITLE),
-!     .                             C2='NODE')
-!          ELSE
-!            NODSYS_4 = ITABM1(NODSYS_4,2)
-!          ENDIF
+          IF (NOD_4 == 0) THEN 
+            ! correction to allow for 3 noded surface (triangle)
+              NODSYS_4 = NODSYS_3
+          ELSE IF (NODSYS_4 == 0) THEN
+            ! Node was not found. Issue an error.
+            CALL ANCMSG(MSGID=1903,ANMODE=ANINFO,MSGTYPE=MSGERROR,
+     .                             I1 = CLAUSE%SET_ID,
+     .                             I2=SEG_ID,
+     .                             I3=NOD_4,
+     .                             C1=TRIM(CLAUSE%TITLE),
+     .                             C2='NODE')
+          ELSE IF (NODSYS_4 /= 0) THEN
+            ! Node found
+              NODSYS_4 =  ITABM1(NODSYS_4,2)
+          ENDIF
+
         ENDIF ! IF (LINE_SEG == 0)
-
-
-
 
         NINDX = NINDX+1    !   nb of CLAUSE SEGs
         BUFSURF(1,NINDX) = NODSYS_1
@@ -186,15 +172,12 @@ C=======================================================================
 
       ENDDO ! DO I=1,SEG_MAX
 
-
-
       ! Copy in final SET
       ! ------------------
 
       !------------------------------------!
       !  create SURF clause or LINE clause !
       !------------------------------------!
-
 
       IF (LINE_SEG == 0) THEN
 
@@ -224,8 +207,6 @@ C=======================================================================
         DO I=1,NINDX
           CLAUSE%LINE_NODES(I,1) = BUFSURF(1,I) ! N1
           CLAUSE%LINE_NODES(I,2) = BUFSURF(2,I) ! N2
-          CLAUSE%LINE_NODES(I,3) = 0 ! N3
-          CLAUSE%LINE_NODES(I,4) = 0 ! N4
           CLAUSE%LINE_ELTYP(I)   = 0  ! ELTYP
           CLAUSE%LINE_ELEM(I)    = 0  ! ELEM
         ENDDO

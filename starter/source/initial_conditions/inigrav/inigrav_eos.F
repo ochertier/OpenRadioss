@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -61,6 +61,7 @@ C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,K
       INTEGER :: EOSTYPE, ITER, MAX_ITER, MAT(NEL), REMAINING_ELTS, NBMAT, NVAREOS
+      INTEGER :: IBID(NEL) !bfrac not used int his context
       my_real :: TOL, INCR
       my_real :: FUNC(NEL), DFUNC(NEL), ERROR(NEL), RHOZERO(NEL), RHO(NEL), 
      .           MU(NEL), MU2(NEL), ESPE(NEL), DVOL(NEL), DF(NEL), VOL(NEL), PSH(NEL), 
@@ -147,7 +148,7 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
          ITER = ITER + 1
          DO K = 1, NEL
             MU(K) = RHO(K) / RHOZERO(K) - ONE
-            DF(K) = RHOZERO(I) / RHO(K)
+            DF(K) = RHOZERO(K) / RHO(K)
             EINT(K) = EINT(K) / DF(K) !with IFLAG==2 we need ESPE=Df*EINT
          ENDDO
          CALL EOSMAIN(2     , NEL    , EOSTYPE  , PM     , OFF  , EINT, 
@@ -155,7 +156,8 @@ C IMAT : relevant for multifluid eos. imat=0 => monomaterial law
      .                DVOL  , DF     , VOL      , MAT    , PSH  , 
      .                PRES  , DPDM   , DPDE     , THETA  , ECOLD, 
      .                BUFMAT, SIG    , MU       , MLW    , POLD ,
-     .                NPF   , TF     , EBUF%VAR , NVAREOS)
+     .                NPF   , TF     , EBUF%VAR , NVAREOS, MAT_PARAM(MATID),
+     .                IBID)
           DO K=1,NEL
             EINT(K)=EINT(K)*DF(K) ! set back to Eint/V
           ENDDO

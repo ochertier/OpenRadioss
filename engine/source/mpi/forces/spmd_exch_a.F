@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,6 +27,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||--- uses       -----------------------------------------------------
       !||    acceleration_dp_mod   ../engine/share/modules/acceleration_dp_mod.F
+      !||    glob_therm_mod        ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod               ../engine/share/modules/h3d_mod.F
       !||====================================================================
       SUBROUTINE SPMD_EXCH_A(
@@ -35,11 +36,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      3   LENR     ,FTHE   ,MCP  ,DMSPH ,CONDN, 
      4   MS_2D,MCP_OFF,
      5   FORNEQS  ,NFACNIT,LENC  ,FCONT ,H3D_DATA ,
-     6   FNCONT  ,FTCONT)
+     6   FNCONT  ,FTCONT, GLOB_THERM)
 C--------------------------------------
       USE ACCELERATION_DP_MOD
       USE H3D_MOD
-C--------------------------------------
+      USE GLOB_THERM_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -76,6 +77,7 @@ C-----------------------------------------------
       my_real  , INTENT(INOUT) :: FCONT(3,NUMNOD),FNCONT(3,NUMNOD),
      .        FTCONT(3,NUMNOD)
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE(GLOB_THERM_) ,INTENT(IN) :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -117,7 +119,7 @@ C
       IF(SOL2SPH_FLAG/=0)THEN
         IADMSPH=5
         IF(IRODDL/=0)IADMSPH=IADMSPH+4
-        IF(INTHEAT /= 0 .OR. ITHERM_FE /= 0 )IADMSPH=IADMSPH+1
+        IF(GLOB_THERM%INTHEAT /= 0 .OR. GLOB_THERM%ITHERM_FE /= 0) IADMSPH=IADMSPH+1
         L = 1
         DO I=1,NSPMD
 C preparation envoi  partie fixe (elem) a proc I
@@ -146,7 +148,7 @@ C
       IAD_SEND(1) = 1
       DO I=1,NSPMD
 C preparation envoi  partie fixe (elem) a proc I
-        IF(INTHEAT == 0 .AND. ITHERM_FE == 0 )THEN
+        IF(GLOB_THERM%INTHEAT == 0 .AND. GLOB_THERM%ITHERM_FE == 0 )THEN
          IF (N2D==0.AND.IFSUBM==0) THEN
           IF(IRODDL/=0) THEN
 #include      "vectorize.inc"
@@ -282,12 +284,12 @@ C
               SBUF(L+6) =  STIFN(NOD)
               SBUF(L+7) =  STIFR(NOD)
               SBUF(L+8) =  FTHE(NOD)
-              IF(ITHERM_FE == 1) SBUF(L+9) = MCP(NOD)
-              IF(ITHERM_FE == 1) SBUF(L+10) = MCP_OFF(NOD)
+              IF(GLOB_THERM%ITHERM_FE == 1) SBUF(L+9) = MCP(NOD)
+              IF(GLOB_THERM%ITHERM_FE == 1) SBUF(L+10) = MCP_OFF(NOD)
               L = L + SIZE
             END DO
           ELSE
-            IF(NODADT_THERM ==1 )THEN
+            IF(GLOB_THERM%NODADT_THERM ==1 )THEN
 #include      "vectorize.inc"
               DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
                 NOD = FR_ELEM(J)
@@ -297,8 +299,8 @@ C
                 SBUF(L+3) =  STIFN(NOD)
                 SBUF(L+4) =  FTHE(NOD)
                 SBUF(L+5) =  CONDN(NOD)
-                IF(ITHERM_FE == 1) SBUF(L+6) = MCP(NOD)
-                IF(ITHERM_FE == 1) SBUF(L+7) = MCP_OFF(NOD)
+                IF(GLOB_THERM%ITHERM_FE == 1) SBUF(L+6) = MCP(NOD)
+                IF(GLOB_THERM%ITHERM_FE == 1) SBUF(L+7) = MCP_OFF(NOD)
                 L = L + SIZE
               END DO
             ELSE
@@ -310,8 +312,8 @@ C
                 SBUF(L+2) =  ACC_POINTER(3,NOD)
                 SBUF(L+3) =  STIFN(NOD)
                 SBUF(L+4) =  FTHE(NOD)
-                IF(ITHERM_FE == 1) SBUF(L+5) = MCP(NOD)
-                IF(ITHERM_FE == 1) SBUF(L+6) = MCP_OFF(NOD)
+                IF(GLOB_THERM%ITHERM_FE == 1) SBUF(L+5) = MCP(NOD)
+                IF(GLOB_THERM%ITHERM_FE == 1) SBUF(L+6) = MCP_OFF(NOD)
                 L = L + SIZE
               END DO
             ENDIF
@@ -485,7 +487,7 @@ C
       IF(SOL2SPH_FLAG/=0)THEN 
        IADMSPH=5
        IF(IRODDL/=0)IADMSPH=IADMSPH+4
-       IF(INTHEAT /= 0 .OR. ITHERM_FE /= 0 )IADMSPH=IADMSPH+1
+       IF (GLOB_THERM%INTHEAT /= 0 .OR. GLOB_THERM%ITHERM_FE /= 0) IADMSPH=IADMSPH+1
        DO I = 1, NSPMD
         NB_NOD = IAD_ELEM(1,I+1)-IAD_ELEM(1,I)
         IF(NB_NOD>0)THEN
@@ -508,7 +510,7 @@ C   test si msg necessaire a envoyer a completer par test interface
           CALL MPI_WAIT(REQ_R(I),STATUS,IERROR)
           L = IAD_RECV(I)
 C cas 3D
-          IF(ITHERM_FE == 0 .AND. INTHEAT == 0 ) THEN
+          IF (GLOB_THERM%ITHERM_FE == 0 .AND. GLOB_THERM%INTHEAT == 0 ) THEN
             IF (N2D==0.AND.IFSUBM==0) THEN
               IF(IRODDL/=0) THEN
 #include        "vectorize.inc"
@@ -643,12 +645,12 @@ C
                 STIFN(NOD)= STIFN(NOD)+ RBUF(L+6)
                 STIFR(NOD)= STIFR(NOD)+ RBUF(L+7)
                 FTHE(NOD) = FTHE(NOD) + RBUF(L+8)
-                IF(ITHERM_FE == 1) MCP(NOD) = MCP(NOD) + RBUF(L+9)
-                IF(ITHERM_FE == 1) MCP_OFF(NOD) = MAX(MCP_OFF(NOD),RBUF(L+10))
+                IF(GLOB_THERM%ITHERM_FE == 1) MCP(NOD) = MCP(NOD) + RBUF(L+9)
+                IF(GLOB_THERM%ITHERM_FE == 1) MCP_OFF(NOD) = MAX(MCP_OFF(NOD),RBUF(L+10))
                 L = L + SIZE
               END DO
             ELSE
-              IF(NODADT_THERM == 1) THEN
+              IF(GLOB_THERM%NODADT_THERM == 1) THEN
 #include      "vectorize.inc"
                 DO J=IAD_ELEM(1,I),IAD_ELEM(1,I+1)-1
                   NOD = FR_ELEM(J)
@@ -658,8 +660,8 @@ C
                   STIFN(NOD)= STIFN(NOD)+ RBUF(L+3)
                   FTHE(NOD) = FTHE(NOD) + RBUF(L+4)
                   CONDN(NOD) = CONDN(NOD) + RBUF(L+5)
-                  IF(ITHERM_FE == 1) MCP(NOD) = MCP(NOD) + RBUF(L+6)
-                  IF(ITHERM_FE == 1) MCP_OFF(NOD) =MAX(MCP_OFF(NOD),RBUF(L+7))
+                  IF(GLOB_THERM%ITHERM_FE == 1) MCP(NOD) = MCP(NOD) + RBUF(L+6)
+                  IF(GLOB_THERM%ITHERM_FE == 1) MCP_OFF(NOD) =MAX(MCP_OFF(NOD),RBUF(L+7))
                   L = L + SIZE
                 END DO
               ELSE
@@ -671,8 +673,8 @@ C
                   ACC_POINTER(3,NOD) = ACC_POINTER(3,NOD) + RBUF(L+2)
                   STIFN(NOD)= STIFN(NOD)+ RBUF(L+3)
                   FTHE(NOD) = FTHE(NOD) + RBUF(L+4)
-                  IF(ITHERM_FE == 1) MCP(NOD) = MCP(NOD) + RBUF(L+5)
-                  IF(ITHERM_FE == 1) MCP_OFF(NOD) =MAX(MCP_OFF(NOD),RBUF(L+6))
+                  IF(GLOB_THERM%ITHERM_FE == 1) MCP(NOD) = MCP(NOD) + RBUF(L+5)
+                  IF(GLOB_THERM%ITHERM_FE == 1) MCP_OFF(NOD) =MAX(MCP_OFF(NOD),RBUF(L+6))
                   L = L + SIZE
                 END DO
               ENDIF

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,7 +38,7 @@
       !||--- uses       -----------------------------------------------------
       !||    constant_mod   ../common_source/modules/constant_mod.F
       !||    inivel_mod     ../common_source/modules/inivel_mod.F90
-      !||    sensor_mod     ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod     ../common_source/modules/sensor_mod.F90
       !||====================================================================
         subroutine inivel_dt2(ninivelt,inivel_t,sensors,time , dt2 ,nspmd)
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -76,6 +76,8 @@
 !  if activation due to T_start or sensor
        iactiv = 0
        time1 = time +half*dt2
+       tstart = -HUGE(tstart)
+       sens_id = -HUGE(sens_id)
        do n =1,ninivelt 
          itype = inivel_t(n)%itype
          if (itype < 0 ) cycle 

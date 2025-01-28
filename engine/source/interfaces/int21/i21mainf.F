@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,16 +33,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i21sms2            ../engine/source/interfaces/int21/i21sms2.F
       !||    i21therm           ../engine/source/interfaces/int21/i21therm.F
       !||    i7cdcor3           ../engine/source/interfaces/int07/i7cdcor3.F
-      !||    startime           ../engine/source/system/timer.F
-      !||    stoptime           ../engine/source/system/timer.F
+      !||    startime           ../engine/source/system/timer_mod.F90
+      !||    stoptime           ../engine/source/system/timer_mod.F90
       !||    sum_6_float_sens   ../engine/source/system/parit.F
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod            ../engine/share/modules/h3d_mod.F
       !||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
       !||    message_mod        ../engine/share/message_module/message_mod.F
       !||    outputs_mod        ../common_source/modules/outputs_mod.F
+      !||    timer_mod          ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I21MAINF(
+      SUBROUTINE I21MAINF(TIMERS,
      1                   IPARI  ,INTBUF_TAB         ,X        ,A      ,
      2                   ICODT  ,FSAV    ,V         ,MS       ,ITAB   ,
      3                   STIFN  ,FSKYI   ,ISKY      ,FCONT    ,NIN    ,
@@ -56,10 +57,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      B                   CONDNSKYI,DT2T   ,NELTST   ,ITYPTST ,KINET    ,
      C                   FBSAV6  ,ISENSINT,DIMFB    ,NISKYFI ,H3D_DATA ,
      D                   PSKIDS  ,TAGNCONT,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,
-     E                   DGAPLOADINT,S_LOADPINTER,INTEREFRIC )                   
+     E                   DGAPLOADINT,S_LOADPINTER,INTEREFRIC ,NODADT_THERM,THEACCFACT)                   
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTSTAMP_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
@@ -89,6 +91,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER NELTST, ITYPTST, NIN, NSTRF(*), NRTMDIM
       INTEGER IPARI(NPARI,NINTER), ICODT(*),ICONTACT(*),
      .        ITAB(*), ISKY(*), ISKYI_SMS(*), NODNX_SMS(*),
@@ -103,7 +106,8 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
       INTEGER  , INTENT(IN) :: INTEREFRIC
-C     REAL
+      INTEGER  , INTENT(IN) :: NODADT_THERM
+      my_real  , intent(in) :: theaccfact
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real 
      .   X(*), A(3,*), FSAV(*), V(3,*),
@@ -345,7 +349,7 @@ C cand_n et cand_e remplace par cand_n_n et cand_e_n
      M  H4       ,DIST      ,ITAB         ,NOINT   ,INTBUF_TAB%VARIABLES(23),
      N  INVN     )
           
-          IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+          IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
 
           IPARI(29,NIN) = 1
           IF (DEBUG(3)>=1)
@@ -389,7 +393,7 @@ C
      9                   X3     ,Y3    ,Z3    ,X4    ,Y4    ,
      A                   Z4     ,ITAB  ,NSVG  ,INTBUF_TAB%MSR_L,IX1   ,
      B                   IX2    ,IX3   ,IX4    ,TEMP ,FCOND ,
-     C                   DCOND )      
+     C                   DCOND  ,THEACCFACT)      
           ENDIF 
 C
           IF(IDTMINS==2.OR.IDTMINS_INT/=0)THEN
@@ -426,9 +430,10 @@ C
      E                  PRATIO   ,H3D_DATA%N_SCAL_SKID,PSKIDS ,IPARI(95,NIN),
      F                  TAGNCONT ,KLOADPINTER,LOADPINTER ,LOADP_HYD_INTER,
      G                  DGAPLOADINT,DIST,GAPV,S_LOADPINTER    ,EFRIC_L  ,
-     H                  FHEAT     ,EFRICT ,INTEREFRIC )  
+     H                  FHEAT     ,EFRICT ,INTEREFRIC , 
+     .                  NODADT_THERM)
 C
-          IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+          IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
 C
         ENDDO
 

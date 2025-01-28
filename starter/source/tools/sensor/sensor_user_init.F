@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,9 +25,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    lectur             ../starter/source/starter/lectur.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod         ../starter/share/modules1/sensor_mod.F
       !||====================================================================
-        SUBROUTINE SENSOR_USER_INIT()
+        SUBROUTINE SENSOR_USER_INIT(SENSOR_USER_STRUCT)
 !$COMMENT
 !       SENSOR_USER_INIT description
 !       initialization of size of SENSOR_USER_STRUCT
@@ -42,6 +41,10 @@ C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
 #include      "implicit_f.inc"
+C-----------------------------------------------
+C   A r g u m e n t s
+C-----------------------------------------------
+      type(sensor_user_struct_), INTENT(inout) :: SENSOR_USER_STRUCT
 C-----------------------------------------------
 C   S o u r c e   L i n e s
 C-----------------------------------------------

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fvbag_mod                    ../engine/share/modules/fvbag_mod.F
       !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||====================================================================
       SUBROUTINE NODALSSP(IFUNC          , WA4                  , WA4_FVM, IFLOW   , RFLOW,
      .                    IPARG          , ELBUF_TAB            , IX     , NIX     , NUMEL,
@@ -44,7 +44,7 @@ C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
 C   This subroutine defines & writes nodal sound speed requested by Engine keyword /H3D/NODA/SSP
-C      application :  /MONVOL/FVMBAG* (sound spped from polyhedra, specific buffer).
+C      application :  /MONVOL/FVMBAG* (sound speed from polyhedra, specific buffer).
 C-----------------------------------------------
 C   P r e - C o n d i t i o n s
 C-----------------------------------------------
@@ -57,6 +57,7 @@ C-----------------------------------------------
       USE FVBAG_MOD , only:FVBAG_DATA,NFVBAG
       USE GROUPDEF_MOD , only:GROUP_
       USE MULTI_FVM_MOD , ONLY : MULTI_FVM_STRUCT
+      use anim_nodal_ssp_elems_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------

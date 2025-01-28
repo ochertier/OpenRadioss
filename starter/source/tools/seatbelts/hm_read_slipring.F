@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -293,6 +293,7 @@ C
               SLIPRING(I)%FRAM(J)%VECTOR = ZERO
               SLIPRING(I)%FRAM(J)%ORIENTATION_ANGLE = ZERO
               SLIPRING(I)%FRAM(J)%MATERIAL_FLOW = ZERO
+              SLIPRING(I)%FRAM(J)%MATERIAL_FLOW_OLD = ZERO
               SLIPRING(I)%FRAM(J)%DFS = ZERO
               SLIPRING(I)%FRAM(J)%RESIDUAL_LENGTH = ZERO
               SLIPRING(I)%FRAM(J)%CURRENT_LENGTH = ZERO
@@ -468,6 +469,7 @@ C
               SLIPRING(I)%FRAM(J)%VECTOR = ZERO
               SLIPRING(I)%FRAM(J)%ORIENTATION_ANGLE = ZERO
               SLIPRING(I)%FRAM(J)%MATERIAL_FLOW = ZERO
+              SLIPRING(I)%FRAM(J)%MATERIAL_FLOW_OLD = ZERO
               SLIPRING(I)%FRAM(J)%DFS = ZERO
               SLIPRING(I)%FRAM(J)%RESIDUAL_LENGTH = ZERO
               SLIPRING(I)%FRAM(J)%CURRENT_LENGTH = ZERO
@@ -654,6 +656,9 @@ C---------- Fill of fram structure
 C
             DO J=1,NFRAM
 C
+              NODE1 = -HUGE(NODE1)
+              NODE2 = -HUGE(NODE2)
+              NODE3 = -HUGE(NODE3)
               NODE_ID = IGRNOD(GRN_LOC)%ENTITY(J)
               SLIPRING(I)%FRAM(J)%ANCHOR_NODE = NODE_ID
               SLIPRING(I)%FRAM(J)%ORIENTATION_NODE = 0

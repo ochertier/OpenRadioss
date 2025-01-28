@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -37,6 +37,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    init_link_c          ../engine/source/coupling/rad2rad/rad2rad_c.c
       !||    init_link_nl_c       ../engine/source/coupling/rad2rad/rad2rad_c.c
       !||    init_link_spmd       ../engine/source/coupling/rad2rad/r2r_init.F
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
       !||    openfifo_c           ../engine/source/coupling/rad2rad/rad2rad_c.c
       !||    opensem_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
       !||    openshm_c            ../engine/source/coupling/rad2rad/rad2rad_c.c
@@ -327,7 +328,7 @@ C
                 CALL GET_MASS_RBY_C(IDP,NNG,GRNOD,MS,IN,X,NPBY,NRBODY,RBY,NNPBY,NRBY)
                 CALL R2R_RBY(NNG,ITAB,GRNOD,X,MS,IN,NPBY,RBY,XDP,1,WEIGHT)
               ELSEIF (NLLNK(IEX)==1) THEN
-C---------- Coupling of non local dof - mass not modifed -
+C---------- Coupling of non local dof - mass not modified -
                 CALL SEND_IBUF_C(IDP,1)
               ELSE
                 CALL GET_MASS_C(IDP,NNG,GRNOD,MS,IN)

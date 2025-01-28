@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,8 +40,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
+      !||    my_alloc_mod                 ../common_source/tools/memory/my_alloc.F90
       !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
       !||====================================================================
       SUBROUTINE DFUNCS(ELBUF_TAB  ,FUNC      ,IFUNC     ,IPARG    ,GEO     ,
@@ -50,7 +51,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      4                  IADG       ,SPBUF     ,IPART     ,IPARTSP  ,ISPH3D  ,
      5                  X          ,V         ,W         ,ALE_CONNECTIVITY,
      6                  NERCVOIS   ,NESDVOIS  ,LERCVOIS  ,LESDVOIS ,BUFMAT  ,
-     7                  FANI_CELL  ,MULTI_FVM ,MAT_PARAM )
+     7                  FANI_CELL  ,MULTI_FVM ,MAT_PARAM ,ITHERM   )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -65,6 +66,7 @@ C-----------------------------------------------
       USE ELBUFDEF_MOD
       USE MULTIMAT_PARAM_MOD , ONLY : M51_N0PHAS, M51_NVPHAS
       USE MATPARAM_DEF_MOD , ONLY : MATPARAM_STRUCT_
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -94,7 +96,7 @@ C-----------------------------------------------
       INTEGER IPARG(NPARG,*),EL2FA(*),IXS(NIXS,NUMELS),IFUNC,NBF,ISPH3D,
      .        NBPART,IADG(NSPMD,*),IPM(NPROPMI,NUMMAT),
      .        IPART(LIPART1,*),IPARTSP(*),BUF,IGEO(NPROPGI,NUMGEO)
-      REAL  WAL(NBF)
+      INTEGER, INTENT(IN) :: ITHERM
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
@@ -121,6 +123,7 @@ C-----------------------------------------------
      .   SIG1(MVSIZ),SIG2(MVSIZ),SIG3(MVSIZ),SIG4(MVSIZ),SIG5(MVSIZ),
      .   SIG6(MVSIZ),FF0,GG0,HH0,LL0,MM0,NN0,CRIT,VEL(0:4),VFRAC(MVSIZ,21),TMP(3,8)
       REAL R4
+      REAL,DIMENSION(:),ALLOCATABLE::WAL
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF    
       TYPE(BUF_MAT_)  ,POINTER :: MBUF  
@@ -133,6 +136,7 @@ C-----------------------------------------------
       TARGET :: BUFMAT
       my_real :: MY_VALUE,MY_ONE
 C=======================================================================
+      CALL MY_ALLOC(WAL,NBF)
       NN1  = 1
       NN2  = 1
       NN3  = NN2 + NUMELS
@@ -145,7 +149,8 @@ C-----------------------------------------------
       !     INITIALIZATION IF SCHLIEREN DEFINED               !
       !-------------------------------------------------------!      
       IF(IFUNC==4892)THEN
-        CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM)
+        CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM,
+     .                                  ITHERM)
       ENDIF!(IFUNC==4892)
    
 
@@ -1609,9 +1614,7 @@ C
 
 c------------------------------------ Tillotson Region id
             ELSEIF( IFUNC == 5172 ) THEN
-              DO I=LFT,LLT
-                EVAR(I) = ZERO
-              ENDDO 
+              EVAR(1:NEL) = ZERO
               MT = IXS(1,NFT+1)
               IF (MLW == 151) THEN 
                 NLAY = ELBUF_TAB(NG)%NLAY 
@@ -1657,7 +1660,45 @@ c------------------------------------ Tillotson Region id
                   ENDDO
                 ENDIF
               ENDIF
-                       
+
+c------------------------------------ Volumetric Strain (VSTRAIN)
+            ELSEIF( IFUNC == 5173 ) THEN
+              EVAR(1:NEL) = ZERO
+              MT = IXS(1,NFT+1)
+              IF(PM(89,MT) > ZERO)THEN
+                DO I=1,NEL
+                  EVAR(I) = GBUF%RHO(I) / PM(89,MT) - ONE
+                ENDDO
+              ENDIF
+
+           ELSEIF(IFUNC >= 5173+1 .AND. IFUNC <= 5173+21)THEN
+              EVAR(1:NEL) = ZERO
+              ISUBMAT = IFUNC-5173
+              IF(MLW == 151)THEN
+                MT = IXS(1,1+NFT)
+                MT = MAT_PARAM(MT)%MULTIMAT%MID(ISUBMAT)
+                DO I=1,NEL
+                  EVAR(I) = MULTI_FVM%RHO(I + NFT)  / PM(89,MT) - ONE
+                ENDDO
+              ELSEIF(MLW == 51)THEN
+                   ISUBMAT   = IFUNC - 5173
+                   !bijection for iform=12
+                   IMAT = IXS(1,NFT+1)
+                   IADBUF = IPM(7,IMAT)
+                   NUPARAM= IPM(9,IMAT)
+                   UPARAM => BUFMAT(IADBUF:IADBUF+NUPARAM)
+                   ISUBMAT = UPARAM(276+ISUBMAT) !bijective order
+                   IUS=M51_N0PHAS+(ISUBMAT-1)*M51_NVPHAS
+                   !
+                   LLT       = IPARG(2,NG)
+                   IPOS      = 20
+                   K         = LLT * ((IUS )+IPOS-1)
+                   MT = IXS(1,1+NFT)
+                   MT = MAT_PARAM(MT)%MULTIMAT%MID(ISUBMAT)
+                   DO I=LFT,LLT
+                     EVAR(I) = MBUF%VAR(K+I) / PM(89,MT) - ONE
+                   ENDDO
+              ENDIF
 c------------------------------------ 
               !OTHER IFUNC VALUES
               ELSE 

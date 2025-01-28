@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    r6def3   ../engine/source/elements/spring/r6def3.F
+      !||    r6def3             ../engine/source/elements/spring/r6def3.F
       !||--- called by ------------------------------------------------------
-      !||    rforc3   ../engine/source/elements/spring/rforc3.F
+      !||    rforc3             ../engine/source/elements/spring/rforc3.F
       !||--- calls      -----------------------------------------------------
-      !||    redef3   ../engine/source/elements/spring/redef3.F
-      !||    repla3   ../engine/source/elements/spring/repla3.F
+      !||    repla3             ../engine/source/elements/spring/repla3.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod   ../common_source/modules/python_mod.F90
       !||====================================================================
-      SUBROUTINE R6DEF3(
+      SUBROUTINE R6DEF3(PYTHON,
      1   SKEW,    GEO,     FX,      FY,
      2   FZ,      E,       DX,      DY,
      3   DZ,      NPF,     TF,      OFF,
@@ -40,7 +41,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9   RPZ,     XMEP,    RMEP,    ZMEP,
      A   RPX2,    RPY2,    RPZ2,    ANIM,
      B   POSX,    POSY,    POSZ,    POSXX,
-     C   POSYY,   POSZZ,   FR_WAVE, E6,
+     C   POSYY,   POSZZ,    E6,
      D   NEL,     AL2DP,   EXX2,    EYX2,
      E   EZX2,    EXY2,    EYY2,    EZY2,
      F   EXZ2,    EYZ2,    EZZ2,    IGEO,
@@ -54,7 +55,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      N   UVAR,    DX0,     DY0,     DZ0,
      O   RX0,     RY0,     RZ0,     FX0,
      P   FY0,     FZ0,     XMOM0,   YMOM0,
-     Q   ZMOM0,   CRITNEW, NFT)
+     Q   ZMOM0,   CRITNEW, NFT,     STF,
+     R   SANIN,   IRESP,   IMPL_S,  IDYNA,
+     S   SNPC)
+        USE python_funct_mod
+        USE REDEF3_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -77,17 +82,24 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(python_), intent(inout) :: PYTHON
+      INTEGER, INTENT(IN) :: STF !< size if TF
+      INTEGER, INTENT(IN) :: SANIN !< size of ANIM
+      INTEGER, INTENT(IN) :: IRESP !< single precision flag
+      INTEGER, INTENT(IN) :: IMPL_S !< Implicit Solver Flag 
+      INTEGER, INTENT(IN) :: IDYNA  !< Implicit Solver Flag
+      INTEGER, INTENT(IN) :: SNPC   !< Size of NPF
       INTEGER, INTENT(IN) :: NFT
-      INTEGER NPF(*), IGEO(NPROPGI,*),NEL,NGL(*),MGN(*),NUVAR
+      INTEGER NPF(SNPC), IGEO(NPROPGI,*),NEL,NGL(*),MGN(*),NUVAR
 C     REAL
       my_real
      .   SKEW(LSKEW,*), GEO(NPROPG,*), FX(*), FY(*), FZ(*), E(*), DX(*),
-     .   DY(*), DZ(*), TF(*), OFF(*), DPX(*), DPY(*), DPZ(*), FXEP(*),
+     .   DY(*), DZ(*), TF(STF), OFF(*), DPX(*), DPY(*), DPZ(*), FXEP(*),
      .   FYEP(*), FZEP(*), X0(*), Y0(*), Z0(*), XMOM(*), YMOM(*),
      .   ZMOM(*), RX(*), RY(*), RZ(*), RPX(*), RPY(*), RPZ(*), XMEP(*),
      .   RMEP(*), ZMEP(*), DPX2(*), DPY2(*), DPZ2(*),RPX2(*), RPY2(*),
-     .   RPZ2(*),ANIM(*),POSX(*),POSY(*),POSZ(*),POSXX(*),
-     .   POSYY(*),POSZZ(*),FR_WAVE(*),E6(NEL,6),
+     .   RPZ2(*),ANIM(SANIN),POSX(*),POSY(*),POSZ(*),POSXX(*),
+     .   POSYY(*),POSZZ(*),E6(NEL,6),
      .   EXX2(MVSIZ), EYX2(MVSIZ), EZX2(MVSIZ),
      .   EXY2(MVSIZ), EYY2(MVSIZ), EZY2(MVSIZ),
      .   EXZ2(MVSIZ), EYZ2(MVSIZ), EZZ2(MVSIZ),
@@ -100,6 +112,7 @@ C     REAL
      .   RX0(*),RY0(*),RZ0(*),FX0(*),FY0(*),FZ0(*),XMOM0(*),YMOM0(*),ZMOM0(*)
       DOUBLE PRECISION ALDP(MVSIZ),AL2DP(MVSIZ)
       my_real, INTENT(INOUT) :: CRITNEW(NEL)
+      TARGET :: UVAR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -120,11 +133,14 @@ C     REAL
       my_real
      .   AT,C,CP,DT05,CC,CN,XA,XB,DLIM,VFAIL,XKA,YKA,X21,Y21,Z21,
      .   VX21,VY21,VZ21, EPXY,EPXZ,EYZP,EXZP,RYAV,RZAV,RYAV1,RZAV1,
-     .   NOT_USED
+     .   NOT_USED,NOT_USED2(2)
       DOUBLE PRECISION X0DP(MVSIZ)
+      my_real ,DIMENSION(:), POINTER :: XX_OLD
+      TARGET :: NOT_USED2
 C-----------------------------------------------
 C
       NOT_USED = ZERO
+      NOT_USED2 = ZERO
 C
       DO I=1,NEL
         EPLA(I)=ZERO
@@ -268,18 +284,24 @@ C---- Tension / Compression
         DMX(I)   = GEO(66,MGN(I))        
       ENDDO
 C
-      CALL REDEF3(
+      IF (NUVAR > 0) THEN 
+         XX_OLD => UVAR(1,1:NEL) 
+      ELSE 
+         XX_OLD => NOT_USED2
+      ENDIF 
+      CALL REDEF3(PYTHON,
      1   FX,        XK,        DX,        FXEP,
      2   DXOLD,     DPX,       TF,        NPF,
      3   XC,        OFF,       E6(1,1),   DPX2,
-     4   ANIM,      ANIM_E(11),POSX,      FR_WAVE,
+     4   ANIM,      ANIM_E(11),POSX,      
      5   XL0,       DMN,       DMX,       DV,
      6   FF,        LSCALE,    EE,        GF3,
      7   IFUNC3,    YIELDX,    X0DP,      AK,
      8   B,         D,         IECROU,    IFUNC,
-     9   IFV,       IFUNC2,    EPLA,      UVAR(1,1),
-     A   NOT_USED,  NOT_USED,  NOT_USED,  NEL,
-     B   NFT)
+     9   IFV,       IFUNC2,    EPLA,      XX_OLD,
+     A   NEL,       NFT,       STF,       SANIN,
+     B   DT1,       IRESP,     IMPL_S,    IDYNA,
+     C   SNPC)
 C
       DO I=1,NEL
         CC     = GEO(103,MGN(I))
@@ -356,18 +378,20 @@ C---- Shear
         FR(I) = SQRT(FY(I)**2 + FZ(I)**2)
       ENDDO
       KK = 1 + NUMELR * ANIM_E(11)
-      CALL REDEF3(
+      IF (NUVAR > 0) XX_OLD => UVAR(2,1:NEL)
+      CALL REDEF3(PYTHON,
      1   FR,        YK,        DR,        FYEP,
      2   DROLD,     DPY,       TF,        NPF,
      3   YC,        OFF,       E6(1,2),   DPY2,
-     4   ANIM(KK),  ANIM_E(12),POSY,      FR_WAVE,
+     4   ANIM(KK),  ANIM_E(12),POSY,      
      5   XL0,       DMN,       DMX,       DV,
      6   FF,        LSCALE,    EE,        GF3,
      7   IFUNC3,    YIELDY,    X0DP,      AK,
      8   B,         D,         IECROU,    IFUNC,
-     9   IFV,       IFUNC2,    EPLA,      UVAR(2,1),
-     A   NOT_USED,  NOT_USED,  NOT_USED,  NEL,
-     B   NFT)
+     9   IFV,       IFUNC2,    EPLA,      XX_OLD,
+     A   NEL,       NFT,       STF,       SANIN,
+     B   DT1,       IRESP,     IMPL_S,    IDYNA,
+     C   SNPC)
       DO I=1,NEL
         CC  = GEO(104,MGN(I))
         CN  = GEO(110,MGN(I))
@@ -470,18 +494,20 @@ C
         DMX(I)   = GEO(72,MGN(I))
       ENDDO
 C
-      CALL REDEF3(
+      IF (NUVAR > 0) XX_OLD => UVAR(4,1:NEL)
+      CALL REDEF3(PYTHON,
      1   XMOM,     XK,       RX,       XMEP,
      2   DXOLD,    RPX,      TF,       NPF,
      3   XC,       OFF,      E6(1,3),  RPX2,
-     4   ANIM,     0,        POSXX,    FR_WAVE,
+     4   ANIM,     0,        POSXX,    
      5   XL0,      DMN,      DMX,      DV,
      6   FF,       LSCALE,   EE,       GF3,
      7   IFUNC3,   YIELDX2,  X0DP,     AK,
      8   B,        D,        IECROU,   IFUNC,
-     9   IFV,      IFUNC2,   EPLA,     UVAR(4,1),
-     A   NOT_USED, NOT_USED, NOT_USED, NEL,
-     B   NFT)
+     9   IFV,      IFUNC2,   EPLA,     XX_OLD,
+     A   NEL,      NFT,      STF,      SANIN,
+     B   DT1,      IRESP,    IMPL_S,   IDYNA,
+     C   SNPC)
       DO I=1,NEL
         CC  = GEO(105,MGN(I))
         CN  = GEO(111,MGN(I))
@@ -558,18 +584,20 @@ C
         ENDIF
         RMOM(I) = SQRT(YMOM(I)**2 + ZMOM(I)**2)
       ENDDO
-      CALL REDEF3(
+      IF (NUVAR > 0) XX_OLD => UVAR(5,1:NEL)
+      CALL REDEF3(PYTHON,
      1   RMOM,     YK,       DR,       RMEP,
      2   DROLD,    RPY,      TF,       NPF,
      3   YC,       OFF,      E6(1,4),  RPY2,
-     4   ANIM,     0,        POSYY,    FR_WAVE,
+     4   ANIM,     0,        POSYY,    
      5   XL0,      DMN,      DMX,      DV,
      6   FF,       LSCALE,   EE,       GF3,
      7   IFUNC3,   YIELDY2,  X0DP,     AK,
      8   B,        D,        IECROU,   IFUNC,
-     9   IFV,      IFUNC2,   EPLA,     UVAR(5,1),
-     A   NOT_USED, NOT_USED, NOT_USED, NEL,
-     B   NFT)
+     9   IFV,      IFUNC2,   EPLA,     XX_OLD,
+     A   NEL,      NFT,      STF,      SANIN,
+     B   DT1,      IRESP,    IMPL_S,   IDYNA,
+     C   SNPC)
       DO I=1,NEL
         CC  = GEO(106,MGN(I))
         CN  = GEO(112,MGN(I))

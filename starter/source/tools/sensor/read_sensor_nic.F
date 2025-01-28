@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,7 +31,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod     ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod            ../starter/share/message_module/message_mod.F
-      !||    sensor_mod             ../starter/share/modules1/sensor_mod.F
       !||    submodel_mod           ../starter/share/modules1/submodel_mod.F
       !||====================================================================
       SUBROUTINE READ_SENSOR_NIC(
@@ -105,7 +104,7 @@ card4
       CALL HM_GET_FLOATV('CFC'       ,CFC       ,IS_AVAILABLE,LSUBMODEL,UNITAB)
 c
 c--------------------------------------------------
-c     Check input and defaul values
+c     Check input and default values
 c--------------------------------------------------
       IF (F_DIR(1:1) == 'X' .or. F_DIR(1:1) == 'x') IDIR1 = 1
       IF (F_DIR(1:1) == 'Y' .or. F_DIR(1:1) == 'y') IDIR1 = 2

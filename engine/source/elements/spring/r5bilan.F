@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,13 +27,19 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
       !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
+      !||--- uses       -----------------------------------------------------
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE R5BILAN(
      1   EINT,    PARTSAV, IXR,     UMAS,
      2   V,       IPARTR,  UINER,   X,
      3   VR,      GRESAV,  GRTH,    IGRTH,
      4   NC1,     NC2,     ITASK,   IAD,
-     5   IGRE,    NFT,     NEL)
+     5   IGRE,    NFT,     NEL,     SENSORS)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -61,6 +67,7 @@ C     REAL
       my_real
      .   UMAS(*),EINT(*),PARTSAV(NPSAV,*),V(3,*),VR(3,*),X(3,*),
      .   UINER(MVSIZ),GRESAV(*)
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -212,7 +219,7 @@ C COQUE          PARTSAV(21,MX)=PARTSAV(21,MX) + REI(I)
         ENDDO
       ENDIF
       OFF(1:MVSIZ) = ONE
-      CALL SENSOR_ENERGY_BILAN(1,NEL,EINT,EK,OFF,IPARTR,ITASK)  
+      CALL SENSOR_ENERGY_BILAN(1,NEL,EINT,EK,OFF,IPARTR,ITASK,SENSORS)  
 C---
       RETURN
       END

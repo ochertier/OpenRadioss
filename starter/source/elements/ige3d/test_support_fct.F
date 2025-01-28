@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -76,6 +76,9 @@ c
       ELSEIF(DIR==3) THEN
         DIRTANG1 = 1
         DIRTANG2 = 2
+      ELSE
+        DIRTANG1 = -HUGE(DIRTANG1)
+        DIRTANG2 = -HUGE(DIRTANG2)
       ENDIF
 c
 C----------------------------------------------------------------------

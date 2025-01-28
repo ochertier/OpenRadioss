@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -201,7 +201,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    scinit3                          ../starter/source/elements/thickshell/solidec/scinit3.F
       !||    seggetv                          ../engine/source/interfaces/interf/seggetv.F
       !||    sforc3                           ../engine/source/elements/solid/solide/sforc3.F
-      !||    sigeps51                         ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51                         ../engine/source/materials/mat/mat051/sigeps51.F90
+      !||    sigeps51_boundary_material       ../engine/source/materials/mat/mat051/sigeps51_boundary_material.F90
       !||    sinit22_fvm                      ../engine/source/interfaces/int22/sinit22_fvm.F
       !||    sinit3                           ../starter/source/elements/solid/solide/sinit3.F
       !||    sortie_main                      ../engine/source/output/sortie_main.F

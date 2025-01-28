@@ -1,5 +1,5 @@
 //Copyright>    OpenRadioss
-//Copyright>    Copyright (C) 1986-2024 Altair Engineering Inc.
+//Copyright>    Copyright (C) 1986-2025 Altair Engineering Inc.
 //Copyright>
 //Copyright>    This program is free software: you can redistribute it and/or modify
 //Copyright>    it under the terms of the GNU Affero General Public License as published by
@@ -143,7 +143,7 @@ extern "C" {
     *result_size = fin-result;
   }
 /* -----------------------------------------------------------------------------------------------------
-    count_member_list : count the number of appeareance of union_list's members in the merged_list
+    count_member_list : count the number of appearances of union_list's members in the merged_list
    -----------------------------------------------------------------------------------------------------
     int * union_list : input - size=size_union_list
     int * size_union_list : input - size of union_list

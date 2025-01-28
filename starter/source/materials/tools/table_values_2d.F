@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    table_values_2d   ../starter/source/materials/tools/table_values_2d.F
       !||--- called by ------------------------------------------------------
-      !||    law50_table       ../starter/source/materials/mat/mat050/law50_table.F90
+      !||    func_table_copy   ../starter/source/materials/tools/func_table_copy.F90
       !||    law70_table       ../starter/source/materials/mat/mat070/law70_table.F
       !||====================================================================
        SUBROUTINE TABLE_VALUES_2D(LEN,NPTF,XI,YI,XF,YF)
@@ -35,7 +35,11 @@ c   NPTF >= LEN
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
-#include      "implicit_f.inc"
+      implicit none
+C-----------------------------------------------
+C   I n c l u d e   F i l e s
+C-----------------------------------------------
+#include      "my_real.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------

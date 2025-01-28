@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,8 +33,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_cell_exchange               ../engine/source/mpi/generic/spmd_cell_exchange.F
       !||    spmd_rnumcd                      ../engine/source/mpi/interfaces/spmd_i7tool.F
       !||    spmd_tri7gat                     ../engine/source/mpi/interfaces/spmd_int.F
-      !||    startime                         ../engine/source/system/timer.F
-      !||    stoptime                         ../engine/source/system/timer.F
+      !||    startime                         ../engine/source/system/timer_mod.F90
+      !||    stoptime                         ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp                  ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    check_sorting_criteria_mod       ../engine/source/interfaces/intsort/check_sorting_criteria.F90
@@ -44,13 +44,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    inter_sorting_mod                ../engine/share/modules/inter_sorting_mod.F
       !||    inter_struct_mod                 ../engine/share/modules/inter_struct_mod.F
       !||    message_mod                      ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod                    ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                    ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    timer_mod                        ../engine/source/system/timer_mod.F90
       !||    tri7box                          ../engine/share/modules/tri7box.F
       !||====================================================================
-        SUBROUTINE INTER_SORT_07( IPARI,X,NIN,ITASK,ISENDTO,
+        SUBROUTINE INTER_SORT_07(TIMERS, IPARI,X,NIN,ITASK,ISENDTO,
      1                            IRCVFROM,RETRI,ITAB,NRTM_T,RENUM,RENUM_SIZ,
      2                            NSNFIOLD,ESHIFT,MULTI_FVM,INTBUF_TAB,H3D_DATA,
-     3                            INTER_STRUCT,SORT_COMM)
+     3                            INTER_STRUCT,SORT_COMM,INTHEAT, IDT_THERM, NODADT_THERM)
 !$COMMENT
 !       INTER_SORT_07 description
 !       sort computation for interface TYP07
@@ -60,6 +61,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
+        USE TIMER_MOD
         USE TRI7BOX
         USE COMMAND_LINE_ARGS_MOD
         USE MESSAGE_MOD
@@ -96,9 +98,13 @@ C common pour variable globale en memoire partagee
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+        TYPE(TIMER_), INTENT(in) :: TIMERS
         INTEGER, INTENT(in) :: RENUM_SIZ    ! size of RENUM
         INTEGER, INTENT(in) :: NIN ,ITASK,NRTM_T,ESHIFT
         INTEGER, INTENT(inout) :: RETRI
+        INTEGER, INTENT(IN) :: INTHEAT
+        INTEGER, INTENT(IN) :: IDT_THERM
+        INTEGER, INTENT(IN) :: NODADT_THERM
         INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITAB
         INTEGER, DIMENSION(NPARI,NINTER),INTENT(inout) :: IPARI
         INTEGER, DIMENSION(NINTER+1,NSPMD+1),INTENT(in) :: ISENDTO,IRCVFROM
@@ -202,7 +208,7 @@ C -------------------------------------------------------------
             IF(ITASK==0)THEN
             ! ---------------------------
             ! send/rcv the secondary node data
-                CALL SPMD_CELL_EXCHANGE( NIN,ISENDTO,IRCVFROM,NSN,NSNR,IPARI(21,NIN),
+                CALL SPMD_CELL_EXCHANGE(TIMERS, NIN,ISENDTO,IRCVFROM,NSN,NSNR,IPARI(21,NIN),
      1                                   IFQ,INACTI,NSNFIOLD,IPARI(47,NIN),NTY, intbuf_tab%stfns, intbuf_tab%nsv,
      2                                   NRTM, X,
      2                                   ITIED,NMN,INTER_STRUCT,SORT_COMM, GOT_PREVIEW)
@@ -242,7 +248,7 @@ C
             INTBUF_TAB%METRIC%TIC = NINT(100.0 * T1) 
         ENDIF
 #endif
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(30,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,30)
 C
         IF(GOT_PREVIEW == 1) THEN
             CALL INTER7_COLLISION_DETECTION(
@@ -258,7 +264,8 @@ C
      D      INTBUF_TAB%KREMNODE,INTBUF_TAB%REMNODE,  IPARI(63,NIN),DRAD         ,
      E      ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP,
      F      INTER_STRUCT(NIN)%SIZE_CAND_A,
-     .      INTBUF_TAB%S_KREMNODE, INTBUF_TAB%S_REMNODE, NSPMD, NUMNOD, INTER_STRUCT(nin))
+     .      INTBUF_TAB%S_KREMNODE, INTBUF_TAB%S_REMNODE, NSPMD, NUMNOD, INTER_STRUCT(nin),
+     .      INTHEAT, IDT_THERM, NODADT_THERM)
 
         ELSE IF(INTBUF_TAB%METRIC%ALGO == ALGO_VOXEL .OR.  INTBUF_TAB%METRIC%ALGO == TRY_ALGO_VOXEL) THEN
             FIRST = 1 + ITASK*(NRTM/NTHREAD)
@@ -279,7 +286,7 @@ C
      C      INTBUF_TAB%GAP_ML(1+ESHIFT),INTTH ,ITASK  , INTBUF_TAB%VARIABLES(bgapsmx_index),I_MEM     ,  
      D      INTBUF_TAB%KREMNODE(1+2*ESHIFT),INTBUF_TAB%REMNODE,ITAB , IPARI(63,NIN),DRAD         ,
      E      ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP,REMOTE_S_NODE,LIST_REMOTE_S_NODE,
-     F      NRTM)
+     F      NRTM,INTHEAT,IDT_THERM,NODADT_THERM)
 
         ELSE
             FIRST = 1 + ITASK*(NRTM/NTHREAD)
@@ -297,7 +304,7 @@ C
      B GAPMIN ,GAPMAX      ,CURV_MAX_MAX   ,NUM_IMP   ,INTBUF_TAB%GAP_SL,
      C INTBUF_TAB%GAP_ML(1+ESHIFT),INTTH ,ITASK  , INTBUF_TAB%VARIABLES(bgapsmx_index),I_MEM     ,  
      D INTBUF_TAB%KREMNODE(1+2*ESHIFT),INTBUF_TAB%REMNODE,ITAB , IPARI(63,NIN),DRAD         ,
-     E ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP)
+     E ITIED ,INTBUF_TAB%CAND_F,DGAPLOADP,INTHEAT, IDT_THERM, NODADT_THERM)
 
         ENDIF
       
@@ -338,7 +345,7 @@ C        UPGRADE_MULTIMP routine !!!!
         ENDIF
 
 C
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(30,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,30)
         IF( ITASK == 0) THEN
             IF( INTBUF_TAB%METRIC%ALGO == TRY_ALGO_VOXEL) THEN ! if test phase
                 INTBUF_TAB%METRIC%ALGO =  TRY_ALGO_BUCKET
@@ -384,17 +391,17 @@ C mise a - de dist temporairement pour reperage dans partie frontiere
         IF(NSPMD>1)THEN
 C mono tache
 !$OMP SINGLE
-            IF (IMONM > 0) CALL STARTIME(26,1)
+            IF (IMONM > 0) CALL STARTIME(TIMERS,26)
             INTBUF_TAB%VARIABLES(distance_index) = -INTBUF_TAB%VARIABLES(distance_index)
 C
             CALL SPMD_TRI7GAT(
      1          RESULT       ,NSN     ,INTBUF_TAB%CAND_N,INTBUF_TAB%I_STOK(1),NIN,
      2          IPARI(21,NIN),NSNR    ,MULTIMP        ,NTY         ,IPARI(47,NIN),  
      3          IDUM1        ,NSNFIOLD, IPARI        , H3D_DATA    ,IPARI(72,NIN),
-     4          MULTI_FVM)
+     4          MULTI_FVM,NODADT_THERM)
             IPARI(24,NIN) = NSNR
 
-            IF (IMONM > 0) CALL STOPTIME(26,1)
+            IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 !$OMP END SINGLE
         END IF
 

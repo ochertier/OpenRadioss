@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -473,7 +473,7 @@ C
                 TAG(INTBUF_TAB(N)%NSV(I)) = 0
               ENDDO
               IF( abs(NSN - NMN) < NSN / 50 .AND. abs(NMN - CPT) < NMN/50) THEN
-! Heursitic to find auto-impacting interface 
+! Heuristic to find auto-impacting interface 
                  CONDITION(N) = .TRUE.
                  avg_stiff(N) = 0.0D0
                  DO I = 1,NRTM 

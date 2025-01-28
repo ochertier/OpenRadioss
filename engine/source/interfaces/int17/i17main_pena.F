@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -141,13 +141,14 @@ C
       !||    my_barrier      ../engine/source/system/machine.F
       !||    spmd_tri17box   ../engine/source/mpi/interfaces/spmd_tri17box.F
       !||    spmd_tri17gat   ../engine/source/mpi/interfaces/spmd_i7crit.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
+      !||    startime        ../engine/source/system/timer_mod.F90
+      !||    stoptime        ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
       !||    message_mod     ../engine/share/message_module/message_mod.F
+      !||    timer_mod       ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I17MAIN_TRI(
+      SUBROUTINE I17MAIN_TRI(TIMERS,
      1          IPARI  ,INTBUF_TAB ,X       ,NIN     ,
      2          ITASK  ,IGRBRIC    ,NME     ,NMES    ,
      3          EMINX  ,IXS        ,IXS16  ,IXS20   ,WEIGHT  ,
@@ -156,6 +157,7 @@ C
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
       USE GROUPDEF_MOD   
@@ -198,6 +200,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER NIN,ITASK , NME, NMES, RETRI, NME_T, ESH_T
       INTEGER IPARI(NPARI,NINTER),
      .        IXS(NIXS,*)  ,IXS16(8,*)  ,IXS20(12,*),WEIGHT(*),
@@ -330,7 +333,7 @@ C -------------------------------------------------------------
 C -------------------------------------------------------------
          IF(NSPMD>1)THEN
 !$OMP SINGLE
-          IF (IMONM > 0) CALL STARTIME(26,1)
+          IF (IMONM > 0) CALL STARTIME(TIMERS,26)
           INTBUF_TAB%VARIABLES(5) = -INTBUF_TAB%VARIABLES(5)
           RESULT = 0
 C comm SPMD apres tri (compactage)
@@ -339,7 +342,7 @@ C comm SPMD apres tri (compactage)
      2      NMESR  )
 C sauvegarde des candidats additionnels dans IPARI(24)  pas besoin car pas de inacti
 c          IPARI(24,NIN) = NMESR
-          IF (IMONM > 0) CALL STOPTIME(26,1)
+          IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 !$OMP END SINGLE
 
          END IF

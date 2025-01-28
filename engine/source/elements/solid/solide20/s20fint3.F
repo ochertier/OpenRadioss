@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,7 +35,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6   EINTG,   RHOG,    QG,      EPLASG,
      7   WI,      VOLG,    VOL0,    VOL0G,
      8   G_PLA,   NEL,     CONDE,   DELTAX,
-     9   CONDEG,  ISRAT,   SVIS)
+     9   CONDEG,  ISRAT,   SVIS ,   NODADT_THERM)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -48,6 +48,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER, INTENT(IN) :: ISRAT
+      INTEGER, INTENT(IN) :: NODADT_THERM
       INTEGER NPE,G_PLA,NEL
       my_real
      .  PX(MVSIZ,*),PY(MVSIZ,*),PZ(MVSIZ,*),SSP_EQ(*),

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -54,6 +54,7 @@ C-----------------------------------------------
       SET(IGS)%SET_ID = SET_ID
       SET(IGS)%TITLE  = SET_TITLE
       SET(IGS)%SET_TYPE  = ISET_TYPE
+      SET(IGS)%EXT_ALL = 0 ! type of surface : /EXT or /ALL
 !
 !      SET(IGS)%SET_ACTIV = 1         ! SET_ACTIV was already initialized in sort_sets.F, 
                                       ! this permits to treat the /SET/COLLECT, in /SET/COLLECT, only one is active,

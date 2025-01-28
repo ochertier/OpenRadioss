@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    user_interface_mod     ../engine/share/modules/user_interface_mod.F
+      !||    output_mod             ../common_source/modules/output/output_mod.F90
+      !||    user_interface_mod     ../engine/source/modules/user_interface_mod.F90
       !||====================================================================
       SUBROUTINE REPORT(IH3DREADER,N,IMVW)
 C-----------------------------------------------
@@ -37,6 +38,7 @@ C-----------------------------------------------
       USE INOUTFILE_MOD
       USE USER_INTERFACE_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: LPATH
+      USE OUTPUT_MOD, ONLY : WFEXT, WFEXT_MD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -47,7 +49,7 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "com01_c.inc"
 #include      "com04_c.inc"
-#include      "com06_c.inc"
+!#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "com10_c.inc"
 #include      "commandline.inc"
@@ -119,8 +121,8 @@ C=======================================================================
 c
        ENTOT = ENCIN + ENINT + ENROT
        ENTOTB = ENTOT + ENCIN2 + ENROT2 
-       ENTOT1=ENTOT0 + TFEXT
-       ENTOT1B=ENTOT0 + TFEXT + DELTAE + TFEXT_MD       
+       ENTOT1=ENTOT0 + WFEXT
+       ENTOT1B=ENTOT0 + WFEXT + DELTAE + WFEXT_MD
        IF(ABS(ENTOT1B)>EM20)THEN
          ERR = ENTOTB/ENTOT1B - ONE
          ERR1 = MAX(-X99, MIN(X99,ERR*HUNDRED))     
@@ -738,7 +740,7 @@ c       WRITE(IOUTREP,'(A)')'<p>'
        WRITE(IOUTREP,'(A,G11.4,A)')'<td><font face="Arial" size="2">',ENINT,'</td>'
        WRITE(IOUTREP,'(A,G11.4,A)')'<td><font face="Arial" size="2">',ENCIN,'</td>'
        WRITE(IOUTREP,'(A,G11.4,A)')'<td><font face="Arial" size="2">',ENROT,'</td>'
-       WRITE(IOUTREP,'(A,G11.4,A)')'<td><font face="Arial" size="2">',TFEXT,'</td>'
+       WRITE(IOUTREP,'(A,G11.4,A)')'<td><font face="Arial" size="2">',WFEXT,'</td>'
        WRITE(IOUTREP,'(A,G11.4,A)')'<td align="right"><font face="Arial" size="2">',EMASS,'</td>'
        WRITE(IOUTREP,'(A)')'</tr>'
        WRITE(IOUTREP,'(A)')'</table>'

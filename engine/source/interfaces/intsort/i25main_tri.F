@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,8 +42,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_tri25vox                ../engine/source/mpi/interfaces/spmd_tri25vox.F
       !||    spmd_tri25vox0               ../engine/source/mpi/interfaces/spmd_tri25vox0.F
       !||    spmd_tri25vox0_edge          ../engine/source/mpi/interfaces/spmd_tri25vox0.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_lcand_e2s            ../common_source/interf/upgrade_multimp.F
       !||    upgrade_lcand_edg            ../common_source/interf/upgrade_multimp.F
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
@@ -52,20 +52,22 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
       !||    parameters_mod               ../common_source/modules/interfaces/parameters_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    tri25ebox                    ../engine/share/modules/tri25ebox.F
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I25MAIN_TRI(
+      SUBROUTINE I25MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,V       ,INTBUF_TAB,
      2                  MS      ,NIN     ,ITASK   ,WEIGHT  ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM ,
      4                  ITAB    ,KINET   ,TEMP    ,RENUM   ,
      5                  NSNFIOLD,NUM_IMP ,IND_IMP ,NODNX_SMS,
      6                  H3D_DATA,ESHIFT  ,NEDGE_T ,SSHIFT   ,NRTM_T ,
-     7                  ICODT   ,ISKEW   ,PARAMETERS)
+     7                  ICODT   ,ISKEW   ,PARAMETERS,NODADT_THERM)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TRI25EBOX
       USE TRI7BOX
       USE MESSAGE_MOD
@@ -95,6 +97,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER NIN ,ITASK, RETRI, NEDGE_T, NRTM_T, SSHIFT, ESHIFT,
      .        NUM_IMP ,IND_IMP(*),
      .        ITAB(*), KINET(*),
@@ -102,6 +105,7 @@ C-----------------------------------------------
      .        ISENDTO(NINTER+1,*),IRCVFROM(NINTER+1,*),
      .        WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .        RENUM(*), NSNFIOLD(NSPMD), NODNX_SMS(*), ICODT(*), ISKEW(*)
+      INTEGER , INTENT(IN) :: NODADT_THERM
 C     REAL
       my_real 
      .    X(3,*), V(*), MS(*),TEMP(*)
@@ -327,7 +331,7 @@ C
         ENDIF
 
         CALL MY_BARRIER
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,26)
         BGAPEMX=INTBUF_TAB%VARIABLES(bgapemx_index)
 
         CALL SPMD_TRI25VOX0(
@@ -347,7 +351,7 @@ C
      .      INTBUF_TAB%GAPE,DGAPLOAD)
 
         CALL MY_BARRIER
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,26)
 
         IF(ITASK==0)THEN
 
@@ -357,6 +361,7 @@ C
           INACTI=0
           NEDGE_LOCAL = INTBUF_TAB%NB_INTERNAL_EDGES + INTBUF_TAB%NB_BOUNDARY_EDGES_LOCAL
           IEDGE   = IPARI(58,NIN)
+          IF(IMONM > 0) CALL STARTIME(TIMERS,25)
           CALL SPMD_TRI25VOX(
      1      INTBUF_TAB%NSV   ,NSN         ,X               ,V            ,MS           ,
      2      BMINMA          ,WEIGHT       ,INTBUF_TAB%STFNS,NIN          ,ISENDTO      ,
@@ -374,6 +379,7 @@ C
      E      INTBUF_TAB%IPARTFRIC_E,INTBUF_TAB%E2S_NOD_NORMAL,IPARI(97,NIN),INTBUF_TAB%STIFMSDT_S,
      .                                                                     INTBUF_TAB%STIFMSDT_EDG,
      F      IFSUB_CAREA     ,PARAMETERS%INTAREAN)
+            IF(IMONM > 0) CALL STOPTIME(TIMERS,25)
 
 C local renumbering of old candidates to collision
           CALL SPMD_RNUM25(
@@ -395,7 +401,7 @@ C Barrier comm spmd_tri7vox + BMINMA + Retour I7BUCE
 C      
       CALL MY_BARRIER
 C
-      IF (IMONM > 0) CALL STARTIME(30,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,30)
 C
 C     NCONT additional candidates (if all secondary nodes are already impacted, cf i25optcd)
       MULTIMP = IPARI(23,NIN)
@@ -435,7 +441,7 @@ C New barrier needed for Dynamic MultiMP
         GOTO 40
       ENDIF
 
-      IF (IMONM > 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,30)
 C--------------------------------------------------------------
 C     Edges
 C--------------------------------------------------------------
@@ -473,7 +479,7 @@ C Barrier comm spmd_tri7vox + BMINMA + Retour I7BUCE
 C      
       CALL MY_BARRIER
 C
-      IF (IMONM > 0) CALL STARTIME(30,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,30)
 C
       MULNSNE = INTBUF_TAB%S_CANDM_E2E
       MULNSNS = INTBUF_TAB%S_CANDM_E2S
@@ -534,14 +540,14 @@ C New barrier needed for Dynamic MultiMP
 C
       IF(ITASK==0)DEALLOCATE(INTBUF_TAB%I25_CAND_A,INTBUF_TAB%I25_CAND_B)
 C
-      IF (IMONM > 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,30)
 C--------------------------------------------------------------
  200  CONTINUE
 C--------------------------------------------------------------
 C Negative value in "dist" : tag boundary part
       IF(NSPMD>1)THEN
 !$OMP SINGLE
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
         INTBUF_TAB%VARIABLES(distance_index) = - ONE
 C
         CALL SPMD_TRI25GAT(
@@ -549,7 +555,7 @@ C
      2      IPARI(21,NIN),NSNR,MULTIMP      ,NTY,IPARI(47,NIN),
      3      ILEV         ,NSNFIOLD,IPARI   ,NSNROLD, RENUM, H3D_DATA ,
      4      IPARI(72,NIN),FLAGREMN,LREMNORMAX,NRTM ,INTBUF_TAB%KREMNODE,
-     5      INTBUF_TAB%REMNODE,IVIS2,IPARI(97,NIN),IFSUB_CAREA )
+     5      INTBUF_TAB%REMNODE,IVIS2,IPARI(97,NIN),IFSUB_CAREA ,NODADT_THERM)
         IPARI(24,NIN) = NSNR
 
         NEDGE_REMOTE_OLD = NEDGE_REMOTE
@@ -562,7 +568,7 @@ C
 
         IPARI(69 ,NIN) = NEDGE_REMOTE_OLD
 C
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
         IF(IEDGE /= 0) THEN
             DEALLOCATE(RENUM_EDGE)
             DEALLOCATE(OLDNUM_EDGE)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -1360,8 +1360,6 @@ C------Hybrid----produce {w}=[LT_K]{v}+[LT_I]{v} using only upper-triangle----
       !||    mv_matv         ../engine/source/airbag/monv_imp0.F
       !||    my_barrier      ../engine/source/system/machine.F
       !||    spmd_sumf_v     ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime        ../engine/source/system/timer.F
-      !||    stoptime        ../engine/source/system/timer.F
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod    ../common_source/modules/groupdef_mod.F
       !||====================================================================
@@ -1499,9 +1497,9 @@ C
      2                  NDOF  ,NUM_IMP,NS_IMP,NE_IMP,V       ,
      3                  NSREM ,NSL    ,IBFV  ,SKEW  ,XFRAME  ,
      4                  W     ,IRBE3  ,LRBE3 ,IRBE2  ,LRBE2  )
-        IF(IMONM > 0) CALL STARTIME(66,1)
+!       IF(IMONM > 0) CALL STARTIME(TIMERS,66)
         CALL SPMD_SUMF_V(W )
-        IF(IMONM > 0) CALL STOPTIME(66,1)
+!       IF(IMONM > 0) CALL STOPTIME(TIMERS,66)
        ENDIF
       END IF !(ITASK==0) THEN
 C--------------------------------------------
@@ -1527,7 +1525,6 @@ C-----------Hybrid {x}t{y}-.{Weight}--
       !||--- calls      -----------------------------------------------------
       !||    my_barrier   ../engine/source/system/machine.F
       !||    spmd_sum_s   ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime     ../engine/source/system/timer.F
       !||====================================================================
       SUBROUTINE PRODUT_H(F_DDL  ,L_DDL ,X   ,Y  ,W , R ,ITASK )
 C-----------------------------------------------
@@ -1602,9 +1599,9 @@ C----------------------
       CALL MY_BARRIER
 C---------------------
        IF (ITASK==0) THEN
-         IF(IMONM > 0) CALL STARTIME(67,1)
+!        IF(IMONM > 0) CALL STARTIME(TIMERS,67)
          CALL SPMD_SUM_S(R_N2)
-         IF(IMONM > 0) CALL STARTIME(67,1)
+!        IF(IMONM > 0) CALL STARTIME(TIMERS,67)
        END IF
 C
       END IF !(NSPMD == 1) THEN
@@ -3246,7 +3243,6 @@ C-----------Hybrid {x}t{y}-.{Weight}--HP: Hyprid SMP // inside
       !||--- calls      -----------------------------------------------------
       !||    imp_smpini    ../engine/source/implicit/imp_solv.F
       !||    spmd_sum_s    ../engine/source/mpi/implicit/imp_spmd.F
-      !||    startime      ../engine/source/system/timer.F
       !||====================================================================
       SUBROUTINE PRODUT_HP(NDDL ,X   ,Y  ,W , R )
 C-----------------------------------------------
@@ -3287,9 +3283,9 @@ C---------------------
         R = R + RL
 #include "lockoff.inc"
 !$OMP END PARALLEL 
-         IF(IMONM > 0) CALL STARTIME(67,1)
+!        IF(IMONM > 0) CALL STARTIME(TIMERS,67)
          CALL SPMD_SUM_S(R)
-         IF(IMONM > 0) CALL STARTIME(67,1)
+!        IF(IMONM > 0) CALL STARTIME(TIMERS,67)
 C------mono domain
       ELSE
 !$OMP PARALLEL PRIVATE(ITSK,F_DDL ,L_DDL,RL,J )

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -51,19 +51,21 @@ C-----
       !||    spmd_max_s       ../engine/source/mpi/implicit/imp_spmd.F
       !||    spmd_nndft_sms   ../engine/source/mpi/ams/spmd_sms.F
       !||    spmd_nnz_sms     ../engine/source/mpi/ams/spmd_sms.F
-      !||    startime         ../engine/source/system/timer.F
-      !||    stoptime         ../engine/source/system/timer.F
+      !||    startime         ../engine/source/system/timer_mod.F90
+      !||    stoptime         ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    message_mod      ../engine/share/message_module/message_mod.F
       !||    mod_sms_fsa      ../engine/source/ams/sms_fsa_inv.F
+      !||    timer_mod        ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SMS_CHECK(NODFT ,NODLT ,IADK  ,JDIK  ,DIAG_K ,  
+      SUBROUTINE SMS_CHECK(TIMERS,NODFT ,NODLT ,IADK  ,JDIK  ,DIAG_K ,  
      2                     LT_K  ,IADI  , JDII ,LT_I  ,ITASK  ,
      3                     ITAB  ,IAD_ELEM,FR_ELEM,FR_SMS,FR_RMS,
      4                     LIST_SMS,LIST_RMS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MOD_SMS_FSA
       USE MESSAGE_MOD
 C-----------------------------------------------
@@ -82,6 +84,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER  NODFT, NODLT, 
      .         IADK(*), JDIK(*), IADI(*), JDII(*),
      .         ITASK, ITAB(*), IAD_ELEM(2,*), FR_ELEM(*),
@@ -119,7 +122,7 @@ C     [M]:factorized sparse approximated inverse Lt D L
 C------------------------------------------
       NNZM  = NNZ_SMS
 C
-      IF (IMON>0.AND.ITASK==0) CALL STARTIME(32,1)
+      IF (IMON>0.AND.ITASK==0) CALL STARTIME(TIMERS,32)
 C
       IF(ITASK==0)THEN
         ALLOCATE(IADM(NUMNOD+1),JADM(NUMNOD+1),KADM(NUMNOD),
@@ -315,7 +318,7 @@ C-------
         END IF
       END IF
 C
-      IF (IMON>0.AND.ITASK==0) CALL STOPTIME(32,1)
+      IF (IMON>0.AND.ITASK==0) CALL STOPTIME(TIMERS,32)
 C----------------------
       CALL MY_BARRIER
 C---------------------

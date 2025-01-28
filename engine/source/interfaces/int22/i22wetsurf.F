@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -454,7 +454,7 @@ c      ENDDO
 !                         +  \                                 +
 !                         +   \                                +
 !                         +    \                               +             8 real cuts from polyedra
-!                         +     \ ICUT=1                       +            +6 fictious cuts from closed surface hypothesis
+!                         +     \ ICUT=1                       +            +6 fictitious cuts from closed surface hypothesis
 !                         +      \                             +
 !                         +       \                            +
 !                         +        \                           +

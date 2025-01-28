@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -41,11 +41,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    intstamp_mod      ../engine/share/modules/intstamp_mod.F
       !||    message_mod       ../engine/share/message_module/message_mod.F
-      !||    mod_sms_work      ../engine/source/ams/sms_mass_scale_2.F
       !||    output_mod        ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod        ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod        ../common_source/modules/sensor_mod.F90
+      !||    timer_mod         ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SMS_ENCIN_2(
+      SUBROUTINE SMS_ENCIN_2(TIMERS,
      1        ITASK    ,NODFT    ,NODLT    ,NODXI_SMS,
      2        MS       ,JAD_SMS  ,JDI_SMS  ,LT_SMS    ,INDX1_SMS,
      3        DIAG_SMS ,IAD_ELEM ,FR_ELEM  ,WEIGHT    ,V        ,
@@ -61,11 +61,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D        LRBE3    ,FRBE3    ,IAD_RBE3M,FR_RBE3M  ,FR_RBE3MP ,
      E        RRBE3    ,RRBE3_PON,IAD_RBY  ,FR_RBY6   ,RBY6      ,
      F        LPBY     ,TAGMSR_RBY_SMS,R3SIZE,NODII_SMS,INDX2_SMS,
-     G        IBCSCYC  ,LBCSCYC  ,OUTPUT)
+     G        IBCSCYC  ,LBCSCYC  ,OUTPUT, MSKYI_FI_SMS,LIST_SMS,
+     H        LIST_RMS ,VFI,sz_mw6,mw6)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MOD_SMS_WORK
+      USE TIMER_MOD
       USE INTSTAMP_MOD
       USE MESSAGE_MOD
       USE SENSOR_MOD
@@ -92,6 +93,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) ,INTENT(INOUT) :: TIMERS
       INTEGER  ITASK, NODFT, NODLT, NODXI_SMS(*),
      .         JAD_SMS(*), JDI_SMS(*), INDX1_SMS(*),
      .         IAD_ELEM(2,NSPMD+1) ,FR_ELEM(*), WEIGHT(*),
@@ -112,6 +114,12 @@ C-----------------------------------------------
      .    XFRAME(NXFRAME,*),LTI_SMS(*), MSKYI_SMS(*),FTHREAC(6,*),
      .    AR(3,*), VR(3,*), DR(3,*), IN(*), RBY(NRBY,*),
      .    FRBE3(*), RRBE3(*)
+      my_real,dimension(fr_rms(nspmd+1)),intent(inout) :: MSKYI_FI_SMS
+      integer,dimension(fr_sms(nspmd+1)),intent(inout) :: LIST_SMS
+      integer,dimension(fr_rms(nspmd+1)),intent(inout) :: LIST_RMS
+      my_real, DIMENSION(3,FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1) ), intent(inout):: VFI
+      integer,intent(in) :: SZ_mw6
+      my_real,dimension(6,SZ_mw6),intent(inout) :: MW6
       DOUBLE PRECISION RRBE3_PON(*)
       DOUBLE PRECISION RBY6(8,6,NRBYKIN)
       TYPE(INTSTAMP_DATA) INTSTAMP(*)
@@ -161,25 +169,7 @@ C
      .                C1='(/DT/.../AMS)')
           CALL ARRET(2)
         ENDIF
-        IF(ITASK==0)THEN
-          ALLOCATE(MW6(6,3*NUMNOD),STAT=IERROR)
-          IF(IERROR/=0) THEN
-            CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .                  C1='(/DT/.../AMS)')
-            CALL ARRET(2)
-          ENDIF
-        END IF
       END IF
-      IF(ITASK==0)THEN
-        ALLOCATE(LIST_SMS(FR_SMS(NSPMD+1)),LIST_RMS(FR_RMS(NSPMD+1)),
-     .        MSKYI_FI_SMS(FR_RMS(NSPMD+1)),
-     .        VFI(3,FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1)),STAT=IERROR)
-        IF(IERROR/=0) THEN
-          CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .                C1='(/DT/.../AMS)')
-          CALL ARRET(2)
-        ENDIF
-      ENDIF
 C
       IF(NSPMD > 1)THEN
         IF(ITASK==0)THEN
@@ -250,7 +240,7 @@ C
         END IF
       END IF
 C----
-      CALL SMS_MAV_LT(
+      CALL SMS_MAV_LT(TIMERS,
      1        NODFT   ,NODLT   ,NUMNOD ,JAD_SMS  ,JDI_SMS  ,
      2        ITASK   ,WDG     ,LT_SMS ,WV       ,WMV      ,
      3        NODFT1_SMS,NODLT1_SMS,INDX1_SMS,NODXI_SMS,IAD_ELEM ,
@@ -340,7 +330,7 @@ C
      3                  WEIGHT  ,D     ,IFRAME ,XFRAME ,SENSORS%NSENSOR,
      4                  -(IT+1),DIAG_SMS,NODXI_SMS,CPTREAC,
      5                  NODREAC,FTHREAC ,AR     ,VR       ,DR  ,
-     6                  IN     ,RBY     )
+     6                  IN     ,RBY     ,OUTPUT%WFEXT)
       END IF
 C
       CALL MY_BARRIER
@@ -392,11 +382,8 @@ C
 C
       END IF
 C
-      IF(ITASK==0)DEALLOCATE(LIST_SMS,LIST_RMS,
-     .        MSKYI_FI_SMS,VFI)
       IF(IPARIT/=0)THEN
         DEALLOCATE(IMV, MV, MV6)
-        IF(ITASK==0)DEALLOCATE(MW6)
       END IF
 C
 C     fin section //

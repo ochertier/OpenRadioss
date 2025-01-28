@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,9 +33,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    create_node_from_element      ../starter/source/model/sets/create_node_from_element.F
       !||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
       !||    set_merge_simple              ../starter/source/model/sets/set_merge_simple.F
+      !||    surface_type                  ../starter/source/model/sets/surface_type.F90
       !||--- uses       -----------------------------------------------------
       !||    hm_option_read_mod            ../starter/share/modules1/hm_option_read_mod.F
       !||    message_mod                   ../starter/share/message_module/message_mod.F
+      !||    set_mod                       ../starter/share/modules1/set_mod.F
+      !||    surface_type_mod              ../starter/source/model/sets/surface_type.F90
       !||====================================================================
       SUBROUTINE INSERT_CLAUSE_IN_SET(SET       ,CLAUSE   ,CLAUSE_OPERATOR,
      .                                IXS       ,IXS10    ,IXS20     ,IXS16     ,IXQ    ,
@@ -61,7 +64,6 @@ C============================================================================
 C-----------------------------------------------
 C   D e f i n i t i o n s 
 C-----------------------------------------------
-#include      "set_def.inc"
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -71,6 +73,8 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE SET_SCRATCH_MOD
       USE NAMES_AND_TITLES_MOD , ONLY : NCHARFIELD
+      USE SET_MOD , ONLY : SET_ADD,SET_DELETE,SET_INTERSECT
+      use surface_type_mod , only : surface_type
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -104,6 +108,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(:), ALLOCATABLE :: NODES
       INTEGER, DIMENSION(:,:), ALLOCATABLE :: SURF
       INTEGER NEW_SIZE,NS,ND_SIZE,OPERATOR
+      logical :: empty_condition
 C-----------------------------------------------
 C     NODES 
 C-----------------------------------------------
@@ -582,6 +587,7 @@ C-----------------------------------------------
          SET%ELLIPSE_A = CLAUSE%ELLIPSE_A
          SET%ELLIPSE_B = CLAUSE%ELLIPSE_B
          SET%ELLIPSE_C = CLAUSE%ELLIPSE_C
+         SET%EXT_ALL = CLAUSE%EXT_ALL
          CALL MY_ALLOC(SET%ELLIPSE_SKEW,9)
          SET%ELLIPSE_SKEW(1:9) = CLAUSE%ELLIPSE_SKEW(1:9)
 
@@ -597,13 +603,14 @@ C-----------------------------------------------
          SET%PLANE_XM1 = CLAUSE%PLANE_XM1
          SET%PLANE_YM1 = CLAUSE%PLANE_YM1
          SET%PLANE_ZM1 = CLAUSE%PLANE_ZM1
-
+         SET%EXT_ALL = CLAUSE%EXT_ALL
       ELSE
         !------------------------!
         !    classic SURFACES    !
         !------------------------!
+        empty_condition = (clause%nb_surf_seg==0)
         IF( CLAUSE%NB_SURF_SEG > 0) THEN
-
+          empty_condition = (set%nb_surf_seg==0)
           IF( SET%NB_SURF_SEG > 0 ) THEN
 
               !
@@ -620,6 +627,7 @@ C-----------------------------------------------
      .                                CLAUSE%SURF_NODES(1,3), CLAUSE%SURF_NODES(1,4),
      .                                CLAUSE%SURF_ELTYP, CLAUSE%SURF_ELEM, CLAUSE%NB_SURF_SEG,
      .                                NS  )
+                  call surface_type( empty_condition,clause_operator,clause,set )
 
               ELSEIF ( CLAUSE_OPERATOR == SET_DELETE) THEN
 
@@ -630,6 +638,7 @@ C-----------------------------------------------
      .                                CLAUSE%SURF_NODES(1,3), CLAUSE%SURF_NODES(1,4),
      .                                CLAUSE%SURF_ELTYP, CLAUSE%SURF_ELEM, CLAUSE%NB_SURF_SEG,
      .                                NS  )
+                  call surface_type( empty_condition,clause_operator,clause,set )
 
               ELSEIF ( CLAUSE_OPERATOR == SET_INTERSECT)THEN
 
@@ -640,6 +649,7 @@ C-----------------------------------------------
      .                                    CLAUSE%SURF_NODES(1,3), CLAUSE%SURF_NODES(1,4),
      .                                    CLAUSE%SURF_ELTYP, CLAUSE%SURF_ELEM, CLAUSE%NB_SURF_SEG,
      .                                    NS )
+                  call surface_type( empty_condition,clause_operator,clause,set )
               ELSE
                   print*,'Unknown clause operator'
               ENDIF
@@ -677,7 +687,7 @@ C-----------------------------------------------
               SET%SURF_NODES(1:NEW_SIZE,1:4) = CLAUSE%SURF_NODES(1:NEW_SIZE,1:4)
               SET%SURF_ELTYP(1:NEW_SIZE)     = CLAUSE%SURF_ELTYP(1:NEW_SIZE)
               SET%SURF_ELEM(1:NEW_SIZE)      = CLAUSE%SURF_ELEM(1:NEW_SIZE)
-
+              call surface_type( empty_condition,clause_operator,clause,set )
             ENDIF
           ENDIF
         ELSE             
@@ -687,6 +697,7 @@ C-----------------------------------------------
                IF(ALLOCATED(SET%SURF_ELTYP)) DEALLOCATE(SET%SURF_ELTYP)
                IF(ALLOCATED(SET%SURF_ELEM)) DEALLOCATE(SET%SURF_ELEM)
                SET%NB_SURF_SEG=0
+               call surface_type( empty_condition,clause_operator,clause,set )
             ENDIF
           ENDIF
         ENDIF

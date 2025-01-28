@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,13 +29,17 @@ C
       !||    my_barrier          ../engine/source/system/machine.F
       !||    spmd_exchseg_idel   ../engine/source/mpi/kinematic_conditions/spmd_exchseg_idel.F
       !||    spmd_init_idel      ../engine/source/mpi/interfaces/spmd_init_idel.F
+      !||--- uses       -----------------------------------------------------
+      !||    nodal_arrays_mod    ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||====================================================================
       SUBROUTINE CHKLOAD(
      1    IB     ,IXS     ,IXQ     ,IXC    ,IXT     ,IXP     ,
      2    IXR    ,IXTG    ,ITAG   ,ITASK   ,ITAGL   ,ITAB    ,
-     3    ITABM1 ,ADDCNEL ,CNEL   ,TAGEL   ,IPARG   ,GEO     ,
+     3    NODES ,ADDCNEL ,CNEL   ,TAGEL   ,IPARG   ,GEO     ,
      4    IBUFS  ,NINDEX  ,NINDG  ,NPRESLOAD,LOADP_TAGDEL    ,
      5    ILOADP ,LLOADP  ,IAD_ELEM)
+C-----------------------------------------------
+      USE nodal_arrays_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -57,12 +61,13 @@ C-----------------------------------------------
       INTEGER IB(NIBCLD,*), ITAG(*),
      .        IXS(NIXS,*),IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
      .        IXR(NIXR,*), IXTG(NIXTG,*),IPARG(NPARG,*), ITAGL(*), ITAB(*),
-     .        ITABM1(*), CNEL(0:*), ADDCNEL(0:*), TAGEL(*), IBUFS(*) , NINDEX(*)
+     .        CNEL(0:*), ADDCNEL(0:*), TAGEL(*), IBUFS(*) , NINDEX(*)
       INTEGER, INTENT(INOUT) :: LOADP_TAGDEL(NPRESLOAD)
       INTEGER, INTENT(IN) :: LLOADP(SLLOADP), ILOADP(SIZLOADP,NLOADP)
       INTEGER, DIMENSION(2,NSPMD+1), INTENT(in) :: IAD_ELEM
       my_real
      .        GEO(NPROPG,*)
+      TYPE(nodal_arrays_), intent(in) :: NODES
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -273,7 +278,7 @@ C
        CALL SPMD_INIT_IDEL(4*NINDG  , IRSIZE, IRECV,IAD_ELEM)
        CALL SPMD_EXCHSEG_IDEL(
      1         IBUFS  ,4*NINDG   ,IXS    ,IXC    ,IXTG   , 
-     2         IXQ    ,IPARG     ,ITAGL  ,ITABM1 ,TAGEL  ,
+     2         IXQ    ,IPARG     ,ITAGL  ,NODES,TAGEL  ,
      3         IRSIZE ,IRECV     ,CNEL   ,ADDCNEL,OFC    ,
      4         OFT    ,OFTG      ,OFUR   ,OFR    ,OFP    ,
      5         OFQ    ,NINDG     ,IXP    ,IXR    ,IXT    ,

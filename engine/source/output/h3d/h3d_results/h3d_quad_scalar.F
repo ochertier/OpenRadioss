@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_quad_scalar_1_mod        ../engine/source/output/h3d/h3d_results/h3d_quad_scalar_1.F90
       !||    initbuf_mod                  ../engine/share/resol/initbuf.F
       !||    matparam_def_mod             ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||    multimat_param_mod           ../common_source/modules/multimat_param_mod.F90
       !||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
       !||    schlieren_mod                ../engine/share/modules/schlieren_mod.F
@@ -47,8 +47,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  X              ,V           ,W           ,ALE_CONNECT      ,
      .                  NERCVOIS       ,NESDVOIS    ,LERCVOIS    ,LESDVOIS,
      .                  ID_ELEM        ,
-     .                  IS_WRITTEN_QUAD,IPARTQ      ,LAYER_INPUT , NPART1,
-     .                  IUVAR_INPUT    ,H3D_PART    ,KEYWORD     ,
+     .                  IS_WRITTEN_QUAD,IPARTQ      ,LAYER_INPUT ,NPART1,
+     .                  IUVAR_INPUT    ,H3D_PART    ,KEYWORD     ,ITHERM ,
      .                  BUFMAT         ,MULTI_FVM   ,IR_INPUT    ,IS_INPUT    ,IT_INPUT  ,
      .                  ID             ,MAT_PARAM)
 C-----------------------------------------------
@@ -94,6 +94,7 @@ C-----------------------------------------------
      .   LAYER_INPUT ,IUVAR_INPUT,
      .   IR_INPUT,IS_INPUT,IT_INPUT,NPART1
       INTEGER, INTENT(IN) :: ID
+      INTEGER, INTENT(IN) :: ITHERM
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
       CHARACTER(LEN=NCHARLINE100):: KEYWORD
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
@@ -121,7 +122,7 @@ C
       !     INITIALIZATION IF SCHLIEREN DEFINED               !
       !-------------------------------------------------------!      
       IF(KEYWORD == 'SCHLIEREN')THEN
-        CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM)  
+        CALL SCHLIEREN_BUFFER_GATHERING(NERCVOIS ,NESDVOIS ,LERCVOIS ,LESDVOIS, IPARG, ELBUF_TAB, MULTI_FVM,ITHERM)  
       ENDIF
 C-----------
       DO NG=1,NGROUP

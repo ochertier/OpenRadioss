@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -46,12 +46,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    iniresa                      ../engine/source/output/restart/rdresa.F
       !||    init_dyn_lib_struc           ../engine/share/modules/dynlib_mod.F
       !||    init_th0                     ../engine/source/output/th/init_th0.F
-      !||    initime                      ../engine/source/system/timer.F
+      !||    initime                      ../engine/source/system/timer_mod.F90
       !||    lecinp                       ../engine/source/input/lecinp.F
       !||    lectur                       ../engine/source/input/lectur.F
       !||    lf_convert_c_flat            ../engine/source/engine/lf_convert_c.c
       !||    my_getpid                    ../engine/source/system/pid.c
       !||    names_and_title_init         ../common_source/modules/names_and_titles_mod.F
+      !||    omp_get_thread_num           ../engine/source/engine/openmp_stub.F90
       !||    open_c                       ../common_source/tools/input_output/write_routtines.c
       !||    open_f_scratch_file          ../engine/source/system/open_tempfile.F
       !||    printcenter                  ../engine/source/engine/radioss_title.F
@@ -90,48 +91,54 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    alefvm_mod                   ../common_source/modules/ale/alefvm_mod.F
       !||    alemuscl_mod                 ../common_source/modules/ale/alemuscl_mod.F
       !||    check_mod                    ../common_source/modules/check_mod.F
+      !||    connectivity_mod             ../common_source/modules/connectivity.F90
       !||    diffusion_mod                ../engine/share/modules/diffusion_mod.F
       !||    drape_mod                    ../engine/share/modules/drape_mod.F
       !||    dsgraph_mod                  ../engine/share/modules/dsgraph_mod.F
       !||    dt_mod                       ../engine/source/modules/dt_mod.F
       !||    dynlib_mod                   ../engine/share/modules/dynlib_mod.F
-      !||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    ebcs_mod                     ../common_source/modules/boundary_conditions/ebcs_mod.F90
+      !||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    group_mod                    ../engine/share/modules/group_mod.F
       !||    groupdef_mod                 ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    inoutfile_mod                ../common_source/modules/inoutfile_mod.F
       !||    intstamp_glob_mod            ../engine/share/modules/intstamp_glob_mod.F
       !||    linear_solver_mod            ../engine/share/modules/linear_solver_mod.F
-      !||    loads_mod                    ../common_source/modules/loads/loads_mod.F
       !||    mat_elem_mod                 ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mds_restart_mod              ../common_source/modules/mds_rest.mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
       !||    monvol_struct_mod            ../engine/share/modules/monvol_struct_mod.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod         ../common_source/modules/names_and_titles_mod.F
+      !||    nodal_arrays_mod             ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    output_mod                   ../common_source/modules/output/output_mod.F90
       !||    pinchtype_mod                ../common_source/modules/pinchtype_mod.F
       !||    python_funct_mod             ../common_source/modules/python_mod.F90
       !||    qa_out_mod                   ../common_source/qa/qa_out_mod.F
       !||    rad2r_mod                    ../engine/share/modules/rad2r.F
+      !||    rbe3_mod                     ../common_source/modules/constraints/rbe3_mod.F90
       !||    rbody_mod                    ../engine/share/modules/rbody_mod.F
       !||    restmod                      ../engine/share/modules/restart_mod.F
       !||    scratchfile_mod              ../engine/share/modules/scratchfiles_mod.F
       !||    segvar_mod                   ../engine/share/modules/segvar_mod.F
-      !||    sensor_mod                   ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod                   ../common_source/modules/sensor_mod.F90
       !||    skew_mod                     ../common_source/modules/skew_mod.F90
       !||    soltosph_mod                 ../engine/share/modules/soltosph_mod.F
       !||    stack_mod                    ../engine/share/modules/stack_mod.F
       !||    state_mod                    ../common_source/modules/state_mod.F
       !||    table_glob_mod               ../engine/share/modules/table_glob_mod.F
+      !||    time_history_mod             ../common_source/modules/output/time_history_mod.F
       !||    time_mod                     ../engine/share/modules/time_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    unitab_mod                   ../common_source/modules/unitab_mod.F
-      !||    user_interface_mod           ../engine/share/modules/user_interface_mod.F
+      !||    user_interface_mod           ../engine/source/modules/user_interface_mod.F90
       !||====================================================================
       SUBROUTINE RADIOSS2(IDATA,MIDATA,RDATA,MRDATA) 
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE DSGRAPH_MOD
       USE RESTMOD
       USE INTSTAMP_GLOB_MOD
@@ -167,7 +174,7 @@ C-----------------------------------------------
       USE ALEMUSCL_MOD , only:ALEMUSCL_Param
       USE USER_INTERFACE_MOD
       USE ALE_MOD
-      USE OUTPUT_MOD
+      USE OUTPUT_MOD , ONLY : OUTPUT_, WFEXT, WFEXT_MD
       USE INTERFACES_MOD
       USE DT_MOD
       USE LOADS_MOD
@@ -175,6 +182,12 @@ C-----------------------------------------------
       USE NAMES_AND_TITLES_MOD
       USE UNITAB_MOD
       USE SKEW_MOD
+      use glob_therm_mod
+      use PBLAST_MOD
+      use connectivity_mod
+      use nodal_arrays_mod
+      use rbe3_mod
+      USE TIME_HISTORY_MOD , only : TH_CLEAN
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -222,7 +235,6 @@ C-----------------------------------------------
 #include      "rad2r_c.inc"
 #include      "userlib.inc"
 #include      "drape_c.inc"
-#include      "thermal_c.inc"
 #include      "inter22.inc"
 #include      "couple_c.inc"
 C-----------------------------------------------
@@ -289,7 +301,7 @@ C Madymo Stuff
       TYPE (PINCH)  :: PINCH_DATA
       TYPE(DRAPE_), DIMENSION(:), ALLOCATABLE        :: DRAPE_SH4N,DRAPE_SH3N
       TYPE(DRAPEG_)                                  :: DRAPEG
-      TYPE(OUTPUT_)                                  :: OUTPUT
+      TYPE(OUTPUT_),TARGET                           :: OUTPUT
       TYPE(PYTHON_)                                  :: PYTHON
 C      
       INTEGER :: CURRENT_RUN,PREVIOUS_RUN
@@ -301,12 +313,14 @@ C
       INTEGER :: RADFLEX_PROCESS_PID
       INTEGER IUTITLHIS,IUTITLHI(9)
       TYPE (DYNAIN_DATABASE) :: DYNAIN_DATA
-      TYPE (INTERFACES_)  :: INTERFACES
-c      TYPE (SENSORS_)  :: SENSORS    ! defined as global in user_interface_mod
-      TYPE (DT_)       :: DT
-      TYPE (LOADS_)    :: LOADS
-      TYPE (MAT_ELEM_) :: MAT_ELEM
-      TYPE (SKEW_)      :: SKEWS
+      TYPE (INTERFACES_) :: INTERFACES
+c      TYPE (SENSORS_)   :: SENSORS    ! defined as global in user_interface_mod
+      TYPE (DT_)         :: DT
+      TYPE (LOADS_)      :: LOADS
+      TYPE (MAT_ELEM_)   :: MAT_ELEM
+      TYPE (SKEW_)       :: SKEWS
+      type (glob_therm_) :: glob_therm
+      TYPE (PBLAST_)     :: PBLAST
 C----------------------------------------------------------------------------------
 C MDS Table
       INTEGER, DIMENSION(:), ALLOCATABLE :: MDS_OUTPUT_TABLE
@@ -326,6 +340,10 @@ C MDS Table
 C----------------------------------------------------------------------------------
       TYPE(NAMES_AND_TITLES_) :: NAMES_AND_TITLES  !< NAMES_AND_TITLES host the input deck names and titles for outputs
       TYPE(UNIT_TYPE_) :: UNITAB !< units conversion
+      TYPE(connectivity_) :: element 
+      TYPE(nodal_arrays_), target :: nodes 
+      TYPE(timer_) :: TIMERS
+      TYPE(rbe3_) :: rbe3
 C------------------------------------------------------------------
 C to build a IBM PARALLEL version
 C In starter : define install parameter nspmd 
@@ -344,7 +362,7 @@ C------------------------------------------------
     
       CALL CHECK_MESSAGE_DEFINITION()
 C
-      CALL INITIME()
+      CALL INITIME(TIMERS)
 c
       CALL NAMES_AND_TITLE_INIT(NAMES_AND_TITLES)
 C------------------------------------------------
@@ -371,7 +389,11 @@ C                                   IF RELEASE WAS BUILT FROM SOURCE
       ISRCVER=1
       ABINP = 0
       ABOUT = 0
-      
+
+      !External Foce Work
+      WFEXT => OUTPUT%WFEXT
+      WFEXT_MD => OUTPUT%WFEXT_MD
+
 #include      "machine2.inc"
       
 C------------------------------------------------------------------
@@ -395,7 +417,7 @@ C------------------------------------------------------------------
       INERI=0
       IPLAST=1
       IIN=8
-      IOUT=0
+      IOUT=7
       ISOLV=0
       ISTDI=5
       IUGEO=4
@@ -482,6 +504,7 @@ C Initialize ProcessID variable for scratch filesqq
 C--------------------------------------------------
 C Radioss userlibraries initialization
 C--------------------------------------------------
+        user_interface_nodes => NODES ! should be done only if user_interface is used
         IF(GOT_USERL_ALTNAME==1)THEN
           DLIBFILE(1:LEN_USERL_ALTNAME)=USERL_ALTNAME(1:LEN_USERL_ALTNAME)
           DLIBFILE_SIZE=LEN_USERL_ALTNAME
@@ -595,8 +618,6 @@ C--------------------------------------------------
 
       IF ( GOT_INPUT == 0)THEN
        IF (ISPMD/=0) THEN
-C redirect IOUT to tmp file  fichier temporaire when SPMD on pi <> 0
-         IOUT = IUSC4
          CALL OPEN_F_SCRATCH_FILE(IOUT,1,ROOTN,LENROOTN,IUSC4_FNAM)
          LEN_IUSC4_FNAM=LEN_TRIM(IUSC4_FNAM)
 
@@ -610,7 +631,6 @@ C redirect IOUT to tmp file  fichier temporaire when SPMD on pi <> 0
        ENDIF
       ELSE
        IF (ISPMD/=0) THEN
-         IOUT = IUSC4
          CALL OPEN_F_SCRATCH_FILE(IOUT,1,ROOTN,LENROOTN,IUSC4_FNAM)
          LEN_IUSC4_FNAM=LEN_TRIM(IUSC4_FNAM)
          WRITE(UNIT=IOUT,IOSTAT=IOS,FMT='(A)')
@@ -620,7 +640,7 @@ C------------------------------------------------
 C     Standard input reading
 C------------------------------------------------
       CALL LECINP(IRUNN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
-     .            SENSORS,DT,OUTPUT)
+     .            SENSORS,DT,OUTPUT,GLOB_THERM)
       NFSKYI=5
       IF(KDTINT==0 )NFSKYI=4
       
@@ -724,7 +744,6 @@ C       Create info, hist, monitor, progress and tpl files for writing implicit 
 1006      FORMAT('    *Parameter(PLOT_FILE_1, PLOT_FILE_1, FILENAME, "*", "',A,'")')
         ENDIF
       ENDIF
-        IF(IOUT==0)IOUT=7
         WRITE(CHRUN,'(I4.4)')IRUNN
         IF(MCHECK/=0)THEN
          IF(ISPMD==0) THEN
@@ -822,7 +841,8 @@ C------------------------------------------------
       CALL RDRESA(ITSTV1 ,LHEADER ,LVARINT ,LVARREA ,PRADIOS ,
      .            PRESFIL, MULTI_FVM, H3D_DATA,
      .            PINCH_DATA,DYNAIN_DATA,INTERFACES,SENSORS,LOADS,
-     .            MAT_ELEM,NAMES_AND_TITLES,SKEWS )
+     .            MAT_ELEM,NAMES_AND_TITLES,SKEWS ,GLOB_THERM,PBLAST,
+     .            RBE3)
 
 C------------------------------------------------
 C     Test of .rst file compatibility
@@ -852,9 +872,9 @@ C      CALL TRACE_OUT(19)
       CALL INIPAR(ITID,3,NNODES,INPUTNAM,GOT_INPUT,NBTASK)
 
       IF(NSPMD > 1 ) THEN
-        CALL SPMD_ALLREDUCE_INT(NFXFLUX,NFXFLUX_GLOB,1,"SUM ")
+        CALL SPMD_ALLREDUCE_INT(GLOB_THERM%NFXFLUX,NFXFLUX_GLOB,1,"SUM ")
       ELSE
-        NFXFLUX_GLOB = NFXFLUX
+        NFXFLUX_GLOB = GLOB_THERM%NFXFLUX
       ENDIF
       IF(NFXFLUX_GLOB >0 .AND. (IPARIT > 0 .OR. IPARIT == -1)) THEN
         IPARIT=0
@@ -866,7 +886,7 @@ C      CALL TRACE_OUT(19)
 
       CALL TRACE_IN(17,1,ZERO)
 C end init rdresa after call xtime0
-      CALL INIRESA(H3D_DATA,PINCH_DATA)
+      CALL INIRESA(H3D_DATA,PINCH_DATA,GLOB_THERM)
       CALL TRACE_OUT(17)
 
 
@@ -923,7 +943,8 @@ C
       CALL ALE_CONNECTIVITY%ALE_CONNECTIVITY_INIT()
 
       ! Most of arrays from Restart
-      CALL RESTALLOC(MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS)
+      CALL RESTALLOC(ELEMENT,NODES,MULTI_FVM,H3D_DATA,PINCH_DATA,ALE_CONNECTIVITY,SEGVAR,INTERFACES,SKEWS,
+     *               GLOB_THERM,RBE3)
 
       ! Initialization
       IGEO = 0
@@ -936,33 +957,33 @@ C
         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
         CALL ARRET(2)
       ENDIF
-C
-      ! Single Precision version : XDP = X in Double :
-      IF (IRESP==1) THEN
-        SXDP = 3*NUMNOD
-        ALLOCATE(XDP(SXDP),STAT=IXDP)
-        IF(IXDP/=0) THEN
-          CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-          CALL ARRET(2)
-        ENDIF
-        ALLOCATE(DDP(3*NUMNOD),STAT=IXDP)
-        IF(IXDP/=0) THEN
-          CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-          CALL ARRET(2)
-        ENDIF
-      ELSE
-        SXDP = 3
-        ALLOCATE(XDP(SXDP),STAT=IXDP)
-        IF(IXDP/=0) THEN
-          CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-          CALL ARRET(2)
-        ENDIF
-        ALLOCATE(DDP(1),STAT=IXDP)
-        IF(IXDP/=0) THEN
-          CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-          CALL ARRET(2)
-        ENDIF
-      ENDIF
+
+!     ! Single Precision version : XDP = X in Double :
+!     IF (IRESP==1) THEN
+!       SXDP = 3*NUMNOD
+!       ALLOCATE(XDP(SXDP),STAT=IXDP)
+!       IF(IXDP/=0) THEN
+!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+!         CALL ARRET(2)
+!       ENDIF
+!       ALLOCATE(DDP(3*NUMNOD),STAT=IXDP)
+!       IF(IXDP/=0) THEN
+!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+!         CALL ARRET(2)
+!       ENDIF
+!     ELSE
+!       SXDP = 3
+!       ALLOCATE(XDP(SXDP),STAT=IXDP)
+!       IF(IXDP/=0) THEN
+!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+!         CALL ARRET(2)
+!       ENDIF
+!       ALLOCATE(DDP(1),STAT=IXDP)
+!       IF(IXDP/=0) THEN
+!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
+!         CALL ARRET(2)
+!       ENDIF
+!     ENDIF
 
       ! Monvol / Airbag
       ALLOCATE(T_MONVOL(NVOLU))
@@ -990,7 +1011,7 @@ C
       ENDIF
 
       ! Heat Transfer
-      IF(ITHERM_FE > 0   ) THEN
+      IF (GLOB_THERM%ITHERM_FE > 0   ) THEN
         ALLOCATE(MCP(NUMNOD),TEMP(NUMNOD))
       ELSE
          ALLOCATE(MCP(0),TEMP(0))
@@ -1034,10 +1055,10 @@ C
      .            SENSORS        ,EBCS_TAB   ,DYNAIN_DATA   ,USER_WINDOWS     ,OUTPUT    ,
      .            INTERFACES     ,LOADS      ,MAT_ELEM      ,PYTHON           ,IFLOW     ,
      .            SKEWS          ,RFLOW      ,LIFLOW        ,LRFLOW           ,IMPL_S0   ,
-     .            MCP            ,TEMP       ,FORNEQS       ,UNITAB           ,NFXFLUX   ,
-     .            STACK          ,DRAPE_SH4N ,DRAPE_SH3N    ,DRAPEG           ,NDRAPE )
-
-       ! Close restart file
+     .            MCP            ,TEMP       ,FORNEQS       ,UNITAB,
+     .            STACK          ,DRAPE_SH4N ,DRAPE_SH3N    ,DRAPEG           ,NDRAPE ,
+     .            GLOB_THERM     ,PBLAST     ,ELEMENT       ,NODES            ,RBE3)
+      ! Close restart file
        CALL CLOSE_C
        ! --------------------------------------------------------------------------------------------
       IF (NSPMD > 1)  CALL SPMD_RST_CHECK()
@@ -1205,7 +1226,7 @@ C--------------------------------------------
       ENDIF
       
       !no need to output zero contour for ALE ANIM keywords if ALE not defined. (example: schlieren +SH3N)
-      IF(IALE+IEULER+ITHERM == 0)THEN
+      IF(IALE+IEULER+GLOB_THERM%ITHERM == 0)THEN
         NCE_ANI = NCE_ANI - ANIM_CE(10672)
         NSE_ANI = NSE_ANI - ANIM_SE(4892)
         ANIM_CE(10672) = 0 !quad schlieren
@@ -1328,7 +1349,7 @@ C--------------------------------------------
      .            C1='(/DT/.../AMS)')
             CALL ARRET(2)
           ENDIF
-          IF(MCHECK==0)DIAG_SMS(1:NUMNOD)=MS(1:NUMNOD)
+          IF(MCHECK==0)DIAG_SMS(1:NUMNOD)=NODES%MS(1:NUMNOD)
         ENDIF
       ELSEIF(IDTMINS==2)THEN
         IF(IDTMINS_OLD /= 2)THEN
@@ -1348,7 +1369,7 @@ C--------------------------------------------
           DMELP (1:NUMELP)=ZERO
           DMELRT(1:NUMELR)=ZERO
           DMINT2(1:4*I2NSN25)=ZERO
-          DIAG_SMS(1:NUMNOD)=MS(1:NUMNOD)
+          DIAG_SMS(1:NUMNOD)=NODES%MS(1:NUMNOD)
         ENDIF
         IF(IDTMINS_OLD /= 1 .AND. IDTMINS_OLD /= 2)THEN
           ALLOCATE(RES_SMS(3*NUMNOD),STAT=IERR)
@@ -1367,7 +1388,7 @@ C--------------------------------------------
      .            C1='(/DT/.../AMS)')
             CALL ARRET(2)
           ENDIF
-          DIAG_SMS(1:NUMNOD)=MS(1:NUMNOD)
+          DIAG_SMS(1:NUMNOD)=NODES%MS(1:NUMNOD)
         END IF
       END IF
       IF(.NOT.ALLOCATED(ADMSMS))ALLOCATE(ADMSMS(0))
@@ -1412,7 +1433,7 @@ C-----------------------------------------------------
       IF(MCHECK==0)THEN
         CALL SWITCH_TO_DTNODA(
      .                    IXR      ,GEO      ,PM       ,IPARG    ,MAT_ELEM%ELBUF,
-     .                    MS       ,IN       ,ITAB     ,IGEO     ,IPM    ,
+     .                    NODES%MS       ,NODES%IN       ,NODES%ITAB     ,IGEO     ,IPM    ,
      .                    BUFMAT   ,IPART    ,IGRNOD   ,IGRPART)
       END IF
 C------------------------------------------------
@@ -1448,16 +1469,16 @@ C------------------------------------------------
 C     engine file reading
 C------------------------------------------------
       CALL TRACE_IN(16,2,ZERO)
-      CALL LECTUR(  ICODE ,  ISKEW ,  ISKWN ,  IXTG  ,   IXS ,
-     2              IXQ ,    IXC ,    IXT ,    IXP ,     IXR ,
-     3              ITAB ,   ITABM1  ,NPC,     IPARG,    IGRV ,
+      CALL LECTUR(  NODES%ICODE ,  NODES%ISKEW ,  ISKWN ,  IXTG  ,   IXS ,
+     2              IXQ ,    ELEMENT%SHELL%IXC ,    IXT ,    IXP ,     IXR ,
+     3              NODES%ITAB ,   NODES%ITABM1  ,NPC,     IPARG,    IGRV ,
      4              LGRAV   ,IPARI,
      5              NPBY ,   LPBY    ,ILINK,   LLINK  ,LINALE ,
      6              NEFLSW , NNFLSW , ICUT ,   IAF(IF01),
-     7              X  ,     V  ,     VR  ,    MS   ,IN  ,
+     7              NODES%X  ,NODES%V,  NODES%VR, NODES%MS   ,NODES%IN  ,
      8              SKEWS%SKEW  ,TF       ,RBY  ,
      9              WA  ,CRFLSW  ,XCUT  ,ANIN  ,DAMPR  ,
-     A              IGRNOD ,KXSP,WEIGHT ,FR_RBY2 ,FR_RL,
+     A              IGRNOD ,KXSP,NODES%WEIGHT ,FR_RBY2 ,FR_RL,
      B              PARTSAV,IPART,PM,
      C              MONVOL ,VOLMON, IPART_STATE,GEO,TABLE,
      D              IFRAME,XFRAME,MAT_ELEM%ELBUF,IGEO,INTERFACES%INTBUF_TAB,
@@ -1466,7 +1487,7 @@ C------------------------------------------------
      G              MDS_LABEL,MDS_OUTPUT_TABLE,MDS_NMAT,MAX_DEPVAR,
      H              MDS_NDEPSVAR,STACK,IBCL,ILOADP,LLOADP,SENSORS,
      I              DYNAIN_DATA,DT ,LOADS ,OUTPUT,NAMES_AND_TITLES,
-     J              MAT_ELEM%MAT_PARAM)
+     J              MAT_ELEM%MAT_PARAM,GLOB_THERM,PBLAST)
 C------------------------------------------------
 C Close & Delete scratch file
       CLOSE (UNIT=IIN)
@@ -1498,18 +1519,18 @@ C------------------------------------------------
            ANIM_CE(10254) = 1
            ANIM_CE(10255) = 1
         ENDIF
-      CALL BCS0 (ICODE,ICODT,ICODR, ICODE_PLY, ICODT_PLY,IBC_PLY)
+      CALL BCS0 (NODES%ICODE,NODES%ICODT,NODES%ICODR, ICODE_PLY, ICODT_PLY,IBC_PLY)
       IT = 1
       IF (NUMELTG6>0) THEN
-        CALL CDK6BC3(ICODT ,ISKEW,ISKWN,IXTG  ,
+        CALL CDK6BC3(NODES%ICODT ,NODES%ISKEW,ISKWN,IXTG  ,
      1                  IXTG1   ,NPBY,
-     2                  X ,SKEWS%SKEW)
+     2                  NODES%X ,SKEWS%SKEW)
       ENDIF
 C
 C bcs rigid material
 C
       IF(IRIGID_MAT > 0)
-     .   CALL CONDRMAT(ICODT,ICODR, IRBYM, LNRBYM,ICODRBYM)
+     .   CALL CONDRMAT(NODES%ICODT,NODES%ICODR, IRBYM, LNRBYM,ICODRBYM)
 
 C
       CALL TRACE_IN(18,0,ZERO)
@@ -1580,7 +1601,7 @@ C------------------------------------------------
           IFILTITL = IUTITLHIS
           ITHFLAG = 10
           CALL HIST1( FILNAMTH ,IFIL              ,NTHGRP            ,LONG,
-     2                 WA      ,PM                ,GEO               ,IPART,
+     2                 PM                ,GEO               ,IPART,
      3                 SUBSETS ,OUTPUT%TH%ITHGRP  ,OUTPUT%TH%ITHBUF  ,IGEO,
      4                 IPM     ,IPART   ,LIPART1  ,8,
      5                 12      ,ITFORM  ,ITHFLAG ,ITHVAR,
@@ -1603,7 +1624,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(1)
               ITHFLAG = 1
               CALL HIST1( FILNAMTH ,IFIL              ,NTHGRP1(1)        ,LONG ,
-     2                    WA       ,PM                ,GEO               ,IPART,
+     2                    PM                ,GEO               ,IPART,
      3                    SUBSETS  ,OUTPUT%TH%ITHGRPA ,OUTPUT%TH%ITHBUFA ,IGEO ,
      4                    IPM      ,IPART(1+LIPART1*(NPART+NTHPART)) ,2  ,1    ,
      5                    1       ,AFORM(1)           ,ITHFLAG       ,ITHVAR,
@@ -1626,7 +1647,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(2)
               ITHFLAG = 2
               CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(2)        ,LONG,
-     2                   WA      ,PM                ,GEO               ,IPART ,
+     2                   PM                ,GEO               ,IPART ,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPB ,OUTPUT%TH%ITHBUFB ,IGEO ,
      4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+2*(NPART+NTHPART)),2,1,
      5                   1       ,AFORM(2)          ,ITHFLAG          ,ITHVAR,
@@ -1649,7 +1670,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(3)
               ITHFLAG = 3
               CALL HIST1(FILNAMTH ,IFIL             ,NTHGRP1(3)        ,LONG,
-     2                   WA       ,PM               ,GEO               ,IPART ,
+     2                   PM               ,GEO               ,IPART ,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPC ,OUTPUT%TH%ITHBUFC ,IGEO ,
      4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+4*(NPART+NTHPART)) ,2 ,1,
      5                   1       ,AFORM(3)          ,ITHFLAG           ,ITHVAR,
@@ -1672,7 +1693,7 @@ C   Multiple th files
               IFIL= IUNIT
               ITHFLAG = 4
               CALL HIST1(FILNAMTH,IFIL,NTHGRP1(4),LONG,
-     2                   WA  ,PM  ,GEO ,IPART ,
+     2                   PM  ,GEO ,IPART ,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPD ,OUTPUT%TH%ITHBUFD ,IGEO,
      4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+6*(NPART+NTHPART)) ,2 ,1,
      5                   1       ,AFORM(4)          ,ITHFLAG           ,ITHVAR,
@@ -1695,7 +1716,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(5)
               ITHFLAG = 5
               CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(5)        ,LONG,
-     2                   WA      ,PM                ,GEO               ,IPART,
+     2                   PM                ,GEO               ,IPART,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPE ,OUTPUT%TH%ITHBUFE ,IGEO,
      4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+8*(NPART+NTHPART)),2,1,
      5                   1       ,AFORM(5)          ,ITHFLAG           ,ITHVAR,
@@ -1718,7 +1739,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(6)
               ITHFLAG = 6
               CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(6)        ,LONG,
-     2                   WA      ,PM                ,GEO               ,IPART ,
+     2                   PM                ,GEO               ,IPART ,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPF ,OUTPUT%TH%ITHBUFF ,IGEO ,
      4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+10*(NPART+NTHPART)),2,1,
      5                   1       ,AFORM(6)          ,ITHFLAG           ,ITHVAR,
@@ -1741,7 +1762,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(7)
               ITHFLAG = 7
               CALL HIST1(FILNAMTH,IFIL              ,NTHGRP1(7)        ,LONG,
-     2                   WA      ,PM                ,GEO               ,IPART ,
+     2                   PM                ,GEO               ,IPART ,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPG ,OUTPUT%TH%ITHBUFG ,IGEO ,
      4                   IPM,IPART(1+LIPART1*(NPART+NTHPART)+12*(NPART+NTHPART)),2,1,
      5                   1       ,AFORM(7)          ,ITHFLAG           ,ITHVAR,
@@ -1764,7 +1785,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(8)
               ITHFLAG = 8
               CALL HIST1(FILNAMTH ,IFIL              ,NTHGRP1(8),LONG,
-     2                   WA       ,PM                ,GEO               ,IPART,
+     2                   PM                ,GEO               ,IPART,
      3                   SUBSETS  ,OUTPUT%TH%ITHGRPH ,OUTPUT%TH%ITHBUFH ,IGEO,
      4                   IPM      ,IPART(1+LIPART1*(NPART+NTHPART)+14*(NPART+NTHPART)),2,1,
      5                   1       ,AFORM(8)           ,ITHFLAG           ,ITHVAR,
@@ -1787,7 +1808,7 @@ C   Multiple th files
               IFILTITL = IUTITLHI(9)
               ITHFLAG = 9
               CALL HIST1(FILNAMTH,IFIL,NTHGRP1(9),LONG,
-     2                   WA  ,PM  ,GEO ,IPART ,
+     2                   PM  ,GEO ,IPART ,
      3                   SUBSETS ,OUTPUT%TH%ITHGRPI ,OUTPUT%TH%ITHBUFI ,IGEO,
      4                   IPM     ,IPART(1+LIPART1*(NPART+NTHPART)+16*(NPART+NTHPART)),2,1,
      5                   1       ,AFORM(9)          ,ITHFLAG           ,ITHVAR,
@@ -1796,8 +1817,8 @@ C   Multiple th files
         ELSE
           WRITE(CHR_OLD,'(I2.2)')IRUNN
           CALL HIST13(
-     1           IPARG ,IXS ,IXQ ,IXC ,IXT ,
-     2           IXP ,IXR ,WA  ,ITAB ,PM  ,
+     1           IPARG ,IXS ,IXQ ,ELEMENT%SHELL%IXC ,IXT ,
+     2           IXP ,IXR ,NODES%ITAB ,PM  ,
      3           NPBYL ,IXTG ,IRFE    ,LACCELM ,
      4           IPARI ,IPART ,OUTPUT%TH%ITHGRP ,OUTPUT%TH%ITHBUF ,CHR_OLD,NAMES_AND_TITLES)
         ENDIF
@@ -2128,7 +2149,7 @@ c
 #endif
         ENDIF
       ENDIF
-      CALL INIT_TH0( IPARG,MAT_ELEM%ELBUF,IGEO,IXR,OUTPUT%TH,WEIGHT)
+      CALL INIT_TH0( IPARG,MAT_ELEM%ELBUF,IGEO,IXR,OUTPUT%TH,NODES%WEIGHT)
       CALL TRACE_OUT(18)
 C---------------------------------------------------------------------
 #ifdef DNC
@@ -2149,9 +2170,9 @@ C Send Data / Fem Structures
         K9=K8+NUMELTG
         K10=K9+NUMELX
         K11=K10+NUMSPH
-        CALL RAD_INIT_MADCPL(IPART, PM, GEO, ITAB,
-     *                       X,     MS,
-     *                       IXC ,IXTG ,IXS ,
+        CALL RAD_INIT_MADCPL(IPART, PM, GEO, NODES%ITAB,
+     *                       NODES%X,  NODES%MS,
+     *                       ELEMENT%SHELL%IXC ,IXTG ,IXS ,
      *                       IPART(K3),IPART(K8),IPART(K1),
      *                       MADPRT,   MADCLNOD,  MADSH4,  MADSH3,
      *                       MADSOL )
@@ -2161,9 +2182,9 @@ C---------------------------------------------------------------------
          ITASK=0
          IRUNN_BIS = IRUNN
 
-         CALL RESOL_HEAD(ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,XDP ,
+         CALL RESOL_HEAD(ELEMENT, NODES, ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,XDP ,
      .                   GRAPHE       ,IFLOW           ,RFLOW           ,MCP        ,TEMP      ,
-     .                   STACK        ,IRUNN_BIS       ,
+     .                   STACK        ,IRUNN_BIS       , TIMERS,
      .                   MULTI_FVM    ,H3D_DATA        ,SUBSETS    ,IGRNOD    ,
      .                   IGRBRIC      ,IGRQUAD         ,IGRSH4N         ,IGRSH3N    ,IGRTRUSS  ,
      .                   IGRBEAM      ,IGRSPRING       ,IGRPART         ,IGRSURF    ,IGRSLIN   ,
@@ -2171,7 +2192,8 @@ C---------------------------------------------------------------------
      .                   DRAPE_SH4N   ,DRAPE_SH3N      ,T_MONVOL        ,SENSORS    ,EBCS_TAB        ,
      .                   DIFFUSION    ,SEGVAR          ,DYNAIN_DATA     ,DRAPEG     ,USER_WINDOWS    ,
      .                   OUTPUT       ,INTERFACES      ,DT              ,LOADS      ,MAT_ELEM  , PYTHON,
-     .                   NAMES_AND_TITLES, UNITAB ,SKEWS,LIFLOW         ,LRFLOW)
+     .                   NAMES_AND_TITLES, UNITAB ,SKEWS,LIFLOW         ,LRFLOW     ,glob_therm,PBLAST,
+     .                   RBE3)
 C---------------------------------------------------------------------
       CURRENT_RUN = GLOBAL_COMP_TIME%RUN_NBR
       CALL SPMD_REDUCE_DB(GLOBAL_COMP_TIME%ENGINE_TIME(CURRENT_RUN),RESULT,1,0,"MAX ")
@@ -2201,3 +2223,4 @@ C---------------------------------------------------------------------
 
       RETURN
       END
+

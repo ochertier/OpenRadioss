@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -67,45 +67,48 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    srota3                 ../engine/source/elements/solid/solide/srota3.F
       !||    sroto12_sig            ../engine/source/elements/solid/solidez/sroto12_sig.F
       !||    sstra3                 ../engine/source/elements/solid/solide/sstra3.F
-      !||    startime               ../engine/source/system/timer.F
-      !||    stoptime               ../engine/source/system/timer.F
+      !||    startime               ../engine/source/system/timer_mod.F90
+      !||    stoptime               ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    ale_mod                ../common_source/modules/ale/ale_mod.F
       !||    dt_mod                 ../engine/source/modules/dt_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    mat_elem_mod           ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    mmain_mod              ../engine/source/materials/mat_share/mmain.F90
       !||    nlocal_reg_mod         ../common_source/modules/nlocal_reg_mod.F
       !||    sdistor_ini_mod        ../engine/source/elements/solid/solide/sdistror_ini.F90
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||    table_mod              ../engine/share/modules/table_mod.F
+      !||    timer_mod              ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE S4FORC3(
-     1   ELBUF_TAB,  NG,         PM,         GEO,
-     2   IXS,        X,          A,          V,
-     3   MS,         W,          FLUX,       FLU1,
-     4   VEUL,       FV,         ALE_CONNECT,IPARG,
-     5   TF,         NPF,        BUFMAT,     PARTSAV,
-     6   NLOC_DMG,   DT2T,       NELTST,     ITYPTST,
-     7   STIFN,      FSKY,       IADS,       OFFSET,
-     8   EANI,       IPARTS,     F11,        F21,
-     9   F31,        F12,        F22,        F32,
-     A   F13,        F23,        F33,        F14,
-     B   F24,        F34,        NEL,        FSKYM,
-     C   MSNF,       IPM,        IGEO,       BUFVOIS,
-     D   ISTRAIN,    ITASK,      TEMP,       FTHE,
-     E   FTHESKY,    IEXPAN,     GRESAV,     GRTH,
-     F   IGRTH,      MSSA,       DMELS,      TABLE,
-     G   XDP,        VARNOD,     VOLN,       CONDN,
-     H   CONDNSKY,   D,          SENSORS,    IOUTPRT,
-     I   MAT_ELEM,   H3D_STRAIN, DT,         IDEL7NOK,NSVOIS,SZ_BUFVOIS,
-     *   SNPC,       STF,        SBUFMAT,    SVIS,IDTMINS,IRESP, 
-     *   IDEL7NG,    MAXFUNC,    USERL_AVAIL, heat_meca, 
-     V   impl_s,     idyna)
+      SUBROUTINE S4FORC3(TIMERS,
+     1   ELBUF_TAB,  NG,               PM,         GEO,
+     2   IXS,        X,                A,          V,
+     3   MS,         W,                FLUX,       FLU1,
+     4   VEUL,       FV,               ALE_CONNECT,IPARG,
+     5   TF,         NPF,              BUFMAT,     PARTSAV,
+     6   NLOC_DMG,   DT2T,             NELTST,     ITYPTST,
+     7   STIFN,      FSKY,             IADS,       OFFSET,
+     8   EANI,       IPARTS,           F11,        F21,
+     9   F31,        F12,              F22,        F32,
+     A   F13,        F23,              F33,        F14,
+     B   F24,        F34,              NEL,        FSKYM,
+     C   MSNF,       IPM,              IGEO,       BUFVOIS,
+     D   ISTRAIN,    ITASK,            TEMP,       FTHE,
+     E   FTHESKY,    IEXPAN,           GRESAV,     GRTH,
+     F   IGRTH,      MSSA,             DMELS,      TABLE,
+     G   XDP,        SFEM_NODVAR,      VOLN,       CONDN,
+     H   CONDNSKY,   D,                SENSORS,    IOUTPRT,
+     I   MAT_ELEM,   H3D_STRAIN,       DT,         IDEL7NOK,NSVOIS,SZ_BUFVOIS,
+     *   SNPC,       STF,              SBUFMAT,    SVIS,IDTMINS,IRESP,
+     *   IDEL7NG,    MAXFUNC,          USERL_AVAIL, GLOB_THERM,
+     V   impl_s,     idyna,            S_SFEM_NODVAR)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MMAIN_MOD
       USE TABLE_MOD
       USE MAT_ELEM_MOD         
@@ -116,6 +119,8 @@ C-----------------------------------------------
       USE DT_MOD
       USE ELBUFDEF_MOD
       USE SDISTOR_INI_MOD, ONLY : SDISTOR_INI
+      use glob_therm_mod
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -139,6 +144,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) ,INTENT(INOUT) :: TIMERS
+      INTEGER, INTENT(IN)    :: S_SFEM_NODVAR
       INTEGER, INTENT(IN)    :: SNPC
       INTEGER, INTENT(IN)    :: STF
       INTEGER, INTENT(IN)    :: NSVOIS
@@ -152,7 +159,6 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IMPL_S
       INTEGER, INTENT(IN) :: IDYNA
       INTEGER, INTENT(IN) :: USERL_AVAIL
-      my_real, INTENT(INOUT) :: HEAT_MECA
       INTEGER IXS(NIXS,*), IPARG(NPARG,NGROUP), NPF(*),IADS(8,*),
      .        IPARTS(*),IPM(NPROPMI,*),IGEO(NPROPGI,*),ITASK,
      .        GRTH(*),IGRTH(*),IOUTPRT
@@ -174,15 +180,16 @@ C
      .   F13(MVSIZ),F23(MVSIZ),F33(MVSIZ),
      .   F14(MVSIZ),F24(MVSIZ),F34(MVSIZ),D(*),
      .   TEMP(*), FTHE(*), FTHESKY(*),GRESAV(*), MSSA(*), DMELS(*), VOLN(MVSIZ)
-      my_real MSNF(*),VARNOD(*),CONDN(*),CONDNSKY(*),BUFVOIS(6,*)
+      my_real MSNF(*),SFEM_NODVAR(S_SFEM_NODVAR),CONDN(*),CONDNSKY(*),BUFVOIS(6,*)
       my_real, DIMENSION(MVSIZ,6), INTENT(INOUT) :: SVIS
       TYPE(TTABLE) TABLE(*)
       TYPE (ELBUF_STRUCT_), TARGET, DIMENSION(NGROUP) :: ELBUF_TAB
       TYPE (NLOCAL_STR_)  , TARGET :: NLOC_DMG 
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECT
       TYPE (MAT_ELEM_) ,INTENT(INOUT) :: MAT_ELEM
-      TYPE (SENSORS_)  , INTENT(IN) :: SENSORS
+      TYPE (SENSORS_)  , INTENT(INOUT) :: SENSORS
       TYPE(DT_),      INTENT(INOUT) :: DT
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -404,7 +411,7 @@ C!!!!!!calcul local rep for ISMSTR 10 to 11 (offg>un)
          ENDIF
       ENDIF
 C
-      IF(JALE+JLAG/=0)THEN
+      IF(JALE+JLAG /= 0)THEN
        IF (ISMSTR /= 11) THEN
 C!!!!!!also add exception for ismstr10+offg>un
         CALL S4DERI3(
@@ -487,20 +494,20 @@ C-----------------------------------------------------
       IF(JLAG > 0.AND.ISROT == 3) THEN
         RHO_0 = PM(1,MXT(1))
         CALL S4VOLN_M(
-     1   VARNOD,      NC1,         NC2,         NC3,
-     2   NC4,         MXT,         GBUF%OFF,    GBUF%RHO,
-     3   RHO_0,       MFXX,        MFXY,        MFXZ,
-     4   MFYX,        MFYY,        MFYZ,        MFZX,
-     5   MFZY,        MFZZ,        GBUF%VOL,    VOLN,
-     6   LBUF%VOL0DP, VOLDP,       GBUF%AMU,    DXX,
-     7   DYY,         DZZ,         MAT_ELEM%MAT_PARAM,NEL,
-     8   ISMSTR)
+     1   SFEM_NODVAR,      NC1,         NC2,         NC3,
+     2   NC4,              MXT,         GBUF%OFF,    GBUF%RHO,
+     3   RHO_0,            MFXX,        MFXY,        MFXZ,
+     4   MFYX,             MFYY,        MFYZ,        MFZX,
+     5   MFZY,             MFZZ,        GBUF%VOL,    VOLN,
+     6   LBUF%VOL0DP,      VOLDP,       GBUF%AMU,    DXX,
+     7   DYY,              DZZ,         MAT_ELEM%MAT_PARAM,NEL,
+     8   ISMSTR,           S_SFEM_NODVAR)
       ENDIF
-      IF(JALE > 0.AND.ISROT == 3.AND.MTN /= 37.AND.MTN /= 51.AND.
-     .   MTN /= 18.AND.MTN /= 11) THEN
+      IF(JALE > 0 .AND. ISROT == 3 .AND. MTN /= 37 .AND. MTN /= 51 .AND.
+     .   MTN /= 18 .AND. MTN /= 11) THEN
         DO I=LFT,LLT
          IF(OFF(I) /= 0) THEN
-         SUM=VARNOD(NC1(I))+VARNOD(NC2(I))+VARNOD(NC3(I))+VARNOD(NC4(I))
+         SUM=SFEM_NODVAR(NC1(I))+SFEM_NODVAR(NC2(I))+SFEM_NODVAR(NC3(I))+SFEM_NODVAR(NC4(I))
          VOLN(I)=FOURTH*SUM*GBUF%RHO(I)/PM(1,MXT(I))
          ENDIF
         ENDDO
@@ -579,7 +586,7 @@ C------------------------------------------------------
 C     CALCUL DES CONTRAINTES SUIVANT LOIS CONSTITUTIVES
 C------------------------------------------------------
 Cpour le fluide en SPMD : BUFVOIS LOI11
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(35,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STARTIME(TIMERS,35)
 
       ILAY = 1                                                
       IPTR = 1                                                
@@ -599,7 +606,7 @@ Cpour le fluide en SPMD : BUFVOIS LOI11
      2       NPT,   SENSORS%NSENSOR,SENSORS%SENSOR_TAB)
       END IF
 
-      CALL MMAIN(
+      CALL MMAIN(TIMERS,
      1   ELBUF_TAB,   NG,          PM,          GEO,
      2                ALE_CONNECT, IXS,         IPARG,
      3   V,           TF,          NPF,         BUFMAT,
@@ -627,16 +634,16 @@ Cpour le fluide en SPMD : BUFVOIS LOI11
      P   BID,         IPARG(1,NG), IGEO,        CONDE,
      Q   ITASK,       NLOC_DMG,    VAR_REG,     MAT_ELEM,
      R   H3D_STRAIN,  JPLASOL,     JSPH,        SZ_BUFVOIS,
-     T                SNPC,        STF,         SBUFMAT,
+     T   SNPC,        STF,         SBUFMAT,     GLOB_THERM,   
      U   SVIS,        SZ_IX,       IRESP,
-     V   N2D,         TH_STRAIN,   NGROUP,      TT, 
+     V   N2D,         th_strain,   NGROUP,      TT, 
      .   DT1,         NTABLE,      NUMELQ,      nummat,
      .   numgeo,      numnod,      numels,
      .   IDEL7NOK,    IDTMIN,      MAXFUNC,
-     .   IMON_MAT,    USERL_AVAIL, heat_meca,   impl_s,
+     .   IMON_MAT,    USERL_AVAIL, impl_s,
      .   idyna,       DT,    fheat      )
 c
-      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(35,1)
+      IF ((ITASK==0).AND.(IMON_MAT==1)) CALL STOPTIME(TIMERS,35)
 C-----------  return to global system    
        IF (ISMSTR == 12.AND.IDTMIN(1)==3) THEN
          IF (ISM12_11==0) THEN
@@ -675,7 +682,7 @@ C--------------------------
      .   VZ1, VZ2, VZ3, VZ4, VOLN,IPARTS,GRESAV,
      .   GRTH,IGRTH,IEXPAN,GBUF%EINTTH,GBUF%FILL,
      .   X1, X2, X3, X4, Y1, Y2, Y3, Y4, 
-     .   Z1, Z2, Z3, Z4,ITASK,IPARG(1,NG),OFF)
+     .   Z1, Z2, Z3, Z4,ITASK,IPARG(1,NG),OFF,SENSORS)
       ENDIF
 C
       IF(JLAG+JALE+JEUL == 0)RETURN
@@ -749,7 +756,7 @@ C
      N   MTN)
       ENDIF
 
-        IF(JEUL+JALE/=0) CALL CHECK_OFF_ALE(F11,F21,F31,F12,F22,
+        IF(JEUL+JALE /= 0) CALL CHECK_OFF_ALE(F11,F21,F31,F12,F22,
      1                           F32,F13,F23,F33,F14,
      2                           F24,F34,BID,BID,BID,
      3                           BID,BID,BID,BID,BID,
@@ -778,7 +785,7 @@ C --------------------------
      4         PY2,     PY3,     PY4,     PZ1,
      5         PZ2,     PZ3,     PZ4,     DT1,
      6         TEMP,    TEMPEL,  FHEAT,   THEM,
-     7         GBUF%OFF,LBUF%OFF,NEL)
+     7         GBUF%OFF,LBUF%OFF,NEL,GLOB_THERM%THEACCFACT)
         ELSE
           CALL S4THERM (
      1         PM,      IMAT,    VOLN,    NC1,
@@ -787,7 +794,7 @@ C --------------------------
      4         PY2,     PY3,     PY4,     PZ1,
      5         PZ2,     PZ3,     PZ4,     DT1,
      6         TEMP,    TEMPEL,  DIE,    THEM,
-     7         GBUF%OFF,LBUF%OFF,NEL)
+     7         GBUF%OFF,LBUF%OFF,NEL,GLOB_THERM%THEACCFACT)
         END IF
       
       ENDIF
@@ -805,7 +812,7 @@ c--------------------------
      7   GBUF%VOL,NFT)
       ENDIF 
 C----------------------------
-C     distorsion control  
+C     distortion control  
 C----------------------------
       IF (ISCTL > 0) THEN
          CALL SDISTOR_INI(                                      
@@ -860,7 +867,7 @@ C----------------------------
      4   F22,     F32,     F13,     F23,
      5   F33,     F14,     F24,     F34,
      6   THEM,    FTHE,    CONDN,   CONDE,
-     7   NEL,     JTHE)
+     7   NEL,     JTHE,    GLOB_THERM%NODADT_THERM)
       ELSE
         CALL S4CUMU3P(
      1   GBUF%OFF,STI,     FSKY,    FSKY,
@@ -868,7 +875,8 @@ C----------------------------
      3   F12,     F22,     F32,     F13,
      4   F23,     F33,     F14,     F24,
      5   F34,     THEM,    FTHESKY, CONDNSKY,
-     6   CONDE,   NEL,     NFT,     JTHE)
+     6   CONDE,   NEL,     NFT,     JTHE,    
+     7   GLOB_THERM%NODADT_THERM)
       ENDIF
       IF (ALLOCATED(VAR_REG)) DEALLOCATE(VAR_REG)
       RETURN

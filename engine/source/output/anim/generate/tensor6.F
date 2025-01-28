@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,6 +33,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    initbuf_mod        ../engine/share/resol/initbuf.F
+      !||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE TENSORS(ELBUF_TAB,IPARG   ,ITENS   ,IXS     ,PM       ,
      2                   EL2FA    ,NBF     ,TENS    ,EPSDOT  ,
@@ -42,7 +43,8 @@ C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INITBUF_MOD
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -69,7 +71,6 @@ C     REAL
      .   IXS(NIXS,*),EL2FA(*),IADG(NSPMD,*),IPM(NPROPMI,*),
      .   NBF,NBPART,IPART(LIPART1,*),IPARTSP(*),
      .   ISPH3D,IGEO(NPROPGI,*)
-      REAL WA(6*NBF)
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP), TARGET :: ELBUF_TAB
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
@@ -83,9 +84,11 @@ C     REAL
      .        NN1,NN2,NN3,NN4,ICSIG,IOR_TSH,NUVAR,BUF,L_PLA,L_STRA,KHBE,
      .        KCVT,ISOLNOD,NLAY,NPTR,NPTS,NPTT,NPTG,IL,IS,IR,IT,IVISC,IOK,
      .        JJ(6),IR0,IS0,IT0
+      REAL,DIMENSION(:),ALLOCATABLE :: WA
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
       TYPE(L_BUFEL_)  ,POINTER :: LBUF
-C=======================================================================      
+C=======================================================================
+      CALL MY_ALLOC(WA,6*NBF)
       DO J=1,18      
         R4(J) = ZERO
       ENDDO         
@@ -3620,6 +3623,7 @@ C-----------------------------------------------
 C-----------------------------------------------
  600  CONTINUE
 C-----------
+      DEALLOCATE(WA)
       RETURN
       END SUBROUTINE TENSORS
       !||====================================================================

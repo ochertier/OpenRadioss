@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mmain           ../engine/source/materials/mat_share/mmain.F90
       !||    mmain8          ../engine/source/materials/mat_share/mmain8.F
       !||    mulaw           ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F
+      !||    mulaw8          ../engine/source/materials/mat_share/mulaw8.F90
       !||    usermat_solid   ../engine/source/materials/mat_share/usermat_solid.F
       !||====================================================================
       SUBROUTINE FAIL_JOHNSON(
@@ -91,11 +91,11 @@ C-----------------------------------------------
       IDEL=0
       IDEV=0
       SCALE = ZERO
-      IF(ISOLID==1)THEN
+      IF ((ISOLID==1).OR.(ISOLID == 4)) THEN
         IDEL=1
-      ELSEIF(ISOLID==2)THEN
-       IDEV =1
-      END IF
+      ELSEIF ((ISOLID==2).OR.(ISOLID == 3)) THEN
+        IDEV =1
+      ENDIF
 C...
       IF(IDEL==1)THEN
         DO I=1,NEL
@@ -107,7 +107,7 @@ C
       IF(IDEL==1)THEN
        NINDX=0  
        DO I=1,NEL
-        IF(ISOLID==1.AND.OFF(I)==ONE)THEN
+        IF ((ISOLID==1.AND.OFF(I)==ONE).OR.(ISOLID==4))THEN
          IF(DPLA(I)/=ZERO)THEN
            P = THIRD*(SIGNXX(I) + SIGNYY(I) + SIGNZZ(I))
            SXX = SIGNXX(I) - P
@@ -122,12 +122,24 @@ C
            IF(D5/=ZERO) EPSF = EPSF * (ONE + D5*TSTAR(I)) ! if d5=0, tsart is not correctly defined
            EPSF = MAX(EPSF,EPSF_MIN)
            IF(EPSF>ZERO) DFMAX(I) = DFMAX(I) + DPLA(I)/EPSF
+           DFMAX(I) = MIN(ONE,DFMAX(I))
          ENDIF
-         IF(DFMAX(I)>=ONE.AND.OFF(I)==ONE) THEN
-          OFF(I)=FOUR_OVER_5
-          NINDX=NINDX+1
-          INDX(NINDX)=I
-          TDELE(I) = TIME    
+         IF (DFMAX(I)>=ONE.AND.OFF(I)==ONE) THEN
+          IF (ISOLID == 1) THEN 
+            OFF(I)=FOUR_OVER_5
+            NINDX=NINDX+1
+            INDX(NINDX)=I
+            TDELE(I) = TIME 
+          ELSEIF (ISOLID == 4) THEN
+            DFMAX(I)  = ONE
+            OFF(I)    = ONE 
+            SIGNXX(I) = ZERO
+            SIGNYY(I) = ZERO
+            SIGNZZ(I) = ZERO
+            SIGNXY(I) = ZERO
+            SIGNYZ(I) = ZERO
+            SIGNZX(I) = ZERO 
+          ENDIF
          ENDIF
         ENDIF 
        ENDDO
@@ -144,7 +156,7 @@ Cc deviatoric will be vanished
       IF(IDEV==1)THEN
        NINDX=0 
        DO I=1,NEL 
-        IF(ISOLID==2.AND.OFF(I)==ONE)THEN 
+        IF((ISOLID==2.OR.ISOLID==3).AND.OFF(I)==ONE)THEN 
          IF(DFMAX(I)<ONE.AND.DPLA(I)/=ZERO)THEN
           P = THIRD*(SIGNXX(I) + SIGNYY(I) + SIGNZZ(I))
           SXX = SIGNXX(I) - P
@@ -160,25 +172,46 @@ Cc deviatoric will be vanished
      .                    *(ONE + D5*TSTAR(I))
           EPSF = MAX(EPSF,EPSF_MIN)
           IF(EPSF>ZERO) DFMAX(I) = DFMAX(I) + DPLA(I)/EPSF
+          DFMAX(I) = MIN(ONE,DFMAX(I))
           IF(DFMAX(I)>=ONE.AND.OFF(I)==ONE) THEN
            NINDX=NINDX+1
            INDX(NINDX)=I
-           SIGNXX(I) =   P
-           SIGNYY(I) =   P
-           SIGNZZ(I) =   P
-           SIGNXY(I) = ZERO
-           SIGNYZ(I) = ZERO
-           SIGNZX(I) = ZERO                 
+           DFMAX(I) = ONE
+           IF (ISOLID == 2) THEN 
+            SIGNXX(I) =   P
+            SIGNYY(I) =   P
+            SIGNZZ(I) =   P
+            SIGNXY(I) = ZERO
+            SIGNYZ(I) = ZERO
+            SIGNZX(I) = ZERO       
+           ELSEIF (ISOLID == 3) THEN
+            SIGNXX(I) = MIN(P,ZERO)
+            SIGNYY(I) = MIN(P,ZERO)
+            SIGNZZ(I) = MIN(P,ZERO)
+            SIGNXY(I) = ZERO
+            SIGNYZ(I) = ZERO
+            SIGNZX(I) = ZERO             
+           ENDIF
           ENDIF
 c       
          ELSEIF(DFMAX(I)>=ONE)THEN
           P = THIRD*(SIGNXX(I) + SIGNYY(I) + SIGNZZ(I))
-          SIGNXX(I) =   P
-          SIGNYY(I) =   P
-          SIGNZZ(I) =   P
-          SIGNXY(I) = ZERO
-          SIGNYZ(I) = ZERO
-          SIGNZX(I) = ZERO
+          DFMAX(I) = ONE
+          IF (ISOLID == 2) THEN
+            SIGNXX(I) =   P
+            SIGNYY(I) =   P
+            SIGNZZ(I) =   P
+            SIGNXY(I) = ZERO
+            SIGNYZ(I) = ZERO
+            SIGNZX(I) = ZERO
+          ELSEIF (ISOLID == 3) THEN
+            SIGNXX(I) = MIN(P,ZERO)
+            SIGNYY(I) = MIN(P,ZERO)
+            SIGNZZ(I) = MIN(P,ZERO)
+            SIGNXY(I) = ZERO
+            SIGNYZ(I) = ZERO
+            SIGNZX(I) = ZERO
+          ENDIF
          ENDIF
         ENDIF  
        ENDDO

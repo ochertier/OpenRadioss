@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -629,6 +629,9 @@ c----   Shells
           PROP_TAG(IGTYP)%G_STRPG  = 8
 C
           IF((IGTYP == 11 .OR. IGTYP == 17 ) )  PROP_TAG(IGTYP)%LY_DMG = 2
+          IF (IGTYP == 9  .OR. IGTYP == 10 .OR. IGTYP == 11 .OR.
+     .        IGTYP == 16 .OR. IGTYP == 17 .OR. IGTYP == 51 .OR.
+     .        IGTYP == 52 ) PROP_TAG(IGTYP)%L_OFF = 1
         ENDIF
 C
       ENDDO
@@ -650,7 +653,9 @@ C
         IGTYP=IGEO(11,CPT)
         NUMS= NUMGEO_STACK(CPT)
         IF (IGTYP == 17 .OR. IGTYP == 51 ) THEN
-C--- generalizing ZSHIFT ! kepp only IPOS= 2 as before
+          ! Initialization of stack thickness
+          GEO(1,CPT) = ZERO
+C--- generalizing ZSHIFT ! keep only IPOS= 2 as before
           IPOS =IGEO(99,CPT) 
           ZSHIFT = GEO(199, CPT)
           IF(IPOS == 0 )THEN                         
@@ -674,8 +679,10 @@ C number of stack where ply is attached
                      NSTACK = IGEO(42,K)
                      NSTACK = NSTACK +  1
                      IGEO(42   ,K) = NSTACK
-C stack whe e ply is belong                  
+C stack where ply belongs                  
                      IGEO(200 + NSTACK ,K) = CPT
+C update ply thickness
+                     GEO(1,CPT) = GEO(1,CPT) + GEO(1,K)
                      GOTO 100
                    ENDIF
                  ENDDO

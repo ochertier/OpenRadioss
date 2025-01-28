@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -22,22 +22,24 @@ Copyright>        software under a commercial license.  Contact Altair to discus
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 #include "my_real.inc"
       !||====================================================================
-      !||    finter        ../starter/source/tools/curve/finter.F
+      !||    finter                    ../starter/source/tools/curve/finter.F
       !||--- called by ------------------------------------------------------
-      !||    cm58_refsta   ../starter/source/materials/mat/mat058/cm58_refsta.F
-      !||    fct_fiber_2   ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||    inimom_fvm    ../starter/source/elements/solid/solide/inimom_fvm.F
-      !||    law87_upd     ../starter/source/materials/mat/mat087/law87_upd.F
-      !||    lossfun_98    ../starter/source/materials/mat/mat098/lossfun_98.F
-      !||    m38init       ../starter/source/materials/mat/mat038/m38init.F
-      !||    m75init       ../starter/source/materials/mat/mat075/m75init.F
-      !||    m77init       ../starter/source/materials/mat/mat077/m77init.F
-      !||    sigeps35      ../starter/source/materials/mat/mat035/sigeps35.F
-      !||    sigeps37      ../starter/source/materials/mat/mat037/sigeps37.F
-      !||    sigeps38      ../starter/source/materials/mat/mat038/sigeps38.F
-      !||    sigeps42      ../starter/source/materials/mat/mat042/sigeps42.F
-      !||    sigeps70      ../starter/source/materials/mat/mat070/sigeps70.F
-      !||    sigeps90      ../starter/source/materials/mat/mat090/sigeps90.F
+      !||    cm58_refsta               ../starter/source/materials/mat/mat058/cm58_refsta.F
+      !||    fct_fiber_2               ../starter/source/materials/mat/mat098/lossfun_98.F
+      !||    hm_read_eos_compaction2   ../starter/source/materials/eos/hm_read_eos_compaction2.F90
+      !||    inimom_fvm                ../starter/source/elements/solid/solide/inimom_fvm.F
+      !||    law81_upd                 ../starter/source/materials/mat/mat081/law81_upd.F90
+      !||    law87_upd                 ../starter/source/materials/mat/mat087/law87_upd.F90
+      !||    lossfun_98                ../starter/source/materials/mat/mat098/lossfun_98.F
+      !||    m38init                   ../starter/source/materials/mat/mat038/m38init.F
+      !||    m75init                   ../starter/source/materials/mat/mat075/m75init.F
+      !||    m77init                   ../starter/source/materials/mat/mat077/m77init.F
+      !||    sigeps35                  ../starter/source/materials/mat/mat035/sigeps35.F
+      !||    sigeps37                  ../starter/source/materials/mat/mat037/sigeps37.F
+      !||    sigeps38                  ../starter/source/materials/mat/mat038/sigeps38.F
+      !||    sigeps42                  ../starter/source/materials/mat/mat042/sigeps42.F
+      !||    sigeps70                  ../starter/source/materials/mat/mat070/sigeps70.F
+      !||    sigeps90                  ../starter/source/materials/mat/mat090/sigeps90.F
       !||====================================================================
       my_real FUNCTION FINTER(IFUNC,XX,NPF,TF,DERI)
 C-----------------------------------------------
@@ -46,6 +48,8 @@ C-----------------------------------------------
 #include      "implicit_f.inc"
       INTEGER IFUNC,NPF(*),I
       my_real TF(*),ABC,DERI,XX,DX1,DX2
+
+      FINTER = 0
 C
       DX2 = TF(NPF(IFUNC)) - XX
 C

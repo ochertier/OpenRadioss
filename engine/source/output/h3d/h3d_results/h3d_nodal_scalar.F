@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fvbag_mod              ../engine/share/modules/fvbag_mod.F
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
       !||    outputs_mod            ../common_source/modules/outputs_mod.F
       !||====================================================================
@@ -57,7 +57,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                  IPARTT             ,IPARTS       ,IPARTQ          ,KXSP                   ,IXR     ,
      .                  IXP                ,IXT          ,N_H3D_PART_LIST ,INTERFRIC              ,CSEFRIC ,
      .                  CSEFRICG           ,CSEFRIC_STAMP,CSEFRICG_STAMP  ,NODAL_SCALAR_FVM       ,AIRBAGS_TOTAL_FVM_IN_H3D,
-     .                  IS_WRITTEN_NODE_FVM,ISPMD        ,FVDATA_P        ,AIRBAGS_NODE_ID_SHIFT  ,MULTI_FVM)
+     .                  IS_WRITTEN_NODE_FVM,ISPMD        ,FVDATA_P        ,AIRBAGS_NODE_ID_SHIFT  ,MULTI_FVM,
+     .                  ITHERM_FE          )
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -91,7 +92,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER,INTENT(IN) :: AIRBAGS_TOTAL_FVM_IN_H3D,ISPMD, AIRBAGS_NODE_ID_SHIFT
+      INTEGER, INTENT(IN) :: AIRBAGS_TOTAL_FVM_IN_H3D,ISPMD, AIRBAGS_NODE_ID_SHIFT
+      INTEGER, INTENT(IN) :: ITHERM_FE
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       my_real
      .   NODAL_SCALAR(NUMNOD),MASS(*),GEO(NPROPG,NUMGEO),
@@ -351,10 +353,12 @@ c
      .                           NUMNOD                 ,AIRBAGS_NODE_ID_SHIFT) 
          ENDIF                        
          !Then Monitored Volumes (Pressure,Density,Temperature,Sound Speed)
-         CALL ANIMBALE(IFUNC, VALUE_NUMNOD_REAL, MONVOL, VOLMON, 1)
+         CALL ANIMBALE(IFUNC, VALUE_NUMNOD_REAL, IS_WRITTEN_NODE , MONVOL, VOLMON, 1)
          DO I=1,NUMNOD
-           VALUE(I)=VALUE_NUMNOD_REAL(I) 
-           IS_WRITTEN_VALUE(I) = IS_WRITTEN_NODE(I)
+           IF(IS_WRITTEN_NODE(I) == 1) THEN
+             VALUE(I) = VALUE_NUMNOD_REAL(I)
+             IS_WRITTEN_VALUE(I) = IS_WRITTEN_NODE(I)
+           ENDIF
          ENDDO
 c
        ENDIF

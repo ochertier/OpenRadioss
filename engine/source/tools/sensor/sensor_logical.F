@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,9 +32,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    sensor_sens      ../engine/source/tools/sensor/sensor_sens.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod      ../engine/share/message_module/message_mod.F
-      !||    sensor_mod       ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE SENSOR_LOGICAL(NSENSOR,SENSOR_TAB)
+      SUBROUTINE SENSOR_LOGICAL(SENSORS)
 C-----------------------------------------------
 C   M a c r o s 
 C-----------------------------------------------
@@ -59,35 +59,34 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER ,INTENT(IN) :: NSENSOR
-      TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR), TARGET :: SENSOR_TAB
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER :: I,K,TYP
 C=======================================================================
-      DO I = 1, LOGICAL_SENSOR_COUNT
+      DO I = 1, SENSORS%LOGICAL_SENSOR_COUNT
 
-         K = LOGICAL_SENSORS_LIST(I)
-         TYP     = SENSOR_TAB(K)%TYPE
+         K    = SENSORS%LOGICAL_SENSORS_LIST(I)
+         TYP  = SENSORS%SENSOR_TAB(K)%TYPE
 C--------------------------------
          SELECT CASE(TYP)
 
          CASE (SENS_SENS) 
 
-                         CALL SENSOR_SENS(NSENSOR,SENSOR_TAB,K)
+                         CALL SENSOR_SENS(SENSORS%NSENSOR,SENSORS%SENSOR_TAB,K)
 
          CASE (SENS_AND) 
 
-                         CALL SENSOR_AND(NSENSOR,SENSOR_TAB,K)
+                         CALL SENSOR_AND(SENSORS%NSENSOR,SENSORS%SENSOR_TAB,K)
 c
          CASE (SENS_OR)
 
-                         CALL SENSOR_OR(NSENSOR,SENSOR_TAB,K)
+                         CALL SENSOR_OR(SENSORS%NSENSOR,SENSORS%SENSOR_TAB,K)
 c
          CASE (SENS_NOT)
 
-                         CALL SENSOR_NOT(NSENSOR,SENSOR_TAB,K)
+                         CALL SENSOR_NOT(SENSORS%NSENSOR,SENSORS%SENSOR_TAB,K)
          END SELECT
 C-----------------------------------------------------------------------
        ENDDO

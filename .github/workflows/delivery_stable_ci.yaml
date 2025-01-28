@@ -21,206 +21,6 @@ env:
 
 jobs:
 
-  build_tools_linux:
-    if: ${{ github.repository_owner == 'OpenRadioss' }}
-    # DEV ONLY # runs-on: ["linux64","dev_pmci"] 
-    runs-on: ["linux64","prmerge_ci"]
-    continue-on-error: true
-    container: 
-      image: fr-qafactorydev.europe.altair.com/build-linux64_gf:cos8-ompi411-devts11
-      credentials: 
-        username: ${{secrets.DOCKER_REGISTRY_USER}}
-        password: ${{secrets.DOCKER_REGISTRY_PASSWD}}
-      volumes: 
-        - /etc/localtime:/etc/localtime:ro
- 
-    env:
-      STATUS_BUILD: 0
-      os: linux64
-
-    steps:
-
-      # Set the working dir suffixed with branch name
-      - name: Set workdir 
-        run: |
-          echo "WORKDIR=latest" >> $GITHUB_ENV
-
-      - name: Create branch oriented WS directory & integration WS
-        run: |
-          mkdir -p ${{ env.WORKDIR }}
-
-      - name: Clean local exe dir
-        working-directory: ${{ env.WORKDIR }}
-        run: |
-          rm -rf exec
-          md5sum exec/* || echo "Nothing in exec/" 
-
-      # Get last git modifications, don't clean before (way to keep persistent obj files)
-      - name: Checkout git sources
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.WORKDIR }}
-          clean: 'false'
-          lfs: 'true'
-          ref: ${{ env.LAST_STABLE_TAG_NAME }}
-
-      - name: Running builds
-        working-directory: ${{ env.WORKDIR }}
-        run: |
-          mkdir exec
-          source /home/adminqa/.bashrc
-
-          cmd="./build.bash"
-          echo "========================================="
-          echo "--  BUILD tools for anim_to_vtk (${{ env.os }}) --"   
-          echo "--  $cmd --"   
-          echo "========================================="
-
-          cd tools/anim_to_vtk/${{ env.os }}
-          eval $cmd
-
-          cmd="./build.bash"
-          echo "========================================="
-          echo "--  BUILD tools for anim_to_vtk (${{ env.os }}) --"   
-          echo "--  $cmd --"   
-          echo "========================================="
-
-          cd ../../th_to_csv/${{ env.os }}
-          eval $cmd
-
-          # Set correct end of step status (if not an email will be sent)
-          echo "STATUS_BUILD=1" >> $GITHUB_ENV
-
-      - name: Managing step execution
-        if: ${{ always() }}
-        run: |
-
-          MAILMSG="Some error(s) has(ve) been raised during workflow execution:\n\n"
-          echo -e "\n#### STATUS_STEP_BUILD ${{ env.os }} ###"
-          if [ "$STATUS_BUILD" = 0 ]
-          then
-            echo -e "Status\t[ \033[31;2;1mFAILED\033[0m ]" 
-            MAILMSG="The build tools ${{ env.os }} has failed \n"
-
-            # Send email 
-
-            # Setting SMTP server (docker host)
-            DOCKER_HOST=`/sbin/ip route|awk '/default/ { print $3 }'`
-            echo "set smtp=smtp://${DOCKER_HOST}:25" >> /etc/mail.rc 
-
-            # Print message in log 
-            echo -e $MAILMSG
-
-            # Send email
-            echo -e "$MAILMSG" | Mail -r $FROM_EMAIL -s "Error in Github CI repo ${{ github.repository }} ($(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }}))" $TO_EMAIL
-
-          else
-            echo -e "Status\t[ \033[32;2;1mOK\033[0m ]"
-          fi
-
-      # Upload artifact
-      - name: Upload built artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: tools-${{ env.os }}
-          path: ${{ env.WORKDIR }}/exec
-
-  build_tools_windows_no_container:
-    if: ${{ github.repository_owner == 'OpenRadioss' }}
-    # DEV ONLY # runs-on: ["win64","dev_pmci"]
-    runs-on: ["win64","build","prmerge_ci"]
-    continue-on-error: true
- 
-    env:
-      STATUS_BUILD: 0
-      os: win64
-
-    steps:
-
-      # Set the working dir suffixed with branch name
-      - name: Set workdir 
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          echo \"WORKDIR=lastest\" >> $GITHUB_ENV;
-          "
-      - name: Create branch oriented WS directory & integration WS (WIN64)
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          cd %cd:\=/%;
-          mkdir -p ${{ env.WORKDIR }};
-          "
-
-      - name: Clean local exe dir
-        working-directory: ${{ env.WORKDIR }}
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          cd %cd:\=/%;
-          rm -rf exec;
-          "
-
-      # Get last git modifications, don't clean before (way to keep persistent obj files)
-      - name: Checkout git sources
-        uses: actions/checkout@v4
-        with:
-          path: ${{ env.WORKDIR }}
-          clean: 'false'
-          lfs: 'true'
-          ref: ${{ env.LAST_STABLE_TAG_NAME }}
-
-      - name: Running builds
-        working-directory: ${{ env.WORKDIR }}
-        shell: cmd
-        run: >
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019 && C:\cygwin64\bin\bash --login -c "
-          cd %cd:\=/%;
-          mkdir exec;
-          cmd=\"./build.bat\";
-          echo \"=========================================\";
-          echo \"--  BUILD tools for anim_to_vtk (${{ env.os }}) --\";
-          echo \"--  $cmd --\";
-          echo \"=========================================\";
-          cd tools/anim_to_vtk/${{ env.os }};
-          eval $cmd || exit 1;
-          cmd=\"./build.bat\";
-          echo \"=========================================\";
-          echo \"--  BUILD tools for anim_to_vtk (${{ env.os }}) --\";
-          echo \"--  $cmd --\";
-          echo \"=========================================\";
-          cd ../../th_to_csv/${{ env.os }};
-          eval $cmd || exit 1;
-          echo \"STATUS_BUILD=1\" >> $GITHUB_ENV;
-          "
-
-      - name: Managing step execution
-        if: ${{ always() }}
-        # Running cygwin from powershell or cmd => neither identation nor comment !
-        shell: cmd
-        run: >
-          call C:\cygwin64\bin\bash --login -c "
-          MAILMSG=\"Some error(s) has(ve) been raised during workflow execution:\n\n\";
-          echo -e \"\n#### STATUS_STEP_BUILD ${{ env.os }} ###\";
-          if [ ${{ env.STATUS_BUILD }} = 0 ];
-          then
-          echo -e \"Status\t[ \033[31;2;1mFAILED\033[0m ]\";
-          MAILMSG+=\"The build tools ${{ env.os }} has failed \n\";
-          echo -e $MAILMSG;
-          echo -e \"$MAILMSG\" | Email -f $FROM_EMAIL -s \"Error in Github CI repo ${{ github.repository }} ($(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }}))\" -r $MAIL_RELAY $TO_EMAIL;
-          exit 1;
-          else
-          echo -e \"Status\t[ \033[32;2;1mOK\033[0m ]\";
-          fi;   
-          "
-
-      # Upload artifact
-      - name: Upload built artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: tools-${{ env.os }}
-          path: ${{ env.WORKDIR }}/exec
-
   build_linux:
     if: ${{ github.repository_owner == 'OpenRadioss' }}
     # DEV ONLY # runs-on: ["${{ matrix.build }}","dev_pmci"]
@@ -533,7 +333,8 @@ jobs:
             Write-Output "Status`t[ $([char]27)[31;2;1mFAILED$([char]27)[0m ]"
             $MAILMSG += "The build ${{ matrix.build }} has failed `r`n"
             Add-Content -Path $env:GITHUB_ENV -Value "CLOSE_BRANCH=1"
-            Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $env:TO_EMAIL -Subject "Error in Github CI repo ${{ github.repository }} ($(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }}))" -Body $MAILMSG -Port 25
+            $ALL_RECIPIENTS = $env:TO_EMAIL -split ","
+            Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $ALL_RECIPIENTS -Subject "Error in Github CI repo ${{ github.repository }} ($(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }}))" -Body $MAILMSG -Port 25
             exit 1
           }
           else {
@@ -569,12 +370,13 @@ jobs:
           $MAILMSG += "Return status API is : ${{ steps.close_branch_build.outputs.status }}`r`n`r`n"
           $MAILMSG += "Check more detailed datas in CI logs`r`n"
           Write-Output "`r`nClose return API is : ${{ steps.close_branch_build.outputs.status }} / ${{ steps.close_branch_build.outputs.data }}";
-          Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $env:TO_EMAIL -Subject "Error in Github CI repo ${{ github.repository }} ($(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }})) on closing branch" -Body $MAILMSG -Port 25
+          $ALL_RECIPIENTS = $env:TO_EMAIL -split ","
+          Send-MailMessage -SmtpServer $env:MAIL_RELAY -From $env:FROM_EMAIL -To $ALL_RECIPIENTS -Subject "Error in Github CI repo ${{ github.repository }} ($(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }})) on closing branch" -Body $MAILMSG -Port 25
           exit 1
         if: ${{ always() && env.CLOSE_BRANCH == 1 && steps.close_branch_build.outputs.status != 200 }} 
 
   delivery:
-    needs: [build_linux,build_windows_no_container,build_tools_linux,build_tools_windows_no_container]
+    needs: [build_linux,build_windows_no_container]
     # DEV ONLY # runs-on: dev_delivery
     runs-on: delivery    
     container: 
@@ -593,10 +395,28 @@ jobs:
       DELIVERY_NB_RELEASES_TO_KEEP: 3
       DELIVERY_TAG_PREFIX: 'latest-'
       OPENRADIOSS_MAINDIR_NAME: 'OpenRadioss'
+      OPENRADIOSS_GUI: 'openradioss_gui'
+      TOOLS_OPENRADIOSS_GUI: 'TOOLS/openradioss_gui'
+      TOOLS_INP2RAD: 'TOOLS/input_converters/inp2rad/inp2rad/inp2rad.py'
+      CI: 'true'  # if true, disables interactive prompts and progress bar  
+      JFROG_CLI_AVOID_NEW_VERSION_WARNING: "true"
+      JFROG_CLI_LOG_LEVEL: "ERROR"
+      JF_OPTIONS: "--url=${{ secrets.JFROG_DELIVERY_URL }} --user=${{ secrets.JFROG_DELIVERY_USER }} --password=${{ secrets.JFROG_DELIVERY_TOKEN }}"
+      JF_TOOLS_OUTPUT_CONVERTERS: "${{ secrets.JFROG_DELIVERY_RADIOSS_REPO }}/OpenRadioss_Tools/output_converters"
 
     steps:
 
+      # Set the working dir suffixed with deliv_stable
+      - name: Set workdir 
+        run: |
+          echo "WORKDIR=deliv_stable" >> $GITHUB_ENV
+
+      - name: Create branch oriented WS directory & integration WS
+        run: |
+          mkdir -p ${{ env.WORKDIR }}
+
       - name: Set the release name & clean previous exec
+        working-directory: ${{ env.WORKDIR }}
         run: |
           echo "DATEOFTHETAG=${LAST_STABLE_TAG_NAME#latest-}" >> $GITHUB_ENV
           rm -rf exec todeliver exec_tmp
@@ -605,6 +425,7 @@ jobs:
       - name: Checkout git sources
         uses: actions/checkout@v4
         with:
+          path: ${{ env.WORKDIR }}
           clean: 'false'
           lfs: 'true'
           ref: ${{ env.LAST_STABLE_TAG_NAME }}
@@ -616,20 +437,32 @@ jobs:
           lfs: 'true'
           clean: 'false'
           repository: '${{ secrets.EXTRA_REPOSITORY }}'
-          path: 'EXTRA'
+          path: "${{ env.WORKDIR }}/EXTRA"
+          token: '${{ secrets.EXTRA_REPOSITORY_PAT }}'
+
+      # Get OpenRadioss gui in Tools repository
+      - name: Checkout git Tools sources
+        uses: actions/checkout@v4
+        with:
+          lfs: 'true'
+          clean: 'false'
+          repository: '${{ secrets.TOOLS_REPOSITORY }}'
+          path: "${{ env.WORKDIR }}/TOOLS"
           token: '${{ secrets.EXTRA_REPOSITORY_PAT }}'
 
       # Download ALL artifacts
       - name: Download ALL artifacts for packaging
         uses: actions/download-artifact@v4
         with:
-          path: exec_tmp
+          path: "${{ env.WORKDIR }}/exec_tmp"
 
       - name: Check files in exec
+        working-directory: ${{ env.WORKDIR }}
         run: |
           ls -l exec_tmp/
 
       - name: Copy all artifact complex structure into flat files in exec
+        working-directory: ${{ env.WORKDIR }}
         run: |
           echo "List exec_tmp : "
           find exec_tmp -type f
@@ -648,6 +481,7 @@ jobs:
           find exec -type f
 
       - name: Provide ALL binaries
+        working-directory: ${{ env.WORKDIR }}
         run: |
           # Removed lfs hook (not supported in next action, not neeeded)
           rm -f .git/hooks/pre-push
@@ -666,6 +500,19 @@ jobs:
             then
               cp -a EXTRA/${os}/* todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/
             fi
+
+            # Get OpenRadioss gui from Tools repository and inp2rad
+            if test -d ${{ env.TOOLS_OPENRADIOSS_GUI}}
+            then
+              cp -a ${{ env.TOOLS_OPENRADIOSS_GUI}} todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/
+              if test -f ${{ env.TOOLS_INP2RAD}}
+              then
+                cp -a ${{ env.TOOLS_INP2RAD}} todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/${{ env.OPENRADIOSS_GUI }}/
+              fi            
+            fi
+
+            # Get some output converters from Tools repository
+            jf rt download ${JF_OPTIONS} "${JF_TOOLS_OUTPUT_CONVERTERS}/${os}/*" todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/exec/ --flat=true
 
             cp -a hm_cfg_files todeliver/${os}/${{ env.OPENRADIOSS_MAINDIR_NAME }}/
 
@@ -686,9 +533,15 @@ jobs:
           done 
 
       - name: Set some variables
+        working-directory: ${{ env.WORKDIR }}
         run: |
           echo "LAST_STABLE_COMMIT=$(git rev-list -n 1 ${{ env.LAST_STABLE_TAG_NAME }})" >> $GITHUB_ENV
-          echo "LAST_STABLE_COMMIT_MESSAGE=$(git log -1 --format=%B ${{ env.LAST_STABLE_TAG_NAME }})" >> $GITHUB_ENV
+          # Way to deal with special chars in a commit message
+          {
+            echo "LAST_STABLE_COMMIT_MESSAGE<<EOF"
+            git log -1 --format=%B "${{ env.LAST_STABLE_TAG_NAME }}"
+            echo "EOF"
+          } >> $GITHUB_ENV
 
       - uses: octokit/request-action@v2.x
         id: get_commit_author
@@ -699,6 +552,7 @@ jobs:
           route: GET /repos/${{ github.repository }}/commits/${{ env.LAST_STABLE_COMMIT }}
 
       - name: Counter Download - Update values
+        working-directory: ${{ env.WORKDIR }}
         run: |
             cd /github_download_counter
 
@@ -729,12 +583,13 @@ jobs:
             Commit message:
             ${{ env.LAST_STABLE_COMMIT_MESSAGE }}
           files: |
-            todeliver/*
+            ${{ env.WORKDIR }}/todeliver/*
           clear_attachments: true    
           skip_tag_creation: true 
           target_commit: ${{ env.LAST_STABLE_COMMIT }}
 
       - name: Counter Download - Update/Add entries
+        working-directory: ${{ env.WORKDIR }}
         run: |
             cd /github_download_counter
             github_download_count.py \
@@ -746,6 +601,7 @@ jobs:
               --tag_date ${{ env.DATEOFTHETAG }}
 
       - name: Clean old github release/tag if needed + clean Counter Download
+        working-directory: ${{ env.WORKDIR }}
         run: |
             clean_github_release.py \
               --git_api_url ${{ github.api_url }} \

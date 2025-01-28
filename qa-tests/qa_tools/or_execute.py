@@ -106,7 +106,7 @@ if __name__ == "__main__":
       mpi=arguments[count]
 
     if(arg == '-debug'):
-      debug="_"+arguments[count]
+      debug=arguments[count]
 
     if(arg == '-np'):
       np=int(arguments[count])
@@ -362,7 +362,7 @@ if __name__ == "__main__":
 
      exp_l=pon_string.split(',')
 
-     # pon string is a komma separated list : item is #MPIx#Threads
+     # pon string is a comma separated list : item is #MPIx#Threads
      # -------------------------------------------------------------
      # Each item will be executed, Engine output files kept
      for exp in exp_l:

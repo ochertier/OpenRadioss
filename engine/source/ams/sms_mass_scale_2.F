@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,29 +20,7 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    mod_sms_work       ../engine/source/ams/sms_mass_scale_2.F
-      !||--- called by ------------------------------------------------------
-      !||    sms_build_mat_2    ../engine/source/ams/sms_build_mat_2.F
-      !||    sms_encin_2        ../engine/source/ams/sms_encin_2.F
-      !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
-      !||====================================================================
-      module MOD_SMS_WORK
-      implicit none
-#include      "my_real.inc"
-      my_real
-     .       , DIMENSION(:,:), ALLOCATABLE :: CJWORK, FREA, 
-     .         ARWORK,PR,ZR,YR
-      INTEGER, DIMENSION(:), ALLOCATABLE :: IRWL_WORK
-C-----
-      INTEGER, DIMENSION(:), ALLOCATABLE :: LIST_SMS,LIST_RMS
-      my_real
-     .       , DIMENSION(:), ALLOCATABLE :: MSKYI_FI_SMS
-      my_real
-     .       , DIMENSION(:,:), ALLOCATABLE :: VFI
-      DOUBLE PRECISION
-     .       , DIMENSION(:,:), ALLOCATABLE :: MW6
-      END MODULE MOD_SMS_WORK
+
       !||====================================================================
       !||    sms_mass_scale_2   ../engine/source/ams/sms_mass_scale_2.F
       !||--- called by ------------------------------------------------------
@@ -67,16 +45,16 @@ C-----
       !||    spmd_exch_a_rb6    ../engine/source/mpi/kinematic_conditions/spmd_exch_a_rb6.F
       !||    spmd_list_sms      ../engine/source/mpi/ams/spmd_sms.F
       !||    spmd_mij_sms       ../engine/source/mpi/ams/spmd_sms.F
-      !||    startime           ../engine/source/system/timer.F
-      !||    stoptime           ../engine/source/system/timer.F
+      !||    startime           ../engine/source/system/timer_mod.F90
+      !||    stoptime           ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
       !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
       !||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
       !||    message_mod        ../engine/share/message_module/message_mod.F
-      !||    mod_sms_work       ../engine/source/ams/sms_mass_scale_2.F
-      !||    sensor_mod         ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod         ../common_source/modules/sensor_mod.F90
+      !||    timer_mod          ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE SMS_MASS_SCALE_2(
+      SUBROUTINE SMS_MASS_SCALE_2(TIMERS,
      1        ITASK    ,NODFT    ,NODLT    ,NODII_SMS ,INDX2_SMS ,
      2        NODXI_SMS,MS       ,MS0      ,A         ,ICODT     ,
      3        ICODR    ,ISKEW    ,SKEW     ,JAD_SMS   ,JDI_SMS   ,
@@ -102,11 +80,12 @@ C-----
      O        LRBE3      ,FRBE3    ,IAD_RBE3M ,FR_RBE3M ,FR_RBE3MP,
      P        RRBE3      ,RRBE3_PON,PREC_SMS3 ,DIAG_SMS3,IAD_RBY  ,
      Q        FR_RBY6    ,RBY6     ,R3SIZE ,BETATE      ,IBCSCYC  ,
-     R        LBCSCYC  )
+     R        LBCSCYC    ,MSKYI_FI_SMS, LIST_SMS,LIST_RMS,CJWORK  ,
+     S        FREA       ,IRWL_WORK,VFI,sz_mw6,MW6,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE MOD_SMS_WORK
+      USE TIMER_MOD
       USE INTSTAMP_MOD
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
@@ -137,6 +116,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       INTEGER  ITASK, NODFT,NSENSOR,NODLT, NODII_SMS(*), INDX2_SMS(*),
      .         NODXI_SMS(*), ICODT(*), ICODR(*),
      .         ISKEW(*), JAD_SMS(*), JDI_SMS(*), INDX1_SMS(*),
@@ -172,6 +152,17 @@ C-----------------------------------------------
      .    FRBE3(*), RRBE3(*), PREC_SMS3(3,*), DIAG_SMS3(3,*),BETATE
       DOUBLE PRECISION FRL6(*), FNL6(*), FRWL6(*), RRBE3_PON(*)
       DOUBLE PRECISION RBY6(8,6,NRBYKIN)
+      my_real,dimension(fr_rms(nspmd+1)),intent(inout) :: MSKYI_FI_SMS
+      integer,dimension(fr_sms(nspmd+1)),intent(inout) :: LIST_SMS
+      integer,dimension(fr_rms(nspmd+1)),intent(inout) :: LIST_RMS
+      my_real, DIMENSION(18,NJOINT),intent(inout):: CJWORK
+      my_real, DIMENSION(3,NUMNOD),intent(inout):: FREA
+      integer, dimension(SLPRW),intent(inout):: IRWL_WORK
+      my_real, DIMENSION(3,FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1) ), intent(inout):: VFI
+      integer, intent(in) :: sz_mw6
+      DOUBLE PRECISION,dimension(6,sz_mw6),intent(inout) :: MW6
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
+
       TYPE(INTSTAMP_DATA) INTSTAMP(*)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
@@ -188,7 +179,7 @@ C-----------------------------------------------
       INTEGER NODFT2_SMS, NODLT2_SMS,NGR2USR
       my_real
      .   VX,VY,VZ, MVX, MVY, MVZ,
-     .   VXJ, VYJ, VZJ, MAS,TFEXTT, ERRTET, DW, DT15, DT25, RBID,
+     .   VXJ, VYJ, VZJ, MAS,WFEXTT, ERRTET, DW, DT15, DT25, RBID,
      .   OMEGA, BETASDT, DAMPT, FACTB, D_TSTART, D_TSTOP, DA, ADT,
      .   P1, P2, P3, UOMEGA, DOMEGA
 C-----
@@ -201,19 +192,6 @@ C-----
      .       , DIMENSION(:,:), ALLOCATABLE :: MV6
       EXTERNAL NGR2USR
 C-----------------------------------------------
-      IF(ITASK==0)THEN
-        ALLOCATE(CJWORK(18,NJOINT),
-     .     FREA(3,NUMNOD), IRWL_WORK(SLPRW),
-     .           STAT=IERROR)
-        IF(IERROR/=0) THEN
-          CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .          C1='(/DT/.../AMS)')
-          CALL ARRET(2)
-        ENDIF
-      END IF
-C
-      CALL MY_BARRIER
-C
       FREA(1:3,NODFT:NODLT)=ZERO
 C
       IF(IPARIT/=0)THEN
@@ -233,25 +211,7 @@ C
      .                C1='(/DT/.../AMS)')
           CALL ARRET(2)
         ENDIF
-        IF(ITASK==0)THEN
-          ALLOCATE(MW6(6,3*NUMNOD),STAT=IERROR)
-          IF(IERROR/=0) THEN
-            CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .                  C1='(/DT/.../AMS)')
-            CALL ARRET(2)
-          ENDIF
-        END IF
       END IF
-      IF(ITASK==0)THEN
-        ALLOCATE(LIST_SMS(FR_SMS(NSPMD+1)),LIST_RMS(FR_RMS(NSPMD+1)),
-     .        MSKYI_FI_SMS(FR_RMS(NSPMD+1)),
-     .        VFI(3,FR_RMS(NSPMD+1)+FR_SMS(NSPMD+1)),STAT=IERROR)
-        IF(IERROR/=0) THEN
-          CALL ANCMSG(MSGID=19,ANMODE=ANINFO,
-     .                C1='(/DT/.../AMS)')
-          CALL ARRET(2)
-        ENDIF
-      ENDIF
 C
       IF(NSPMD > 1)THEN
         IF(ITASK==0)THEN
@@ -279,7 +239,7 @@ C----
 C
       CALL SMS_GRAVIT(IGRV  ,AGRV   ,NPC   ,TF   ,A     ,
      2                V     ,X      ,SKEW  ,MS   ,SENSOR_TAB,
-     3                WEIGHT,LGRAV ,ITASK,TAGSLV_RBY_SMS,NSENSOR)
+     3                WEIGHT,LGRAV ,ITASK,TAGSLV_RBY_SMS,NSENSOR,WFEXT)
 C
       CALL MY_BARRIER
 C
@@ -341,7 +301,7 @@ C
         CALL MY_BARRIER
 C
 C       Z_SMS utilise temporairement pour [M]V
-        CALL SMS_MAV_LT(
+        CALL SMS_MAV_LT(TIMERS,
      1           NODFT   ,NODLT  ,NUMNOD ,JAD_SMS  ,JDI_SMS  ,
      2           ITASK   ,DIAG_SMS,LT_SMS,X_SMS ,Z_SMS ,
      3           NODFT1_SMS,NODLT1_SMS,INDX1_SMS,NODXI_SMS,IAD_ELEM ,
@@ -421,7 +381,7 @@ C
 C
 C-----------------------------------
         IF(ITASK==0)THEN
-         IF (IMON>0) CALL STARTIME(5,1)
+         IF (IMON>0) CALL STARTIME(TIMERS,5)
          DW = ZERO
          DO ND=1,NDAMP
           IGR   = NINT(DAMPR(2,ND))
@@ -594,9 +554,9 @@ C             2nd order error
           END IF
          END DO
 #include "lockon.inc"
-         TFEXT = TFEXT + DW
+         WFEXT = WFEXT + DW
 #include "lockoff.inc"
-         IF (IMON>0) CALL STOPTIME(5,1)
+         IF (IMON>0) CALL STOPTIME(TIMERS,5)
         END IF
 C
         CALL MY_BARRIER
@@ -634,7 +594,7 @@ C-----------------------------------
          END DO
         END IF !(ISTATG==0)THEN
 #include "lockon.inc"
-         TFEXT = TFEXT + DW
+         WFEXT = WFEXT + DW
 #include "lockoff.inc"
 !$OMP END SINGLE
 C
@@ -769,7 +729,7 @@ C
      3                    WEIGHT  ,D        ,IFRAME ,XFRAME ,NSENSOR ,
      4                    IT     ,PREC_SMS,NODXI_SMS,CPTREAC,NODREAC,
      5                    FTHREAC,AM      ,VR       ,DR     ,IN     ,
-     6                    RBY    )
+     6                    RBY    ,WFEXT)
         END IF
 C
         CALL MY_BARRIER
@@ -796,7 +756,7 @@ C
 C
       END IF
 C-----------------------------------
-      CALL SMS_PCG(NODFT  ,NODLT    ,NNZ_SMS,JAD_SMS  ,
+      CALL SMS_PCG(TIMERS, NODFT  ,NODLT    ,NNZ_SMS,JAD_SMS  ,
      2            JDI_SMS ,DIAG_SMS ,LT_SMS ,A      ,ISP      ,
      3            X_SMS   ,P_SMS    ,Z_SMS  ,Y_SMS  ,PREC_SMS ,
      4            NODFT1_SMS,NODLT1_SMS,INDX1_SMS,ICODT ,ICODR ,
@@ -821,34 +781,10 @@ C-----------------------------------
      N            IAD_RBE3M ,FR_RBE3M ,FR_RBE3MP,RRBE3,RRBE3_PON,
      O            PREC_SMS3,DIAG_SMS3,IAD_RBY  ,FR_RBY6    ,RBY6,
      P            TAGSLV_RBY_SMS,R3SIZE,NODFT2_SMS,NODLT2_SMS,INDX2_SMS,
-     Q            NODII_SMS,IBCSCYC ,LBCSCYC  )
+     Q            NODII_SMS,IBCSCYC ,LBCSCYC ,WFEXT )
 C
       CALL MY_BARRIER
-C
-c      DT15=HALF*DT1
-c      DT25=HALF*DT2
-c      TFEXTT=ERRTE_SMS
-c      ERRTET =ZERO
-c      DO N=NODFT1_SMS,NODLT1_SMS
-c        I = INDX1_SMS(N)
-c        VX = V(1,I)+DT05*A(1,I)
-c        VY = V(2,I)+DT05*A(2,I)
-c        VZ = V(3,I)+DT05*A(3,I)
-c        MVX = RES_SMS(1,I)
-c        MVY = RES_SMS(2,I)
-c        MVZ = RES_SMS(3,I)
-c        DW = (VX*MVX + VY*MVY + VZ*MVZ)*WEIGHT(I)
-c        TFEXTT =TFEXTT + DT15*DW
-c        ERRTET =ERRTET  + DT25*DW
-c      END DO
-c#include "lockon.inc"
-c      TFEXT=TFEXT+TFEXTT
-c      ERRTE_SMS=ERRTE_SMS+ERRTET
-c#include "lockoff.inc"
-c
-c      CALL MY_BARRIER
-c
-C
+
       IF(NJOINT > 0)THEN
         CALL SMS_CJOINT_2(A    ,AM    ,V ,VR,X    ,
      2                    LJOINT,MS,IN,IADCJ,FR_CJ,
@@ -868,11 +804,8 @@ C
 C
       CALL MY_BARRIER
 C
-      IF(ITASK==0) DEALLOCATE(CJWORK, FREA, IRWL_WORK, 
-     .      LIST_SMS,LIST_RMS,MSKYI_FI_SMS,VFI)
       IF(IPARIT/=0)THEN
         DEALLOCATE(IMV, MV, MV6)
-        IF(ITASK==0)DEALLOCATE(MW6)
       END IF
 C
       RETURN

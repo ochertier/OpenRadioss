@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -707,6 +707,7 @@ C------
           ENDIF
 C------
           ! Variable for Eint_distor
+          ICONTROL = -HUGE(ICONTROL)
           IF (ITY == 1 ) THEN
             ICONTROL = IGEO(97,IPID)
             IF (ICONTROL==1) GBUF%G_EINT_DISTOR = 1
@@ -735,7 +736,10 @@ C----- thickshell will be checked later----
           IF (JTHE      /= 0 .AND. NPG > 1) GBUF%G_TEMPG = NPG 
           IF (JEUL+JALE /= 0 .AND. ISNOD >= 4) GBUF%G_MOM = 3
           IF (JHBE == 15 .OR. JHBE == 24) GBUF%G_HOURG = 12
-          IF (JHBE == 15 .AND. ISNOD == 6) GBUF%G_HOURG = 2
+          IF (JHBE == 15 .AND. ISNOD == 6) THEN 
+            GBUF%G_HOURG = 2 
+            IF (ICONTROL==1) GBUF%G_HOURG = 12
+          END IF
           IF (JHBE == 1 .AND. IINT == 3) GBUF%G_HOURG = 12
 C------------- for strain output, to 3*6 
           IF (JHBE == 24) GBUF%G_STRHG = 3*6
@@ -769,12 +773,14 @@ c           Allocate thermal stress and Thermal internal energy
             IF(IUFACYLD == 1.AND.(MLW==36.OR.MLW==87))BUFLY%L_FAC_YLD = 1
 C---- only useful with the law where P=Bulk*AMU(rho,rho0) but not do the distinc here         
             IF(ITY == 1) BUFLY%L_VOL0DP = 1
+            IF ((ISORTH == 1).AND.(IGTYP == 34)) THEN
+              BUFLY%L_SIGL = 6
+            ENDIF
           ENDDO
 C
 C         Orthotropic SPH properties
           IF ((ISORTH == 1).AND.(IGTYP == 34)) THEN
             GBUF%G_GAMA = 6
-            BUFLY%L_SIGL = 6
           ENDIF
 C
 c        Bolt Preloading

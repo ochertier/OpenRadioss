@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -275,7 +275,7 @@ C----finally not to splite IKINW, otherwise too many changes
           ENDIF
           MAXB0 = MAXB
           NNDL=3*NUMNOD
-c          IF (IMON>0) CALL STOPTIME(31,1)
+c          IF (IMON>0) CALL STOPTIME(TIMERS,31)
           IF(ISPMD==0)THEN
            WRITE(ISTDO,*)
            WRITE(ISTDO,*)'          **************************'

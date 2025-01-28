@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -47,7 +47,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
-          use constant_mod,             only: zero,em20
+          use constant_mod,             only: zero,em20,one
           use intbufdef_mod   
 ! ----------------------------------------------------------------------------------------------------------------------
           implicit none
@@ -85,12 +85,14 @@
 ! ----------------------------------------------------------------------------------------------------------------------
         integer i,j,k,n,ii,mid,pid,icontr,nty,igsti,nsn,ns
         integer, dimension(:)  ,  allocatable :: itag    
-        my_real sfac
+        my_real sfac,sfac_max
 !
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
+         sfac_max = one
          allocate(itag(numnod))
+         sfac = -HUGE(sfac)
          itag = 0
          do i = 1, numels8 
            mid = ixs(1,i)
@@ -98,6 +100,7 @@
            icontr = igeo(97,pid)
            if (icontr/=1) cycle
            sfac = pm(107,mid)/max(em20,pm(32,mid))
+           sfac_max=max(sfac_max,sfac)
            do j = 1, 8
              n = ixs(1+j,i)
              if (itag(n)==0) then 
@@ -114,6 +117,7 @@
            icontr = igeo(97,pid)
            if (icontr/=1) cycle
            sfac = pm(107,mid)/max(em20,pm(32,mid))
+           sfac_max=max(sfac_max,sfac)
            do j = 1, 8
              n = ixs(1+j,i)
              if (itag(n)==0) then 
@@ -137,6 +141,7 @@
            icontr = igeo(97,pid)
            if (icontr/=1) cycle
            sfac = pm(107,mid)/max(em20,pm(32,mid))
+           sfac_max=max(sfac_max,sfac)
            do j = 1, 8
              n = ixs(1+j,i)
              if (itag(n)==0) then 
@@ -153,13 +158,14 @@
            end do
          end do
 ! s16         
-         do ii = 1, numels20 
+         do ii = 1, numels16 
            i = numels8 +numels10 + ii
            mid = ixs(1,i)
            pid = ixs(nixs-1,i)
            icontr = igeo(97,pid)
            if (icontr/=1) cycle
            sfac = pm(107,mid)/max(em20,pm(32,mid))
+           sfac_max=max(sfac_max,sfac)
            do j = 1, 8
              n = ixs(1+j,i)
              if (itag(n)==0) then 
@@ -184,7 +190,7 @@
               nsn=ipari(5,n)
               do j = 1, nsn
                 ns = intbuf_tab(n)%nsv(j)
-                if (itag(ns)==0) stifint(ns) =  sfac*stifint(ns)
+                if (itag(ns)==0) stifint(ns) =  sfac_max*stifint(ns)
               end do
             endif
           end if

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,19 +25,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    resol                       ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
-      !||    alloc_1d_array              ../common_source/modules/array_mod.F
       !||    count_nb_elem_edge          ../engine/source/interfaces/interf/count_nb_elem_edge.F
       !||    count_remote_nb_elem_edge   ../engine/source/interfaces/interf/count_remote_nb_elem_edge.F
-      !||    dealloc_1d_array            ../common_source/modules/array_mod.F
       !||    myqsort_int                 ../common_source/tools/sort/myqsort_int.F
       !||--- uses       -----------------------------------------------------
       !||    array_mod                   ../common_source/modules/array_mod.F
+      !||    nodal_arrays_mod            ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    shooting_node_mod           ../engine/share/modules/shooting_node_mod.F
       !||====================================================================
         SUBROUTINE INIT_NODAL_STATE( IPARI,SHOOT_STRUCT,INTBUF_TAB,IAD_ELEM,FR_ELEM,
-     .                               ITAB,ITABM1,GEO,ADDCNEL,CNEL,
+     .                               ITAB,NODES,GEO,ADDCNEL,CNEL,
      .                               IXS,IXC,IXT,IXP,IXR,IXTG,
-     .                               SIZE_ADDCNEL,SIZE_CNEL )
+     .                               SIZE_ADDCNEL,SIZE_CNEL,
+     .                               numelsg,numelqg,numelcg,numeltrg,numelpg,
+     .                               numelrg,numeltgg )
 !$COMMENT
 !       INIT_NODAL_STATE description
 !           initialization of structures for the new shooting node algo    
@@ -55,7 +56,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !           - the number of surface where the node is defined
 !           - the list of surface where the node is defined
 !$ENDCOMMENT
-
+        USE nodal_arrays_mod
         USE INTBUFDEF_MOD  
         USE SHOOTING_NODE_MOD
         USE ARRAY_MOD
@@ -80,23 +81,30 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-        INTEGER, INTENT(in) :: SIZE_ADDCNEL,SIZE_CNEL ! array size : cnel & addcnel
+        INTEGER, INTENT(in) :: SIZE_ADDCNEL,SIZE_CNEL !< array size : cnel & addcnel
+        integer, intent(in) :: numelsg !< global number of solid
+        integer, intent(in) :: numelqg !< global number of quad
+        integer, intent(in) :: numelcg !< global number of shell
+        integer, intent(in) :: numeltrg !< global number of truss
+        integer, intent(in) :: numelpg !< global number of beam
+        integer, intent(in) :: numelrg !< global number of spring
+        integer, intent(in) :: numeltgg !< global number of shell3n
         INTEGER, DIMENSION(NPARI,NINTER), INTENT(in) :: IPARI
-        INTEGER, DIMENSION(2,NSPMD+1), INTENT(in) :: IAD_ELEM  ! adress for frontier node
-        INTEGER, DIMENSION(SFR_ELEM), INTENT(in) :: FR_ELEM    ! frontier node id 
-        TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT ! structure for shooting node algo
-        TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    ! interface data
-        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITAB ! array to convert local id to global id
-        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITABM1    ! array of global id
-        my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
-        INTEGER, DIMENSION(0:SIZE_ADDCNEL), INTENT(in) :: ADDCNEL ! address for the CNEL array
-        INTEGER, DIMENSION(0:SIZE_CNEL), INTENT(in) :: CNEL ! connectivity node --> element
-        INTEGER, DIMENSION(NIXS,NUMELS),TARGET, INTENT(in) :: IXS   ! solid array
-        INTEGER, DIMENSION(NIXC,NUMELC),TARGET, INTENT(in) :: IXC   ! shell array
-        INTEGER, DIMENSION(NIXT,NUMELT),TARGET, INTENT(in) :: IXT! truss array
-        INTEGER, DIMENSION(NIXP,NUMELP),TARGET, INTENT(in) :: IXP! beam array
-        INTEGER, DIMENSION(NIXR,NUMELR),TARGET, INTENT(in) :: IXR! spring array
-        INTEGER, DIMENSION(NIXTG,NUMELTG),TARGET, INTENT(in) :: IXTG! triangle array
+        INTEGER, DIMENSION(2,NSPMD+1), INTENT(in) :: IAD_ELEM  !< adress for frontier node
+        INTEGER, DIMENSION(SFR_ELEM), INTENT(in) :: FR_ELEM    !< frontier node id 
+        TYPE(shooting_node_type), INTENT(inout) :: SHOOT_STRUCT !< structure for shooting node algo
+        TYPE(INTBUF_STRUCT_), DIMENSION(NINTER), INTENT(inout) :: INTBUF_TAB    !< interface data
+        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITAB !< array to convert local id to global id
+        type(nodal_arrays_), INTENT(INOUT) :: NODES !< nodal data
+        my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO !< property data
+        INTEGER, DIMENSION(0:SIZE_ADDCNEL), INTENT(in) :: ADDCNEL !< address for the CNEL array
+        INTEGER, DIMENSION(0:SIZE_CNEL), INTENT(in) :: CNEL !< connectivity node --> element
+        INTEGER, DIMENSION(NIXS,NUMELS),TARGET, INTENT(in) :: IXS   !< solid array
+        INTEGER, DIMENSION(NIXC,NUMELC),TARGET, INTENT(in) :: IXC   !< shell array
+        INTEGER, DIMENSION(NIXT,NUMELT),TARGET, INTENT(in) :: IXT !< truss array
+        INTEGER, DIMENSION(NIXP,NUMELP),TARGET, INTENT(in) :: IXP !< beam array
+        INTEGER, DIMENSION(NIXR,NUMELR),TARGET, INTENT(in) :: IXR !< spring array
+        INTEGER, DIMENSION(NIXTG,NUMELTG),TARGET, INTENT(in) :: IXTG !<triangle array
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -133,6 +141,32 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NSPMD) :: R_SIZE_BUFFER_MAIN,R_SIZE_BUFFER_SECOND
 
 C-----------------------------------------------
+        ! --------------------------------
+        ! Upper & lower bound, only used by the erosion of solid element + /TYPE25
+        ! to get the kind of element (solid,shell or shell3n)
+        ! --------------------------------
+        ! solid
+        shoot_struct%offset_elem%sol_low_bound = 0
+        shoot_struct%offset_elem%sol_up_bound = numelsg
+        ! quad
+        shoot_struct%offset_elem%quad_low_bound = shoot_struct%offset_elem%sol_up_bound + 1
+        shoot_struct%offset_elem%quad_up_bound = shoot_struct%offset_elem%sol_up_bound + numelqg
+        ! shell
+        shoot_struct%offset_elem%shell_low_bound = shoot_struct%offset_elem%quad_up_bound + 1
+        shoot_struct%offset_elem%shell_up_bound = shoot_struct%offset_elem%quad_up_bound + numelcg
+        ! truss
+        shoot_struct%offset_elem%truss_low_bound = shoot_struct%offset_elem%shell_up_bound + 1
+        shoot_struct%offset_elem%truss_up_bound = shoot_struct%offset_elem%shell_up_bound + numeltrg
+        ! beam
+        shoot_struct%offset_elem%beam_low_bound = shoot_struct%offset_elem%truss_up_bound + 1
+        shoot_struct%offset_elem%beam_up_bound = shoot_struct%offset_elem%truss_up_bound + numelpg
+        ! spring
+        shoot_struct%offset_elem%spring_low_bound = shoot_struct%offset_elem%truss_up_bound + 1
+        shoot_struct%offset_elem%spring_up_bound = shoot_struct%offset_elem%truss_up_bound + numelrg
+        ! shell3n
+        shoot_struct%offset_elem%shell3n_low_bound = shoot_struct%offset_elem%spring_up_bound + 1
+        shoot_struct%offset_elem%shell3n_up_bound = shoot_struct%offset_elem%spring_up_bound + numeltgg
+        ! --------------------------------        
 
         ALLOCATE( BUFFER_SECOND(NSPMD) )
         ALLOCATE( BUFFER_MAIN(NSPMD) )
@@ -700,14 +734,14 @@ C-----------------------------------------------
             DO I=1,NSPMD
                 IF(R_BUFFER_MAIN(I)%SIZE_INT_ARRAY_1D>0) THEN
                     CALL COUNT_REMOTE_NB_ELEM_EDGE( R_BUFFER_MAIN(I)%SIZE_INT_ARRAY_1D,R_BUFFER_MAIN(I)%INT_ARRAY_1D,
-     .                                              GEO,IXS,IXC,IXT,IXP,IXR,IXTG,ADDCNEL,ITABM1,CNEL,CHUNK)
+     .                                              GEO,IXS,IXC,IXT,IXP,IXR,IXTG,ADDCNEL,NODES,CNEL,CHUNK)
                     CALL MPI_ISEND( R_BUFFER_MAIN(I)%INT_ARRAY_1D,R_BUFFER_MAIN(I)%SIZE_INT_ARRAY_1D,
      .                             MPI_INTEGER,IT_SPMD(I),MSGTYP,MPI_COMM_WORLD,REQUEST_S2(I),IERROR )     
    
                 ENDIF
                 IF(R_BUFFER_SECOND(I)%SIZE_INT_ARRAY_1D>0) THEN
                     CALL COUNT_REMOTE_NB_ELEM_EDGE( R_BUFFER_SECOND(I)%SIZE_INT_ARRAY_1D,R_BUFFER_SECOND(I)%INT_ARRAY_1D,
-     .                                              GEO,IXS,IXC,IXT,IXP,IXR,IXTG,ADDCNEL,ITABM1,CNEL,CHUNK)
+     .                                              GEO,IXS,IXC,IXT,IXP,IXR,IXTG,ADDCNEL,NODES,CNEL,CHUNK)
                     CALL MPI_ISEND( R_BUFFER_SECOND(I)%INT_ARRAY_1D,R_BUFFER_SECOND(I)%SIZE_INT_ARRAY_1D,
      .                             MPI_INTEGER,IT_SPMD(I),MSGTYP,MPI_COMM_WORLD,REQUEST_S3(I),IERROR )
                 ENDIF

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -59,14 +59,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    wrtdes0                 ../engine/source/output/th/wrtdes0.F
       !||--- uses       -----------------------------------------------------
       !||    cluster_mod             ../engine/share/modules/cluster_mod.F
-      !||    ebcs_mod                ../common_source/modules/boundary_conditions/ebcs_mod.F
+      !||    ebcs_mod                ../common_source/modules/boundary_conditions/ebcs_mod.F90
       !||    elbufdef_mod            ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod            ../common_source/modules/groupdef_mod.F
       !||    matparam_def_mod        ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod           ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    output_mod              ../common_source/modules/output/output_mod.F90
       !||    pinchtype_mod           ../common_source/modules/pinchtype_mod.F
       !||    seatbelt_mod            ../common_source/modules/seatbelt_mod.F
-      !||    sensor_mod              ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod              ../common_source/modules/sensor_mod.F90
       !||    stack_mod               ../engine/share/modules/stack_mod.F
       !||    th_mod                  ../engine/share/modules/th_mod.F
       !||    th_surf_mod             ../common_source/modules/interfaces/th_surf_mod.F
@@ -91,7 +93,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      L                 IGAUP   ,NGAUP     ,ITTYP    ,SIZE_MES    ,
      M                 RTHBUF  ,THKE      ,STACK    ,ISPHIO      ,VSPHIO    ,
      N                 ITHFLAG ,PINCH_DATA,MULTI_FVM,W           ,SITHBUF   ,
-     Q                 FSAVSURF,NEED_TO_REINIT_FSAV)
+     Q                 FSAVSURF,NEED_TO_REINIT_FSAV ,GLOB_THERM  ,OUTPUT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -107,6 +109,8 @@ C-----------------------------------------------
       USE MATPARAM_DEF_MOD
       USE EBCS_MOD , only : t_ebcs_tab
       USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
+      use glob_therm_mod
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -132,7 +136,6 @@ C-----------------------------------------------
 #include      "task_c.inc"
 #include      "impl1_c.inc"
 #include      "rad2r_c.inc"
-#include      "thermal_c.inc"
 #include      "tabsiz_c.inc"
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
@@ -171,8 +174,10 @@ C-----------------------------------------------
       TYPE (MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM   
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MATPARAM_TAB
+      TYPE (glob_therm_), INTENT(IN) :: glob_therm
       my_real, INTENT(INOUT) :: FSAVSURF(TH_SURF_NUM_CHANNEL,NSURF)
-      LOGICAL, INTENT(INOUT) :: NEED_TO_REINIT_FSAV !< boolean to re-initialize PARTSAV array 
+      LOGICAL, INTENT(INOUT) :: NEED_TO_REINIT_FSAV !< boolean to re-initialize PARTSAV array
+      TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -198,6 +203,26 @@ C-----------------------------------------------
       THISC = THIS0
       THISC_DOUBLE = THIS0
       SEEK_ID = IUNIT-29
+      IXX = ZERO
+      IYY = ZERO
+      IZZ = ZERO
+      IXY = ZERO
+      IYZ = ZERO
+      IZX = ZERO
+      JXX = ZERO
+      JYY = ZERO
+      JZZ = ZERO
+      IZX = ZERO
+      JXY = ZERO
+      JZX = ZERO
+      XXMOM = ZERO
+      YYMOM = ZERO
+      ZZMOM = ZERO
+      XCG = ZERO
+      YCG = ZERO
+      ZCG = ZERO
+      AA = ZERO
+
       IF (IUNIT == 3) SEEK_ID = 1                   
 C--------Multidomains : control of time history for subdomains-----------
       IF ((IRAD2R==1).AND.(R2R_SIU==1)) THEN
@@ -240,11 +265,11 @@ C---------------------------
 C---------------------------                  
         IF(ITTYP==3) CALL CUR_FIL_C(IFIL)
 C Heat Outputs
-        ARRAY(1) =  HEAT_FFLUX
-        ARRAY(2) =  HEAT_STORED
-        ARRAY(3) =  HEAT_CONV
-        ARRAY(4) =  HEAT_RADIA
-        ARRAY(5) =  HEAT_MECA
+        ARRAY(1) =  GLOB_THERM%HEAT_FFLUX
+        ARRAY(2) =  GLOB_THERM%HEAT_STORED
+        ARRAY(3) =  GLOB_THERM%HEAT_CONV
+        ARRAY(4) =  GLOB_THERM%HEAT_RADIA
+        ARRAY(5) =  GLOB_THERM%HEAT_MECA
         IF(NSPMD > 1) CALL SPMD_GLOB_RSUM_POFF(ARRAY,5)
 C       SPMD: only process 0 is writing
         IF (ISPMD==0) THEN
@@ -272,7 +297,7 @@ C------------------------
           WA(II+6) =XMASS
           WA(II+7) =DT2
           WA(II+8) =ENROT
-          WA(II+9) =TFEXT
+          WA(II+9) =OUTPUT%WFEXT
           WA(II+10)=REINT
           WA(II+11)=ECONT+ECONT_CUMU+ECONTV+ECONTD   ! Global contact energy : Sum of contact energies
           WA(II+12)=EHOUR
@@ -763,7 +788,7 @@ C-------------------------------------------------------
      3             VR      ,AR      ,ISKWN   ,IFRAME  ,SKEW   ,
      4             XFRAME  ,WEIGHT  ,TEMP    ,INOD    ,FTHREAC,
      5             NODREAC, CPTREAC ,DR      ,ITTYP   ,NTHGRP2,
-     6             ITHGRP ,PINCH_DATA)
+     6             ITHGRP ,PINCH_DATA,GLOB_THERM%ITHERM_FE)
         !   send WA_NOD to PROC0
         IF(NSPMD>1) THEN
             CALL SPMD_GATHERV(WA_NOD(ID_HIST)%WA_REAL,WA_NOD_P0(ID_HIST)%WA_REAL,0,
@@ -782,7 +807,7 @@ C-------------------------------------------------------
         CALL THSOL(    ELBUF_TAB, NTHGRP2, ITHGRP                  ,
      .                 IPARG    , ITHBUF , WA_SOL(ID_HIST)%WA_REAL ,
      .                 IXS      , X      , IPM                     ,PM     ,IGEO    ,
-     .                 MULTI_FVM, V      , W                       ,
+     .                 MULTI_FVM, V      , W                       ,GLOB_THERM%ITHERM,
      .                 NUMELS   , NUMMAT , NUMGEO                  , NUMNOD,SITHBUF)
 
         !   send WA_SOL to PROC0
@@ -803,7 +828,7 @@ C-------------------------------------------------------
         CALL THQUAD(ELBUF_TAB,NTHGRP2  ,ITHGRP    ,
      1              IPARG    ,ITHBUF   ,WA_QUAD(ID_HIST)%WA_REAL      ,
      2              IPM      ,IXQ      ,IXTG      ,X       ,MULTI_FVM ,
-     3              V        ,W        ,
+     3              V        ,W        ,GLOB_THERM%ITHERM  ,
      .              NUMELQ   ,NUMMAT   ,NUMNOD    ,SITHBUF   ,NUMELTG)
         !   send WA_QUAD to PROC0
         IF(NSPMD>1) THEN

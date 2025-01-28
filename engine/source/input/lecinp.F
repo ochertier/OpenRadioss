@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,20 +21,21 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    lecinp       ../engine/source/input/lecinp.F
+      !||    lecinp           ../engine/source/input/lecinp.F
       !||--- called by ------------------------------------------------------
-      !||    radioss2     ../engine/source/engine/radioss2.F
+      !||    radioss2         ../engine/source/engine/radioss2.F
       !||--- calls      -----------------------------------------------------
-      !||    freform      ../engine/source/input/freform.F
+      !||    freform          ../engine/source/input/freform.F
       !||--- uses       -----------------------------------------------------
-      !||    dt_mod       ../engine/source/modules/dt_mod.F
-      !||    h3d_mod      ../engine/share/modules/h3d_mod.F
-      !||    output_mod   ../common_source/modules/output/output_mod.F90
-      !||    sensor_mod   ../engine/share/modules/sensor_mod.F
-      !||    state_mod    ../common_source/modules/state_mod.F
+      !||    dt_mod           ../engine/source/modules/dt_mod.F
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    h3d_mod          ../engine/share/modules/h3d_mod.F
+      !||    output_mod       ../common_source/modules/output/output_mod.F90
+      !||    sensor_mod       ../common_source/modules/sensor_mod.F90
+      !||    state_mod        ../common_source/modules/state_mod.F
       !||====================================================================
       SUBROUTINE LECINP(IRUN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
-     .                  SENSORS ,DT, OUTPUT )
+     .                  SENSORS ,DT, OUTPUT ,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -43,6 +44,7 @@ C-----------------------------------------------
       USE SENSOR_MOD
       USE DT_MOD
       USE OUTPUT_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -56,6 +58,7 @@ C-----------------------------------------------
       TYPE(SENSORS_), INTENT(INOUT) :: SENSORS
       TYPE (DT_), INTENT(INOUT) :: DT
       TYPE(OUTPUT_), INTENT(INOUT) :: OUTPUT !< output structure
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 
 C-----------------------------------------------
 C   C o m m o n   B l o c k s
@@ -85,7 +88,7 @@ C
 C
       IFREEF=1
       CALL FREFORM(IRUN,IRFL,IRFE,H3D_DATA,FLAG_CST_AMS,DYNAIN_DATA,
-     .             SENSORS,DT,OUTPUT)
+     .             SENSORS,DT,OUTPUT,GLOB_THERM)
 C
       REWIND IIN
 C

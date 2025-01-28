@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat36                  ../starter/source/materials/mat/mat036/hm_read_mat36.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                         ../starter/source/output/message/message.F
       !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
@@ -141,23 +141,13 @@ Card3
 C-----------------------------------------------
       ! Poisson's ratio check
       IF (NU < ZERO .OR. NU >= HALF) THEN
-        CALL ANCMSG(MSGID=49,
-     .              MSGTYPE=MSGERROR,
-     .              ANMODE=ANINFO_BLIND_2,
-     .              R1=NU,
-     .              I1=ID,
-     .              C1=TITR)
+        CALL ANCMSG(MSGID=49,MSGTYPE=MSGERROR,ANMODE=ANINFO_BLIND_2,R1=NU,I1=ID,C1=TITR)
       ENDIF
 c
       IF(NRATE > 100)THEN
-        CALL ANCMSG(MSGID=215, MSGTYPE=MSGERROR, ANMODE=ANINFO,
-     .               I1=36,
-     .               I2=ID,
-     .               C1=TITR)
+        CALL ANCMSG(MSGID=215, MSGTYPE=MSGERROR, ANMODE=ANINFO,I1=36,I2=ID,C1=TITR)
       ELSEIF (NRATE <= 0) THEN
-        CALL ANCMSG(MSGID=740, MSGTYPE=MSGERROR, ANMODE=ANINFO,
-     .              I1=ID,
-     .              C1=TITR)
+        CALL ANCMSG(MSGID=740, MSGTYPE=MSGERROR, ANMODE=ANINFO,I1=ID,C1=TITR)
       ENDIF
 c
       IF (IPFUN == 0) THEN
@@ -174,7 +164,6 @@ c------------------------
         DO J=1,NRATE
           CALL HM_GET_INT_ARRAY_INDEX ('FUN_LOAD',IFUNC(J),J,IS_AVAILABLE,LSUBMODEL)
         ENDDO
-c
         DO J=1,NRATE
           CALL HM_GET_FLOAT_ARRAY_INDEX    ('SCALE_LOAD',YFAC(J)     ,J,IS_AVAILABLE,LSUBMODEL,UNITAB)
           IF(YFAC(J) == ZERO) THEN
@@ -182,25 +171,21 @@ c
             YFAC(J)=ONE * YFAC_UNIT(J)
           ENDIF
         ENDDO
-c
+
+        RATE(1:MAXFUNC) = ZERO
         DO J=1,NRATE
           CALL HM_GET_FLOAT_ARRAY_INDEX    ('STRAINRATE_LOAD',RATE(J),J,IS_AVAILABLE,LSUBMODEL,UNITAB)
         ENDDO
-c
+
         DO I=1,NRATE-1                        
           IF (RATE(I) >= RATE(I+1)) THEN        
-            CALL ANCMSG(MSGID=478, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
-     .                  I1=ID,
-     .                  C1=TITR)
+            CALL ANCMSG(MSGID=478, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR)
             EXIT                         
           ENDIF                               
         ENDDO                                 
         DO I=1,NRATE
           IF (IFUNC(I) == 0) THEN
-            CALL ANCMSG(MSGID=126, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
-     .                  I1=ID,
-     .                  C1=TITR,
-     .                  I2=IFUNC(I))
+            CALL ANCMSG(MSGID=126, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR,I2=IFUNC(I))
           ENDIF
         ENDDO
       ENDIF
@@ -236,11 +221,9 @@ c
       IFUNC(MFUNC) = IPFUN
 c-----------------------------------------------
       IF (FISOKIN > ONE .OR. FISOKIN < ZERO) THEN
-        CALL ANCMSG(MSGID=912, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
-     .              I1=ID,C1='36',
-     .              C2=TITR)
+        CALL ANCMSG(MSGID=912, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,I1=ID,C1='36',C2=TITR)
       END IF
-C      
+
       IF (EPSR1 == ZERO .AND. EPSR2 == ZERO .AND. EPSF == ZERO) THEN
         IF (EPSMAX == ZERO) THEN
           IFAIL = 0
@@ -270,11 +253,15 @@ c     Limit max failure values
 c      
       IF (EPSR1 /= ZERO .AND. EPSR2 /= ZERO) THEN 
         IF (EPSR1 >= EPSR2) THEN
-         CALL ANCMSG(MSGID=480, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,
-     .               I1=ID,
-     .               C1=TITR)
+         CALL ANCMSG(MSGID=480, MSGTYPE=MSGERROR, ANMODE=ANINFO_BLIND_1,I1=ID,C1=TITR)
         ENDIF
       ENDIF
+
+      IF(E <= ZERO)THEN
+        CALL ANCMSG(MSGID=276,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=36,I2=ID,C1=TITR)
+        E=ZERO
+      ENDIF
+
 C------------------------------
       G = HALF*E/(ONE+NU)
       C1= E/THREE/(ONE - TWO*NU)
@@ -288,7 +275,6 @@ C------------------------------
       UPARAM(2)= E
       UPARAM(3)= E/(ONE - NU*NU)
       UPARAM(4)= NU*UPARAM(3)
-C---
       UPARAM(5)= G
       UPARAM(6)= NU
       DO J=1,NFUNC
@@ -297,7 +283,6 @@ C---
       DO J=1,NFUNC
         UPARAM(NFUNC + 6+J)= YFAC(J)
       ENDDO
-C---
       UPARAM(2*NFUNC + 7) = EPSMAX
       UPARAM(2*NFUNC + 8) = EPSR1
       UPARAM(2*NFUNC + 9) = EPSR2
@@ -313,7 +298,7 @@ C---
         UPARAM(2*NFUNC + 16) = MFUNC 
       ENDIF
       UPARAM(2*NFUNC + 17) = PSCALE 
-c sound speed coque
+c sound speed (shell)
       UPARAM(2*NFUNC + 18) = SQRT(E/(ONE - NU*NU)/RHO0)  ! soundspeed shells
       UPARAM(2*NFUNC + 19) = NU / (ONE-NU)
       UPARAM(2*NFUNC + 20) = THREE / (ONE+NU)
@@ -365,6 +350,9 @@ C-----------------------
         MTAG%L_SIGB = 6
       ENDIF
 C-----------------------  
+      CALL INIT_MAT_KEYWORD(MATPARAM,"ELASTO_PLASTIC")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"INCREMENTAL")
+      CALL INIT_MAT_KEYWORD(MATPARAM,"LARGE_STRAIN") 
       ! Properties compatibility
       CALL INIT_MAT_KEYWORD(MATPARAM,"SHELL_ISOTROPIC")
       CALL INIT_MAT_KEYWORD(MATPARAM,"SOLID_ISOTROPIC")

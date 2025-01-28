@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,18 @@ C
       !||--- called by ------------------------------------------------------
       !||    chkstfn3n           ../engine/source/interfaces/interf/chkstfn3.F
       !||--- calls      -----------------------------------------------------
-      !||    sysfus2             ../engine/source/system/sysfus.F
+      !||    get_local_node_id   ../engine/source/engine/node_spliting/nodal_arrays.F90
+      !||--- uses       -----------------------------------------------------
+      !||    nodal_arrays_mod    ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||====================================================================
       SUBROUTINE SPMD_EXCHMSR_IDEL(
      1    BUFS  ,LBUFS,IXS    ,IXC    ,IXTG   ,
-     2    IXQ   ,IPARG ,ITAGL  ,ITABM1 ,
+     2    IXQ   ,IPARG ,ITAGL  ,NODES,
      3    IRSIZE,IRECV ,CNEL   ,ADDCNEL,OFC    ,
      4    OFT   ,OFTG  ,OFUR   ,OFR    ,OFP    ,
      5    LINDEX,IXP   ,IXR    ,IXT    ,GEO    ,
      6    TAGEL ,IAD_ELEM)
+       USE nodal_arrays_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,9 +58,10 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(nodal_arrays_), INTENT(INOUT) :: NODES
       INTEGER IXS(NIXS,*), IXQ(NIXQ,*), IXC(NIXC,*), IXP(NIXP,*),
      .        IXR(NIXR,*), IXT(NIXT,*), TAGEL(*),
-     .        IXTG(NIXTG,*), IPARG(NPARG,*), ITABM1(*),
+     .        IXTG(NIXTG,*), IPARG(NPARG,*), 
      .        BUFS(*),ITAGL(*), IRECV(*), CNEL(0:*), ADDCNEL(0:*),
      .        IRSIZE, LBUFS, OFC, OFT, OFTG, OFUR, OFR, OFP, LINDEX
       INTEGER, DIMENSION(2,NSPMD+1), INTENT(in) :: IAD_ELEM
@@ -80,10 +84,6 @@ C-----------------------------------------------
       INTEGER :: SIZ
       DATA MSGOFF2/188/
       DATA MSGOFF3/189/
-C-----------------------------------------------
-C   E x t e r n a l   F u n c t i o n s
-C-----------------------------------------------
-      INTEGER SYSFUS2
 C-----------------------------------------------
       ALLOCATE(BUFR(IRSIZE))
       LOC_PROC = ISPMD+1
@@ -136,14 +136,14 @@ C
      +          ITYP==20.OR.ITYP==22.OR.ITYP==23.OR.ITYP==24.OR.
      +          ITYP==25.OR.ITYP==2 ).AND.IDEL==2)  )THEN
             DO NN = 1, NBEL
-             N1 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+1),ITABM1,NUMNOD)
+             N1 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+1))
              BUFR(NN+IOFF) = 0
              IF(N1/=0) THEN
-              N2 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+2),ITABM1,NUMNOD)
+              N2 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+2))
               IF(N2/=0) THEN
-               N3 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+3),ITABM1,NUMNOD)
+               N3 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+3))
                IF(N3/=0) THEN
-                N4 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+4),ITABM1,NUMNOD)
+                N4 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+4))
                 IF(N4/=0) THEN
                   DO J=ADDCNEL(N1),ADDCNEL(N1+1)-1
                    II = CNEL(J)
@@ -187,14 +187,14 @@ C
      +             .OR.ITYP==20.OR.ITYP==22.OR.ITYP==23.OR.ITYP==24
      +             .OR.ITYP==25.OR.ITYP==2) .AND. IDEL == 1))THEN
             DO NN = 1, NBEL
-             N1 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+1),ITABM1,NUMNOD)
+             N1 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+1))
              BUFR(NN+IOFF) = 0
              IF(N1/=0) THEN
-              N2 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+2),ITABM1,NUMNOD)
+              N2 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+2))
               IF(N2/=0) THEN
-               N3 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+3),ITABM1,NUMNOD)
+               N3 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+3))
                IF(N3/=0) THEN
-                N4 = SYSFUS2(BUFR(IDEB-1+4*(NN-1)+4),ITABM1,NUMNOD)
+                N4 = get_local_node_id(NODES, BUFR(IDEB-1+4*(NN-1)+4))
                 IF(N4/=0) THEN
                  DO J=ADDCNEL(N1),ADDCNEL(N1+1)-1
                   II = CNEL(J)
@@ -236,10 +236,10 @@ C
             IDEB = IDEB + 4*NBEL
            ELSEIF((ITYP==11.OR.ITYP==-20).AND.IDEL==2)THEN  ! -20 => type20 edge
             DO NN = 1, NBEL
-             N1 = SYSFUS2(BUFR(IDEB-1+2*(NN-1)+1),ITABM1,NUMNOD)
+             N1 = get_local_node_id(NODES, BUFR(IDEB-1+2*(NN-1)+1))
              BUFR(NN+IOFF) = 0
              IF(N1/=0) THEN
-              N2 = SYSFUS2(BUFR(IDEB-1+2*(NN-1)+2),ITABM1,NUMNOD)
+              N2 = get_local_node_id(NODES, BUFR(IDEB-1+2*(NN-1)+2))
               IF(N2/=0) THEN
                DO J=ADDCNEL(N1),ADDCNEL(N1+1)-1
                 II = CNEL(J)
@@ -300,10 +300,10 @@ C
             IDEB = IDEB + 2*NBEL
            ELSEIF((ITYP==11.OR.ITYP==-20).AND.IDEL==1)THEN  ! -20 => type20 edge
             DO NN = 1, NBEL
-             N1 = SYSFUS2(BUFR(IDEB-1+2*(NN-1)+1),ITABM1,NUMNOD)
+             N1 = get_local_node_id(NODES, BUFR(IDEB-1+2*(NN-1)+1))
              BUFR(NN+IOFF) = 0
              IF(N1/=0) THEN
-              N2 = SYSFUS2(BUFR(IDEB-1+2*(NN-1)+2),ITABM1,NUMNOD)
+              N2 = get_local_node_id(NODES, BUFR(IDEB-1+2*(NN-1)+2))
               IF(N2/=0) THEN
                DO J=ADDCNEL(N1),ADDCNEL(N1+1)-1
                 II = CNEL(J)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,26 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    surf_mod              ../starter/share/modules1/surf_mod.F
+      !||    surf_mod                      ../starter/share/modules1/surf_mod.F
       !||--- called by ------------------------------------------------------
-      !||    deallocate_surf_elm   ../starter/source/groups/init_surf_elm.F
-      !||    fill_igr              ../starter/source/model/sets/fill_igr.F
-      !||    hm_read_lines         ../starter/source/groups/hm_read_lines.F
-      !||    hm_read_sensors       ../starter/source/tools/sensor/hm_read_sensors.F
-      !||    hm_read_surf          ../starter/source/groups/hm_read_surf.F
-      !||    init_surf_elm         ../starter/source/groups/init_surf_elm.F
-      !||    ssurftag              ../starter/source/groups/ssurftag.F
-      !||    surftag               ../starter/source/groups/surftag.F
+      !||    create_surface_from_element   ../starter/source/model/sets/create_surface_from_element.F
+      !||    deallocate_surf_elm           ../starter/source/groups/init_surf_elm.F
+      !||    fill_igr                      ../starter/source/model/sets/fill_igr.F
+      !||    hm_read_lines                 ../starter/source/groups/hm_read_lines.F
+      !||    hm_read_sensors               ../starter/source/tools/sensor/hm_read_sensors.F
+      !||    hm_read_surf                  ../starter/source/groups/hm_read_surf.F
+      !||    init_surf_elm                 ../starter/source/groups/init_surf_elm.F
+      !||    ssurftag                      ../starter/source/groups/ssurftag.F
+      !||    surface_type                  ../starter/source/model/sets/surface_type.F90
+      !||    surftag                       ../starter/source/groups/surftag.F
       !||====================================================================
       MODULE SURF_MOD
 C-----------------------------------------------
 C   m y _ r e a l
 C-----------------------------------------------
 #include      "my_real.inc"
+        INTEGER, PARAMETER :: EXT_SURF = 1 !< definition of /EXT surface
+        INTEGER, PARAMETER :: ALL_SURF = 2 !< definition of /ALL surface
 C-----------------------------------------------
 C   D e r i v e d   T y p e   D e f i n i t i o n s
 C-----------------------------------------------

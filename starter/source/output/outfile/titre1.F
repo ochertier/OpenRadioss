@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -112,7 +112,7 @@ C------------------------------------
       TITRE(151)       = '    NFXVEL: NUMBER OF FIXED VELOCITIES. . . . . . . . . .'               
       TITRE(152)       = '    NRIVET: NUMBER OF RIVETS OR SPOT WELDS. . . . . . . .'               
       TITRE(153)       = '    NSECT : NUMBER OF SECTIONS SAVED (TIME HISTORY PLOTS)'               
-      TITRE(154)       = '                                                         ' !obsloete option removed        
+      TITRE(154)       = '                                                         ' !obsolete option removed        
       TITRE(155)       = '    NJOINT: NUMBER OF JOINTS. . . . . . . . . . . . . . .'               
       TITRE(156)       = '    NSNOD: NUMBER OF NODES SAVED (TIME HISTORY PLOTS) . .'               
       TITRE(157)       = '    NSELQ: NUMBER OF QUAD   ELEMENTS SAVED. . . . . . . .'               

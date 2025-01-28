@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,25 +23,20 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    dprag51    ../engine/source/materials/mat/mat051/dprag51.F
       !||--- called by ------------------------------------------------------
-      !||    sigeps51   ../engine/source/materials/mat/mat051/sigeps51.F
+      !||    sigeps51   ../engine/source/materials/mat/mat051/sigeps51.F90
       !||====================================================================
       SUBROUTINE DPRAG51
-     .          (NEL    ,SIGD   ,VOL    ,EPSEQ  ,
-     .           DEPS   ,UPARAM ,VOLUME ,EINT   , EPX   ,
-     .           UVAR   ,NUVAR  ,KK     ,RHO0   ,
-     .           C0     ,C1     ,C2     ,C3     ,PFRAC  ,PP     ,
-     .           OFF    ,PEXT   ,TIMESTEP,DE )
+     .          (NEL    ,SIGD   ,VOL      ,EPSEQ  ,
+     .           DEPS   ,UPARAM ,VOLUME   ,EINT   , EPX    ,
+     .           UVAR   ,NUVAR  ,KK       ,RHO0   ,
+     .           C0     ,C1     ,C2       ,C3     , PFRAC  ,PP     ,
+     .           OFF    ,PEXT   ,TIMESTEP ,DE )
 
-!COMMENTAIRE
-!       1) passer EPX en argument et initialiser
-!       2) SSP depend de G, voir si pris encompte dans sigeps510.F, ssp non calcule ici
-!       3) EPX = muold a cosnerver dans PLAS() et sortie dans "Plastic Strain"
 
-!EQUIVALENCES PAR RAPPORT A M10LAW()
-        !SIGD   = tenseur deviateur du sous-materiau stocke dans UVAR
-        !T      = copie du deviateur
+!common points with M10LAW()
+        !SIGD   = deviatoric stress
+        !T      = SIGD copy
         !G*DEPSXX = G * DT1*D1
-        !PFRAC  = PFRAC
 
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s

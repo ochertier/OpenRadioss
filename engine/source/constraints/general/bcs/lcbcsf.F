@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,6 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    ancmsg            ../engine/source/output/message/message.F
       !||    spmd_glob_isum9   ../engine/source/mpi/interfaces/spmd_th.F
-      !||    sysfus            ../engine/source/system/sysfus.F
       !||    sysfus2           ../engine/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    message_mod       ../engine/share/message_module/message_mod.F
@@ -68,8 +67,6 @@ C   E x t e r n a l   F u n c t i o n s
 C-----------------------------------------------
       INTEGER SYSFUS2
 C     REAL
-      my_real
-     .   SYSFUS
 C-----------------------------------------------
 C
       DATA MESS/'BOUNDARY CONDITIONS                     '/

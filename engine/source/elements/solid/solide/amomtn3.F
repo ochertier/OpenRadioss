@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -176,7 +176,7 @@ C-----------------------------------------------
        IF(INT22>0)THEN
          DO I=1,NEL
            IF(NINT(IAD22(I))==0)THEN
-             !currently unpluged only for cut cell buffer      
+             !currently unplugged only for cut cell buffer      
              F1P(I) = ZERO
              F2P(I) = ZERO
              F3P(I) = ZERO
@@ -248,7 +248,7 @@ C-----------------------------------------------
         IF(INT22>0)THEN 
           DO I=1,NEL       
             IF(NINT(IAD22(I))==0)THEN
-              !currently unpluged only for cut cell buffer
+              !currently unplugged only for cut cell buffer
               F1P(I) = ZERO
               F2P(I) = ZERO
               F3P(I) = ZERO

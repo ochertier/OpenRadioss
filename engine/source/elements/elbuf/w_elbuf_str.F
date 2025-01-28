@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -109,6 +109,9 @@ C-----------------------------------------------
       TYPE(L_BUFEL_DIR_) , POINTER :: LBUF_DIR
 C=======================================================================
       NPG = 0
+      NPTTOT = 0
+      NULLIFY(BUFLY)
+      L_VOL0DP = 0
       DO NG=1,NGROUP
 c----
           ITY    = IPARG(5,NG)

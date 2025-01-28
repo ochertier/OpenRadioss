@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -67,6 +67,7 @@ C======================================================================|
 C
       P0ARSZ2 = 0
       WASZ2   = 0
+      IGTYP = 0
 C
       IF (DYNAIN_DATA%DYNAIN_C(4) == 1) THEN
 C------------------------------

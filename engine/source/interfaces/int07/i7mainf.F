@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,8 +50,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    my_barrier                  ../engine/source/system/machine.F
       !||    spmd_exch_n                 ../engine/source/mpi/generic/spmd_exch_n.F
       !||    spmd_i7curvsz               ../engine/source/mpi/interfaces/spmd_i7curvsz.F
-      !||    startime                    ../engine/source/system/timer.F
-      !||    stoptime                    ../engine/source/system/timer.F
+      !||    startime                    ../engine/source/system/timer_mod.F90
+      !||    stoptime                    ../engine/source/system/timer_mod.F90
       !||    sum_6_float_sens            ../engine/source/system/parit.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod        ../common_source/modules/ale/ale_connectivity_mod.F
@@ -60,10 +60,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_mod                     ../engine/share/modules/h3d_mod.F
       !||    intbuf_fric_mod             ../common_source/modules/interfaces/intbuf_fric_mod.F90
       !||    message_mod                 ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod               ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod               ../common_source/modules/ale/multi_fvm_mod.F90
       !||    outputs_mod                 ../common_source/modules/outputs_mod.F
+      !||    timer_mod                   ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I7MAINF(
+      SUBROUTINE I7MAINF(TIMERS,
      1                   IPARI          ,X           ,A              ,ALE_CONNECTIVITY ,XCELL      ,
      2                   ICODT          ,FSAV        ,V              ,MS               ,DT2T       ,
      3                   NELTST         ,ITYPTST     ,ITAB           ,STIFN            ,FSKYI      ,
@@ -78,16 +79,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      D                   PCONTACT       ,TEMP        ,FTHE           ,FTHESKYI         ,
      E                   PM             ,IPARG       ,IAD17          ,MSKYI_SMS        ,ISKYI_SMS  ,
      F                   NODNX_SMS      ,MS0         ,QFRICINT       ,NPC              ,TF         ,
-     G                   CONDN          ,CONDNSKYI   ,INTBUF_TAB     , 
+     G                   CONDN          ,CONDNSKYI   ,INTBUF_TAB     ,NODADT_THERM     ,THEACCFACT , 
      H                   FBSAV6         ,ISENSINT    ,DIMFB          ,IXIG3D           ,KXIG3D     ,
      I                   WIGE           ,KNOT        ,IGEO           ,MULTI_FVM        ,H3D_DATA   ,
      J                   INTBUF_FRIC_TAB,KNOTLOCPC   ,KNOTLOCEL      ,ITASK            ,TAGNCONT   ,
      K                   KLOADPINTER    ,LOADPINTER  ,LOADP_HYD_INTER,DGAPLOADINT      ,S_LOADPINTER,
-     L                   INTEREFRIC     ,S_XCELL_REMOTE,XCELL_REMOTE)
+     L                   INTEREFRIC     ,S_XCELL_REMOTE,XCELL_REMOTE )
 C======================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE ELBUFDEF_MOD 
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
@@ -123,6 +125,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(INOUT) :: TIMERS
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
       TYPE (ELBUF_STRUCT_), DIMENSION(NGROUP) :: ELBUF_TAB
       INTEGER NELTST,ITYPTST,NIN,NEWFRONT,NSTRF(*),
@@ -141,6 +144,8 @@ C-----------------------------------------------
       INTEGER  , INTENT(IN) :: KLOADPINTER(NINTER+1),LOADPINTER(S_LOADPINTER),
      .         LOADP_HYD_INTER(NLOADP_HYD)
       INTEGER  , INTENT(IN) :: INTEREFRIC
+      INTEGER ,INTENT(IN) :: NODADT_THERM
+      my_real ,intent(in) :: theaccfact
       my_real  , INTENT(IN) :: DGAPLOADINT(S_LOADPINTER)
       my_real  EMINX(*), XCELL(3,SXCELL)
       my_real DT2T,
@@ -651,7 +656,7 @@ C
             ENDIF
 
             JLT = JLT_NEW
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
             IF(JLT_NEW/=0) THEN
               IPARI(29,NIN) = 1
               IDIR = IPARI(34,NIN)
@@ -706,7 +711,7 @@ C
      L        IREP_FRICMI  ,DIR_FRICMI,DGAPLOADP)
 
             JLT = JLT_NEW
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
             IF(JLT_NEW/=0) THEN
               IPARI(29,NIN) = 1
               IF (DEBUG(3)>=1)
@@ -716,7 +721,7 @@ C
         !-------------------------------------------------------------------------------
         ! Friction model : computation of friction coefficients based on Material of connected Parts
         !-------------------------------------------------------------------------------
-        IF(ITASK==1) CALL STARTIME(MACRO_TIMER_FRIC,1)
+        IF(ITASK==1) CALL STARTIME(TIMERS,MACRO_TIMER_FRIC)
            IF(IORTHFRIC > 0) THEN
               CALL FRICTIONPARTS_MODEL_ORTHO(
      1           INTFRIC        ,JLT          ,IPARTFRICSI  ,IPARTFRICMI  ,ADPARTS_FRIC   ,
@@ -741,7 +746,7 @@ C
      6           TEMP           , H1          ,H2               ,H3           ,H4         ,
      7           IX1            , IX2         ,IX3              ,IX4          ,IFORM      )
             ENDIF
-            IF(ITASK==1) CALL STOPTIME(MACRO_TIMER_FRIC,1)
+            IF(ITASK==1) CALL STOPTIME(TIMERS,MACRO_TIMER_FRIC)
 
 C
               CALL I7FOR3(
@@ -800,7 +805,7 @@ C
      6                        GAPV  ,FNI  ,IRSTH,XTHE  ,NPC    ,TF    ,
      6                        CONDINT,PHI1,PHI2  ,PHI3   ,PHI4  ,FHEATS,
      7                        FHEATM,EFRICT,TEMP ,H1     ,H2     ,H3   ,
-     8                        H4    )      
+     8                        H4    ,theaccfact)      
               ENDIF
 
 C
@@ -822,14 +827,14 @@ C
      F  CONDN     ,CONDINT   ,CONDNSKYI ,IXIG3D    ,KXIG3D    ,
      J  WIGE      ,KNOT      ,IGEO      ,INTBUF_TAB%NIGE      ,
      K  INTBUF_TAB%RIGE      ,X         ,H3D_DATA  ,KNOTLOCPC ,
-     L  KNOTLOCEL ,IFORM     ) 
+     L  KNOTLOCEL ,IFORM     ,NODADT_THERM) 
 C
             ENDIF
           ENDIF
 
 C-----------------------------------------------
 C
-          IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+          IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
 
 C
           IF(IMPL_S==1) THEN

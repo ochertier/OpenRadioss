@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,13 +21,15 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    r27def3   ../engine/source/elements/spring/r27def3.F
+      !||    r27def3               ../engine/source/elements/spring/r27def3.F
       !||--- called by ------------------------------------------------------
-      !||    rforc3    ../engine/source/elements/spring/rforc3.F
+      !||    rforc3                ../engine/source/elements/spring/rforc3.F
       !||--- calls      -----------------------------------------------------
-      !||    finter    ../engine/source/tools/curve/finter.F
+      !||    finter                ../engine/source/tools/curve/finter.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
       !||====================================================================
-      SUBROUTINE R27DEF3(
+      SUBROUTINE R27DEF3(PYTHON,
      1   F,       E,       DL,      AL0,
      2   IPOS,    GEO,     IGEO,    NPF,
      3   TF,      V,       OFF,     ANIM,
@@ -35,6 +37,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      5   MGN,     EX,      EY,      EZ,
      6   XK,      XM,      XC,      FSCALE,
      7   NEL,     NFT,     CRIT)
+       USE python_funct_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -55,6 +58,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(python_), intent(inout) :: PYTHON
       INTEGER, INTENT(IN) :: NEL
       INTEGER, INTENT(IN) :: NFT
       INTEGER NPF(*),IGEO(NPROPGI,*),NGL(*),MGN(*)
@@ -84,6 +88,8 @@ C     REAL
      .    BID,SUM,DT11,DAMP,DAMM
       DOUBLE PRECISION EXDP(MVSIZ),EYDP(MVSIZ),EZDP(MVSIZ),ALDP(MVSIZ),
      .                 AL0DP(MVSIZ)
+      LOGICAL :: ANY_PYTHON_FUNCTION
+      INTEGER :: NFUNCT,PYID
 C-----------------------------------------------
 C   E x t e r n a l
 C-----------------------------------------------
@@ -95,6 +101,9 @@ c
 C     ==================================================================
 C     RECOVERING SPRING PARAMETERS
 C     ==================================================================
+      ANY_PYTHON_FUNCTION = .FALSE.
+      NFUNCT = PYTHON%FUNCT_OFFSET + PYTHON%nb_functs! OFFSET = nb of non-python functions
+
       DO I=1,NEL
         PID        = MGN(I) 
         XM(I)      = GEO(1,PID)          ! Spring mass
@@ -116,6 +125,16 @@ C     ==================================================================
         IFUNC(I)   = IGEO(101,PID)       ! Function ID for stiffness tabulated force
         IFUNC2(I)  = IGEO(102,PID)       ! Function ID for damping tabulated force
         IF (IFUNC2(I) /= 0) XC(I) = GEO(141,PID)
+        PYID = python_funct_id(nfunct, IFUNC(I),NPF)  
+        IF(PYID > 0) THEN
+          ANY_PYTHON_FUNCTION = .TRUE.
+          IFUNC(I) = -PYID
+        ENDIF
+        PYID = python_funct_id(nfunct, IFUNC2(I),NPF)
+        IF(PYID > 0) THEN
+          ANY_PYTHON_FUNCTION = .TRUE.
+          IFUNC2(I) = -PYID
+        ENDIF 
       ENDDO
 C     ==================================================================
 C
@@ -204,7 +223,8 @@ c
           !   Computation of the tabulated stiffness force
           IF (IFUNC(I) > 0) THEN
             FK(I) = FSCALE(I)*FINTER(IFUNC(I),(DL(I)-GAP(I))/ASCALE(I),NPF,TF,DF1)
-          !   Computation of linear elastic stiffness force (non-linear if NEXP > 1)
+          ELSEIF(IFUNC(I) < 0) THEN
+             CALL python_call_funct1D(PYTHON, -IFUNC(I),(DL(I)-GAP(I))/ASCALE(I), FK(I))
           ELSE
             IF (ABS(DL(I)-GAP(I)) > ZERO) THEN 
               FK(I) = SIGN(ONE,(DL(I)-GAP(I)))*XK(I)*EXP(NEXP(I)*LOG(ABS(DL(I)-GAP(I))))
@@ -229,6 +249,8 @@ c
           IF (IFUNC2(I) > 0) THEN
             FD(I) = FSCALE2(I)*FINTER(IFUNC2(I),DVL(I)/ASCALE2(I),NPF,TF,DF2)
           !   Computation of the linear damping
+          ELSEIF(IFUNC2(I) < 0) THEN
+             CALL python_call_funct1D(PYTHON, -IFUNC2(I),DVL(I)/ASCALE2(I), FD(I))
           ELSE
             FD(I) = XC(I)*DVL(I)
           ENDIF

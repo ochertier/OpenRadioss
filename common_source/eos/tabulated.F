@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,14 +21,20 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    tabulated   ../common_source/eos/tabulated.F
+      !||    tabulated    ../common_source/eos/tabulated.F
       !||--- called by ------------------------------------------------------
-      !||    eosmain     ../common_source/eos/eosmain.F
+      !||    eosmain      ../common_source/eos/eosmain.F
+      !||--- uses       -----------------------------------------------------
+      !||    output_mod   ../common_source/modules/output/output_mod.F90
       !||====================================================================
       SUBROUTINE TABULATED(IFLAG,NEL  ,PM   ,OFF  ,EINT ,MU  ,MU2 , 
      2                     ESPE ,DVOL ,DF   ,VNEW ,MAT  ,PSH ,
      3                     PNEW ,DPDM ,DPDE ,THETA,ECOLD, 
      4                     NPF  ,TF)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      USE OUTPUT_MOD , ONLY : WFEXT
 C-----------------------------------------------
 C   D e s c r i p t i o n
 C-----------------------------------------------
@@ -65,7 +71,7 @@ C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER I, MX
-      my_real :: P0,GAMMA,T0,E0,SPH,AA, BB,TFEXTT, DVV, PP, Cv, RHO, RHO0
+      my_real :: P0,GAMMA,T0,E0,SPH,AA, BB,WFEXTT, DVV, PP, Cv, RHO, RHO0
       my_real :: XSCALE_A,XSCALE_B,FSCALE_A,FSCALE_B
       INTEGER :: A_fun_id, B_fun_id
       my_real :: RES_A(MVSIZ),RES_B(MVSIZ),DERI_A(MVSIZ),DERI_B(MVSIZ),PC
@@ -118,7 +124,7 @@ C-----------------------------------------------
          ENDDO
 C-----------------------------------------------
       ELSEIF(IFLAG == 1) THEN
-         TFEXTT = ZERO
+         WFEXTT = ZERO
          MX = MAT(1)
          E0 = PM(23,MX)         
          PSH(1:NEL) = PM(88,MX)
@@ -157,10 +163,10 @@ C-----------------------------------------------
            PNEW(I) = (AA+BB*(ESPE(I)-PSH(I)*DVV))/(ONE+BB*DVV)
            PNEW(I) = MAX(PNEW(I),PC )*OFF(I)
            EINT(I) = EINT(I) - HALF*DVOL(I)*(PNEW(I)+PSH(I) )
-           TFEXTT  = TFEXTT-DVOL(I)*PSH(I)
+           WFEXTT  = WFEXTT-DVOL(I)*PSH(I)
          ENDDO       
 #include "atomic.inc"
-       TFEXT = TFEXT + TFEXTT
+       WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
          MX     = MAT(1)
          RHO0   = PM(1 ,MX)

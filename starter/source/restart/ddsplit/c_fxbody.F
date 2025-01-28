@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -221,6 +221,10 @@ c initially was set in starter0, but re-set here for multi threading compatibili
       IFXM_L = 27000
       IFXS_L = 28000 
       NELS_L  = 0
+      NELC_L = 0
+      NELT_L = 0
+      NELP_L = 0
+      NELTG_L = 0
 
 
       WRITE(CIT,'(I4.4)')ITASK

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,9 @@
 !Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 !Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
 ! ======================================================================================================================
+module bcs_wall_trigger_mod
+  contains
+! ======================================================================================================================
 !                                                   PROCEDURES
 ! ======================================================================================================================
 !! \brief Check if sliding wall boundary condition must be enlabled or disabled
@@ -35,7 +38,7 @@
       !||    ale_connectivity_mod   ../common_source/modules/ale/ale_connectivity_mod.F
       !||    bcs_mod                ../common_source/modules/boundary_conditions/bcs_mod.F90
       !||    constant_mod           ../common_source/modules/constant_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||====================================================================
       subroutine bcs_wall_trigger(time, ale_connectivity, nsensor, sensor_tab)
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -135,3 +138,4 @@
 
 
       end subroutine bcs_wall_trigger
+end module bcs_wall_trigger_mod

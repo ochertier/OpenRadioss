@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,13 +25,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    ale_box_coloration            ../starter/source/initial_conditions/inivol/ale_box_coloration.F
       !||    contrl                        ../starter/source/starter/contrl.F
-      !||    hm_read_inivol                ../starter/source/initial_conditions/inivol/hm_read_inivol.F
+      !||    hm_read_inivol                ../starter/source/initial_conditions/inivol/hm_read_inivol.F90
       !||    hm_read_mat151                ../starter/source/materials/mat/mat151/hm_read_mat151.F
       !||    inisoldist                    ../starter/source/initial_conditions/inivol/inisoldist.F
       !||    init_inivol                   ../starter/source/initial_conditions/inivol/init_inivol.F90
       !||    init_inivol_2d_polygons       ../starter/source/initial_conditions/inivol/init_inivol_2D_polygons.F90
       !||    initia                        ../starter/source/elements/initia/initia.F
-      !||    inivol_interf_mod             ../starter/share/modules1/inivol_mod.F
       !||    lectur                        ../starter/source/starter/lectur.F
       !||    qgrtails                      ../starter/source/elements/solid_2d/quad/qgrtails.F
       !||    r2r_group                     ../starter/source/coupling/rad2rad/r2r_group.F
@@ -57,14 +56,13 @@ C   D e r i v e d   T y p e   D e f i n i t i o n s
 C-----------------------------------------------
         TYPE CONTAINER_
           INTEGER   :: SURF_ID
+          INTEGER   :: GRNOD_ID
           INTEGER   :: SUBMAT_ID  ! Phase of the multi-material ALE to fill the Part
           my_real   :: VFRAC     ! Filling ratio
           INTEGER   :: ICUMU     ! Flag for cumulate volume filling
           INTEGER   :: IREVERSED ! Filling option parameter for filling action (inside or outside the container) 
                        ! 0 ! filling the side along normal direction 
                        ! 1 ! filling the side against normal direction
-          LOGICAL   :: REQUIRED_MONTE_CARLO_METHOD
-          LOGICAL   :: REQUIRED_2D_POLYGON_CLIPPING
         END TYPE CONTAINER_
         
 C-----------------------------------------------
@@ -75,9 +73,8 @@ C-----------------------------------------------
           INTEGER :: PART_ID
           INTEGER :: SIZE
           INTEGER :: NUM_CONTAINER
-          LOGICAL :: REQUIRED_MONTE_CARLO_METHOD   !set to true if at least one container is using this method
-          LOGICAL :: REQUIRED_2D_POLYGON_CLIPPING  !set to true if at least one container is using this method
           TYPE (CONTAINER_) ,DIMENSION(:) ,ALLOCATABLE :: CONTAINER
+          my_real :: XYZ(6) !global min,max
         END TYPE INIVOL_STRUCT_
 
 C-----------------------------------------------
@@ -90,47 +87,4 @@ C-----------------------------------------------
 
 C-----------------------------------------------
       END MODULE INIVOL_DEF_MOD
-C-----------------------------------------------
-
-
-
-      !||====================================================================
-      !||    inivol_interf_mod   ../starter/share/modules1/inivol_mod.F
-      !||--- called by ------------------------------------------------------
-      !||    lectur              ../starter/source/starter/lectur.F
-      !||--- uses       -----------------------------------------------------
-      !||    inivol_def_mod      ../starter/share/modules1/inivol_mod.F
-      !||    submodel_mod        ../starter/share/modules1/submodel_mod.F
-      !||====================================================================
-      MODULE INIVOL_INTERF_MOD
-C-----------------------------------------------
-C   m y _ r e a l
-C-----------------------------------------------
-#include      "my_real.inc"
-C-----------------------------------------------
-C   B l o c k   I n t e r f a c e
-C------------------------------------------------
-      INTERFACE
-         SUBROUTINE HM_READ_INIVOL(INIVOL_STRUCT , KVOL, IGRSURF ,IPART  ,MULTI_FVM, BUFMAT, IPM, NSUBMAT, LSUBMODEL, UNITAB)
-           USE UNITAB_MOD
-           USE MULTI_FVM_MOD
-           USE GROUPDEF_MOD
-           USE INIVOL_DEF_MOD
-           USE SUBMODEL_MOD
-           USE SETDEF_MOD
-#include "tabsiz_c.inc"           
-#include "com04_c.inc"  
-              TYPE(INIVOL_STRUCT_),INTENT(INOUT),DIMENSION(:),ALLOCATABLE  :: INIVOL_STRUCT
-              my_real,DIMENSION(:), ALLOCATABLE, INTENT(INOUT) :: KVOL
-              INTEGER,DIMENSION(SIPART) :: IPART
-              TYPE(MULTI_FVM_STRUCT),INTENT(IN) :: MULTI_FVM
-              INTEGER,INTENT(IN),DIMENSION(SIPM) :: IPM
-              my_real,INTENT(IN),TARGET :: BUFMAT(*)
-              TYPE (SURF_), DIMENSION(NSURF+NSETS) :: IGRSURF
-              TYPE(SUBMODEL_DATA),INTENT(IN) :: LSUBMODEL(NSUBMOD)
-             TYPE (UNIT_TYPE_),INTENT(IN) :: UNITAB
-             INTEGER,INTENT(INOUT) :: NSUBMAT
-           END SUBROUTINE HM_READ_INIVOL
-         END INTERFACE
-      END MODULE INIVOL_INTERF_MOD
 C-----------------------------------------------

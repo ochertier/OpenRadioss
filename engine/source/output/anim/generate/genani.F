@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,6 @@ Copyright>
 Copyright>        As an alternative to this open-source version, Altair also offers Altair Radioss
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
-      !||====================================================================
-      !||    genani_mod    ../engine/source/output/anim/generate/genani.F
-      !||--- called by ------------------------------------------------------
-      !||    eig           ../engine/stub/eig.F
-      !||    eig1          ../engine/stub/eig1.F
-      !||    eigp          ../engine/stub/eigp.F
-      !||    imp_buck      ../engine/source/implicit/imp_buck.F
-      !||    sortie_main   ../engine/source/output/sortie_main.F
-      !||====================================================================
-      MODULE GENANI_MOD
-      CONTAINS
-c 
       !||====================================================================
       !||    genani                 ../engine/source/output/anim/generate/genani.F
       !||--- called by ------------------------------------------------------
@@ -195,12 +183,14 @@ c
       !||    crackxfem_mod          ../engine/share/modules/crackxfem_mod.F
       !||    elbufdef_mod           ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    fvbag_mod              ../engine/share/modules/fvbag_mod.F
+      !||    glob_therm_mod         ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod           ../common_source/modules/groupdef_mod.F
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    inoutfile_mod          ../common_source/modules/inoutfile_mod.F
       !||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    my_alloc_mod           ../common_source/tools/memory/my_alloc.F90
       !||    plyxfem_mod            ../engine/share/modules/plyxfem_mod.F
       !||    stack_mod              ../engine/share/modules/stack_mod.F
       !||====================================================================
@@ -239,7 +229,7 @@ c
      Y                  LESDVOIS ,CRKEDGE  ,INDX_CRK    ,XEDGE4N     ,XEDGE3N   ,
      Z                  STACK    ,SPH2SOL  ,STIFN       ,STIFR       ,IGRNOD    ,
      1                  H3D_DATA ,SUBSET   ,MULTI_FVM   ,KNOTLOCPC   ,KNOTLOCEL ,
-     2                  FCONT_MAX,FNCONTP2 ,FTCONTP2    )
+     2                  FCONT_MAX,FNCONTP2 ,FTCONTP2    ,GLOB_THERM  )
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -257,6 +247,8 @@ C-----------------------------------------------
       USE INOUTFILE_MOD
       USE ALE_CONNECTIVITY_MOD
       USE MATPARAM_DEF_MOD
+      use glob_therm_mod
+      use my_alloc_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -351,23 +343,36 @@ C-----------------------------------------------
       TYPE(MULTI_FVM_STRUCT), INTENT(IN) :: MULTI_FVM
       TYPE(t_ale_connectivity), INTENT(IN) :: ALE_CONNECTIVITY
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
+      type (glob_therm_) ,intent(in)       :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER ANIMSIZE
-      my_real
-     .       , DIMENSION(:), ALLOCATABLE :: WAFT  , MAS   , XNORM, 
+      my_real, DIMENSION(:), ALLOCATABLE :: WAFT  , MAS   , XNORM, 
      .                                      XMASS1, XMASS2, XMASS3,
      .                                      XFUNC1, XFUNC2, XFUNC3,
      .                                      XUSR
-      INTEGER IAD(SIAD),INVERT(SINVERT),MATER(SMATER),EL2FA(SEL2FA),
-     .        IADG(NSPMD,SIADG),IADG_TPR(NSPMD,SIADG),
-     .        UIX(SUIX)      ,NFACPTX(3,SNFACPTX),
-     .        IXEDGE(SIXEDGE), IXFACET(SIXFACET), IXSOLID(SIXSOLID),
-     .        INUMX1(SNUMX1) , INUMX2(SNUMX2)   , INUMX3(SNUMX3),
-     .        IOFFX1(SOFFX1) , IOFFX2(SOFFX2)   , IOFFX3(SOFFX3),
-     .        SZ16,SHFT16,IADGPS,NSN,IADISO     , IG3DSOLID(SIG3DSOLID),
-     .        FIRST_NODE_IG3D
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IAD
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INVERT
+      INTEGER,DIMENSION(:),ALLOCATABLE :: MATER
+      INTEGER,DIMENSION(:),ALLOCATABLE :: EL2FA
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: IADG
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: IADG_TPR
+      !
+      INTEGER,DIMENSION(:),ALLOCATABLE :: UIX
+      INTEGER,DIMENSION(:,:),ALLOCATABLE :: NFACPTX
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IXEDGE
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IXFACET
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IXSOLID
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INUMX1
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INUMX2
+      INTEGER,DIMENSION(:),ALLOCATABLE :: INUMX3
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IOFFX1
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IOFFX2
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IOFFX3
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IG3DSOLID
+      INTEGER SZ16,SHFT16,IADGPS,NSN,IADISO,FIRST_NODE_IG3D
+  
       REAL
      .       , DIMENSION(:), ALLOCATABLE :: WA4, MAS4, WA4_FVM
       my_real
@@ -439,8 +444,10 @@ C-----------------------------------------------
       INTEGER IUL,IAD_GP2,IFIRST,
      .        NEL_PLY, NFNOD_PXFEM,IDPLY,NBF_PXFEM_L,
      .        IPLY,NPLYSUBS,ID_PART,NBF_PXFEM,SWAFT_PXFEM,MAXPART,
-     .        NBF_PXFEMG,NFNOD_PXFEMG,NFNODSZ(NPLYMAX),PLYNUMC,
-     .        NFSHSZ(NPLYMAX),SEL2FA_PLY,IADPC,IFV,IAD_GP3,IAD_ISO,IAD_GP4
+     .        NBF_PXFEMG,NFNOD_PXFEMG,PLYNUMC,
+     .        SEL2FA_PLY,IADPC,IFV,IAD_GP3,IAD_ISO,IAD_GP4
+      INTEGER, DIMENSION(:), ALLOCATABLE :: NFSHSZ
+      INTEGER, DIMENSION(:), ALLOCATABLE :: NFNODSZ
       INTEGER, DIMENSION(:), ALLOCATABLE :: ITAGPS      
       my_real
      .       , DIMENSION(:), ALLOCATABLE :: WGPS  , VGPS
@@ -463,7 +470,8 @@ C
       CHARACTER(len=2048) :: TMP_NAME
       LOGICAL :: CONDITION
       INTEGER :: IS_WRITTEN_NODE_FVM(AIRBAGS_TOTAL_FVM_IN_H3D)
-      INTEGER :: IS_WRITTEN_NODE(NUMNOD)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IS_WRITTEN_NODE
+      INTEGER :: DEFAULT_OUTPUT
 C=======================================================================
       ALLOCATE(WAFT(SWAFT)   , MAS(SMAS)     , XNORM(SXNORM) ,
      .         XMASS1(SMASS1), XMASS2(SMASS2), XMASS3(SMASS3),
@@ -478,7 +486,30 @@ C=======================================================================
      .        VFLU_ALE(3,NUMNOD),FANREACT(3,NUMNOD),FANREACR(3,NUMNOD))
 
       ALLOCATE(WGPS(NUMNOD), VGPS(NUMNOD), ITAGPS(NUMNOD))
-       
+
+      CALL MY_ALLOC(IS_WRITTEN_NODE,NUMNOD)
+      CALL MY_ALLOC(IAD,SIAD)
+      CALL MY_ALLOC(INVERT,SINVERT)
+      CALL MY_ALLOC(MATER,SMATER)
+      CALL MY_ALLOC(EL2FA,SEL2FA)
+      CALL MY_ALLOC(IADG,NSPMD,SIADG)
+      CALL MY_ALLOC(IADG_TPR,NSPMD,SIADG)
+      CALL MY_ALLOC(NFSHSZ,NPLYMAX)
+      CALL MY_ALLOC(NFNODSZ,NPLYMAX)
+      CALL MY_ALLOC(UIX,SUIX)
+      CALL MY_ALLOC(NFACPTX,3,SNFACPTX)
+      CALL MY_ALLOC(IXEDGE,SIXEDGE)
+      CALL MY_ALLOC(IXFACET,SIXFACET)
+      CALL MY_ALLOC(IXSOLID,SIXSOLID)
+      CALL MY_ALLOC(INUMX1,SNUMX1)
+      CALL MY_ALLOC(INUMX2,SNUMX2)
+      CALL MY_ALLOC(INUMX3,SNUMX3)
+      CALL MY_ALLOC(IOFFX1,SOFFX1)
+      CALL MY_ALLOC(IOFFX2,SOFFX2)
+      CALL MY_ALLOC(IOFFX3,SOFFX3)
+      CALL MY_ALLOC(IG3DSOLID,SIG3DSOLID)
+C=======================================================================
+      IADG(1:NSPMD,1:SIADG) = 0
        IF (ANIM_PLY > 0)THEN
          NPLYPARTW=NPLYPART
        ELSE
@@ -2458,16 +2489,10 @@ C all NPTT for PID51
         DO I=IDX+2+1,IDX+2+11
           IF (ANIM_CE(I) == 1) THEN
             II = I - (IDX+2)
-            WRITE(MES,'(A,I3,A)')
-     .       'Nloc rate at point ',II,' '
+            WRITE(MES,'(A,I3,A)')'Nloc rate at point ',II,' '
             CALL ANI_TXT(MES,30)
           ENDIF
         ENDDO 
-        
-        !---NTILLOTSON EoS
-        IDX = 14596 + 4*MX_PLY_ANIM
-        IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Region identifier in p,v diagram',32)  
-        
 
 C----------------------------------------------------------------------
 C   Tsai-Wu criterion output for composites
@@ -2481,8 +2506,7 @@ C----------------------------------------------------------------------
           IF(ANIM_CE(IDX + 2 + I)==1)THEN
             IUS = I
             IF(IUS==0) IUS = 100
-            WRITE(MES,'(A,I3,A)')
-     .       'Tsai-Wu Crit. Layer ',IUS, ' '
+            WRITE(MES,'(A,I3,A)')'Tsai-Wu Crit. Layer ',IUS, ' '
             CALL ANI_TXT(MES,24)
           END IF
         END DO
@@ -2493,8 +2517,7 @@ C  upper for PID51
            IF (ANIM_CE(IDX + I) == 1) THEN
              IUS = I
              IF(IUS==0) IUS = 100
-             WRITE(MES,'(A,I3,A)')
-     .       'Tsai-Wu Crit. Upper Layer',IUS, ' '
+             WRITE(MES,'(A,I3,A)')'Tsai-Wu Crit. Upper Layer',IUS, ' '
                CALL ANI_TXT(MES,29)
             END IF
         END DO
@@ -2504,8 +2527,7 @@ C  lower for PID51
            IF (ANIM_CE(IDX + I) == 1) THEN
              IUS = I
              IF(IUS==0) IUS = 100
-             WRITE(MES,'(A,I3,A)')
-     .       'Tsai-Wu Crit. Lower Layer',IUS, ' '
+             WRITE(MES,'(A,I3,A)')'Tsai-Wu Crit. Lower Layer',IUS, ' '
                CALL ANI_TXT(MES,29)
             END IF
         END DO
@@ -2517,15 +2539,31 @@ C all NPTT for PID51
             IF (ANIM_CE(IDX + IUS) == 1) THEN
               ILAY = I
               IPT  = J
-              WRITE(MES,'(A,I4,I3,A)')
-     .        'Tsai-Wu Crit. Lay/IPT ',ILAY,IPT, ' '
+              WRITE(MES,'(A,I4,I3,A)')'Tsai-Wu Crit. Lay/IPT ',ILAY,IPT, ' '
               CALL ANI_TXT(MES,30)
             END IF
           ENDDO
         ENDDO 
 
+        !---TILLOTSON EoS
+        IDX = 15898 + 4*MX_PLY_ANIM
+        IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Region identifier in p,v diagram',32)
+
+        !---Volumetric Strain EoS
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain',17)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 1',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 2',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 3',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 4',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 5',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 6',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 7',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 8',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 9',20)
+        IDX=IDX+1; IF(ANIM_CE(IDX) == 1) CALL ANI_TXT('Volumetric Strain - 10',20)
+
         !---NEXT ANIM
-        !IDX=IDX+1   ! => IDX = 4*MX_PLY_ANIM + 15898
+        !IDX=IDX+1
   
        ENDIF !  (NBF+NELCUT+NESBW2/=0)
 !
@@ -2554,7 +2592,7 @@ C-----------------------------------------------
             ENDDO
             K = K + NUMNOD
           ELSEIF(I>=3.AND.I<=11 .OR. I==30) THEN
-           IF(I == 6 .AND. (ITHERM_FE  > 0  )) THEN
+           IF(I == 6 .AND. (GLOB_THERM%ITHERM_FE  > 0  )) THEN
              DO N=1,NUMNOD
               WA4(N)=TEMP(N)
              ENDDO
@@ -2590,7 +2628,7 @@ C-----------------------------------------------
              
 
              !Then Monitored Volumes (Pressure,Density,Temperature,Sound Speed)
-             CALL ANIMBALE(I, WA4, MONVOL, VOLMON ,2)
+             CALL ANIMBALE(I, WA4,IS_WRITTEN_NODE, MONVOL, VOLMON ,2)
            ENDIF
 
           !Nodal Potential (/BEM/FLOW)
@@ -3172,7 +3210,7 @@ C  en spmd localement NBF = 0 mais pas la somme sur pi !
      .      (I>=10253.AND.I<=10675) .OR. (I >= 10676 .AND. I <= 1000000)) THEN
             CALL DFUNCC(ELBUF_TAB ,WAFT        ,IFUNC         ,IPARG,GEO    ,
      .                  IXQ       ,IXC         ,IXTG          ,MAS          ,PM         ,
-     .                  EL2FA     ,NBF         ,IAD          ,
+     .                  EL2FA     ,NBF         ,IAD           ,GLOB_THERM%ITHERM        ,
      .                  NBF_L     ,EANI        ,ANIN(NDMA2+1) ,NBPART       ,IADG       ,
      .                  IPM       ,IGEO        ,THKE          ,ERR_THK_SH4  ,ERR_THK_SH3,
      .                  INVERT    ,X           ,V             ,W            ,ALE_CONNECTIVITY,
@@ -3193,7 +3231,7 @@ C ply information
      .                        IXC ,  IXTG    , MAS,   PM,    EL2FA_PLY,
      .                        NBF_PXFEM,IAD  , PLYNUMC,EANI,ANIN(NDMA2+1),
      .                        NPLYPART,IAD_PLYG,IPM  ,IGEO , THKE,
-     .                        ERR_THK_SH4, ERR_THK_SH3,
+     .                        ERR_THK_SH4, ERR_THK_SH3,MAT_PARAM,
      .                        NBF_PXFEMG ,X , STACK )
             ENDIF
             IF (ANIM_CRK > 0)THEN
@@ -3833,7 +3871,7 @@ C
              CALL TENSORC_PLY(IPLY,    NEL_PLY,  ELBUF_TAB ,IPARG,
      .                        IFUNC,   INVERT,   EL2FA_PLY ,NBF_PXFEM,
      .                        WAFT_PLY,TANI,     IAD,       PLYNUMC,
-     .                        NBPART,  IAD_PLYG, X,         IXC,
+     .                        NBPART,  IAD_PLYG, X,         IXC,MAT_PARAM,
      .                        IGEO,    IXTG,     NBF_PXFEMG,IPM, STACK )
           ENDIF
 C
@@ -3844,7 +3882,7 @@ C
      .               LEN_CRKX ,TANI     ,IAD      ,NBF_CRKXFEM ,
      .               NBPART   ,IAD_CRKG ,X        ,IXC         ,
      .               IGEO     ,IXTG     ,IEL_CRK  ,IADC_CRK    ,
-     .               CRKEDGE  ,INDX_CRK )
+     .               CRKEDGE  ,INDX_CRK ,MAT_PARAM)
           ENDIF
 C
           IF (ISPMD==0.AND.NFVTR>0) THEN
@@ -4648,6 +4686,7 @@ C
           ENDIF
         ENDDO
         IF(ANIM_SE(5172)==1)CALL ANI_TXT('Region identifier in p,v diagram',32)
+        IF(ANIM_SE(5173)==1)CALL ANI_TXT('Volumetric Strain',17)
         
 C-----------------------------------------------                                         
       ENDIF !(ISPMD==0)
@@ -4669,7 +4708,7 @@ C-----------------------------------------------
      4              IADG      ,SPBUF     ,IPART       ,IPARTSP     ,ISPH3D       ,
      5              X         ,V         ,W           ,ALE_CONNECTIVITY,
      6              NERCVOIS  ,NESDVOIS  ,LERCVOIS    ,LESDVOIS    ,BUFMAT       ,
-     7              FANI_CELL ,MULTI_FVM ,MAT_PARAM   )
+     7              FANI_CELL ,MULTI_FVM ,MAT_PARAM   ,GLOB_THERM%ITHERM)
         ENDIF
       ENDDO
 C-----------------------------------------------
@@ -4739,6 +4778,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   3D TENSOR
 C-----------------------------------------------
+
       DO I = 1,MX_ANI
        IFUNC = I
        IF(ANIM_ST(I)==1)THEN
@@ -6233,7 +6273,7 @@ C-----------------------------------------------
       IF (ISPMD==0) THEN
         CALL WRITE_I_C(NUMSPHG+MAXPJET,1)
         CALL WRITE_I_C(NBPART,1)
-        CALL WRITE_I_C(NSE_ANI+1,1)
+        CALL WRITE_I_C(NSE_ANI+2,1)
         CALL WRITE_I_C(NST_ANI,1)
       ENDIF
 C-----------------------------------------------
@@ -6294,8 +6334,9 @@ C   FUNC TEXT
 C-----------------------------------------------
       IF (ISPMD==0) THEN
        CTEXT(81)=0
-C     diameter is compulsory.
+C      diameter and nb of neighbours are compulsory.
        CALL ANI_TXT('Diameter',8)
+       CALL ANI_TXT('Number of neighbours',20)
 C
        IF(ANIM_SE(1)==1) CALL ANI_TXT('Plastic Strain',14)
        IF(ANIM_SE(2)==1) CALL ANI_TXT('Density',7)
@@ -6404,26 +6445,41 @@ C
        IF(ANIM_SE(4937)==1) CALL ANI_TXT('Element Time Step',17)
        IF(ANIM_SE(4959)==1) CALL ANI_TXT('AMS selection',13)    
        IF(ANIM_SE(4965)==1) CALL ANI_TXT('Element status',14) 
-       IF(ANIM_SE(4895)==1)CALL ANI_TXT('Equiv stress',12)
-       IF(ANIM_SE(5172)==1)CALL ANI_TXT('Region identifier in p,v diagram',32)
+       IF(ANIM_SE(4895)==1) CALL ANI_TXT('Equiv stress',12)
+       IF(ANIM_SE(5172)==1) CALL ANI_TXT('Region identifier in p,v diagram',32)
+       IF(ANIM_SE(5173)==1) CALL ANI_TXT('Volumetric Strain',17)
       ENDIF
 C-----------------------------------------------
 C   ELEMENT FUNC (SPH)
 C-----------------------------------------------
       NNN = NUMSPH+MAXPJET
-      DO I = 0,MX_ANI
+C
+C     Default output for SPH - diameter + nb of neignbours
+      DO I = 1,2
+        IFUNC = 0
+        DEFAULT_OUTPUT = I
+        CALL DFUNC0(ELBUF_TAB ,WAFT            ,IFUNC    ,IPARG   ,
+     2              MAS       ,PM              ,EL2FA    ,NNN     ,
+     3              NBPART    ,IADG            ,SPBUF    ,IPART   ,
+     4              IPARTSP   ,ALE_CONNECTIVITY,IXQ      ,IPM     ,
+     5              X         ,V               ,W        ,GLOB_THERM%ITHERM,
+     6              NERCVOIS  ,NESDVOIS        ,LERCVOIS ,LESDVOIS,
+     7              BUFMAT    ,MULTI_FVM       ,KXSP     ,DEFAULT_OUTPUT)
+      ENDDO
+C      
+C     other output for SPH
+      DO I = 1,MX_ANI
         IFUNC = I
-        CONDITION = (IFUNC == 0) 
-        IF(IFUNC > 0) CONDITION = CONDITION .OR. (ANIM_SE(I) == 1)
-        IF(CONDITION) THEN
+        DEFAULT_OUTPUT = 0
+        IF(ANIM_SE(I) == 1) THEN
           CALL DFUNC0(ELBUF_TAB ,WAFT            ,IFUNC    ,IPARG   ,
      2                MAS       ,PM              ,EL2FA    ,NNN     ,
      3                NBPART    ,IADG            ,SPBUF    ,IPART   ,
      4                IPARTSP   ,ALE_CONNECTIVITY,IXQ      ,IPM     ,
-     5                X         ,V               ,W        ,
+     5                X         ,V               ,W        ,GLOB_THERM%ITHERM,
      6                NERCVOIS  ,NESDVOIS        ,LERCVOIS ,LESDVOIS,
-     7                BUFMAT    ,MULTI_FVM)
-        ENDIF
+     7                BUFMAT    ,MULTI_FVM       ,KXSP     ,DEFAULT_OUTPUT)
+        ENDIF 
       ENDDO
 C-----------------------------------------------
 C   3D TENSOR TEXT
@@ -6656,10 +6712,30 @@ C
        DEALLOCATE(VFLU,VVAR1,AFLU,VFLU_ALE,FANREACT,FANREACR)
 
        DEALLOCATE(WGPS,VGPS,ITAGPS)
+       DEALLOCATE(IS_WRITTEN_NODE)
+       DEALLOCATE(IAD)
+       DEALLOCATE(INVERT)
+       DEALLOCATE(MATER)
+       DEALLOCATE(EL2FA)
+       DEALLOCATE(IADG)
+       DEALLOCATE(IADG_TPR)
+       DEALLOCATE(NFSHSZ)
+       DEALLOCATE(NFNODSZ)
+       DEALLOCATE(UIX)
+       DEALLOCATE(NFACPTX)
+       DEALLOCATE(IXEDGE)
+       DEALLOCATE(IXFACET)
+       DEALLOCATE(IXSOLID)
+       DEALLOCATE(INUMX1)
+       DEALLOCATE(INUMX2)
+       DEALLOCATE(INUMX3)
+       DEALLOCATE(IOFFX1)
+       DEALLOCATE(IOFFX2)
+       DEALLOCATE(IOFFX3)
+       DEALLOCATE(IG3DSOLID)
 c-----------       
        RETURN
       END SUBROUTINE GENANI
-      END MODULE GENANI_MOD
 c
       !||====================================================================
       !||    xyz16               ../engine/source/output/anim/generate/genani.F
@@ -6829,7 +6905,7 @@ C
       !||--- uses       -----------------------------------------------------
       !||    fvbag_mod                ../engine/share/modules/fvbag_mod.F
       !||====================================================================
-      SUBROUTINE ANIMBALE(IAN ,WA4 ,MONVOL,VOLMON, IOPT)
+      SUBROUTINE ANIMBALE(IAN ,WA4, IS_WRITTEN_NODE,MONVOL,VOLMON, IOPT)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -6854,6 +6930,7 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: IOPT
       ! OPT=1 : write internal nodes (1:NUMNOD)            : calls for /H3D
       ! OPT=2 : write also additional nodes (1:NUMNOD+NNA) : calls for /ANIM
+      INTEGER , INTENT(INOUT) :: IS_WRITTEN_NODE(NUMNOD) 
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -6872,6 +6949,7 @@ C-----------------------------------------------
       INTEGER NNS, NBA, NNA, NNI, NTGI,NNT
       INTEGER IFV
 C
+      IS_WRITTEN_NODE(1:NUMNOD) = 0
       K1 = 1
       KK1 = 1
       KIBHOL =1 + NIMV*NVOLU  + LICBAG + LIBAGJET
@@ -6916,6 +6994,7 @@ C
                 N1=FVSPMD(IFV)%IBUF_L(1,N)
                 N2=FVSPMD(IFV)%IBUF_L(2,N)
                 WA4(N2)=VOLMON(KR1-1+N1)
+                IS_WRITTEN_NODE(N2)=1
              ENDDO
           ELSEIF (IAN==4) THEN
 C densite
@@ -6935,6 +7014,7 @@ C
                 N1=FVSPMD(IFV)%IBUF_L(1,N)
                 N2=FVSPMD(IFV)%IBUF_L(2,N)
                 WA4(N2)=VOLMON(KR2-1+N1)
+                IS_WRITTEN_NODE(N2)=1
              ENDDO
           ELSEIF (IAN==6) THEN
 C temperature
@@ -6954,6 +7034,7 @@ C
                 N1=FVSPMD(IFV)%IBUF_L(1,N)
                 N2=FVSPMD(IFV)%IBUF_L(2,N)
                 WA4(N2)=VOLMON(KR3-1+N1)
+                IS_WRITTEN_NODE(N2)=1
              ENDDO
           ELSEIF (IAN==30) THEN
 C ssp:sound speed
@@ -6973,6 +7054,7 @@ C
                 N1=FVSPMD(IFV)%IBUF_L(1,N)
                 N2=FVSPMD(IFV)%IBUF_L(2,N)
                 WA4(N2)=VOLMON(KR9-1+N1)
+                IS_WRITTEN_NODE(N2)=1
              ENDDO
           ENDIF
         ENDIF

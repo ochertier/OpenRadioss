@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -31,6 +31,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_i_c          ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod       ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    my_alloc_mod       ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE PARSORC(X    ,D    ,XNORM,IADD ,CDG  ,
      .                  BUFEL,IPARG,IXQ  ,IXC  ,IXTG ,
@@ -40,7 +41,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD         
+      USE ELBUFDEF_MOD
+      USE MY_ALLOC_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,7 +75,9 @@ C     REAL
      .        IPRT, NEL, IAD, NPAR, NFT, IMID,IALEL,MTN,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,
      .        JJ, K, SH_IH, BUF
-      INTEGER NP((NUMELQ + NUMELC + NUMELTG)*4)
+      INTEGER,DIMENSION(:),ALLOCATABLE::NP
+C-----------------------------------------------
+      CALL MY_ALLOC(NP,(NUMELQ + NUMELC + NUMELTG)*4)
 C-----------------------------------------------
 C     NORMALE
 C-----------------------------------------------
@@ -245,6 +249,7 @@ C   construction tableau global des parts sur p0
           IADG(1,I) = IADD(I)
         END DO
       ENDIF
+      DEALLOCATE(NP)
 C-----------------------------------------------
       RETURN
       END

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- calls      -----------------------------------------------------
       !||    nlocal     ../starter/source/spmd/node/ddtools.F
       !||====================================================================
-      SUBROUTINE W_FBFT(VEL,NC,IBFT,NFXTEMP_L,LEN_AM,PROC)
+      SUBROUTINE W_FBFT(VEL,NC,IBFT,NFXTEMP_L,LEN_AM,PROC,
+     .           NIFT,LFACTHER)
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -39,10 +40,11 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      INTEGER NC, LEN_AM, PROC, NFXTEMP_L,
-     .        IBFT(NIFT,*)
-      my_real
-     .        VEL(LFACTHER,*)
+      INTEGER ,INTENT(IN) :: NIFT
+      INTEGER ,INTENT(IN) :: LFACTHER
+      INTEGER :: NC, LEN_AM, PROC, NFXTEMP_L
+      INTEGER :: IBFT(NIFT,*)
+      my_real :: VEL(LFACTHER,*)
 C-----------------------------------------------
 C   F u n c t i o n
 C-----------------------------------------------
@@ -51,10 +53,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I, J, N_L, N
-      my_real
-     .        VELTMP(LFACTHER,NFXTEMP_L)
-C
+      INTEGER :: I,J,N,N_L 
+      my_real :: VELTMP(LFACTHER,NFXTEMP_L)
+C-----------------------------------------------
       N_L = 0
       DO I = 1, NC
         N = IABS(IBFT(1,I))

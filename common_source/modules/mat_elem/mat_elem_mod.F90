@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -66,7 +66,6 @@
       !||    fail_setoff_c             ../engine/source/materials/fail/fail_setoff_c.F
       !||    fail_setoff_npg_c         ../engine/source/materials/fail/fail_setoff_npg_c.F
       !||    fail_setoff_wind_frwave   ../engine/source/materials/fail/fail_setoff_wind_frwave.F
-      !||    fail_windshield_init      ../starter/source/materials/fail/windshield_alter/fail_windshield_init.F
       !||    forint                    ../engine/source/elements/forint.F
       !||    forintc                   ../engine/source/elements/forintc.F
       !||    forintp                   ../engine/source/elements/forintp.F
@@ -88,8 +87,8 @@
       !||    mmain                     ../engine/source/materials/mat_share/mmain.F90
       !||    mmain8                    ../engine/source/materials/mat_share/mmain8.F
       !||    mulaw                     ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8                    ../engine/source/materials/mat_share/mulaw8.F
-      !||    mulawc                    ../engine/source/materials/mat_share/mulawc.F
+      !||    mulaw8                    ../engine/source/materials/mat_share/mulaw8.F90
+      !||    mulawc                    ../engine/source/materials/mat_share/mulawc.F90
       !||    pforc3                    ../engine/source/elements/beam/pforc3.F
       !||    q4forc2                   ../engine/source/elements/solid_2d/quad4/q4forc2.F
       !||    qforc2                    ../engine/source/elements/solid_2d/quad/qforc2.F

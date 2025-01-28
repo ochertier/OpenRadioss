@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod                ../engine/share/modules/h3d_mod.F
       !||    message_mod            ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    stack_mod              ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE H3D_LIST_QUAD_SCALAR(H3D_KEYWORD_QUAD_SCALAR,GEO,IGEO,MULTI_FVM,NKEY)
@@ -280,7 +280,7 @@ c-----------------------------------------------
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_ID = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%IS_MODE = 1
       H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Failure'
-      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT = 'Damage of current failue criterion'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT = 'Damage of current failure criterion'
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'DAMA/MEMB'
@@ -463,9 +463,66 @@ c-----------------------------------------------
 c-----------------------------------------------
       I = I + 1
       H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'DIV(U)'
-      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'div(u)'
-      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'Volumetric dilatation rate'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric dilatation rate'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'div(u)'
 c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/1'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 1'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/2'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 2'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/3'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 3'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/4'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 4'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/5'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 5'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/6'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 6'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/7'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 7'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/8'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 8'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/9'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 9'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+      I = I + 1
+      H3D_KEYWORD_QUAD_SCALAR(I)%KEY3  = 'VSTRAIN/10'
+      H3D_KEYWORD_QUAD_SCALAR(I)%TEXT1  = 'Volumetric Strain 10'
+      H3D_KEYWORD_QUAD_SCALAR(I)%COMMENT  = 'mu=rho/rho0-1'
+c-----------------------------------------------
+
       NKEY=I
 c-----------------------------------------------
       END

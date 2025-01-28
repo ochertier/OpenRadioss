@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -87,6 +87,13 @@ C-----------------------------------------------
 C=======================================================================
 C     COORDONNEES (GLOBAL)
 C-----------------------
+      p1 = 0
+      p2 = 0
+      nx1 = 0
+      nx2 = 0
+      area1 = 0
+      area2 = 0
+      area3 = 0
       DO I=JFT,JLT
         X1G(I)=X(1,IXTG(2,I+NFT))
         Y1G(I)=X(2,IXTG(2,I+NFT))

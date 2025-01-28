@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -50,6 +50,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    h3d_mod             ../engine/share/modules/h3d_mod.F
       !||    mat_elem_mod        ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    preload_axial_mod   ../engine/source/elements/spring/preload_axial.F90
+      !||    sensor_mod          ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE PFORC3(
      1           ELBUF_STR,JFT      ,JLT      ,NEL      ,
@@ -70,7 +71,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      G           SBUFMAT  ,SNPC     ,STF      ,NUMMAT   ,
      H           NUMGEO   ,IOUT     ,ISTDO    ,IDEL7NOK ,
      I           IDYNA    ,IMCONV   ,IMPL_S   ,MAT_PARAM,
-     J           PRELD1   ,STF_F    ,DT       )
+     J           PRELD1   ,STF_F    ,DT       ,SENSORS)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -79,6 +80,7 @@ C-----------------------------------------------
       USE PRELOAD_AXIAL_MOD
       USE ELBUFDEF_MOD
       USE DT_MOD
+      USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -128,6 +130,7 @@ C
       TYPE (H3D_DATABASE) :: H3D_DATA
       TYPE (MATPARAM_STRUCT_) ,DIMENSION(NUMMAT) ,INTENT(IN) :: MAT_PARAM
       TYPE (DT_), INTENT(IN) :: DT
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -151,7 +154,7 @@ C-----------------------------------------------
      .   FSCAL_ALPHA,ETH(MVSIZ),DEINTTH,ALPHA,DF,VL12(MVSIZ),DTINV
 C
       my_real ::  KC,PHIX, CA,CB, AREA, FPHI(MVSIZ,2),DIE(MVSIZ)
-      my_real ::  SIGX,FXINV,RR
+      my_real ,DIMENSION(NEL) ::  SIGX,SAPT
       my_real ,DIMENSION(:) ,POINTER :: UVAR
       TYPE(G_BUFEL_) ,POINTER :: GBUF
       TYPE(BUF_LAY_) ,POINTER :: BUFLY
@@ -310,7 +313,7 @@ C--------------------------
      8   VY1G,     VY2G,     VZ1G,     VZ2G,
      9   X1,       X2,       Y1,       Y2,
      A   Z1,       Z2,       ITASK,    H3D_DATA,
-     B   IGRE)
+     B   IGRE,     SENSORS)
 C-------------------------
 C     /PRELOAD/AXIAL
 C-------------------------
@@ -321,13 +324,15 @@ C-------------------------
            ENDDO
            CALL PRELOAD_AXIAL(NEL,PRELD1,GBUF%BPRELD,VL12,STF_F,F1 )
            IF (IGTYP == 18) THEN
+             SAPT(1:NEL)=ZERO
              DO IPT = 1,NPT        
                DO I=1,NEL
-                 FXINV =  GBUF%FOR(I)/MAX(GBUF%FOR(I)**2,EM20)  
-                 RR = F1(I)*FXINV
-                 SIGX  = ELBUF_STR%BUFLY(1)%LBUF(1,1,IPT)%SIG(I)*RR 
-                 ELBUF_STR%BUFLY(1)%LBUF(1,1,IPT)%SIG(I) = SIGX 
+                 SAPT(I) = SAPT(I) + GEO(400+IPT,PID(I))    
                ENDDO
+             ENDDO
+             SIGX(1:NEL) = F1(1:NEL)/SAPT(1:NEL)
+             DO IPT = 1,NPT        
+               ELBUF_STR%BUFLY(1)%LBUF(1,1,IPT)%SIG(1:NEL) = SIGX(1:NEL) 
              ENDDO
            END IF
            GBUF%FOR(1:NEL) = F1(1:NEL) 

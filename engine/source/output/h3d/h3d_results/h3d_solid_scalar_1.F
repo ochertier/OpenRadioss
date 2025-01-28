@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,7 +42,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    initbuf_mod                    ../engine/share/resol/initbuf.F
       !||    mat_elem_mod                   ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||    matparam_def_mod               ../common_source/modules/mat_elem/matparam_def_mod.F90
-      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                  ../common_source/modules/ale/multi_fvm_mod.F90
       !||    multimat_param_mod             ../common_source/modules/multimat_param_mod.F90
       !||    names_and_titles_mod           ../common_source/modules/names_and_titles_mod.F
       !||    schlieren_mod                  ../engine/share/modules/schlieren_mod.F
@@ -2871,7 +2871,17 @@ C--------------------------------------------------
                       IS_WRITTEN_VALUE(I) = 1
                     ENDDO
                 ENDIF
-C--------------------------------------------------
+!--------------------------------------------------
+              ELSEIF (KEYWORD == 'VSTRAIN') then
+!--------------------------------------------------
+                DO I=1,NEL
+                  MT = IXS(1,I+NFT)
+                  IF(PM(89,MT) > ZERO)THEN
+                    VALUE(I) = GBUF%RHO(I) / PM(89,MT) - ONE
+                    IS_WRITTEN_VALUE(I) = 1
+                  END IF
+                ENDDO
+!--------------------------------------------------
               ENDIF
 C--------------------------------------------------
               IF(CALLED_FROM_PYTHON) THEN

@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -94,28 +94,31 @@
       !||    spmd_tri7vox                    ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri7vox0                   ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_wvois                      ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_xv_inter_type1             ../engine/source/mpi/nodes/spmd_sd_xv_inter1.F90
       !||    spmd_xvois                      ../engine/source/mpi/fluid/spmd_cfd.F
       !||====================================================================
       module spmd_mod
+        implicit none
         ! Define the interface for spmd_send
-!#define DEBUG_SPMD
 ! dummy tags for MPI calls that do not have a tag
-        integer, parameter :: TAG_BARRIER = -1
-        integer, parameter :: TAG_WAIT = -2
-        integer, parameter :: TAG_WAITALL = -3
-        integer, parameter :: TAG_WAITANY = -4
-        integer, parameter :: TAG_REDUCE = -5
-        integer, parameter :: TAG_ALLREDUCE = -6
+
+        private
+        integer, parameter, public :: TAG_BARRIER = -1
+        integer, parameter, public :: TAG_WAIT = -2
+        integer, parameter, public :: TAG_WAITALL = -3
+        integer, parameter, public :: TAG_WAITANY = -4
+        integer, parameter, public :: TAG_REDUCE = -5
+        integer, parameter, public :: TAG_ALLREDUCE = -6
 ! MPI operators
-        integer, parameter :: SPMD_MAX = 1
-        integer, parameter :: SPMD_MIN = 2
-        integer, parameter :: SPMD_SUM = 3
-        integer, parameter :: SPMD_PROD = 4
+        integer, parameter,public :: SPMD_MAX = 1
+        integer, parameter,public :: SPMD_MIN = 2
+        integer, parameter,public :: SPMD_SUM = 3
+        integer, parameter,public :: SPMD_PROD = 4
 
 #ifndef MPI
-        integer, parameter :: MPI_COMM_WORLD = 0
-        integer, parameter :: MPI_STATUS_IGNORE = 0
-        integer, parameter :: MPI_STATUS_SIZE = 1
+        integer, parameter, public :: MPI_COMM_WORLD = 0
+        integer, parameter, public :: MPI_STATUS_IGNORE = 0
+        integer, parameter, public :: MPI_STATUS_SIZE = 1
 #endif
         ! \brief Interface for spmd_send, a wrapper for MPI_SEND
         interface spmd_send
@@ -178,6 +181,20 @@
           module procedure spmd_allreduce_int     !< Reduces a single integer across all processes and distributes result
           module procedure spmd_allreduce_double  !< Reduces a single double precision number across all processes and distributes result
         end interface spmd_allreduce
+
+        public :: spmd_send
+        public :: spmd_recv
+        public :: spmd_isend
+        public :: spmd_irecv
+        public :: spmd_reduce
+        public :: spmd_allreduce 
+        public :: spmd_comm_size        
+        public :: spmd_comm_rank
+        public :: spmd_waitall
+        public :: spmd_wait
+        public :: spmd_waitany
+        public :: spmd_probe
+        public :: spmd_barrier
 
 
       contains
@@ -251,12 +268,16 @@
           integer, intent(in) :: tag !< Tag of the the MPI call
           integer, intent(in) :: ierr !< error of the MPI call
 ! ----------------------------------------------------------------------------------------------------------------------
+! ----------------------------------------------------------------------------------------------------------------------
+!                                                   Local variables
+! ----------------------------------------------------------------------------------------------------------------------
+          integer :: ierror
 !                                                   Body
 ! ----------------------------------------------------------------------------------------------------------------------
 #ifdef MPI
           if(ierr /= MPI_SUCCESS) then
             write(6,*) 'MPI error: ', ierr,' at ',tag
-            call MPI_Abort(MPI_COMM_WORLD, ierr)
+            call MPI_Abort(MPI_COMM_WORLD, ierr,ierror)
           end if
 #ifdef DEBUG_SPMD
           write(6,*) 'Exiting MPI call: ', tag
@@ -484,7 +505,7 @@
 !                                                  WRAPPER
 ! ======================================================================================================================
 !   The remaining subroutines are wrappers for the MPI subroutines.
-!   They are not ment to be called directely, but through the interfaces defined above.
+!   They are not meant to be called directly, but through the interfaces defined above.
 !   See MPI documentation for the meaning of the arguments.
 ! ======================================================================================================================
       !||====================================================================
@@ -563,6 +584,7 @@
       !||    spmd_tri25vox                   ../engine/source/mpi/interfaces/spmd_tri25vox.F
       !||    spmd_tri7vox                    ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_wvois                      ../engine/source/mpi/fluid/spmd_cfd.F
+      !||    spmd_xv_inter_type1             ../engine/source/mpi/nodes/spmd_sd_xv_inter1.F90
       !||    spmd_xvois                      ../engine/source/mpi/fluid/spmd_cfd.F
       !||--- calls      -----------------------------------------------------
       !||    spmd_in                         ../engine/source/mpi/spmd_mod.F90
@@ -1158,6 +1180,9 @@
 
           call MPI_Reduce(sendbuf, recvbuf, buf_count, MPI_REAL, mpi_op, root, used_comm, ierr)
           call spmd_out(TAG_REDUCE,ierr)
+#else
+          recvbuf(1:buf_count) = sendbuf(1:buf_count)
+
 #endif
         end subroutine spmd_reduce_doubles
 ! ======================================================================================================================
@@ -1191,6 +1216,9 @@
 
           call MPI_Allreduce(sendbuf, recvbuf, buf_count, MPI_INTEGER, mpi_op, used_comm, ierr)
           call spmd_out(TAG_ALLREDUCE,ierr)
+#else
+          recvbuf(1:buf_count) = sendbuf(1:buf_count)
+
 #endif
         end subroutine
 ! ======================================================================================================================
@@ -1224,6 +1252,9 @@
 
           call MPI_Allreduce(sendbuf, recvbuf, buf_count, MPI_DOUBLE_PRECISION, mpi_op, used_comm, ierr)
           call spmd_out(TAG_ALLREDUCE,ierr)
+#else
+          recvbuf(1:buf_count) = sendbuf(1:buf_count)
+
 #endif
         end subroutine
 ! ======================================================================================================================
@@ -1257,6 +1288,8 @@
 
           call MPI_Allreduce(sendbuf, recvbuf, buf_count, MPI_REAL, mpi_op, used_comm, ierr)
           call spmd_out(TAG_ALLREDUCE,ierr)
+#else
+          recvbuf(1:buf_count) = sendbuf(1:buf_count)
 #endif
         end subroutine
 ! ======================================================================================================================

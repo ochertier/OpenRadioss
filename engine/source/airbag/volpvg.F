@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -26,8 +26,8 @@ C new routine (starter input format >= 4.4)
       !||--- called by ------------------------------------------------------
       !||    monvol0   ../engine/source/airbag/monvol0.F
       !||====================================================================
-      SUBROUTINE VOLPVGA(IVOLU ,RVOLU   ,VOL     ,FSAV    ,NVENT   ,
-     .                 IBAGHOL ,RBAGHOL ,PMAIN )
+      SUBROUTINE VOLPVGA(IVOLU  ,RVOLU   ,VOL  , FSAV    ,NVENT   ,
+     .                  IBAGHOL ,RBAGHOL ,PMAIN, WFEXT )
 C-----------------------------------------------
 C      MONITORED VOLUMES TYPE PERFECT GAS, INPUT STARTER >= 4.4 (PRESSURE).
 C-----------------------------------------------
@@ -59,7 +59,9 @@ C-----------------------------------------------
      .   TRELAX,DEIN, PEXT, PINI, CV, TEMPERATURE
       INTEGER :: IEQUI
       my_real :: MIN_TVENT
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
+      PRES = -HUGE(PRES)
       MIN_TVENT = EP30
       DO II = 1, NVENT
          MIN_TVENT = MIN(MIN_TVENT, RBAGHOL(3, II))
@@ -98,6 +100,7 @@ C------------------------
       CV = RVOLU(19)
       DV     =VOL-VOLD
       TEMPERATURE = ZERO
+      ENERGY = ZERO
 C
       IF(IDEF==1)THEN
         PRES  = PEXT
@@ -167,7 +170,7 @@ C
       RVOLU(12) = PRES
 C
       IF (ISPMD+1==PMAIN) THEN
-        TFEXT=TFEXT+(HALF*(Q+QOLD+PRES+POLD)-PEXT)*DV
+        WFEXT=WFEXT+(HALF*(Q+QOLD+PRES+POLD)-PEXT)*DV
         FSAV(1)=AMTOT
         FSAV(2)=VOL
         FSAV(3)=PRES

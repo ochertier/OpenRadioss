@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,6 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    write_c_c         ../common_source/tools/input_output/write_routtines.c
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod      ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    my_alloc_mod      ../common_source/tools/memory/my_alloc.F90
       !||====================================================================
       SUBROUTINE ANIOFFF(ELBUF_TAB,      IPARG ,IOFF ,EL2FA ,
      .                   NBF      ,IADD ,NBPART,IADG ,IOFFX1,
@@ -36,7 +37,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
-      USE ELBUFDEF_MOD            
+      USE ELBUFDEF_MOD   
+      USE my_alloc_mod         
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -63,11 +65,11 @@ C-----------------------------------------------
       INTEGER I,NG,NEL,NFT,ITY,LFT,LLT,N,J,MLW,
      .        NN, K1, K2,MT, IMID,N1,N2,N3,N4,N_FA,
      .        NN1,NN2,NN3,NN4,NN5,NN6,NN7,NN8,NN9,NN10,NBF2,RBUF
-      INTEGER
-     .        IOFFF(NBF+NANIM1D_L)
+      INTEGER,DIMENSION(:),ALLOCATABLE :: IOFFF
 C
       TYPE(G_BUFEL_)  ,POINTER :: GBUF     
 C-----------------------------------------------
+      CALL MY_ALLOC(IOFFF,NBF+NANIM1D_L)
       NN1 = 1
       NN2 = 1
       NN3 = 1
@@ -165,5 +167,6 @@ C-----------------------------------------------
         CALL SPMD_IGET_PARTN(1,NBF2,IOFFF,NBPART,IADG,RBUF,2)
       ENDIF ! IF (NSPMD == 1)
 C-----------
+      DEALLOCATE(IOFFF)
       RETURN
       END

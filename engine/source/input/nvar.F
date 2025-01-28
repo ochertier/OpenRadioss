@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -91,12 +91,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mmain                     ../engine/source/materials/mat_share/mmain.F90
       !||    mmain8                    ../engine/source/materials/mat_share/mmain8.F
       !||    mulaw                     ../engine/source/materials/mat_share/mulaw.F90
-      !||    mulaw8                    ../engine/source/materials/mat_share/mulaw8.F
-      !||    mulawc                    ../engine/source/materials/mat_share/mulawc.F
+      !||    mulaw8                    ../engine/source/materials/mat_share/mulaw8.F90
+      !||    mulawc                    ../engine/source/materials/mat_share/mulawc.F90
       !||    outp_c_s                  ../engine/source/output/sty/outp_c_s.F
       !||    read_sensors              ../engine/source/output/restart/read_sensors.F
       !||    sensor_hic                ../engine/source/tools/sensor/sensor_hic.F
-      !||    sensor_mod                ../engine/share/modules/sensor_mod.F
       !||    spmd_fxb_for_pon          ../engine/source/mpi/kinematic_conditions/spmd_fxb_for_pon.F
       !||    stat_c_auxf               ../engine/source/output/sta/stat_c_auxf.F
       !||    stat_c_fail               ../engine/source/output/sta/stat_c_fail.F

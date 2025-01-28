@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,34 +21,39 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    asspar4          ../engine/source/assembly/asspar4.F
+      !||    asspar4            ../engine/source/assembly/asspar4.F
       !||--- called by ------------------------------------------------------
-      !||    resol            ../engine/source/engine/resol.F
+      !||    resol              ../engine/source/engine/resol.F
       !||--- calls      -----------------------------------------------------
-      !||    ass2sort         ../engine/source/assembly/ass2sort.F
-      !||    ass2sort_pxfem   ../engine/source/assembly/ass2sort.F
-      !||    my_barrier       ../engine/source/system/machine.F
-      !||    order_v          ../engine/source/assembly/asspar2.F
+      !||    ass2sort           ../engine/source/assembly/ass2sort.F
+      !||    ass2sort_pxfem     ../engine/source/assembly/ass2sort.F
+      !||    my_barrier         ../engine/source/system/machine.F
+      !||    order_v            ../engine/source/assembly/asspar2.F
       !||--- uses       -----------------------------------------------------
-      !||    ale_mod          ../common_source/modules/ale/ale_mod.F
-      !||    plyxfem_mod      ../engine/share/modules/plyxfem_mod.F
+      !||    ale_mod            ../common_source/modules/ale/ale_mod.F
+      !||    connectivity_mod   ../common_source/modules/connectivity.F90
+      !||    glob_therm_mod     ../common_source/modules/mat_elem/glob_therm_mod.F90
+      !||    nodal_arrays_mod   ../engine/source/engine/node_spliting/nodal_arrays.F90
+      !||    plyxfem_mod        ../engine/share/modules/plyxfem_mod.F
       !||====================================================================
-      SUBROUTINE ASSPAR4(
-     1  A       ,AR      ,STIFN  ,STIFR  ,MS      ,
-     2  FSKY    ,FSKYV   ,ADDCNE ,INDSKY ,FSKYM   ,
-     3  MSNF    ,ISKY    ,FSKYI  ,VISCN  ,FTHE    ,
+      SUBROUTINE ASSPAR4(NODES,
+     2  FSKY    ,FSKYV   ,ADSKY , FSKYM   ,
+     3  MSNF    ,ISKY    ,FSKYI  ,FTHE    ,
      4  FTHESKY ,FTHESKYI,NODFT  ,NODLT  ,ADSKYI  ,
      5  PARTSAV ,PARTFT  ,PARTLT ,ITASK  ,GREFT   ,
      6  GRELT   ,GRESAV  ,AF     ,FFSKY  ,MSF     ,
-     7  ADDCNE_PXFEM ,INOD_PXFEM ,ITAB   ,FSKYD   ,
+     7  ADSKY_PXFEM ,INOD_PXFEM ,FSKYD   ,
      8  DMSPH   ,CONDN,CONDNSKY,CONDNSKYI,MS_2D,ICNDS10 ,
      A  STIFND  ,FORNEQS ,FORNEQSKY,NFACNIT,NODFT_2,
-     B  NODLT_2 ,FSKY_L)
+     B  NODLT_2 ,FSKY_L  ,GLOB_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE nodal_arrays_mod
+      USE connectivity_mod
       USE PLYXFEM_MOD
       USE ALE_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -73,39 +78,36 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C----------------------------------------------
-      INTEGER ADDCNE(*),INDSKY(*), ISKY(*),
+      TYPE(nodal_arrays_), intent(inout) :: NODES
+      INTEGER ADSKY(*), ISKY(*),
      .        ADSKYI(0:NUMNOD+1),
      .        NODFT, NODLT, ITASK, PARTFT, PARTLT,GREFT,GRELT,
-     .        ADDCNE_PXFEM(*),INOD_PXFEM(*), ITAB(*),ICNDS10(3,*),NODFT_2  ,NODLT_2
+     .        ADSKY_PXFEM(*),INOD_PXFEM(*), ICNDS10(3,*),NODFT_2  ,NODLT_2
 
 C     REAL
       my_real
-     .   A(3,*)  ,AR(3,*),STIFN(*),STIFR(*),FSKYV(LSKY,8),FSKY(8,LSKY),
-     .   MS(*), FSKYM(*), MSNF(*), VISCN(*), FSKYI(LSKYI,NFSKYI),
+     .   FSKYV(LSKY,8),FSKY(8,LSKY),
+     .   FSKYM(*), MSNF(*), FSKYI(LSKYI,NFSKYI),
      .   FTHE(*), FTHESKY(LSKY), FTHESKYI(LSKYI), PARTSAV(*),GRESAV(*),
      .   AF(3,*),FFSKY(3,*),MSF(*), FSKYD(*), DMSPH(*),CONDNSKY(LSKY),CONDN(*),
      .   CONDNSKYI(LSKYI),MS_2D(*),STIFND(*),FORNEQS(3,*) ,
      .   FORNEQSKY(3*NFACNIT,*)
       my_real, DIMENSION(NISKY), INTENT(INOUT) :: FSKY_L !< working array for FSKY sorting
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
       INTEGER VSIZE, NBCC, NUM7, KM,IL,IPLY,ND
       PARAMETER (VSIZE = 8192)
       PARAMETER (NBCC = 20)
-      INTEGER I,J,K,L,N,NC,IDEB,LB,KK,J1,J2,JJ1,JJ2,NN,
-     .        NL,IFT,ILT,KFT,KLT,
-     .        NISKYFT,NISKYLT,NFSKYFT,NFSKYLT,
-     .        K1,K2,K3,K4,K5,K6,K7,K8,K9,K0,I0,IJK,NF,
-     .        NCT,DIFFADD,NDLT,NDFT,NI,LJ,KKEND,JJ,NSTART,
-     .        KKSTART,KMAX,KSPLIT,IC(NBCC+1),NN_A(VSIZE),IARRAY(VSIZE),
-     .        NFSKYFT_INTPLY,NFSKYLT_INTPLY,
-     .        ITAG, ITAG1,ICHECK,ICHECK1
-      my_real
-     .        FF, FSKYT(NISKY)
+      INTEGER I,J,L,K,N,NC,KK,JJ,JJ1,JJ2,NN,NFSKYFT_INTPLY,NFSKYLT_INTPLY,
+     .        NISKYFT,NISKYLT,NFSKYFT,NFSKYLT,K1,K2,K3,IJK,NF,
+     .        NCT,DIFFADD,NDLT,NDFT,LJ,KKEND,NSTART,KKSTART,KMAX,KSPLIT
+      INTEGER IC(NBCC+1),NN_A(VSIZE),IARRAY(VSIZE)
+      my_real FF, FSKYT(NISKY)
       INTEGER :: VIND_SIZE
       INTEGER, DIMENSION(:), ALLOCATABLE :: VIND1,VIND2,VIND3
-      INTEGER :: CHUNK_NODE,CHUNK_ISKY,CHUNK_NODE_1
+      INTEGER :: CHUNK_NODE,CHUNK_NODE_1
       INTEGER, PARAMETER :: IVSIZE = 32
 C-----------------------------------------------
 C Partie ELEMENT
@@ -123,9 +125,9 @@ C-----------------------------------------------
       CHUNK_NODE_1 = max(1,CHUNK_NODE_1)
 
 !$OMP DO SCHEDULE(guided)
-      DO N = 1,NUMNOD+1
-        ADSKYI(N) = 0
-      ENDDO
+        DO N = 1,NUMNOD+1
+          ADSKYI(N) = 0
+        ENDDO
 !$OMP END DO
 
 !$OMP SINGLE
@@ -154,22 +156,22 @@ C-----------------------------------------------
 !$OMP END SINGLE NOWAIT
 
       ! ------------------------------      
-      IF(ITHERM_FE == 0 ) THEN
+      IF(GLOB_THERM%ITHERM_FE == 0 ) THEN
         ! --------------
         IF(ALE%SUB%IFSUBM==0)THEN
 !$OMP DO SCHEDULE(guided)
           DO N = 1,NUMNOD 
-            NCT = ADDCNE(N)-1
-            NC = ADDCNE(N+1)-ADDCNE(N)
-            DO K = NCT+1, NCT+NC
-              A(1,N)   = A(1,N)   + FSKY(1,K)
-              A(2,N)   = A(2,N)   + FSKY(2,K)
-              A(3,N)   = A(3,N)   + FSKY(3,K)
-              AR(1,N)  = AR(1,N)  + FSKY(4,K)
-              AR(2,N)  = AR(2,N)  + FSKY(5,K)
-              AR(3,N)  = AR(3,N)  + FSKY(6,K)
-              STIFN(N) = STIFN(N) + FSKY(7,K)
-              STIFR(N) = STIFR(N) + FSKY(8,K)
+            NCT = ADSKY(N)-1
+            NC = ADSKY(N+1)-ADSKY(N)
+            DO K = NCT+1, NCT+NC ! ADSKY(N) to ADSKY(N+1)-1
+              NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+              NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+              NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+              NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+              NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+              NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+              NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+              NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
             ENDDO
           ENDDO
 !$OMP END DO
@@ -177,17 +179,17 @@ C-----------------------------------------------
         ELSEIF(N2D/=0)THEN
 !$OMP DO SCHEDULE(guided)
           DO N = 1,NUMNOD
-            NCT = ADDCNE(N)-1
-            NC = ADDCNE(N+1)-ADDCNE(N)
+            NCT = ADSKY(N)-1
+            NC = ADSKY(N+1)-ADSKY(N)
             DO K = NCT+1, NCT+NC
-              A(1,N)   = A(1,N)   + FSKY(1,K)
-              A(2,N)   = A(2,N)   + FSKY(2,K)
-              A(3,N)   = A(3,N)   + FSKY(3,K)
-              AR(1,N)  = AR(1,N)  + FSKY(4,K)
-              AR(2,N)  = AR(2,N)  + FSKY(5,K)
-              AR(3,N)  = AR(3,N)  + FSKY(6,K)
-              STIFN(N) = STIFN(N) + FSKY(7,K)
-              STIFR(N) = STIFR(N) + FSKY(8,K)
+              NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+              NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+              NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+              NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+              NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+              NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+              NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+              NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
               MS_2D(N) = MS_2D(N)  + FSKYM(K)
             ENDDO
           ENDDO
@@ -196,17 +198,17 @@ C-----------------------------------------------
         ELSE
 !$OMP DO SCHEDULE(guided)
           DO N = 1,NUMNOD
-            NCT = ADDCNE(N)-1
-            NC = ADDCNE(N+1)-ADDCNE(N)
+            NCT = ADSKY(N)-1
+            NC = ADSKY(N+1)-ADSKY(N)
             DO K = NCT+1, NCT+NC
-              A(1,N)   = A(1,N)   + FSKY(1,K)
-              A(2,N)   = A(2,N)   + FSKY(2,K)
-              A(3,N)   = A(3,N)   + FSKY(3,K)
-              AR(1,N)  = AR(1,N)  + FSKY(4,K)
-              AR(2,N)  = AR(2,N)  + FSKY(5,K)
-              AR(3,N)  = AR(3,N)  + FSKY(6,K)
-              STIFN(N) = STIFN(N) + FSKY(7,K)
-              STIFR(N) = STIFR(N) + FSKY(8,K)
+              NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+              NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+              NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+              NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+              NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+              NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+              NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+              NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
               MSNF(N)  = MSNF(N)  + FSKYM(K)
             ENDDO
           ENDDO
@@ -216,22 +218,22 @@ C-----------------------------------------------
       ! ------------------------------ 
       ELSE
         ! --------------
-        IF(NODADT_THERM == 1) THEN
+        IF(GLOB_THERM%NODADT_THERM == 1) THEN
           ! --------------
           IF(ALE%SUB%IFSUBM==0)THEN
 !$OMP DO SCHEDULE(guided)
             DO N = 1,NUMNOD
-              NCT = ADDCNE(N)-1
-              NC = ADDCNE(N+1)-ADDCNE(N)
+              NCT = ADSKY(N)-1
+              NC = ADSKY(N+1)-ADSKY(N)
               DO K = NCT+1, NCT+NC
-                A(1,N)   = A(1,N)   + FSKY(1,K)
-                A(2,N)   = A(2,N)   + FSKY(2,K)
-                A(3,N)   = A(3,N)   + FSKY(3,K)
-                AR(1,N)  = AR(1,N)  + FSKY(4,K)
-                AR(2,N)  = AR(2,N)  + FSKY(5,K)
-                AR(3,N)  = AR(3,N)  + FSKY(6,K)
-                STIFN(N) = STIFN(N) + FSKY(7,K)
-                STIFR(N) = STIFR(N) + FSKY(8,K)
+                NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+                NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+                NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+                NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+                NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+                NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+                NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
                 FTHE(N)  = FTHE(N)  + FTHESKY(K)
                 CONDN(N) = CONDN(N) + CONDNSKY(K)
               ENDDO
@@ -241,17 +243,17 @@ C-----------------------------------------------
           ELSEIF(N2D/=0)THEN
 !$OMP DO SCHEDULE(guided)
             DO N = 1,NUMNOD
-              NCT = ADDCNE(N)-1
-              NC = ADDCNE(N+1)-ADDCNE(N)
+              NCT = ADSKY(N)-1
+              NC = ADSKY(N+1)-ADSKY(N)
               DO K = NCT+1, NCT+NC
-                A(1,N)   = A(1,N)   + FSKY(1,K)
-                A(2,N)   = A(2,N)   + FSKY(2,K)
-                A(3,N)   = A(3,N)   + FSKY(3,K)
-                AR(1,N)  = AR(1,N)  + FSKY(4,K)
-                AR(2,N)  = AR(2,N)  + FSKY(5,K)
-                AR(3,N)  = AR(3,N)  + FSKY(6,K)
-                STIFN(N) = STIFN(N) + FSKY(7,K)
-                STIFR(N) = STIFR(N) + FSKY(8,K)
+                NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+                NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+                NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+                NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+                NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+                NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+                NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
                 FTHE(N)  = FTHE(N)  + FTHESKY(K)
                 CONDN(N) = CONDN(N) + CONDNSKY(K)
                 MS_2D(N) = MS_2D(N)  + FSKYM(K)
@@ -262,17 +264,17 @@ C-----------------------------------------------
           ELSE
 !$OMP DO SCHEDULE(guided)
             DO N = 1,NUMNOD
-              NCT = ADDCNE(N)-1
-              NC = ADDCNE(N+1)-ADDCNE(N)
+              NCT = ADSKY(N)-1
+              NC = ADSKY(N+1)-ADSKY(N)
               DO K = NCT+1, NCT+NC
-                A(1,N)   = A(1,N)   + FSKY(1,K)
-                A(2,N)   = A(2,N)   + FSKY(2,K)
-                A(3,N)   = A(3,N)   + FSKY(3,K)
-                AR(1,N)  = AR(1,N)  + FSKY(4,K)
-                AR(2,N)  = AR(2,N)  + FSKY(5,K)
-                AR(3,N)  = AR(3,N)  + FSKY(6,K)
-                STIFN(N) = STIFN(N) + FSKY(7,K)
-                STIFR(N) = STIFR(N) + FSKY(8,K)
+                NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+                NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+                NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+                NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+                NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+                NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+                NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
                 MSNF(N)  = MSNF(N)  + FSKYM(K)
                 FTHE(N)  = FTHE(N)  + FTHESKY(K)
                 CONDN(N) = CONDN(N) + CONDNSKY(K)
@@ -282,22 +284,22 @@ C-----------------------------------------------
           ENDIF
           ! --------------
         ! --------------
-        ELSE ! NODADT_THERM/=1
+        ELSE ! GLOB_THERM%NODADT_THERM/=1
           ! --------------
           IF(ALE%SUB%IFSUBM==0)THEN
 !$OMP DO SCHEDULE(guided)
             DO N = 1,NUMNOD
-              NCT = ADDCNE(N)-1
-              NC = ADDCNE(N+1)-ADDCNE(N)
+              NCT = ADSKY(N)-1
+              NC = ADSKY(N+1)-ADSKY(N)
               DO K = NCT+1, NCT+NC
-                A(1,N)   = A(1,N)   + FSKY(1,K)
-                A(2,N)   = A(2,N)   + FSKY(2,K)
-                A(3,N)   = A(3,N)   + FSKY(3,K)
-                AR(1,N)  = AR(1,N)  + FSKY(4,K)
-                AR(2,N)  = AR(2,N)  + FSKY(5,K)
-                AR(3,N)  = AR(3,N)  + FSKY(6,K)
-                STIFN(N) = STIFN(N) + FSKY(7,K)
-                STIFR(N) = STIFR(N) + FSKY(8,K)
+                NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+                NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+                NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+                NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+                NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+                NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+                NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
                 FTHE(N)  = FTHE(N)  + FTHESKY(K)
               ENDDO
             ENDDO
@@ -306,17 +308,17 @@ C-----------------------------------------------
           ELSEIF(N2D/=0)THEN
 !$OMP DO SCHEDULE(guided)
             DO N = 1,NUMNOD
-              NCT = ADDCNE(N)-1
-              NC = ADDCNE(N+1)-ADDCNE(N)
+              NCT = ADSKY(N)-1
+              NC = ADSKY(N+1)-ADSKY(N)
               DO K = NCT+1, NCT+NC
-                A(1,N)   = A(1,N)   + FSKY(1,K)
-                A(2,N)   = A(2,N)   + FSKY(2,K)
-                A(3,N)   = A(3,N)   + FSKY(3,K)
-                AR(1,N)  = AR(1,N)  + FSKY(4,K)
-                AR(2,N)  = AR(2,N)  + FSKY(5,K)
-                AR(3,N)  = AR(3,N)  + FSKY(6,K)
-                STIFN(N) = STIFN(N) + FSKY(7,K)
-                STIFR(N) = STIFR(N) + FSKY(8,K)
+                NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+                NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+                NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+                NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+                NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+                NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+                NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
                 FTHE(N)  = FTHE(N)  + FTHESKY(K)
                 MS_2D(N) = MS_2D(N)  + FSKYM(K)
               ENDDO
@@ -326,17 +328,17 @@ C-----------------------------------------------
           ELSE
 !$OMP DO SCHEDULE(guided)
             DO N = 1,NUMNOD
-              NCT = ADDCNE(N)-1
-              NC = ADDCNE(N+1)-ADDCNE(N)
+              NCT = ADSKY(N)-1
+              NC = ADSKY(N+1)-ADSKY(N)
               DO K = NCT+1, NCT+NC
-                A(1,N)   = A(1,N)   + FSKY(1,K)
-                A(2,N)   = A(2,N)   + FSKY(2,K)
-                A(3,N)   = A(3,N)   + FSKY(3,K)
-                AR(1,N)  = AR(1,N)  + FSKY(4,K)
-                AR(2,N)  = AR(2,N)  + FSKY(5,K)
-                AR(3,N)  = AR(3,N)  + FSKY(6,K)
-                STIFN(N) = STIFN(N) + FSKY(7,K)
-                STIFR(N) = STIFR(N) + FSKY(8,K)
+                NODES%A(1,N)   = NODES%A(1,N)   + FSKY(1,K)
+                NODES%A(2,N)   = NODES%A(2,N)   + FSKY(2,K)
+                NODES%A(3,N)   = NODES%A(3,N)   + FSKY(3,K)
+                NODES%AR(1,N)  = NODES%AR(1,N)  + FSKY(4,K)
+                NODES%AR(2,N)  = NODES%AR(2,N)  + FSKY(5,K)
+                NODES%AR(3,N)  = NODES%AR(3,N)  + FSKY(6,K)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKY(7,K)
+                NODES%STIFR(N) = NODES%STIFR(N) + FSKY(8,K)
                 MSNF(N)  = MSNF(N)  + FSKYM(K)
                 FTHE(N)  = FTHE(N)  + FTHESKY(K)
               ENDDO
@@ -354,8 +356,8 @@ C-----------------------------------------------
       IF(IALELAG > 0) THEN
 !$OMP DO SCHEDULE(guided)
         DO N = 1,NUMNOD
-          NCT = ADDCNE(N)-1
-          NC = ADDCNE(N+1)-ADDCNE(N)
+          NCT = ADSKY(N)-1
+          NC = ADSKY(N+1)-ADSKY(N)
           DO K = NCT+1, NCT+NC
             AF(1,N)  = AF(1,N)   + FFSKY(1,K)
             AF(2,N)  = AF(2,N)   + FFSKY(2,K)
@@ -373,8 +375,8 @@ C-----------------------------------------------
       IF(SOL2SPH_FLAG/=0)THEN
 !$OMP DO SCHEDULE(guided)
         DO N = 1,NUMNOD
-          NCT = ADDCNE(N)-1
-          NC = ADDCNE(N+1)-ADDCNE(N)
+          NCT = ADSKY(N)-1
+          NC = ADSKY(N+1)-ADSKY(N)
           DO K = NCT+1, NCT+NC
             DMSPH(N) = DMSPH(N) + FSKYD(K)
           ENDDO
@@ -390,8 +392,8 @@ C-----------------------------------------------
         DO N = 1,NUMNOD
           IL = INOD_PXFEM(N)
           IF(IL > 0) THEN
-            NCT = ADDCNE_PXFEM(IL) - 1
-            NC =  ADDCNE_PXFEM(IL+1) - ADDCNE_PXFEM(IL)
+            NCT = ADSKY_PXFEM(IL) - 1
+            NC =  ADSKY_PXFEM(IL+1) - ADSKY_PXFEM(IL)
             DO K = NCT+1, NCT+NC
               DO J=1,NPLYMAX
                 PLY(J)%A(1,IL) = PLY(J)%A(1,IL) + PLYSKY(J)%FSKY(1,K)
@@ -407,18 +409,18 @@ C-----------------------------------------------
 
       IF( (N2D/=0).OR.(ALE%SUB%IFSUBM==1).OR.(IALELAG > 0) ) CALL MY_BARRIER
 
-C masse stocke dans FSKY(1) et A(1) utilise pour cumul en 2D
+C masse stocke dans FSKY(1) et NODES%A(1) utilise pour cumul en 2D
       IF(N2D/=0) THEN
 !$OMP DO SCHEDULE(guided)
         DO I = 1,NUMNOD
-          MS(I) = A(1,I)
-          A(1,I) = ZERO
+          NODES%MS(I) = NODES%A(1,I)
+          NODES%A(1,I) = ZERO
         ENDDO
 !$OMP END DO
       ELSEIF(ALE%SUB%IFSUBM==1)THEN
 !$OMP DO SCHEDULE(guided)
         DO I = 1,NUMNOD
-          MS(I) = MS(I) + MSNF(I)
+          NODES%MS(I) = NODES%MS(I) + MSNF(I)
         ENDDO
 !$OMP END DO
       ENDIF
@@ -439,7 +441,7 @@ C-----------------------------------------------
 #include "vectorize.inc"
         DO I=1,NS10E
           ND  = IABS(ICNDS10(1,I))
-          STIFND(I) = STIFN(ND)
+          STIFND(I) = NODES%STIFN(ND)
         ENDDO
 !$OMP END SINGLE
       ENDIF
@@ -449,8 +451,8 @@ C-----------------------------------------------
       IF(NITSCHE /= 0) THEN
 !$OMP DO SCHEDULE(guided)
         DO N = 1,NUMNOD !NODFT, NODLT
-          NCT = ADDCNE(N)-1
-          NC = ADDCNE(N+1)-ADDCNE(N)
+          NCT = ADSKY(N)-1
+          NC = ADSKY(N+1)-ADSKY(N)
           DO K = NCT+1, NCT+NC
             DO NF=1,NFACNIT
               FORNEQS(1,N) = FORNEQS(1,N) + FORNEQSKY(3*(NF-1)+1,K)
@@ -503,7 +505,7 @@ C-----------------------------------------------
 !$OMP END DO
         ENDDO
 C
-        IF(INTHEAT > 0 ) THEN
+        IF(GLOB_THERM%INTHEAT > 0 ) THEN
 !$OMP SINGLE
           DO I=1,NISKY
             J = ISKY(I)
@@ -513,7 +515,7 @@ C
             FTHESKYI(I) = FSKYT(I)
           ENDDO
 !$OMP END SINGLE
-          IF(NODADT_THERM ==1 ) THEN
+          IF(GLOB_THERM%NODADT_THERM ==1 ) THEN
 !$OMP SINGLE
             DO I=1,NISKY
               J = ISKY(I)
@@ -571,41 +573,41 @@ C   20 valeur seuil pour appel a qsort (20 = NBCC)
 C
 C une seule contribution
 C
-          IF(INTHEAT == 0 ) THEN
+          IF(GLOB_THERM%INTHEAT == 0 ) THEN
             IF(KDTINT==0)THEN
 #include "vectorize.inc"
               DO IJK=1,K1
                 N = VIND1(IJK)
                 K=ADSKYI(N-1)
-                A(1,N)  = A(1,N)  + FSKYI(K,1)
-                A(2,N)  = A(2,N)  + FSKYI(K,2)
-                A(3,N)  = A(3,N)  + FSKYI(K,3)
-                STIFN(N) = STIFN(N) + FSKYI(K,4)
+                NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
               ENDDO
             ELSE
 #include "vectorize.inc"
               DO IJK=1,K1
                 N = VIND1(IJK)
                 K=ADSKYI(N-1)
-                A(1,N)  = A(1,N)  + FSKYI(K,1)
-                A(2,N)  = A(2,N)  + FSKYI(K,2)
-                A(3,N)  = A(3,N)  + FSKYI(K,3)
-                STIFN(N) = STIFN(N) + FSKYI(K,4)
-                VISCN(N) = VISCN(N) + FSKYI(K,5)
+                NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
               ENDDO
             ENDIF
 C + la thermique
           ELSE
-            IF(NODADT_THERM == 1) THEN
+            IF(GLOB_THERM%NODADT_THERM == 1) THEN
               IF(KDTINT==0)THEN
 #include "vectorize.inc"
                 DO IJK=1,K1
                   N = VIND1(IJK)
                   K=ADSKYI(N-1)
-                  A(1,N)  = A(1,N)  + FSKYI(K,1)
-                  A(2,N)  = A(2,N)  + FSKYI(K,2)
-                  A(3,N)  = A(3,N)  + FSKYI(K,3)
-                  STIFN(N) = STIFN(N) + FSKYI(K,4)
+                  NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                  NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                  NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                  NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                   FTHE(N) = FTHE(N) + FTHESKYI(K)
                   CONDN(N) = CONDN(N) + CONDNSKYI(K)
                   FTHESKYI(K) = ZERO
@@ -615,11 +617,11 @@ C + la thermique
                 DO IJK=1,K1
                   N = VIND1(IJK)
                   K=ADSKYI(N-1)
-                  A(1,N)  = A(1,N)  + FSKYI(K,1)
-                  A(2,N)  = A(2,N)  + FSKYI(K,2)
-                  A(3,N)  = A(3,N)  + FSKYI(K,3)
-                  STIFN(N) = STIFN(N) + FSKYI(K,4)
-                  VISCN(N) = VISCN(N) + FSKYI(K,5)
+                  NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                  NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                  NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                  NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                  NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                   FTHE(N) = FTHE(N) + FTHESKYI(K)
                   CONDN(N) = CONDN(N) + CONDNSKYI(K)
                   FTHESKYI(K) = ZERO
@@ -631,10 +633,10 @@ C + la thermique
                 DO IJK=1,K1
                   N = VIND1(IJK)
                   K=ADSKYI(N-1)
-                  A(1,N)  = A(1,N)  + FSKYI(K,1)
-                  A(2,N)  = A(2,N)  + FSKYI(K,2)
-                  A(3,N)  = A(3,N)  + FSKYI(K,3)
-                  STIFN(N) = STIFN(N) + FSKYI(K,4)
+                  NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                  NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                  NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                  NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                   FTHE(N) = FTHE(N) + FTHESKYI(K)
                   FTHESKYI(K) = ZERO
                 ENDDO
@@ -643,11 +645,11 @@ C + la thermique
                 DO IJK=1,K1
                   N = VIND1(IJK)
                   K=ADSKYI(N-1)
-                  A(1,N)  = A(1,N)  + FSKYI(K,1)
-                  A(2,N)  = A(2,N)  + FSKYI(K,2)
-                  A(3,N)  = A(3,N)  + FSKYI(K,3)
-                  STIFN(N) = STIFN(N) + FSKYI(K,4)
-                  VISCN(N) = VISCN(N) + FSKYI(K,5)
+                  NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                  NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                  NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                  NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                  NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                   FTHE(N) = FTHE(N) + FTHESKYI(K)
                   FTHESKYI(K) = ZERO
                 ENDDO
@@ -690,7 +692,7 @@ C   ANCIEN CODE
 C-----------------------------------------------
 C       TRI DES FORCES D'INTERFACES
 C-----------------------------------------------
-              IF(INTHEAT == 0 ) THEN
+              IF(GLOB_THERM%INTHEAT == 0 ) THEN
                 DO 500 K=JJ1,JJ2-1
                   DO 500 KK=K+1,JJ2
                     DO 500 L=1,NFSKYI
@@ -702,7 +704,7 @@ C-----------------------------------------------
   500           CONTINUE
 C + la thermique
               ELSE
-                IF(NODADT_THERM == 1 ) THEN
+                IF(GLOB_THERM%NODADT_THERM == 1 ) THEN
                   DO  K=JJ1,JJ2-1
                     DO  KK=K+1,JJ2
                       DO  L=1,NFSKYI
@@ -764,43 +766,43 @@ C-----------------------------------------------
 C       ASSEMBLAGE DES FORCES
 C-----------------------------------------------
 
-              IF(INTHEAT == 0 ) THEN
+              IF(GLOB_THERM%INTHEAT == 0 ) THEN
                 IF(KDTINT==0)THEN
                   DO K=JJ1,JJ2
-                    A(1,N)  = A(1,N)  + FSKYI(K,1)
-                    A(2,N)  = A(2,N)  + FSKYI(K,2)
-                    A(3,N)  = A(3,N)  + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
+                    NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                    NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                    NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                   ENDDO
                 ELSE
                   DO K=JJ1,JJ2
-                    A(1,N)  = A(1,N)  + FSKYI(K,1)
-                    A(2,N)  = A(2,N)  + FSKYI(K,2)
-                    A(3,N)  = A(3,N)  + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
-                    VISCN(N) = VISCN(N) + FSKYI(K,5)
+                    NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                    NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                    NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                    NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                   ENDDO
                 ENDIF
 C+ la thermique
               ELSE
-                IF(NODADT_THERM == 1) THEN
+                IF(GLOB_THERM%NODADT_THERM == 1) THEN
                   IF(KDTINT==0)THEN
                     DO K=JJ1,JJ2
-                      A(1,N)  = A(1,N)  + FSKYI(K,1)
-                      A(2,N)  = A(2,N)  + FSKYI(K,2)
-                      A(3,N)  = A(3,N)  + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
+                      NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                      NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                      NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                       FTHE(N)  = FTHE(N) + FTHESKYI(K)
                       CONDN(N) = CONDN(N)+ CONDNSKYI(K)
                       FTHESKYI(K) = ZERO
                     ENDDO
                   ELSE
                     DO K=JJ1,JJ2
-                      A(1,N)  = A(1,N)  + FSKYI(K,1)
-                      A(2,N)  = A(2,N)  + FSKYI(K,2)
-                      A(3,N)  = A(3,N)  + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
-                      VISCN(N) = VISCN(N) + FSKYI(K,5)
+                      NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                      NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                      NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                      NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                       FTHE(N)  = FTHE(N) + FTHESKYI(K)
                       CONDN(N) = CONDN(N)+ CONDNSKYI(K)
                       FTHESKYI(K) = ZERO
@@ -809,20 +811,20 @@ C+ la thermique
                 ELSE
                   IF(KDTINT==0)THEN
                     DO K=JJ1,JJ2
-                      A(1,N)  = A(1,N)  + FSKYI(K,1)
-                      A(2,N)  = A(2,N)  + FSKYI(K,2)
-                      A(3,N)  = A(3,N)  + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
+                      NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                      NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                      NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                       FTHE(N)  = FTHE(N) + FTHESKYI(K)
                       FTHESKYI(K) = ZERO
                     ENDDO
                   ELSE
                     DO K=JJ1,JJ2
-                      A(1,N)  = A(1,N)  + FSKYI(K,1)
-                      A(2,N)  = A(2,N)  + FSKYI(K,2)
-                      A(3,N)  = A(3,N)  + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
-                      VISCN(N) = VISCN(N) + FSKYI(K,5)
+                      NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                      NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                      NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                      NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                       FTHE(N)  = FTHE(N) + FTHESKYI(K)
                       FTHESKYI(K) = ZERO
                     ENDDO
@@ -948,7 +950,7 @@ C L=5
               ENDDO
             ENDIF
 C  + la thermique
-            IF(INTHEAT > 0)THEN
+            IF(GLOB_THERM%INTHEAT > 0)THEN
               KKEND=IC(KSPLIT+1)-1
               DO K=1,KSPLIT-1
                 DO KK=K+1,KSPLIT
@@ -968,7 +970,7 @@ C  + la thermique
                 ENDDO
               ENDDO
 C  + Thermal Time Step
-              IF(NODADT_THERM == 1)THEN
+              IF(GLOB_THERM%NODADT_THERM == 1)THEN
                 KKEND=IC(KSPLIT+1)-1
                 DO K=1,KSPLIT-1
                   DO KK=K+1,KSPLIT
@@ -1038,7 +1040,7 @@ C L=4
             ENDIF
 C
 C --- FILL ARRAY A
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(KDTINT==0)THEN
                 DO K=1,KSPLIT
                   KKSTART=IC(K)
@@ -1047,10 +1049,10 @@ C --- FILL ARRAY A
                     IJK=IARRAY(I)
                     N=VIND2(IJK)
                     J=ADSKYI(N-1)+K-1
-                    A(1,N) = A(1,N) + FSKYI(J,1)
-                    A(2,N) = A(2,N) + FSKYI(J,2)
-                    A(3,N) = A(3,N) + FSKYI(J,3)
-                    STIFN(N) = STIFN(N) + FSKYI(J,4)
+                    NODES%A(1,N) = NODES%A(1,N) + FSKYI(J,1)
+                    NODES%A(2,N) = NODES%A(2,N) + FSKYI(J,2)
+                    NODES%A(3,N) = NODES%A(3,N) + FSKYI(J,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(J,4)
                   ENDDO
                 ENDDO
               ELSE
@@ -1061,17 +1063,17 @@ C --- FILL ARRAY A
                     IJK=IARRAY(I)
                     N=VIND2(IJK)
                     J=ADSKYI(N-1)+K-1
-                    A(1,N) = A(1,N) + FSKYI(J,1)
-                    A(2,N) = A(2,N) + FSKYI(J,2)
-                    A(3,N) = A(3,N) + FSKYI(J,3)
-                    STIFN(N) = STIFN(N) + FSKYI(J,4)
-                    VISCN(N) = VISCN(N) + FSKYI(J,5)
+                    NODES%A(1,N) = NODES%A(1,N) + FSKYI(J,1)
+                    NODES%A(2,N) = NODES%A(2,N) + FSKYI(J,2)
+                    NODES%A(3,N) = NODES%A(3,N) + FSKYI(J,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(J,4)
+                    NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(J,5)
                   ENDDO
                 ENDDO
               ENDIF
 C + la thermique
             ELSE
-              IF(NODADT_THERM ==1) THEN
+              IF(GLOB_THERM%NODADT_THERM ==1) THEN
                 IF(KDTINT==0)THEN
                   DO K=1,KSPLIT
                     KKSTART=IC(K)
@@ -1080,10 +1082,10 @@ C + la thermique
                       IJK=IARRAY(I)
                       N=VIND2(IJK)
                       J=ADSKYI(N-1)+K-1
-                      A(1,N) = A(1,N) + FSKYI(J,1)
-                      A(2,N) = A(2,N) + FSKYI(J,2)
-                      A(3,N) = A(3,N) + FSKYI(J,3)
-                      STIFN(N) = STIFN(N) + FSKYI(J,4)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(J,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(J,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(J,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(J,4)
                       FTHE(N) = FTHE(N) + FTHESKYI(J)
                       CONDN(N)= CONDN(N)+ CONDNSKYI(J)
                       FTHESKYI(J) = ZERO
@@ -1097,11 +1099,11 @@ C + la thermique
                       IJK=IARRAY(I)
                       N=VIND2(IJK)
                       J=ADSKYI(N-1)+K-1
-                      A(1,N) = A(1,N) + FSKYI(J,1)
-                      A(2,N) = A(2,N) + FSKYI(J,2)
-                      A(3,N) = A(3,N) + FSKYI(J,3)
-                      STIFN(N) = STIFN(N) + FSKYI(J,4)
-                      VISCN(N) = VISCN(N) + FSKYI(J,5)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(J,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(J,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(J,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(J,4)
+                      NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(J,5)
                       FTHE(N) = FTHE(N) + FTHESKYI(J)
                       CONDN(N)= CONDN(N)+ CONDNSKYI(J)
                       FTHESKYI(J) = ZERO
@@ -1117,10 +1119,10 @@ C + la thermique
                       IJK=IARRAY(I)
                       N=VIND2(IJK)
                       J=ADSKYI(N-1)+K-1
-                      A(1,N) = A(1,N) + FSKYI(J,1)
-                      A(2,N) = A(2,N) + FSKYI(J,2)
-                      A(3,N) = A(3,N) + FSKYI(J,3)
-                      STIFN(N) = STIFN(N) + FSKYI(J,4)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(J,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(J,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(J,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(J,4)
                       FTHE(N) = FTHE(N) + FTHESKYI(J)
                       FTHESKYI(J) = ZERO
                     ENDDO
@@ -1133,11 +1135,11 @@ C + la thermique
                       IJK=IARRAY(I)
                       N=VIND2(IJK)
                       J=ADSKYI(N-1)+K-1
-                      A(1,N) = A(1,N) + FSKYI(J,1)
-                      A(2,N) = A(2,N) + FSKYI(J,2)
-                      A(3,N) = A(3,N) + FSKYI(J,3)
-                      STIFN(N) = STIFN(N) + FSKYI(J,4)
-                      VISCN(N) = VISCN(N) + FSKYI(J,5)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(J,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(J,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(J,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(J,4)
+                      NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(J,5)
                       FTHE(N) = FTHE(N) + FTHESKYI(J)
                       FTHESKYI(J) = ZERO
                     ENDDO
@@ -1177,7 +1179,7 @@ C --- DO THE REST IN OLD WAY - SUM UP ALL CONTRIBUTIONS PER NODE
               NN=N-1
               JJ1=ADSKYI(NN)
               JJ2=ADSKYI(N)-1
-              IF(INTHEAT == 0 ) THEN
+              IF(GLOB_THERM%INTHEAT == 0 ) THEN
                 DO 501 K=JJ1,JJ2-1
                   DO 501 KK=K+1,JJ2
                     DO 501 L=1,NFSKYI
@@ -1189,7 +1191,7 @@ C --- DO THE REST IN OLD WAY - SUM UP ALL CONTRIBUTIONS PER NODE
   501           CONTINUE
 C + la thermique
               ELSE
-                IF(NODADT_THERM == 1) THEN
+                IF(GLOB_THERM%NODADT_THERM == 1) THEN
                   DO  K=JJ1,JJ2-1
                     DO  KK=K+1,JJ2
                       DO  L=1,NFSKYI
@@ -1247,43 +1249,43 @@ C plyxfem + type 24
                 ENDDO
               ENDIF
 C
-              IF(INTHEAT ==  0 ) THEN
+              IF(GLOB_THERM%INTHEAT ==  0 ) THEN
                 IF(KDTINT==0)THEN
                   DO K=JJ1,JJ2
-                    A(1,N) = A(1,N) + FSKYI(K,1)
-                    A(2,N) = A(2,N) + FSKYI(K,2)
-                    A(3,N) = A(3,N) + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
+                    NODES%A(1,N) = NODES%A(1,N) + FSKYI(K,1)
+                    NODES%A(2,N) = NODES%A(2,N) + FSKYI(K,2)
+                    NODES%A(3,N) = NODES%A(3,N) + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                   ENDDO
                 ELSE
                   DO K=JJ1,JJ2
-                    A(1,N) = A(1,N) + FSKYI(K,1)
-                    A(2,N) = A(2,N) + FSKYI(K,2)
-                    A(3,N) = A(3,N) + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
-                    VISCN(N) = VISCN(N) + FSKYI(K,5)
+                    NODES%A(1,N) = NODES%A(1,N) + FSKYI(K,1)
+                    NODES%A(2,N) = NODES%A(2,N) + FSKYI(K,2)
+                    NODES%A(3,N) = NODES%A(3,N) + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                    NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                   ENDDO
                 ENDIF
 C + la thermique
               ELSE
-                IF(NODADT_THERM == 1) THEN
+                IF(GLOB_THERM%NODADT_THERM == 1) THEN
                   IF(KDTINT==0)THEN
                     DO K=JJ1,JJ2
-                      A(1,N) = A(1,N) + FSKYI(K,1)
-                      A(2,N) = A(2,N) + FSKYI(K,2)
-                      A(3,N) = A(3,N) + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(K,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(K,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                       FTHE(N) = FTHE(N) + FTHESKYI(K)
                       CONDN(N)= CONDN(N) + CONDNSKYI(K)
                       FTHESKYI(K) = ZERO
                     ENDDO
                   ELSE
                     DO K=JJ1,JJ2
-                      A(1,N) = A(1,N) + FSKYI(K,1)
-                      A(2,N) = A(2,N) + FSKYI(K,2)
-                      A(3,N) = A(3,N) + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
-                      VISCN(N) = VISCN(N) + FSKYI(K,5)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(K,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(K,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                      NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                       FTHE(N) = FTHE(N) + FTHESKYI(K)
                       CONDN(N)= CONDN(N) + CONDNSKYI(K)
                       FTHESKYI(K) = ZERO
@@ -1292,20 +1294,20 @@ C + la thermique
                 ELSE
                   IF(KDTINT==0)THEN
                     DO K=JJ1,JJ2
-                      A(1,N) = A(1,N) + FSKYI(K,1)
-                      A(2,N) = A(2,N) + FSKYI(K,2)
-                      A(3,N) = A(3,N) + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(K,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(K,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                       FTHE(N) = FTHE(N) + FTHESKYI(K)
                       FTHESKYI(K) = ZERO
                     ENDDO
                   ELSE
                     DO K=JJ1,JJ2
-                      A(1,N) = A(1,N) + FSKYI(K,1)
-                      A(2,N) = A(2,N) + FSKYI(K,2)
-                      A(3,N) = A(3,N) + FSKYI(K,3)
-                      STIFN(N) = STIFN(N) + FSKYI(K,4)
-                      VISCN(N) = VISCN(N) + FSKYI(K,5)
+                      NODES%A(1,N) = NODES%A(1,N) + FSKYI(K,1)
+                      NODES%A(2,N) = NODES%A(2,N) + FSKYI(K,2)
+                      NODES%A(3,N) = NODES%A(3,N) + FSKYI(K,3)
+                      NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                      NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                       FTHE(N) = FTHE(N) + FTHESKYI(K)
                       FTHESKYI(K) = ZERO
                     ENDDO
@@ -1344,50 +1346,50 @@ C-----------------------------------------------
 C       TRI DES FORCES D'INTERFACES (QSORT)
 C-----------------------------------------------
             CALL ASS2SORT(FSKYI,JJ1,JJ2,FSKYT,NFSKYI)
-            IF(INTHEAT >  0) CALL ASS2SORT(FTHESKYI,JJ1,JJ2,FSKYT,1)
-            IF(NODADT_THERM == 1) CALL ASS2SORT(CONDNSKYI,JJ1,JJ2,FSKYT,1)
+            IF(GLOB_THERM%INTHEAT >  0) CALL ASS2SORT(FTHESKYI,JJ1,JJ2,FSKYT,1)
+            IF(GLOB_THERM%NODADT_THERM == 1) CALL ASS2SORT(CONDNSKYI,JJ1,JJ2,FSKYT,1)
             IF(INTPLYXFEM>0)
      .      CALL ASS2SORT_PXFEM(PLYSKYI%FSKYI,JJ1,JJ2,FSKYT,5)
 C-----------------------------------------------
 C       ASSEMBLAGE DES FORCES
 C-----------------------------------------------
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(KDTINT==0)THEN
                 DO K=JJ1,JJ2
-                  A(1,N)  = A(1,N)  + FSKYI(K,1)
-                  A(2,N)  = A(2,N)  + FSKYI(K,2)
-                  A(3,N)  = A(3,N)  + FSKYI(K,3)
-                  STIFN(N) = STIFN(N) + FSKYI(K,4)
+                  NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                  NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                  NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                  NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                 ENDDO
               ELSE
                 DO K=JJ1,JJ2
-                  A(1,N)  = A(1,N)  + FSKYI(K,1)
-                  A(2,N)  = A(2,N)  + FSKYI(K,2)
-                  A(3,N)  = A(3,N)  + FSKYI(K,3)
-                  STIFN(N) = STIFN(N) + FSKYI(K,4)
-                  VISCN(N) = VISCN(N) + FSKYI(K,5)
+                  NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                  NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                  NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                  NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                  NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                 ENDDO
               ENDIF
 C  + la thermique
             ELSE
-              IF(NODADT_THERM ==1) THEN
+              IF(GLOB_THERM%NODADT_THERM ==1) THEN
                 IF(KDTINT==0)THEN
                   DO K=JJ1,JJ2
-                    A(1,N)  = A(1,N)  + FSKYI(K,1)
-                    A(2,N)  = A(2,N)  + FSKYI(K,2)
-                    A(3,N)  = A(3,N)  + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
+                    NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                    NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                    NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                     FTHE(N) = FTHE(N) + FTHESKYI(K)
                     CONDN(N)= CONDN(N) + CONDNSKYI(K)
                     FTHESKYI(K) = ZERO
                   ENDDO
                 ELSE
                   DO K=JJ1,JJ2
-                    A(1,N)  = A(1,N)  + FSKYI(K,1)
-                    A(2,N)  = A(2,N)  + FSKYI(K,2)
-                    A(3,N)  = A(3,N)  + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
-                    VISCN(N) = VISCN(N) + FSKYI(K,5)
+                    NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                    NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                    NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                    NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                     FTHE(N) = FTHE(N) + FTHESKYI(K)
                     CONDN(N)= CONDN(N) + CONDNSKYI(K)
                     FTHESKYI(K) = ZERO
@@ -1396,20 +1398,20 @@ C  + la thermique
               ELSE
                 IF(KDTINT==0)THEN
                   DO K=JJ1,JJ2
-                    A(1,N)  = A(1,N)  + FSKYI(K,1)
-                    A(2,N)  = A(2,N)  + FSKYI(K,2)
-                    A(3,N)  = A(3,N)  + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
+                    NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                    NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                    NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
                     FTHE(N) = FTHE(N) + FTHESKYI(K)
                     FTHESKYI(K) = ZERO
                   ENDDO
                 ELSE
                   DO K=JJ1,JJ2
-                    A(1,N)  = A(1,N)  + FSKYI(K,1)
-                    A(2,N)  = A(2,N)  + FSKYI(K,2)
-                    A(3,N)  = A(3,N)  + FSKYI(K,3)
-                    STIFN(N) = STIFN(N) + FSKYI(K,4)
-                    VISCN(N) = VISCN(N) + FSKYI(K,5)
+                    NODES%A(1,N)  = NODES%A(1,N)  + FSKYI(K,1)
+                    NODES%A(2,N)  = NODES%A(2,N)  + FSKYI(K,2)
+                    NODES%A(3,N)  = NODES%A(3,N)  + FSKYI(K,3)
+                    NODES%STIFN(N) = NODES%STIFN(N) + FSKYI(K,4)
+                    NODES%VISCN(N) = NODES%VISCN(N) + FSKYI(K,5)
                     FTHE(N) = FTHE(N) + FTHESKYI(K)
                     FTHESKYI(K) = ZERO
                   ENDDO
@@ -1476,16 +1478,22 @@ C
 
       RETURN
       END SUBROUTINE ASSPAR4
+
       !||====================================================================
-      !||    asspari2   ../engine/source/assembly/asspar4.F
+      !||    asspari2         ../engine/source/assembly/asspar4.F
       !||--- called by ------------------------------------------------------
-      !||    intti1     ../engine/source/interfaces/interf/intti1.F
+      !||    intti1           ../engine/source/interfaces/interf/intti1.F
+      !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod   ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||====================================================================
       SUBROUTINE ASSPARI2(
      1  A    ,AR    ,STIFN  ,STIFR  ,MS  ,
      2  IN   ,FSKYI2,I2SIZE ,ADDCNI2,INDSKY,
-     3  FTHESKYI2,FTHE,CONDNSKYI2,CONDN)
-C----6---------------------------------------------------------------7---------8
+     3  FTHESKYI2,FTHE,CONDNSKYI2,CONDN,GLOB_THERM)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1508,10 +1516,11 @@ C     REAL
       my_real
      .        A(3,*)  ,AR(3,*), STIFN(*), STIFR(*), MS(*), IN(*),
      .        FSKYI2(I2SIZE,*),FTHESKYI2(*),FTHE(*),CONDNSKYI2(*),CONDN(*)
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
-      INTEGER I,J,K,L,N,NC,NCT,IDEB,LB,KK,K1,K2
+      INTEGER K,N,NC,NCT,IDEB,LB,KK,K1,K2
 C-----------------------------------------------
 C Interface type2
 C-----------------------------------------------
@@ -1521,7 +1530,7 @@ C-----------------------------------------------
           NC = NBCOLI2(LB)
           KK = NBVALI2(LB)
           IF (NC==1) THEN
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -1551,7 +1560,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0) THEN
+              IF(GLOB_THERM%IDT_THERM == 0) THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -1620,7 +1629,7 @@ C-----------------------------------------------
               ENDIF
             ENDIF
           ELSEIF(NC==2) THEN
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -1650,7 +1659,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0) THEN
+              IF(GLOB_THERM%IDT_THERM == 0) THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -1717,7 +1726,7 @@ C-----------------------------------------------
               ENDIF
             ENDIF
           ELSEIF(NC==3) THEN
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -1762,7 +1771,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM ==0 )THEN
+              IF(GLOB_THERM%IDT_THERM ==0 )THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -1865,7 +1874,7 @@ C-----------------------------------------------
               ENDIF
             ENDIF
           ELSEIF(NC==4) THEN
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -1910,7 +1919,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0) THEN
+              IF(GLOB_THERM%IDT_THERM == 0) THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -2013,7 +2022,7 @@ C-----------------------------------------------
               ENDIF
             ENDIF
           ELSEIF(NC==5) THEN
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -2073,7 +2082,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0 ) THEN
+              IF(GLOB_THERM%IDT_THERM == 0 ) THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -2212,7 +2221,7 @@ C-----------------------------------------------
               ENDIF
             ENDIF
           ELSEIF(NC==6) THEN
-            IF(INTHEAT == 0 ) THEN
+            IF(GLOB_THERM%INTHEAT == 0 ) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -2272,7 +2281,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0 ) THEN
+              IF(GLOB_THERM%IDT_THERM == 0 ) THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -2649,7 +2658,7 @@ C-----------------------------------------------
               ENDDO
             ENDIF
           ELSEIF(NC==10) THEN
-            IF(INTHEAT == 0) THEN
+            IF(GLOB_THERM%INTHEAT == 0) THEN
               IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                 DO K1 = IDEB, IDEB+KK-1
@@ -2739,7 +2748,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0) THEN
+              IF(GLOB_THERM%IDT_THERM == 0) THEN
                 IF(IRODDL/=0)THEN
 #include "vectorize.inc"
                   DO K1 = IDEB, IDEB+KK-1
@@ -2952,7 +2961,7 @@ C-----------------------------------------------
 
           ELSE
 
-            IF(INTHEAT == 0) THEN
+            IF(GLOB_THERM%INTHEAT == 0) THEN
               IF(IRODDL/=0)THEN
                 DO K1 = IDEB, IDEB+KK-1
                   N = INDSKY(K1)
@@ -2984,7 +2993,7 @@ C-----------------------------------------------
                 ENDDO
               ENDIF
             ELSE
-              IF(IDT_THERM == 0) THEN
+              IF(GLOB_THERM%IDT_THERM == 0) THEN
                 IF(IRODDL/=0)THEN
                   DO K1 = IDEB, IDEB+KK-1
                     N = INDSKY(K1)
@@ -3061,7 +3070,7 @@ C
       ELSE
 C
 C scalaire
-        IF(INTHEAT == 0 ) THEN
+        IF(GLOB_THERM%INTHEAT == 0 ) THEN
           IF(IRODDL/=0)THEN
             DO N = 1, NUMNOD
               NCT = ADDCNI2(N)-1

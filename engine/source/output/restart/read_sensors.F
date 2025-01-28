@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    rdresb                 ../engine/source/output/restart/rdresb.F
       !||--- calls      -----------------------------------------------------
+      !||    copy_python_function   ../common_source/modules/python_mod.F90
       !||    fretitl2               ../engine/source/input/freform.F
       !||    nvar                   ../engine/source/input/nvar.F
       !||    read_db                ../common_source/tools/input_output/read_db.F
@@ -33,12 +34,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    message_mod            ../engine/share/message_module/message_mod.F
       !||    names_and_titles_mod   ../common_source/modules/names_and_titles_mod.F
-      !||    sensor_mod             ../engine/share/modules/sensor_mod.F
+      !||    python_funct_mod       ../common_source/modules/python_mod.F90
+      !||    sensor_mod             ../common_source/modules/sensor_mod.F90
       !||====================================================================
-      SUBROUTINE READ_SENSORS(SENSORS)
+      SUBROUTINE READ_SENSORS(SENSORS,PYTHON)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE PYTHON_FUNCT_MOD
       USE SENSOR_MOD
       USE MESSAGE_MOD
       USE NAMES_AND_TITLES_MOD, ONLY: NCHARTITLE
@@ -52,7 +55,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
-      TYPE (SENSORS_) ,INTENT(INOUT) ,TARGET :: SENSORS
+      TYPE (SENSORS_) ,INTENT(INOUT) :: SENSORS
+      TYPE(PYTHON_), INTENT(IN) :: PYTHON
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -60,7 +64,7 @@ C-----------------------------------------------
       INTEGER, DIMENSION(LTITR) :: ITITLE
       my_real, DIMENSION(:), ALLOCATABLE :: HEAD,RBUF
       CHARACTER(LEN = NCHARTITLE) :: TITLE
-      TYPE (SENSOR_STR_) ,POINTER :: SENSOR
+      INTEGER :: PYID
 C=======================================================================
       NSENSOR = SENSORS%NSENSOR
       ALLOCATE(SENSORS%SENSOR_TAB(NSENSOR))
@@ -70,28 +74,27 @@ C=======================================================================
         ALLOCATE (HEAD(NFIX) )
 c
         DO ISEN=1,NSENSOR
-          SENSOR => SENSORS%SENSOR_TAB(ISEN)
           CALL READ_DB (HEAD,NFIX)
 c
-          SENSOR%TYPE    = NINT(HEAD(1))
-          SENSOR%SENS_ID = NINT(HEAD(2))
-          SENSOR%STATUS  = NINT(HEAD(3))
-          SENSOR%TCRIT   = HEAD(4)
-          SENSOR%TMIN    = HEAD(5)
-          SENSOR%TDELAY  = HEAD(6)
-          SENSOR%TSTART  = HEAD(7) 
-          SENSOR%VALUE   = HEAD(8)
-          SENSOR%NPARI   = NINT(HEAD(9))
-          SENSOR%NPARR   = NINT(HEAD(10))
-          SENSOR%NVAR    = NINT(HEAD(11))
+          SENSORS%SENSOR_TAB(ISEN)%TYPE    = NINT(HEAD(1))
+          SENSORS%SENSOR_TAB(ISEN)%SENS_ID = NINT(HEAD(2))
+          SENSORS%SENSOR_TAB(ISEN)%STATUS  = NINT(HEAD(3))
+          SENSORS%SENSOR_TAB(ISEN)%TCRIT   = HEAD(4)
+          SENSORS%SENSOR_TAB(ISEN)%TMIN    = HEAD(5)
+          SENSORS%SENSOR_TAB(ISEN)%TDELAY  = HEAD(6)
+          SENSORS%SENSOR_TAB(ISEN)%TSTART  = HEAD(7) 
+          SENSORS%SENSOR_TAB(ISEN)%VALUE   = HEAD(8)
+          SENSORS%SENSOR_TAB(ISEN)%NPARI   = NINT(HEAD(9))
+          SENSORS%SENSOR_TAB(ISEN)%NPARR   = NINT(HEAD(10))
+          SENSORS%SENSOR_TAB(ISEN)%NVAR    = NINT(HEAD(11))
 c
-          NPARI = SENSOR%NPARI
-          NPARR = SENSOR%NPARR
-          NVAR  = SENSOR%NVAR
+          NPARI = SENSORS%SENSOR_TAB(ISEN)%NPARI
+          NPARR = SENSORS%SENSOR_TAB(ISEN)%NPARR
+          NVAR  = SENSORS%SENSOR_TAB(ISEN)%NVAR
           
-          ALLOCATE(SENSOR%IPARAM(NPARI))
-          ALLOCATE(SENSOR%RPARAM(NPARR))
-          ALLOCATE(SENSOR%VAR(NVAR))
+          ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%IPARAM(NPARI))
+          ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%RPARAM(NPARR))
+          ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%VAR(NVAR))
 c
           LEN   = NPARI + NPARR + NVAR
           ALLOCATE (RBUF(LEN) )
@@ -100,19 +103,19 @@ c
           IAD = 0
           IF (NPARI > 0) THEN
             DO I = 1,NPARI
-              SENSOR%IPARAM(I) = NINT(RBUF(IAD+I))
+              SENSORS%SENSOR_TAB(ISEN)%IPARAM(I) = NINT(RBUF(IAD+I))
             END DO
             IAD = IAD + NPARI
           END IF
           IF (NPARR > 0) THEN
             DO I = 1,NPARR
-              SENSOR%RPARAM(I) = RBUF(IAD+I)
+              SENSORS%SENSOR_TAB(ISEN)%RPARAM(I) = RBUF(IAD+I)
             END DO
             IAD = IAD + NPARR
           END IF
           IF (NVAR > 0) THEN
             DO I = 1,NVAR
-              SENSOR%VAR(I) = RBUF(IAD+I)
+              SENSORS%SENSOR_TAB(ISEN)%VAR(I) = RBUF(IAD+I)
             END DO
             IAD = IAD + NVAR
           END IF
@@ -122,23 +125,28 @@ c
 c         read sensor title
           CALL READ_I_C(ITITLE,LTITR)
           CALL FRETITL2(TITLE,ITITLE,LTITR)
-          SENSOR%TITLE = TITLE
+          SENSORS%SENSOR_TAB(ISEN)%TITLE = TITLE
 c
-          TYP = SENSOR%TYPE
+          TYP = SENSORS%SENSOR_TAB(ISEN)%TYPE
           IF (TYP == 29 .OR. TYP == 30 .OR. TYP == 31)THEN
 
-              ALLOCATE(SENSOR%INTEGER_USERPARAM(NSENPARI))
-              ALLOCATE(SENSOR%FLOAT_USERPARAM(NSENPARR))
+              ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%INTEGER_USERPARAM(NSENPARI))
+              ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%FLOAT_USERPARAM(NSENPARR))
 
-              ALLOCATE(SENSOR%INTEGER_USERBUF(ISENBUF))
-              ALLOCATE(SENSOR%FLOAT_USERBUF(LSENBUF))
+              ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%INTEGER_USERBUF(ISENBUF))
+              ALLOCATE(SENSORS%SENSOR_TAB(ISEN)%FLOAT_USERBUF(LSENBUF))
 
-              CALL READ_I_C(SENSOR%INTEGER_USERPARAM,NSENPARI)
-              CALL READ_I_C(SENSOR%INTEGER_USERBUF,ISENBUF)
+              CALL READ_I_C(SENSORS%SENSOR_TAB(ISEN)%INTEGER_USERPARAM,NSENPARI)
+              CALL READ_I_C(SENSORS%SENSOR_TAB(ISEN)%INTEGER_USERBUF,ISENBUF)
 
-              CALL READ_DB (SENSOR%FLOAT_USERPARAM,NSENPARR)
-              CALL READ_DB (SENSOR%FLOAT_USERBUF,LSENBUF)
+              CALL READ_DB (SENSORS%SENSOR_TAB(ISEN)%FLOAT_USERPARAM,NSENPARR)
+              CALL READ_DB (SENSORS%SENSOR_TAB(ISEN)%FLOAT_USERBUF,LSENBUF)
 
+          ENDIF
+          IF( TYP == 40) THEN ! python senso
+             CALL READ_I_C(SENSORS%SENSOR_TAB(ISEN)%PYTHON_FUNCTION_ID,1)
+              PYID = SENSORS%SENSOR_TAB(ISEN)%PYTHON_FUNCTION_ID
+             CALL COPY_PYTHON_FUNCTION(PYTHON%FUNCTS(PYID),SENSORS%SENSOR_TAB(ISEN)%PYTHON_FUNCTION)
           ENDIF
 
         END DO
@@ -146,10 +154,10 @@ c
 c--------------------------------------
 c       Read Logical sensor index array
 c
-        CALL READ_I_C(LOGICAL_SENSOR_COUNT,1)
+        CALL READ_I_C(SENSORS%LOGICAL_SENSOR_COUNT,1)
 
-        ALLOCATE(LOGICAL_SENSORS_LIST(LOGICAL_SENSOR_COUNT))
-        CALL READ_I_C(LOGICAL_SENSORS_LIST,LOGICAL_SENSOR_COUNT)
+        ALLOCATE(SENSORS%LOGICAL_SENSORS_LIST(SENSORS%LOGICAL_SENSOR_COUNT))
+        CALL READ_I_C(SENSORS%LOGICAL_SENSORS_LIST,SENSORS%LOGICAL_SENSOR_COUNT)
 c
 c--------------------------------------
 c       Read spmd/PON exchange arrays

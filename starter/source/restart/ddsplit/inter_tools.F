@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -2330,7 +2330,7 @@ C-----------------------------------------------
       INTEGER :: II_STOK_E, II_STOK_E_L 
       INTEGER :: II_STOK_S, II_STOK_S_L
       INTEGER :: TAG_JJ_E2E(II_STOK_E) !Global id of global E2E cand (OUT)
-      INTEGER :: TAG_JJ_E2S(II_STOK_S) !Globa id of global E2S cand (OUT)
+      INTEGER :: TAG_JJ_E2S(II_STOK_S) !Global id of global E2S cand (OUT)
 
 
       TYPE(INTBUF_STRUCT_) :: INTBUF_TAB

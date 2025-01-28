@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -200,7 +200,7 @@ C-----------------------------------------------
       !||    get_user_window_nodes   ../engine/source/user_interface/userwindow_interface_routines.F
       !||--- uses       -----------------------------------------------------
       !||    restmod                 ../engine/share/modules/restart_mod.F
-      !||    user_interface_mod      ../engine/share/modules/user_interface_mod.F
+      !||    user_interface_mod      ../engine/source/modules/user_interface_mod.F90
       !||====================================================================
       SUBROUTINE GET_USER_WINDOW_NODES(INTERNAL_ID,USER_ID)
 !$COMMENT
@@ -242,7 +242,8 @@ C-----------------------------------------------
         DO I=1,USER_WINDOWS%N_USERNODS
           ND = USER_WINDOWS%USERNODS(I)
           INTERNAL_ID(I)=ND
-          USER_ID(I)=ITAB(ND)
+!         USER_ID(I)=ITAB(ND)
+          USER_ID(i) = 0
         ENDDO      
       ENDIF
       END
@@ -251,7 +252,7 @@ C-----------------------------------------------
       !||====================================================================
       !||    userwindow_get_a     ../engine/source/user_interface/userwindow_interface_routines.F
       !||--- uses       -----------------------------------------------------
-      !||    user_interface_mod   ../engine/share/modules/user_interface_mod.F
+      !||    user_interface_mod   ../engine/source/modules/user_interface_mod.F90
       !||====================================================================
       SUBROUTINE USERWINDOW_GET_A(A_BUF)
 C-----------------------------------------------
@@ -287,7 +288,7 @@ C-----------------------------------------------
       !||====================================================================
       !||    userwindow_get_ar    ../engine/source/user_interface/userwindow_interface_routines.F
       !||--- uses       -----------------------------------------------------
-      !||    user_interface_mod   ../engine/share/modules/user_interface_mod.F
+      !||    user_interface_mod   ../engine/source/modules/user_interface_mod.F90
       !||====================================================================
       SUBROUTINE USERWINDOW_GET_AR(AR_BUF)
 C-----------------------------------------------

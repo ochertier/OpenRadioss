@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -33,7 +33,7 @@ C
      1   IAD_ELEM,FR_ELEM ,SIZI   ,ISKY   ,FSKYI ,
      2   FSKYIF  ,ITAGX   ,ADSKYI ,NBIRCT ,NBISDT,
      3   NBIRCP  ,NBISDP  ,FTHESKYI, FTHESKYIF,CONDNSKYI,
-     4   CONDNSKYIF,FSKYIF_PXFEM)
+     4   CONDNSKYIF,FSKYIF_PXFEM,INTHEAT,NODADT_THERM)
 C
        USE PLYXFEM_MOD       
 C-----------------------------------------------
@@ -59,6 +59,8 @@ C-----------------------------------------------
       INTEGER IAD_ELEM(2,*), FR_ELEM(*), NBIRCP(*), NBISDP(*),
      .        ITAGX(*), ADSKYI(0:*), ISKY(*),
      .        SIZI, NBIRCT, NBISDT
+      INTEGER ,INTENT(IN) :: INTHEAT
+      INTEGER ,INTENT(IN) :: NODADT_THERM
       my_real
      .        FSKYI(LSKYI,NFSKYI),FSKYIF(NFSKYI,*),FTHESKYI(*),
      .        FTHESKYIF(*),CONDNSKYI(*),CONDNSKYIF(*),

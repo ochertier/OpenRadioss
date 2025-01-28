@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    restmod                    ../starter/share/modules1/restart_mod.F
       !||    submodel_mod               ../starter/share/modules1/submodel_mod.F
       !||====================================================================
-      SUBROUTINE CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,NAMES_AND_TITLES,LIPART1,DEFAULTS)
+      SUBROUTINE CONTRL(MULTI_FVM,LSUBMODEL,IS_DYNA,DETONATORS,USER_WINDOWS,MAT_ELEM,
+     .           NAMES_AND_TITLES,LIPART1,DEFAULTS,GLOB_THERM,PBLAST,OUTPUT)
 C----------------------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -102,10 +103,13 @@ C-----------------------------------------------
       USE USER_WINDOWS_MOD
       USE ALE_MOD
       USE MAT_ELEM_MOD
-      USE NAMES_AND_TITLES_MOD, only:NAMES_AND_TITLES_,LTITLE,NCHARLINE,NCHARTITLE,NCHARFIELD
+      USE NAMES_AND_TITLES_MOD
       USE BCS_MOD , only : BCS
       USE DEFAULTS_MOD
       USE FORMAT_MOD
+      use glob_therm_mod
+      USE PBLAST_MOD
+      USE OUTPUT_MOD , ONLY : OUTPUT_
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -150,7 +154,6 @@ C-----------------------------------------------
 #include      "userlib.inc"
 #include      "spmd_c.inc"
 #include      "drape_c.inc"
-#include      "thermal_c.inc"
 #include      "inter22.inc"
 #include      "boltpr_c.inc"
 #include      "ige3d_c.inc"
@@ -168,6 +171,9 @@ C-----------------------------------------------
       TYPE(NAMES_AND_TITLES_),INTENT(INOUT) :: NAMES_AND_TITLES   !< NAMES_AND_TITLES host the input deck names and titles for outputs
       INTEGER,INTENT(IN) ::  LIPART1                              !< Number of variables of IPART
       TYPE(DEFAULTS_), INTENT(INOUT)      :: DEFAULTS             !< Defaults mod
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      TYPE(PBLAST_), INTENT(INOUT)        :: PBLAST               !< PBLAST load type
+      TYPE(OUTPUT_),INTENT(INOUT) :: OUTPUT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -741,7 +747,7 @@ C---------------------------------------------------
       CALL HM_OPTION_COUNT('/PLOAD',NPRELD)
       CALL HM_OPTION_COUNT('/LOAD/CENTRI',NLOADC)
       CALL HM_OPTION_COUNT('/LOAD/PFLUID',NLOADP_F)
-      CALL HM_OPTION_COUNT('/LOAD/PBLAST',NLOADP_B)
+      CALL HM_OPTION_COUNT('/LOAD/PBLAST',PBLAST%NLOADP_B)
       CALL HM_OPTION_COUNT('/LOAD/PRESSURE',NLOADP_HYD)
 C---------------------------------------------------
 C     GRAVITY
@@ -873,11 +879,11 @@ C-----
 C---------------------------------------------------
 C     Thermal FE options 
 C---------------------------------------------------
-      CALL HM_OPTION_COUNT('/INITEMP',NINTEMP)
-      CALL HM_OPTION_COUNT('/IMPTEMP',NIMTEMP)
-      CALL HM_OPTION_COUNT('/IMPFLUX',NIMPFLUX)
-      CALL HM_OPTION_COUNT('/CONVEC',NCONVEC)
-      CALL HM_OPTION_COUNT('/RADIATION',NRADIA)
+      CALL HM_OPTION_COUNT('/INITEMP'  ,GLOB_THERM%NINTEMP)
+      CALL HM_OPTION_COUNT('/IMPTEMP'  ,GLOB_THERM%NIMTEMP)
+      CALL HM_OPTION_COUNT('/IMPFLUX'  ,GLOB_THERM%NIMPFLUX)
+      CALL HM_OPTION_COUNT('/CONVEC'   ,GLOB_THERM%NCONVEC)
+      CALL HM_OPTION_COUNT('/RADIATION',GLOB_THERM%NRADIA)
 C---------------------------------------------------
 C     SPH
 C---------------------------------------------------
@@ -1098,14 +1104,9 @@ C
       TABFIS=ZERO
       TABFWR=ZERO
       ECONTV = ZERO
-      TFEXT = ZERO
+      OUTPUT%WFEXT = ZERO
       REINT = ZERO
       UREINT = ZERO
-      HEAT_STORED = ZERO
-      HEAT_MECA = ZERO
-      HEAT_CONV = ZERO
-      HEAT_RADIA = ZERO
-      HEAT_FFLUX = ZERO
       ECONTD = ZERO
       ECONT_CUMU = ZERO
 

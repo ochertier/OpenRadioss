@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,29 +38,33 @@ C  |         I10XSAVE                        /intsort/i10xsave.F
       !||    spmd_rnumcd10                ../engine/source/mpi/interfaces/spmd_i7tool.F
       !||    spmd_tri10box                ../engine/source/mpi/interfaces/spmd_int.F
       !||    spmd_tri10gat                ../engine/source/mpi/interfaces/spmd_int.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    check_sorting_criteria_mod   ../engine/source/interfaces/intsort/check_sorting_criteria.F90
+      !||    glob_therm_mod               ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                      ../engine/share/modules/h3d_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I10MAIN_TRI(
+      SUBROUTINE I10MAIN_TRI(TIMERS,
      1                  npari   ,IPARI   ,X       ,V       ,
      2                  MS      ,NIN     ,ITASK   ,MWAG    ,WEIGHT  ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM ,
      5                  NRTM_T  ,RENUM   ,NSNFIOLD,ESHIFT  ,NUM_IMP ,
      6                  IND_IMP ,NODNX_SMS,ITAB   ,INTBUF_TAB ,
-     7                  H3D_DATA)
+     7                  H3D_DATA,GLOB_THERM)
 C============================================================================
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE MESSAGE_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       use check_sorting_criteria_mod , only : check_sorting_criteria
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -80,6 +84,7 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), intent(in) :: TIMERS
       integer, intent(in) :: npari !< dimension of ipari
       INTEGER  ITASK, NIN, RETRI, NRTM_T, ESHIFT,
      .         NUM_IMP ,IND_IMP(*),
@@ -87,12 +92,12 @@ C-----------------------------------------------
      .         ISENDTO(NINTER+1,*),IRCVFROM(NINTER+1,*),
      .         WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .         RENUM(NUMNOD), NSNFIOLD(NSPMD), NODNX_SMS(*)
-C     REAL
       my_real
      .   X(*), V(3,*), MS(*)
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
       TYPE(H3D_DATABASE) :: H3D_DATA
+      TYPE(glob_therm_),INTENT(IN)  :: GLOB_THERM
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -231,7 +236,7 @@ C Barrier comm spmd_tri10box + BMINMA + Retour I10BUCE
 C      
  50   CALL MY_BARRIER
 C
-      IF (IMONM > 0) CALL STARTIME(30,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,30)
 C
       IF(NRTM_T/=0)
      .   CALL I10BUCE(
@@ -241,7 +246,7 @@ C
      4   NB_N_B   ,ESHIFT      ,BMINMA       ,MWAG     ,ILD          ,
      7   NCONTACT ,NSNROLD     ,INTBUF_TAB%STFNS,NIN      ,IPARI(21)    ,
      8   INTBUF_TAB%GAP_S,NSNR    ,RENUM     ,INTBUF_TAB%STFM(1+ESHIFT),INTBUF_TAB%GAP_M,
-     9   GAPMIN   ,GAPMAX ,I_MEM)
+     9   GAPMIN   ,GAPMAX ,I_MEM,GLOB_THERM%INTHEAT, GLOB_THERM%IDT_THERM, GLOB_THERM%NODADT_THERM)
 C
 C Upgrade MultiMP
       IF (I_MEM == 2)THEN
@@ -267,7 +272,7 @@ C        UPGRADE_MULTIMP routine !!!!
         NCONTACT=MULTIMP*NCONT
         GOTO 40
       ENDIF
-      IF (IMONM > 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,30)
 C
 #include "lockon.inc"
       INTBUF_TAB%VARIABLES(9) = MIN(MAXBOX,INTBUF_TAB%VARIABLES(9))
@@ -299,7 +304,7 @@ C mise a - de dist temporairement pour reperage dans partie frontiere
 C mono tache
 !$OMP SINGLE
 
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
 
         INTBUF_TAB%VARIABLES(5) = -INTBUF_TAB%VARIABLES(5)
         IBID = 0
@@ -314,7 +319,7 @@ C sauvegarde des candidats additionnels dans IPARI(24)
         IF (NUM_IMP>0) 
      .    CALL IMP_RNUMCD(INTBUF_TAB%CAND_N,NIN,NSN,NUM_IMP,IND_IMP )
 
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 
 !$OMP END SINGLE
 

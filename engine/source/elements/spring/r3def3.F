@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,30 +25,33 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    rforc3                ../engine/source/elements/spring/rforc3.F
       !||--- calls      -----------------------------------------------------
-      !||    redef3                ../engine/source/elements/spring/redef3.F
       !||    table_interp          ../engine/source/tools/curve/table_tools.F
       !||--- uses       -----------------------------------------------------
       !||    interface_table_mod   ../engine/share/modules/table_mod.F
+      !||    python_funct_mod      ../common_source/modules/python_mod.F90
       !||    table_mod             ../engine/share/modules/table_mod.F
       !||====================================================================
-      SUBROUTINE R3DEF3(
+      SUBROUTINE R3DEF3( PYTHON,
      1   GEO,     F,       AL0,     E,
      2   DL,      NPF,     TF,      OFF,
      3   DPL,     FEP,     DPX2,    DFS,
      4   V,       IXR,     DF,      ANIM,
-     5   IPOS,    FR_WAVE, IGEO,    AL0_ERR,
+     5   IPOS,    IGEO,    AL0_ERR,
      6   X1DP,    X2DP,    X3DP,    YIELD,
      7   TABLE,   INIFRIC, NGL,     MGN,
      8   EX,      EY,      EZ,      XK,
      9   XM,      XC,      AK,      EX2,
      A   EY2,     EZ2,     NC1,     NC2,
      B   NC3,     NUVAR,   UVAR,    DL0,
-     C   NEL,     NFT)
+     C   NEL,     NFT,     STF,     SANIN,
+     D   IRESP,   SNPC)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE REDEF3_MOD
       USE TABLE_MOD
       USE INTERFACE_TABLE_MOD
+      USE python_funct_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -72,20 +75,26 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(python_), intent(inout) :: PYTHON
+      INTEGER, INTENT(IN) :: SANIN
+      INTEGER, INTENT(IN) :: STF !< Size of TF
       INTEGER, INTENT(IN) :: NFT
       INTEGER, INTENT(IN) :: NEL
-      INTEGER NPF(*),IXR(NIXR,*),IGEO(NPROPGI,*),NGL(*),MGN(*),
+      INTEGER, INTENT(IN) :: IRESP !< Single Presision Flag
+      INTEGER, INTENT(IN) :: SNPC   !< Size of NPF
+      INTEGER NPF(SNPC),IXR(NIXR,*),IGEO(NPROPGI,*),NGL(*),MGN(*),
      .        NC1(*),NC2(*),NC3(*),NUVAR
 C     REAL
       my_real
-     .   GEO(NPROPG,*), F(*), AL0(*), E(*), DL(*), TF(*), OFF(*),
+     .   GEO(NPROPG,*), F(*), AL0(*), E(*), DL(*), TF(STF), OFF(*),
      .   DPL(*), FEP(*), DPX2(*),DFS(*),V(3,*),DF(*),ANIM(*),
-     .   IPOS(*),FR_WAVE(*),AL0_ERR(*),YIELD(*),INIFRIC(*),
+     .   IPOS(*),AL0_ERR(*),YIELD(*),INIFRIC(*),
      .   EX(MVSIZ),EY(MVSIZ),EZ(MVSIZ),XK(MVSIZ),
      .   XM(MVSIZ),XC(MVSIZ),AK(MVSIZ),EX2(MVSIZ),EY2(MVSIZ),EZ2(MVSIZ),
      .   UVAR(NUVAR,*),DL0(*)
       DOUBLE PRECISION X1DP(3,*),X2DP(3,*),X3DP(3,*)
       TYPE(TTABLE) TABLE(*)
+      TARGET :: UVAR
 C-----------------------------------------------
 c   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -102,23 +111,27 @@ C     REAL
      .     F_MIN(MVSIZ),F_MAX(MVSIZ),EPLA(MVSIZ)
       my_real
      .     BETA, MU,FMAX, DDX ,VX21,VY21,VZ21,VL21,
-     .     VX32,VY32,VZ32,VL32,NOT_USED
+     .     VX32,VY32,VZ32,VL32,NOT_USED,NOT_USED2(2)
       my_real,
      .        DIMENSION(1) :: XX
       DOUBLE PRECISION EXDP(MVSIZ) ,EYDP(MVSIZ) ,EZDP(MVSIZ),
      .                 EX2DP(MVSIZ),EY2DP(MVSIZ),EZ2DP(MVSIZ),
      .                 AL1DP(MVSIZ),AL2DP(MVSIZ),ALDP(MVSIZ),
      .                 AL0DP(MVSIZ)
+      my_real :: MAX_SLOPE(MVSIZ)
+      my_real ,DIMENSION(:), POINTER :: XX_OLD
+      TARGET :: NOT_USED2
 C-----------------------------------------------
 C
       NOT_USED = ZERO
+      NOT_USED2 = ZERO
 C
       DO I=1,NEL
         EPLA(I) = ZERO
         IPID = MGN(I)
         XM(I)  =GEO(1,IPID)
-        XK(I)  =GEO(2,IPID)
-        XC(I)  =GEO(3,IPID) 
+        XK(I)  =GEO(2,IPID) ! K?
+        XC(I)  =GEO(3,IPID) ! C? 
         IECROU(I)=NINT(GEO(7,IPID))
         AK(I)    = GEO(10,IPID)
         B(I)     = GEO(11,IPID)
@@ -140,6 +153,7 @@ C
         F_MIN(I) = GEO(138,IPID)
         F_MAX(I) = GEO(139,IPID)
         YSCALF(I)= GEO(140,IPID)
+        MAX_SLOPE(I) = GEO(141,IPID)
       ENDDO
 C
       DO I=1,NEL
@@ -247,18 +261,24 @@ C
         ENDIF
       ENDDO
 C
-      CALL REDEF3(
+      IF (NUVAR > 0) THEN 
+         XX_OLD => UVAR(1,1:NEL) 
+      ELSE 
+         XX_OLD => NOT_USED2
+      ENDIF 
+      CALL REDEF3(PYTHON,
      1   F,          XK,         DL,         FEP,
      2   DLOLD,      DPL,        TF,         NPF,
      3   XC,         OFF,        E,          DPX2,
-     4   ANIM,       ANIM_FE(11),IPOS,       FR_WAVE,
+     4   ANIM,       ANIM_FE(11),IPOS,       
      5   XL0,        DMN,        DMX,        DV,
      6   FF,         LSCALE,     EE,         GF3,
      7   IFUNC3,     YIELD,      ALDP,       AK,
      8   B,          D,          IECROU,     IFUNC,
-     9   IFV,        IFUNC2,     EPLA,       UVAR(1,1),
-     A   NOT_USED,   NOT_USED,   NOT_USED,   NEL,
-     B   NFT)
+     9   IFV,        IFUNC2,     EPLA,       XX_OLD,
+     A   NEL, NFT,   STF,        SANIN,      DT1,
+     B   IRESP,      IMPL_S,     IDYNA,      SNPC,
+     C   MAX_SLOPE=MAX_SLOPE)
       NINDX = 0
       DO I=1,NEL
         IF (OFF(I) == ONE .AND. DMX(I) /= ZERO .AND. DMN(I) /= ZERO) THEN
@@ -283,7 +303,9 @@ C
         XM(I)=XM(I)*XL0(I)
         XK(I)=XK(I)/XL0(I)
 C--- for time step compute adding +max slope of h
-        XC(I)=(XC(I)+GEO(141,MGN(I)))/XL0(I)
+C Should it be replaced by the 
+C       XC(I)=(XC(I)+GEO(141,MGN(I)))/XL0(I)
+        XC(I) = (XC(I) + MAX_SLOPE(i)) / XL0(I)
       ENDDO
 C
       DO I=1,NEL

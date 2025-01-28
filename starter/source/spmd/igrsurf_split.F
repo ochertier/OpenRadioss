@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -95,7 +95,7 @@ C-----------------------------------------------
         INTEGER :: I_AM_HERE
         LOGICAL, DIMENSION(NSURF) :: ALREADY_DONE
         LOGICAL, DIMENSION(:), ALLOCATABLE :: I_NEED_IT
-        TYPE(array_type), DIMENSION(:), ALLOCATABLE :: PROC_LIST_PER_NODE
+        TYPE(array_type_int_1d), DIMENSION(:), ALLOCATABLE :: PROC_LIST_PER_NODE
 
         INTEGER :: UP_BOUND
         INTEGER :: INDEX_PROC,NUMBER_PROC
@@ -270,7 +270,7 @@ C-----------------------------------------------------
         ! if ity/=0 --> use the CEP array
         ! if ity=0 --> compute the union of processor list of the 4 nodes
         !              merge the processor lists in 1 list
-        !              if there are several processor in the merged list, need to find the processor with the highest occurence
+        !              if there are several processor in the merged list, need to find the processor with the highest occurrence
         DO IS=1,NSURF
             IF(.NOT.ALREADY_DONE(IS)) THEN
                  IGRSURF_PROC(IS,1:NSPMD)%NSEG = 0

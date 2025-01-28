@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       SUBROUTINE INIT_TRIM(NINTER)
 C Initialize arrays that are use to decide if bounding boxes
-C of each interfaces should be trimed or not
+C of each interfaces should be trimmed or not
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------

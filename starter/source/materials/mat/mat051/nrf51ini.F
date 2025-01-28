@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -170,6 +170,7 @@ C=======================================================================
           UVAR(I,4)            =  P0_NRF  ! default initialization for corner elems
           IAD1 = ALE_CONNECTIVITY%ee_connect%iad_connect(IE)
           LGTH = ALE_CONNECTIVITY%ee_connect%iad_connect(IE+1) - IAD1
+          IVMAT = ZERO
           DO J=1,LGTH
             IEV = ALE_CONNECTIVITY%ee_connect%connected(IAD1 + J - 1)
             IF(IEV == 0)CYCLE

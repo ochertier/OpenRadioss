@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -23,7 +23,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||====================================================================
       !||    hm_read_mat51                  ../starter/source/materials/mat/mat051/hm_read_mat51.F
       !||--- called by ------------------------------------------------------
-      !||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F
+      !||    hm_read_mat                    ../starter/source/materials/mat/hm_read_mat.F90
       !||--- calls      -----------------------------------------------------
       !||    ancmsg                         ../starter/source/output/message/message.F
       !||    hm_get_float_array_index       ../starter/source/devtools/hm_reader/hm_get_float_array_index.F
@@ -157,6 +157,7 @@ C-----------------------------------------------
       NFUNC = 10
       UPARAM(1:NUPARAM) = ZERO
       IFUNC(1:NFUNC)    = 0
+      P0(:) = ZERO
       IF (ALEMUSCL_Param%IALEMUSCl > 0) ALEMUSCL_Param%I_LAW = 51  ! Communicate LAW to ALEMUSC_MOD
       IFLG6_SUBMAT_DEFINED(1:4)=.TRUE.
       !----------------!
@@ -263,6 +264,8 @@ C-----------------------------------------------
         IF(IPLA(I) < 0 .OR. IPLA(I) > 2)IPLA(I)=0
       ENDDO
       !----------------!
+      tAV(1:4) = ZERO
+      tMID(1:4)= 0
       SELECT CASE(IFLG)
       !============================!
       ! IFLG == 0                  !
@@ -592,6 +595,7 @@ C-----------------------------------------------
         ENDDO
         UPARAM(09:12) = tMID(1:4)
         UPARAM(13:16) = tAV(1:4)
+        AV(1:4) = tAV(1:4)
         IF(MIP==0)THEN
               chain1='SUBMATERIAL DATA NOT FOUND '
               CALL ANCMSG(MSGID=99,MSGTYPE=MSGERROR,ANMODE=ANINFO,I1=MAT_ID,C1=TITR,C2=chain1)

@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -40,7 +40,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      1        IPARI      ,STFAC      ,FRIGAP    ,NOINT    ,IGRNOD    ,
      2        IGRSURF    ,I2RUPT     ,AREASL    ,DEF_INTER,NPC1      ,
      3        TITR       ,UNITAB     ,LSUBMODEL ,NPARI    ,NPARIR    ,
-     4        SNPC1      )
+     4        SNPC1      ,INTHEAT    )
 C============================================================================
 C     
 C-----------------------------------------------
@@ -67,6 +67,7 @@ C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
       INTEGER,INTENT(IN) :: NPARI,NPARIR,SNPC1 !< array sizes
+      INTEGER,INTENT(INOUT) :: INTHEAT
       INTEGER NOINT
       INTEGER IPARI(NPARI),DEF_INTER(100),NPC1(SNPC1)
       my_real STFAC,AREASL,UNITAB(*)
@@ -82,7 +83,7 @@ C-----------------------------------------------
       INTEGER J,IBUC, NTYP, IGSTI,IS1, IS2,PID,IPRINT,
      .     ILEV, HIERA,IDEL2,INT2DEF,INTTH,IMOD,IFILTR,IGNORE,
      .     IFUNS,IFUNN,IFUNT,NUVAR,ISYM,INTKG,IPROJ,IASSIGN,
-     .     PENFLAG,IROT,OK,ISU1,ISU2,ISI1,ISI2
+     .     PENFLAG,IROT,OK,ISU1,ISU2,ISI1,ISI2,ISU3,ISI3
       my_real
      .   STARTT,STOPT,KTHE,VISC,DNMAX,DTMAX,SCAL_F,
      .   SCAL_SR,SCAL_D,ALPHA,AREA,F_UNIT,SR_UNIT,D_UNIT
@@ -145,6 +146,7 @@ C--------------------------------------------------
       CALL HM_GET_INTV('LEVEL',HIERA,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('Isearch',IBUC,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('NodDel2',IDEL2,IS_AVAILABLE,LSUBMODEL)
+      CALL HM_GET_INTV('secondarysurfids',ISI3,IS_AVAILABLE,LSUBMODEL)
 C -- Hidden flag - PID - 
       PID = 0
 C--------------------------------------------------
@@ -178,9 +180,31 @@ C
       INGR2USR => IGRSURF(1:NSURF)%ID
       ISU2=NGR2USR(ISI2,INGR2USR,NSURF)
 C
+      ISU3 = 0
+      IF (ISI3>0) THEN 
+        ISU3=NGR2USR(ISI3,INGR2USR,NSURF)
+        IF(ISU3 == 0) THEN
+          CALL ANCMSG(MSGID=1725,
+     .               ANMODE=ANINFO_BLIND_1,
+     .               MSGTYPE=MSGERROR,
+     .               I1=NOINT,
+     .               I2=ISI3,
+     .               C1=TITR)
+        END IF
+        IF (ILEV /= 25 .and. ILEV /= 26 .and. ILEV /= 27 .and. ILEV /= 28) THEN
+          CALL ANCMSG(MSGID=3078,
+     .               ANMODE=ANINFO_BLIND_1,
+     .               MSGTYPE=MSGWARNING,
+     .               I1=NOINT,
+     .               I2=ILEV,
+     .               I3=ISI3,
+     .               C1=TITR)
+          ISU3 = 0
+        END IF
+      END IF
 C-------*CHECKS*-------------------
 
-      IF (ISU1==0) THEN
+      IF (ISU1==0.AND.ISU3 == 0) THEN
         CALL ANCMSG(MSGID=1726,
      .               ANMODE=ANINFO_BLIND_1,
      .               MSGTYPE=MSGERROR,
@@ -199,16 +223,24 @@ C-------*CHECKS*-------------------
         IS2=0
       END IF
 C
-      IF ((ISU1 > 0).AND.(IGRNOD(ISU1)%NENTITY == 0)) THEN
-        CALL ANCMSG(MSGID=1131,
+      IF (ISU1 > 0.AND.ISU3== 0) THEN
+        IF (IGRNOD(ISU1)%NENTITY == 0)
+     .   CALL ANCMSG(MSGID=1131,
      .       ANMODE=ANINFO_BLIND_1,
      .      MSGTYPE=MSGERROR,
      .        I1=NOINT,
      .        C1=TITR)
       END IF
 C
-      IPARI(45) = ISU1
-      IPARI(46) = ISU2
+      IF (ISU3 > 0) THEN
+        IPARI(45) = ISU2
+        IPARI(46) = ISU3
+        IS1=-1
+        IS2=-1
+      ELSE
+        IPARI(45) = ISU1
+        IPARI(46) = ISU2 
+      END IF
       IPARI(13) = IS1*10+IS2
 C
 ! ILEV
@@ -403,7 +435,7 @@ C--------------------------------------------------
 C---------------------- 
 C
       IF (IPROJ==0) IPROJ = 1
-      IF(INTTH > 0 ) INTHEAT = 1
+      IF (INTTH > 0 ) INTHEAT = 1
 
       IPARI(47) = INTTH
       FRIGAP(15)  = KTHE
@@ -533,6 +565,7 @@ C--------------------------------------------------------------
         WRITE(IOUT,'(6X,A)')'MAIN SURFACE REFERS ',
      .                      'TO HYPER-ELLIPSOIDAL SURFACE'
       ENDIF
+      IF(IS1<0.AND.IS2<0) WRITE(IOUT,'(4X,A)')'SURFACE TO SURFACE INPUT'
 C
 C--------------------------------------------------------------
  1000 FORMAT(/1X,'  INTERFACE NUMBER :',I10,1X,A)

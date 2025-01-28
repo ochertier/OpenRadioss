@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -75,6 +75,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    ecnd_mod                   ../engine/share/modules/ecdn_mod.F
       !||    elbufdef_mod               ../common_source/modules/mat_elem/elbufdef_mod.F90
       !||    failwave_mod               ../common_source/modules/failwave_mod.F
+      !||    glob_therm_mod             ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    groupdef_mod               ../common_source/modules/groupdef_mod.F
       !||    h3d_inc_mod                ../engine/share/modules/h3d_inc_mod.F
       !||    h3d_mod                    ../engine/share/modules/h3d_mod.F
@@ -82,20 +83,21 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    inter_sh_offset_ini_mod    ../engine/source/interfaces/shell_offset/inter_offset_ini.F90
       !||    inter_sh_offset_mod        ../engine/source/modules/interfaces/sh_offset_mod.F90
       !||    inter_sorting_mod          ../engine/share/modules/inter_sorting_mod.F
-      !||    loads_mod                  ../common_source/modules/loads/loads_mod.F
       !||    nloc_count_solnod_mod      ../engine/source/elements/solid/solide/nloc_count_solnod.F90
       !||    nlocal_reg_mod             ../common_source/modules/nlocal_reg_mod.F
       !||    outmax_mod                 ../common_source/modules/outmax_mod.F
       !||    output_mod                 ../common_source/modules/output/output_mod.F90
       !||    outputs_mod                ../common_source/modules/outputs_mod.F
-      !||    pblast_mod                 ../common_source/modules/loads/pblast_mod.F
+      !||    parith_on_mod              ../common_source/modules/parith_on_mod.F90
       !||    pinchtype_mod              ../common_source/modules/pinchtype_mod.F
       !||    plyxfem_mod                ../engine/share/modules/plyxfem_mod.F
-      !||    sensor_mod                 ../engine/share/modules/sensor_mod.F
+      !||    rbe3_mod                   ../common_source/modules/constraints/rbe3_mod.F90
+      !||    sensor_mod                 ../common_source/modules/sensor_mod.F90
+      !||    spmd_xv_inter_type1_mod    ../engine/source/mpi/nodes/spmd_sd_xv_inter1.F90
       !||    stack_mod                  ../engine/share/modules/stack_mod.F
       !||====================================================================
       SUBROUTINE RESOL_INIT(
-     1  ITASK   ,IADS10   ,IADS20  ,IADS16    ,FR_NBCC   ,
+     1  ITASK   ,FR_NBCC   ,
      2  ISENDTO ,IRCVFROM ,IAD_ELEM,FR_ELEM   ,ITABM1    ,
      3  IPARI   ,IPARG    ,ITAB    ,IXS10     ,IXS20     ,
      4  I13A    ,I13B     ,I13C    ,I13D      ,I13E      ,
@@ -106,8 +108,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9  NFIA    ,NFEA     ,NFOA    ,NDMA      ,NDMA2     ,
      A  NODFT   ,NODLT    ,NDTASK  ,NUMNTHREAD  ,IXS16     ,
      B  IXS     ,IXQ      ,IXC     ,IXT       ,IXP       ,
-     C  IXR     ,IXTG     ,ADSKY   ,IADS      ,IKINE     ,
-     D  FSKY    ,A        ,AR      ,V         ,VR        ,
+     C  IXR     ,IXTG     ,PON, IKINE     ,
+     D  A        ,AR      ,V         ,VR        ,
      E  X       ,D        ,MS      ,IN        ,STIFN     ,
      F  STIFR   ,DMAS     ,DINER   ,FANI      ,ANIN      ,
      G           WA       ,UWA     ,PM        ,GEO       ,
@@ -115,16 +117,16 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      I  I87H    ,I87I     ,I87J    ,I87K      ,
      J  I15J    ,KXX      ,
      K  SECBUF  ,SECFCUM  ,NSTRF   ,IGRNOD    ,IEXLNK    ,
-     L  XFRAME  ,I8A      ,I8AR    ,I8STIFN   ,I8STIFR   ,
-     M  FSKYM   ,IXTG1    ,IB      ,VISCN     ,DD_R2R    ,
-     O  I8VISCN ,ELBUF    ,IPART   ,MADPRT    ,MADSH4    ,
+     L  XFRAME  ,
+     M  IXTG1    ,IB      ,VISCN     ,DD_R2R    ,
+     O           ELBUF    ,IPART   ,MADPRT    ,MADSH4    ,
      P  MADSH3  ,MADSOL   ,MADNOD  ,MADFAIL   ,IGEO      ,
      Q  INTLIST ,NBINTC   ,PROCNE  ,NISKYFI   ,WEIGHT    ,
      R  ISIZXV  ,ILENXV   ,ADDCNI2 ,PROCNI2   ,IAD_I2M   ,
      S  FR_I2M  ,FR_NBCCI2,I2SIZE  ,FR_MAD    ,LWIBEM    ,
      T  LWRBEM  ,FXBFP    ,FXBEFW  ,FXBEDP    ,FXBGRP    ,
-     U  FXBGRW  ,NDIN     ,IADSDP  ,IADRCP    ,ISENDP    ,
-     V  IRECVP  ,ISLEN7   ,IRLEN7  ,ISLEN11   ,IRLEN11   ,
+     U  FXBGRW  ,NDIN     ,
+     V  ISLEN7   ,IRLEN7  ,ISLEN11   ,IRLEN11   ,
      W  LWIFLOW ,LWRFLOW  ,IFLOW   ,ADDCNEL   ,CNEL      ,
      X  ADDTMPL ,IPARTL   ,NPARTL  ,NFNCA     ,NFTCA     ,
      Y  I15ATH  ,I35ATH   ,IPM     ,SH4TREE   ,IPADMESH  ,
@@ -133,7 +135,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      b  ISLEN17 ,IRLEN17  ,IRLEN7T ,ISLEN7T   ,LINDIDEL  ,
      c  LBUFIDEL,SH4TRIM  ,SH3TRIM ,MSCND     ,INCND     ,
      d  IRLEN20 ,ISLEN20  ,IRLEN20T,ISLEN20T  ,NBINT20   ,
-     e  IRLEN20E,ISLEN20E ,NISKYFIE,IRBE3     ,R3SIZE    ,
+     e  IRLEN20E,ISLEN20E ,NISKYFIE,
      f  MCP     ,MS0      ,INOD_PXFEM,IEL_PXFEM,IADC_PXFEM,
      g  ADSKY_PXFEM,ICODT,ICODR    ,IBFV      ,ADMSMS    ,
      h  NODREAC  ,IGROUC  ,NGROUC  ,IGROUNC   ,NGROUNC ,
@@ -163,7 +165,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6  TAGSLV_RBY,NFNCA2 ,NFTCA2  ,IN0  ,SORT_COMM,STACK,OUTPUT,
      7  THKE ,SFR_ELEM ,SH_OFFSET_TAB,
      8  NEED_COMM_INT25_SOLID_EROSION,COMM_INT25_SOLID_EROSION,
-     9  ISKWN ,IFRAME, LOADS )
+     9  ISKWN ,IFRAME, LOADS ,GLOB_THERM,PBLAST,RBE3)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -192,6 +194,10 @@ C-----------------------------------------------
       USE INTER_SH_OFFSET_MOD , only:SH_OFFSET_
       USE LOADS_MOD 
       USE inivel_init_mod ,  only: inivel_init
+      use glob_therm_mod
+      use spmd_xv_inter_type1_mod , only : is_present_inter1
+      USE parith_on_mod, only: element_pon_
+      use rbe3_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -231,6 +237,7 @@ C-----------------------------------------------
 C-----------------------------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(element_pon_) :: PON
       INTEGER ITASK, NBINTC, NODFT, NODLT, LINDIDEL, LBUFIDEL,
      .        NUMNTHREAD, NDTASK, NFIA, NFEA, NFOA ,NDMA, NFNCA, NFTCA,
      .        NDMA2,NDIN,N1,N2,N3,IGTYP,NPARTL,NGROUC,NGROUNC,
@@ -241,28 +248,28 @@ C-----------------------------------------------
      .        ISIZXV , ILENXV, I2SIZE, ISLEN7,IRLEN7 ,ISLEN11 ,IRLEN11,
      .        I15ATH, I35ATH, NME17,ISLEN17,IRLEN17,IRLEN7T,ISLEN7T,
      .        IRLEN20,ISLEN20,IRLEN20T,ISLEN20T,NBINT20,IRLEN20E,
-     .        ISLEN20E,R3SIZE,NELEM,LAG_SEC, NGRTH, NFT2,NMRBE2,
+     .        ISLEN20E,NELEM,LAG_SEC, NGRTH, NFT2,NMRBE2,
      .        INT18KINE,INT24USE,NDAMA2, NRBYKIN_L,IOLDSECT,LBUFIDEL24,
      .        TABMP_L,TAGTRIMC(*),TAGTRIMTG(*), SLLOADP,SFR_ELEM
       INTEGER 
-     .        IXS(NIXS,*),IXS10(6,*) ,IXS20(12,*),IADS10(6,*),
-     .        IADS20(12,*),IXS16(6,*) ,IADS16(12,*), IGEO(NPROPGI,*),
+     .        IXS(NIXS,*),IXS10(6,*) ,IXS20(12,*),
+     .        IXS16(6,*) , IGEO(NPROPGI,*),
      .        IXQ(NIXQ,*),IXC(NIXC,*), IXT(NIXT,*), IXP(NIXP,*),
      .        IXR(NIXR,*), IXTG(NIXTG,*), IXTG1(4,*),
-     .        ITAB(*), IPARG(NPARG,*), IPARI(NPARI,*), ADSKY(*),
-     .        IADS(*), IEXLNK(NR2R,*),
+     .        ITAB(*), IPARG(NPARG,*), IPARI(NPARI,*),
+     .        IEXLNK(NR2R,*),
      .        WEIGHT(*), NSTRF(*), IB(NIBCLD,*), ITABM1(*),
      .        MONVOL(*),KXX(NIXX,*),ISENDTO(NINTER+1,NSPMD+1),
      .        FR_NBCC(2,NSPMD+1), IAD_ELEM(2,NSPMD+1) ,FR_ELEM(*),
      .        IRCVFROM(NINTER+1,NSPMD+1), INTLIST(NINTER), PROCNE(*),
      .        NISKYFI(*),ADDCNI2(*),PROCNI2(*),IAD_I2M(*),FR_I2M(*),
-     .        FR_NBCCI2(*), IPART(*), IADSDP(*), IADRCP(*),
-     .        ISENDP(*),IRECVP(*),DD_R2R(NSPMD+1,*),IPARTL(*),
+     .        FR_NBCCI2(*), IPART(*), 
+     .        DD_R2R(NSPMD+1,*),IPARTL(*),
      .        MADPRT(*), MADSH4(*), MADSH3(*), MADSOL(*), MADNOD(*),
      .        MADFAIL(*), FR_MAD(5,*), LWIBEM, LWRBEM, LWIFLOW, LWRFLOW,
      .        IFLOW(*), ADDCNEL(0:*), CNEL(0:*), ADDTMPL(0:*),
      .        IPM(NPROPMI,*), SH4TREE(*), IPADMESH(*), SH3TREE(*),
-     .        SH4TRIM(*), SH3TRIM(*), NISKYFIE(*),IRBE3(NRBE3L,*),
+     .        SH4TRIM(*), SH3TRIM(*), NISKYFIE(*),
      .        ICODT(*), ICODR(*),IBFV(NIFV,*),  
      .        INOD_PXFEM(*),IEL_PXFEM(*) ,IADC_PXFEM(4,*),ELCUTC(2,*),
      .        ADSKY_PXFEM(*), KXFENOD2ELC(*),NODLEVXF(*),CRKNODIAD(*),
@@ -293,8 +300,8 @@ C-----------------------------------------------
      .   X(3,*), D(3,*), V(3,*), VR(3,*),
      .   MS(*), IN(*),  WA(*),  A(3,*), AR(3,*),
      .   FANI(3,*), UWA(*), STIFN(*),  STIFR(*),
-     .   ANIN(*), FSKY(*),PARTSAV(NPSAV,*),PARTS0(*),
-     .   DMAS, DINER     , FSKYM(*),
+     .   ANIN(*), PARTSAV(NPSAV,*),PARTS0(*),
+     .   DMAS, DINER     ,
      .   PM(NPROPM,*)    , GEO(NPROPG,*), 
      .   VISCN(*),
      .   SECBUF(*),SECFCUM(7,NUMNOD,NSECT),XFRAME(NXFRAME,*),
@@ -308,9 +315,9 @@ C-----------------------------------------------
      .   FXBFP(*), FXBEFW(*), FXBEDP(*), FXBGRP(*), FXBGRW(*),IN0(*)
       my_real
      .   THKE(NUMELC+NUMELTG)
-      INTEGER*8 
-     .  I8A(3,3,*),I8AR(3,3,*),I8STIFN(3,*),I8STIFR(3,*),
-     .  I8VISCN(3,*)
+c     INTEGER*8 
+c    .  I8A(3,3,*),I8AR(3,3,*),I8STIFN(3,*),I8STIFR(3,*),
+c    .  I8VISCN(3,*)
 C
 
       LOGICAL, INTENT(inout) :: NEED_COMM_INT25_SOLID_EROSION !< boolean, true if the proc needs to comm some values related to interface type 25 with solid erosion
@@ -343,6 +350,9 @@ C-----------------------------------------------
       TYPE(OUTPUT_),INTENT(INOUT)    :: OUTPUT
       TYPE(sh_offset_)               :: SH_OFFSET_TAB   
       TYPE (LOADS_) ,INTENT(INOUT)   :: LOADS
+      type (glob_therm_) ,intent(inout)   :: glob_therm
+      type (pblast_) ,intent(inout)   :: pblast
+      type (rbe3_) ,intent(inout)   :: rbe3
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -350,12 +360,11 @@ C-----------------------------------------------
      .        LRBUF, LIBUF, ITY, IAD, NNBEM, ITYP,IROTG,NS,LF,LT,LL,L,
      .        L1,L2,ISECTR,NFR,IC,ICR,NISUB, NI25,NBR,NSENSOR,INLOC
       INTEGER JD(50),KD(50),JFI,KFI,NMN,II,NINOUT,NNO,NEL,IFLGADM,
-     .        NAD_SMS(NUMNOD),MAD_SMS(NUMNOD),N,JJ,KK, NFT, ISOLNOD,NBS
+     .        N,JJ,KK, NFT, ISOLNOD,NBS
       INTEGER, DIMENSION(SENSORS%NSENSOR) :: INDEX_SENSOR
       INTEGER, DIMENSION(:), ALLOCATABLE :: ISEND,IRECV
       INTEGER :: ITIED,NINIVELTG
-      my_real
-     .        RDUM
+      my_real :: RDUM
       CHARACTER ZONE*5
       INTEGER VALUES(8)
 C=======================================================================
@@ -401,13 +410,14 @@ C parallel structures init.
 C
         IROTG=0
         DO I=1,NRBE3
-          IROTG=MAX(IROTG,IRBE3(6,I))
+          IROTG=MAX(IROTG,RBE3%IRBE3(6,I))
         ENDDO
         CALL SPMD_MAX_I(IROTG)
+        RBE3%irotg = IROTG
         IF(IROTG==0) THEN
-          R3SIZE = 5
+          RBE3%irotg_sz = 5
         ELSE
-          R3SIZE = 10
+          RBE3%irotg_sz = 10
         ENDIF
  
 C---------RBE2----        
@@ -429,7 +439,7 @@ C---------RBE2----
                IF (NS==0) R2SIZE = 0
         NFR = IAD_RBE2(NSPMD+1)-IAD_RBE2(1)
         IF (NSPMD==1) THEN
-          R3SIZE = 0
+          RBE3%irotg_sz = 0
           R2SIZE = 0
         ENDIF
 
@@ -534,10 +544,10 @@ C
         I87I = I87H
         I87J = I87I + 4 * NSKYMV0
         I87K = I87J + 4 * NCONLD
-        I87L = I87K + 4 * NUMCONV
-        I87M = I87L + 4 * NUMRADIA
+        I87L = I87K + 4 * GLOB_THERM%NUMCONV
+        I87M = I87L + 4 * GLOB_THERM%NUMRADIA
         I87N = I87M + SLLOADP
-C        I87O = I87N + 4 * NFXFLUX
+C        I87O = I87N + 4 * GLOB_THERM%NFXFLUX
 C
 C---------------------------- 
         MAXNX=0
@@ -583,43 +593,7 @@ C------------------------
 C      PARAL. ARITH.
 C------------------------
         IF(IPARIT==3) THEN
-          DO I=1,NUMNOD
-            I8A(1,1,I) = 0
-            I8A(2,1,I) = 0
-            I8A(3,1,I) = 0
-            I8A(1,2,I) = 0
-            I8A(2,2,I) = 0
-            I8A(3,2,I) = 0
-            I8A(1,3,I) = 0
-            I8A(2,3,I) = 0
-            I8A(3,3,I) = 0
-            I8STIFN(1,I) = 0
-            I8STIFN(2,I) = 0
-            I8STIFN(3,I) = 0
-          ENDDO
-          IF(IRODDL/=0)THEN
-           DO I=1,NUMNOD
-            I8AR(1,1,I) = 0
-            I8AR(2,1,I) = 0
-            I8AR(3,1,I) = 0
-            I8AR(1,2,I) = 0
-            I8AR(2,2,I) = 0
-            I8AR(3,2,I) = 0
-            I8AR(1,3,I) = 0
-            I8AR(2,3,I) = 0
-            I8AR(3,3,I) = 0
-            I8STIFR(1,I) = 0
-            I8STIFR(2,I) = 0
-            I8STIFR(3,I) = 0
-           ENDDO
-          ENDIF
-          IF(KDTINT/=0)THEN
-           DO I=1,NUMNOD
-            I8VISCN(1,I) = 0
-            I8VISCN(2,I) = 0
-            I8VISCN(3,I) = 0
-           ENDDO
-          ENDIF
+          write(6,*) 'Non supported /PARITH option'
         ELSEIF(IPARIT/=0) THEN
 C
 C parith/on
@@ -630,15 +604,15 @@ C
             IAD1 = 1
           ENDIF
           CALL ASSADD2(
-     1       ADSKY   ,ADSKY(IAD1),FSKY  ,FSKYM    ,IAD_ELEM     ,
+     1       PON%ADSKY   ,PON%ADSKY(IAD1),PON%FSKY  ,PON%FSKYM    ,IAD_ELEM     ,
      2       FR_ELEM ,FR_NBCC    ,PROCNE,NISKYFI  ,ADDCNI2      ,
      3       PROCNI2 ,IAD_I2M    ,FR_I2M,FR_NBCCI2,ADDCNI2(IAD1),
-     4       IADSDP  ,IADRCP     ,ISENDP,IRECVP   ,FTHESKY      ,
+     4       PON%IADSDP  ,PON%IADRCP     ,PON%ISENDP,PON%IRECVP   ,FTHESKY      ,
      5       NISKYFIE,INOD_PXFEM ,ADSKY_PXFEM,PROCNE_PXFEM,
      6       ISENDP_PXFEM,IRECVP_PXFEM ,IADSDP_PXFEM,IADRCP_PXFEM,
      7       FR_NBCC1,INOD_CRKXFEM,ADSKY_CRKXFEM,PROCNE_CRKXFEM,
      8     ISENDP_CRKXFEM,IRECVP_CRKXFEM,IADSDP_CRKXFEM,IADRCP_CRKXFEM,
-     9     CONDNSKY)
+     9     CONDNSKY,GLOB_THERM)
         ENDIF
 C
         CALL FILLIPARTL(
@@ -758,7 +732,9 @@ C----------------------------------------------------------
      .               IN  ,ELBUF_TAB  ,SH4TREE,IPADMESH,MSC     ,
      .               INC ,SH3TREE    ,MSTG   ,INTG    ,PTG     ,
      .               SH4TRIM ,SH3TRIM,MSCND  ,INCND   ,PM      ,
-     .               MCP ,MCPC       ,MCPTG  ,TAGTRIMC ,TAGTRIMTG)
+     .               MCP ,MCPC       ,MCPTG  ,TAGTRIMC ,TAGTRIMTG,
+     .               GLOB_THERM%ITHERM_FE)
+!
          CALL ADMORDR(SH4TREE,SH3TREE,IXC,IXTG)
          IADMESH=0
          NGDONE=1
@@ -784,12 +760,15 @@ C NUMMPC + NFVLAG : ok (parallele SPMD)
        END IF
 
 C-----------------------
+C INTERFACE TYPE 1
+C-----------------------
+      IS_PRESENT_INTER1 = -1
+C-----------------------
 C INTERFACE TYPE 18 KINE
 C-----------------------
        INT18KINE=0
        DO I=1, NINTER
-         IF(IPARI(7,I)==7.and.
-     *          IPARI(34,I)==-2.and.IPARI(22,I)==7)THEN
+         IF(IPARI(7,I) == 7 .AND. IPARI(34,I) == -2 .AND. IPARI(22,I) == 7)THEN
            INT18KINE=1
          ENDIF
        ENDDO
@@ -919,7 +898,7 @@ C
             CALL ZERO1(VISCN(NDTASK),NUMNOD)
           ENDIF
 C
-           IF(ITHERM_FE > 0) THEN
+           IF (GLOB_THERM%ITHERM_FE > 0) THEN
               CALL ZERO1(FTHE(NDTASK),NUMNOD)
            ENDIF  
 C
@@ -927,7 +906,7 @@ C
             CALL ZERO1(DMSPH(NDTASK),NUMNOD)
           ENDIF
 
-          IF(NODADT_THERM > 0) THEN
+          IF (GLOB_THERM%NODADT_THERM > 0) THEN
              CALL ZERO1(CONDN(NDTASK),NUMNOD)
           ENDIF  
 C  
@@ -952,7 +931,7 @@ C
             CALL ZERO1(VISCN(NODFT),NUMNTHREAD)
           ENDIF
 C
-          IF(ITHERM_FE > 0  ) THEN
+          IF (GLOB_THERM%ITHERM_FE > 0  ) THEN
             CALL ZERO1(FTHE(NODFT),NUMNTHREAD)
           ENDIF 
 C
@@ -960,7 +939,7 @@ C
             CALL ZERO1(DMSPH(NODFT),NUMNTHREAD)
           ENDIF
 
-          IF(NODADT_THERM > 0) THEN
+          IF (GLOB_THERM%NODADT_THERM > 0) THEN
              CALL ZERO1(CONDN(NODFT),NUMNTHREAD)
           ENDIF  
 C
@@ -996,9 +975,9 @@ C----------------------------------------------------------
       IF(NADMESH/=0)THEN
         IFLGADM=0
         CALL ADMGVID(
-     1    IPARG     ,ELBUF_TAB ,FSKY   ,FSKY  ,FTHESKY,
-     2    IADS(I87C),IADS(I87G),IFLGADM,IGROUC,NGROUC,
-     3    CONDNSKY  )
+     1    IPARG     ,ELBUF_TAB ,PON%FSKY   ,PON%FSKY  ,FTHESKY,
+     2    PON%IADC,PON%IAD_TG,IFLGADM,IGROUC,NGROUC,
+     3    CONDNSKY  ,GLOB_THERM%NODADT_THERM)
       END IF
 C
 C----------------------------------------------------------
@@ -1123,16 +1102,17 @@ C-----------------------
             ALLOCATE (IAD_CNDS(0),FR_CNDS(0))
           END IF
 
-          CALL CNDMASI2_DIM(IPARI,INTBUF_TAB,ICNDS10,ITAGND,WEIGHT,NKEND) 
+          CALL CNDMASI2_DIM(IPARI,INTBUF_TAB,ICNDS10,ITAGND,WEIGHT,NKEND,
+     1                      IAD_CNDS,FR_CNDS,NBS,NSPMD) 
             IF(NKEND>0) THEN
               ALLOCATE (IMAP2ND(NKEND),MASI2ND0(NKEND))
               CALL CNDMASI2_INI(IPARI,INTBUF_TAB,ICNDS10,ITAGND,
      .                    NKEND,IMAP2ND,MASI2ND0,MS0,WEIGHT, itab ) 
-          IF(MCHECK>0) NKEND = -NKEND
-        END IF
-        CALL S10CNDI2_INI(IPARI,INTBUF_TAB,ICNDS10,ITAGND,WEIGHT,
+              IF(MCHECK>0) NKEND = -NKEND
+            END IF
+         CALL S10CNDI2_INI(IPARI,INTBUF_TAB,ICNDS10,ITAGND,WEIGHT,
      .                   FR_CNDS,IAD_CNDS,itab ) 
-        CALL S10CND_INI(ICNDS10,ITAGND,IAD_CNDM,FR_CNDM,FR_NBCCCND,
+         CALL S10CND_INI(ICNDS10,ITAGND,IAD_CNDM,FR_CNDM,FR_NBCCCND,
      1                 ADDCNCND,PROCNCND,VND   ,V    ,ITAB ,
      2                 IAD_CNDM1,FR_CNDM1,FR_NBCCCND1)
         END IF
@@ -1160,10 +1140,10 @@ C-----------------------
      .                ELBUF_TAB,IXS      ,NIXS     ,NUMELS   )
        ENDIF
 C       
-       DO I=1,NLOADP_B
-         NBS = PBLAST_TAB(I)%SIZ
-         ALLOCATE (PBLAST_TAB(I)%PRES(NBS))
-         PBLAST_TAB(I)%PRES(1:NBS)=ZERO
+       DO I=1,PBLAST%NLOADP_B
+         NBS = PBLAST%PBLAST_TAB(I)%SIZ
+         ALLOCATE (PBLAST%PBLAST_TAB(I)%PRES(NBS))
+         PBLAST%PBLAST_TAB(I)%PRES(1:NBS)=ZERO
        ENDDO
 C-----------------------
 C DT_DC OF TSH
@@ -1565,9 +1545,11 @@ C
        END
 C
       !||====================================================================
-      !||    smp_init   ../engine/source/engine/resol_init.F
+      !||    smp_init             ../engine/source/engine/resol_init.F
       !||--- called by ------------------------------------------------------
-      !||    resol      ../engine/source/engine/resol.F
+      !||    resol                ../engine/source/engine/resol.F
+      !||--- calls      -----------------------------------------------------
+      !||    omp_get_thread_num   ../engine/source/engine/openmp_stub.F90
       !||====================================================================
       SUBROUTINE SMP_INIT(
      1   ITSK  ,NODFTSK ,NODLTSK ,NUMNTSK,NDTSK,

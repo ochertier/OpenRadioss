@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ C   left cauchy green tensor [b]=[F][FT]
       !||====================================================================
       !||    polystress2   ../engine/source/materials/mat/mat100/sigpoly.F
       !||--- called by ------------------------------------------------------
-      !||    sigeps100     ../engine/source/materials/mat/mat100/sigeps100.F
+      !||    sigeps100     ../engine/source/materials/mat/mat100/sigeps100.F90
       !||    sigeps95      ../engine/source/materials/mat/mat095/sigeps95.F
       !||--- calls      -----------------------------------------------------
       !||    mullins_or    ../engine/source/materials/fail/mullins_or/fail_mullins_OR_s.F

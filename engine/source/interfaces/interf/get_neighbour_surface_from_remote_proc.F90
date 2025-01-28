@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -42,23 +42,22 @@
       !||--- calls      -----------------------------------------------------
       !||    alloc_my_real_1d_array                   ../common_source/modules/array_mod.F
       !||    dealloc_my_real_1d_array                 ../common_source/modules/array_mod.F
+      !||    get_local_node_id                        ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    get_segment_edge                         ../engine/source/interfaces/interf/get_segment_edge.F90
       !||    get_segment_interface_id                 ../engine/source/interfaces/interf/get_segment_interface_id.F90
       !||    get_segment_normal                       ../engine/source/interfaces/interf/get_segment_normal.F90
-      !||    get_segment_orientation                  ../engine/source/interfaces/interf/get_segment_orientation.F90
-      !||    sysfus2                                  ../engine/source/system/sysfus.F
       !||--- uses       -----------------------------------------------------
       !||    array_mod                                ../common_source/modules/array_mod.F
       !||    constant_mod                             ../common_source/modules/constant_mod.F
       !||    get_segment_edge_mod                     ../engine/source/interfaces/interf/get_segment_edge.F90
       !||    get_segment_interface_id_mod             ../engine/source/interfaces/interf/get_segment_interface_id.F90
       !||    get_segment_normal_mod                   ../engine/source/interfaces/interf/get_segment_normal.F90
-      !||    get_segment_orientation_mod              ../engine/source/interfaces/interf/get_segment_orientation.F90
+      !||    nodal_arrays_mod                         ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||    shooting_node_mod                        ../engine/share/modules/shooting_node_mod.F
       !||====================================================================
-        subroutine get_neighbour_surface_from_remote_proc( ninter,numnod,nspmd,nixs,numels,s_elem_state,  &
+        subroutine get_neighbour_surface_from_remote_proc( ninter,numnod,nspmd,  &
                                                              size_r_buffer,nb_r_segment,s_buffer_2_size, &
-                                                             elem_state,ixs,itabm1,r_buffer,s_buffer_2, &
+                                                             nodes,r_buffer,s_buffer_2, &
                                                              x,intbuf_tab,shoot_struct ,&
                                                              ispmd,proc_id_0 )
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -68,10 +67,10 @@
           use intbufdef_mod , only : intbuf_struct_
           use shooting_node_mod , only : shooting_node_type
           use get_segment_interface_id_mod , only : get_segment_interface_id
-          use get_segment_orientation_mod , only : get_segment_orientation
           use get_segment_normal_mod , only : get_segment_normal
           use get_segment_edge_mod , only : get_segment_edge
           use array_mod , only : array_type,alloc_my_real_1d_array,dealloc_my_real_1d_array
+          use nodal_arrays_mod, only : get_local_node_id, nodal_arrays_
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -88,15 +87,11 @@
           integer, intent(in) :: nspmd !< total number of mpi tasks
           integer, intent(in) :: size_r_buffer !< size of r_buffer
           integer, intent(in) :: nb_r_segment !< number of new remote segment
-          integer, intent(in) :: nixs !< 1rst dim of "ixs" array
-          integer, intent(in) :: numels !< number of solid element
-          integer, intent(in) :: s_elem_state !< dim of elem_state
           integer, intent(in) :: proc_id_0 !< S processor id
           integer, intent(in) :: ispmd !< current processor id
-          integer, dimension(nixs,numels), intent(in) :: ixs !< solid element data
-          logical, dimension(s_elem_state), intent(in) :: elem_state !< state of the element : on or off
           integer, dimension(3,nspmd), intent(inout) :: s_buffer_2_size !< size of s_buffer_2
-          integer, dimension(numnod), intent(in) :: itabm1 !< global to local node id
+!         integer, dimension(numnod), intent(in) :: itabm1 !< global to local node id
+          type(nodal_arrays_), intent(in) :: nodes !< nodal arrays
           my_real, dimension(size_r_buffer) :: r_buffer !< mpi buffer (rcv)
           my_real, dimension(3,numnod), intent(in) :: x !< nodal position
           type(intbuf_struct_), dimension(ninter), intent(inout) :: intbuf_tab    !< interface data 
@@ -138,7 +133,7 @@
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   external functions
 ! ----------------------------------------------------------------------------------------------------------------------
-          integer , external :: dichotomic_search_i_asc,sysfus2
+          integer , external :: dichotomic_search_i_asc
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   body
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -187,8 +182,11 @@
             global_node_id_1 = list_r_segment(i,2)
             global_node_id_2 = list_r_segment(i,3)
             nin = list_r_segment(i,4)
-            local_node_id_1 = sysfus2(global_node_id_1,itabm1,numnod) ! convert the global node id to local
-            local_node_id_2 = sysfus2(global_node_id_2,itabm1,numnod) ! convert the global node id to local
+!            local_node_id_1 = sysfus2(global_node_id_1,itabm1,numnod) ! convert the global node id to local
+!            local_node_id_2 = sysfus2(global_node_id_2,itabm1,numnod) ! convert the global node id to local
+            local_node_id_1 = get_local_node_id(nodes,global_node_id_1)
+            local_node_id_2 = get_local_node_id(nodes,global_node_id_2)
+
             ! ------
             ! 1srt node
             nb_surface_1 = shoot_struct%shift_m_node_surf(local_node_id_1+1) - shoot_struct%shift_m_node_surf(local_node_id_1)   ! get the number of surface for the node "node_id_1"
@@ -225,8 +223,6 @@
             do ijk=1,my_reduced_nb
               ! segment/surface orientation
               n_segment_id = my_reduced_list(ijk,1) ! connected segment id
-              call get_segment_orientation( n_segment_id,s_elem_state,nixs,numels,numnod, &
-                                            elem_state,ixs,x,intbuf_tab(nin) )
               ! compute the normal to the segment "n_segment_id"
               call get_segment_normal( n_segment_id,segment_node_id,segment_position,n_normal(1,ijk),intbuf_tab(nin),numnod,x )
               ! find the edge id of n_segment_id

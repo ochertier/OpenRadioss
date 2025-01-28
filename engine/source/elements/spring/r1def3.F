@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -21,22 +21,27 @@ Copyright>        As an alternative to this open-source version, Altair also off
 Copyright>        software under a commercial license.  Contact Altair to discuss further if the
 Copyright>        commercial version may interest you: https://www.altair.com/radioss/.
       !||====================================================================
-      !||    r1def3   ../engine/source/elements/spring/r1def3.F
+      !||    r1def3             ../engine/source/elements/spring/r1def3.F
       !||--- called by ------------------------------------------------------
-      !||    rforc3   ../engine/source/elements/spring/rforc3.F
+      !||    rforc3             ../engine/source/elements/spring/rforc3.F
       !||--- calls      -----------------------------------------------------
-      !||    redef3   ../engine/source/elements/spring/redef3.F
+      !||--- uses       -----------------------------------------------------
+      !||    python_funct_mod   ../common_source/modules/python_mod.F90
       !||====================================================================
-      SUBROUTINE R1DEF3(
+      SUBROUTINE R1DEF3(PYTHON,
      1   GEO,     F,       AL0,     E,
      2   DL,      NPF,     TF,      OFF,
      3   DPL,     FEP,     DPL2,    ANIM,
-     4   IPOS,    FR_WAVE, IGEO,    AL0_ERR,
+     4   IPOS,    IGEO,    AL0_ERR,
      5   X1DP,    X2DP,    V,       YIELD,
      6   NGL,     MGN,     EX,      EY,
      7   EZ,      XK,      XM,      XC,
      8   AK,      NC1,     NC2,     NUVAR,
-     9   UVAR,    DL0,     NEL,     NFT)
+     9   UVAR,    DL0,     NEL,     NFT, STF,
+     A   SANIN,   IRESP,   SNPC)
+C-----------------------------------------------  
+        USE python_funct_mod
+        USE REDEF3_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -60,17 +65,23 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      type(python_) :: PYTHON
+      INTEGER, INTENT(IN) :: STF !< Size of TF
+      INTEGER, INTENT(IN) :: SANIN !< Size of ANIM
       INTEGER, INTENT(IN) :: NFT
       INTEGER, INTENT(IN) :: NEL
+      INTEGER, INTENT(IN) :: IRESP  !< Single precision flag
+      INTEGER, INTENT(IN) :: SNPC   !< Size of NPF
       INTEGER NPF(*),IGEO(NPROPGI,*),NGL(*),MGN(*),
      .        NC1(*),NC2(*),NUVAR
 C     REAL
       my_real
-     .   GEO(NPROPG,*), F(*), AL0(*), E(*), DL(*), TF(*), OFF(*),
-     .   DPL(*), DPL2(*), FEP(*),ANIM(*),IPOS(*),FR_WAVE(*),V(3,*),
+     .   GEO(NPROPG,*), F(*), AL0(*), E(*), DL(*), TF(STF), OFF(*),
+     .   DPL(*), DPL2(*), FEP(*),ANIM(SANIN),IPOS(*),V(3,*),
      .   AL0_ERR(MVSIZ),YIELD(*),EX(MVSIZ),EY(MVSIZ),EZ(MVSIZ),
      .   XK(MVSIZ),XM(MVSIZ),XC(MVSIZ),AK(MVSIZ),UVAR(NUVAR,*),DL0(*)
       DOUBLE PRECISION X1DP(3,*),X2DP(3,*)
+      TARGET :: UVAR
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -84,12 +95,16 @@ C     REAL
      .   XL0(MVSIZ),DV(MVSIZ),FF(MVSIZ),LSCALE(MVSIZ),EE(MVSIZ),
      .   GF3(MVSIZ),EPLA(MVSIZ)
       my_real
-     .   SUM ,VX21,VY21,VZ21,VL21,NOT_USED
+     .   SUM ,VX21,VY21,VZ21,VL21,NOT_USED,NOT_USED2(2)
+      my_real :: MAX_SLOPE(MVSIZ)
       DOUBLE PRECISION EXDP(MVSIZ),EYDP(MVSIZ),EZDP(MVSIZ),
      .                 AL0DP(MVSIZ),ALDP(MVSIZ)
+      my_real ,DIMENSION(:), POINTER :: XX_OLD
+      TARGET :: NOT_USED2
 C-----------------------------------------------
 C
       NOT_USED = ZERO
+      NOT_USED2 = ZERO
 C
       DO I=1,NEL
         EPLA(I)=ZERO
@@ -111,6 +126,7 @@ c        XC(I)=GEO(3,MGN(I)) + GEO(141,MGN(I)) ! +max slope of h
         IFV(I)   =IGEO(102,MGN(I))
         IFUNC2(I)=IGEO(103,MGN(I))
         IFUNC3(I)=IGEO(119,MGN(I))
+        MAX_SLOPE(I) = GEO(141,MGN(I))
       ENDDO
 C
       DO I=1,NEL
@@ -198,18 +214,24 @@ C
         ENDIF
       ENDDO
 C
-      CALL REDEF3(
+      IF (NUVAR > 0) THEN 
+         XX_OLD => UVAR(1,1:NEL) 
+      ELSE 
+         XX_OLD => NOT_USED2
+      ENDIF 
+      CALL REDEF3(PYTHON,
      1   F,          XK,         DL,         FEP,
      2   DLOLD,      DPL,        TF,         NPF,
      3   XC,         OFF,        E,          DPL2,
-     4   ANIM,       ANIM_FE(11),IPOS,       FR_WAVE,
+     4   ANIM,       ANIM_FE(11),IPOS,
      5   XL0,        DMN,        DMX,        DV,
      6   FF,         LSCALE,     EE,         GF3,
      7   IFUNC3,     YIELD,      ALDP,       AK,
      8   B,          D,          IECROU,     IFUNC,
-     9   IFV,        IFUNC2,     EPLA,       UVAR(1,1),
-     A   NOT_USED,   NOT_USED,   NOT_USED,   NEL,
-     B   NFT)
+     9   IFV,        IFUNC2,     EPLA,       XX_OLD,
+     A   NEL,        NFT,        STF,        SANIN, 
+     B   DT1,        IRESP,      IMPL_S,     IDYNA,
+     C   SNPC,       MAX_SLOPE=MAX_SLOPE)
       NINDX = 0
       DO I=1,NEL
         IF (OFF(I) == ONE .AND. DMX(I) /= ZERO .AND. DMN(I) /= ZERO) THEN
@@ -232,7 +254,11 @@ C
         XM(I)=XM(I)*XL0(I)
         XK(I)=XK(I)/XL0(I)
 C--- for time step compute adding +max slope of h
-        XC(I)=(XC(I)+GEO(141,MGN(I)))/XL0(I)
+C       XC(I)=(XC(I)+GEO(141,MGN(I)))/XL0(I)
+          XC(I)=(XC(I)+MAX_SLOPE(I))/XL0(I)
+
+
+! sinon derivée au point courrant 
       ENDDO
 C
  1000 FORMAT(1X,'-- RUPTURE OF SPRING ELEMENT NUMBER ',I10)

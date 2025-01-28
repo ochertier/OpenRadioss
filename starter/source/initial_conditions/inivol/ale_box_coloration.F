@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -78,7 +78,6 @@ C-----------------------------------------------
         INTEGER :: LOW_Z,UP_Z
         my_real :: XMIN,YMIN,ZMIN
         my_real :: XMAX,YMAX,ZMAX
-        LOGICAL :: REQUIRED_MONTE_CARLO_METHOD
 C-----------------------------------------------
 
         !   ------------------
@@ -93,8 +92,6 @@ C-----------------------------------------------
         !   ------------------
         ! loop over the surface
         DO I=1,SURFACE_NUMBER
-            REQUIRED_MONTE_CARLO_METHOD = INIVOL%CONTAINER(I)%REQUIRED_MONTE_CARLO_METHOD
-            IF(.NOT.REQUIRED_MONTE_CARLO_METHOD)CYCLE
             ! ------------------
             ! allocation of CELL array
             CELL(I)%SIZE_INT_ARRAY_3D(1) = NB_CELL_X

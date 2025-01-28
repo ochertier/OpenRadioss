@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -28,7 +28,6 @@ C
       !||    dswrest         ../starter/source/restart/ddsplit/wrrest.F
       !||    eigwrest        ../starter/source/restart/ddsplit/wrrest.F
       !||    fxbwrestp       ../starter/source/restart/ddsplit/wrrest.F
-      !||    fxtempwrest     ../starter/source/restart/ddsplit/wrrest.F
       !||    nfwrest         ../starter/source/restart/ddsplit/wrrest.F
       !||    plyxfem_wrest   ../starter/source/restart/ddsplit/wrrest.F
       !||    rigmatwrest     ../starter/source/restart/ddsplit/wrrest.F

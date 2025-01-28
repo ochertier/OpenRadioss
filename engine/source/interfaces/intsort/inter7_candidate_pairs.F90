@@ -1,5 +1,5 @@
 !Copyright>        OpenRadioss
-!Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+!Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 !Copyright>
 !Copyright>        This program is free software: you can redistribute it and/or modify
 !Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -184,7 +184,7 @@
 !$OMP BARRIER
 
 ! The global bounding box contains all the nodes
-! Some nodes may by higly distant from the impact zone
+! Some nodes may by highly distant from the impact zone
 ! The domain is subdivided in cells (voxel)
 ! All the cells have the sime size, except the first and the last one in each direction
 

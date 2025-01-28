@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,8 +38,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_tri22vox                ../engine/source/mpi/interfaces/spmd_tri22vox.F
       !||    spmd_tri22vox0               ../engine/source/mpi/interfaces/spmd_tri22vox0.F
       !||    spmd_tri7gat                 ../engine/source/mpi/interfaces/spmd_int.F
-      !||    startime                     ../engine/source/system/timer.F
-      !||    stoptime                     ../engine/source/system/timer.F
+      !||    startime                     ../engine/source/system/timer_mod.F90
+      !||    stoptime                     ../engine/source/system/timer_mod.F90
       !||    upgrade_multimp              ../common_source/interf/upgrade_multimp.F
       !||--- uses       -----------------------------------------------------
       !||    ale_connectivity_mod         ../common_source/modules/ale/ale_connectivity_mod.F
@@ -49,20 +49,22 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i22bufbric_mod               ../common_source/modules/interfaces/cut-cell-search_mod.F
       !||    i22tri_mod                   ../common_source/modules/interfaces/cut-cell-search_mod.F
       !||    message_mod                  ../engine/share/message_module/message_mod.F
-      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F
+      !||    multi_fvm_mod                ../common_source/modules/ale/multi_fvm_mod.F90
+      !||    timer_mod                    ../engine/source/system/timer_mod.F90
       !||    tri7box                      ../engine/share/modules/tri7box.F
       !||====================================================================
-      SUBROUTINE I22MAIN_TRI(
+      SUBROUTINE I22MAIN_TRI(TIMERS,
      1                  IPARI   ,X       ,V       ,
      2                  MS      ,NIN     ,ITASK   ,MWAG    ,WEIGHT    ,
      3                  ISENDTO ,IRCVFROM,RETRI   ,IAD_ELEM,FR_ELEM   ,
      4                  ITAB    ,KINET   ,TEMP    ,NRTM_T  ,RENUM     ,
      5                  NSNFIOLD,ESHIFT  ,NUM_IMP ,IND_IMP ,NODNX_SMS ,
      6                  IXS     ,IGRBRIC ,ALE_CONNECTIVITY,INTBUF_TAB, 
-     7                  COUNT_REMSLV ,H3D_DATA,MULTI_FVM)
+     7                  COUNT_REMSLV ,H3D_DATA,MULTI_FVM,NODADT_THERM)
 C============================================================================
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE TRI7BOX
       USE I22TRI_MOD
       USE MESSAGE_MOD
@@ -100,6 +102,7 @@ C common pour variable globale en memoire partagee
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_) :: TIMERS
       INTEGER NIN ,ITASK, RETRI, NRTM_T,ESHIFT,
      .        NUM_IMP ,IND_IMP(*),
      .        ITAB(*), KINET(*),
@@ -108,6 +111,7 @@ C-----------------------------------------------
      .        WEIGHT(*), IAD_ELEM(2,*) ,FR_ELEM(*),
      .        RENUM(NUMNOD), NSNFIOLD(NSPMD), NODNX_SMS(*),
      .        IXS(NIXS,*),NSHELL,  COUNT_REMSLV(*)
+      INTEGER , INTENT(IN) :: NODADT_THERM
       my_real 
      .   X(3,*), V(3,*), MS(*),TEMP(*)
       TYPE(INTBUF_STRUCT_) INTBUF_TAB
@@ -311,8 +315,11 @@ C -------------------------------------------------------------
       IF(NSPMD > 1) THEN
         IF(ITASK==0)THEN
           ALLOCATE(BMINMA_LAG_SPMD(6,NSPMD))
+          IF(IMONM > 0) CALL STARTIME(TIMERS,25)
           CALL SPMD_LAGBOUNDS_EXCH_I22(
      .            BMINMA_LAG_SPMD, BMINMA_LAG, ISENDTO  ,IRCVFROM , NIN)
+           IF(IMONM > 0) CALL STOPTIME(TIMERS,25)
+
           if(itask==0.and.ibug22_tri==1)print *, "BMINMA=", 
      .                          BMINMA_LAG(4:6),BMINMA_LAG(1:3)
           J=1
@@ -441,7 +448,7 @@ C -------------------------------------------------------------
 
         IF(ITASK==0) CRVOXEL(0:LRVOXEL,0:LRVOXEL,LOC_PROC)=0
         CALL MY_BARRIER ! waiting for crvoxel init.
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STARTIME(TIMERS,26)
 
         CALL SPMD_TRI22VOX0(
      1        X, BMINMA_FLU  , NBRIC_L,     IXS, IGRBRIC(ISU1)%ENTITY,
@@ -451,15 +458,17 @@ C -------------------------------------------------------------
 
         CALL MY_BARRIER ! all thread has to mark local domain Voxel before reading it above.
 
-        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0 .AND. ITASK == 0) CALL STOPTIME(TIMERS,26)
         IF(ITASK==0)THEN
-      
+          IF (IMONM > 0 ) CALL STARTIME(TIMERS,25)
         !CONTACT=TRUE si intersection non nulle entre domaine FLUIDE LOCAL / LAG DISTANTS    
         IF(IS_CONTACT) CALL SPMD_TRI22VOX(
      1      INTBUF_TAB%IRECTM ,NSHEL_L ,X        ,V          ,BMINMA_AND_R,  !envoyer les shell du domaine.
      2      INTBUF_TAB%STFM   ,NIN     ,ISENDTO  ,IRCVFROM   ,IAD_ELEM  , 
      3      FR_ELEM           ,NSNR    ,ITAB     ,ITASK      )
            
+          IF (IMONM > 0) CALL STOPTIME(TIMERS,25)
+
         NIRECT_L = NSHEL_L + NSNR !on avait un majorant de NSHEL_L+NSHELR_L, on connait mainteannt la taille exacte car NSHELR_L=NSNR (nb candidat remote)
 
        ELSE 
@@ -585,7 +594,7 @@ C -------------------------------------------------------------
 C     RECHERCHE DES COUPLES CANDIDATS POUR L'INTERACTION
 C -------------------------------------------------------------
  
-      IF (IMONM > 0) CALL STARTIME(30,1)
+      IF (IMONM > 0) CALL STARTIME(TIMERS,30)
       CALL I22BUCE(
      1 X                ,INTBUF_TAB%IRECTM(1+4*ESHIFT) ,INTBUF_TAB%NSV            ,INACTI            ,ISKIP22            ,
      2 NMN              ,NSHEL_T                       ,NSN                       ,INTBUF_TAB%CAND_E ,INTBUF_TAB%CAND_N  ,
@@ -622,7 +631,7 @@ C eshift : decalage sur cand_e
         GOTO 40
       ENDIF
 
-      IF (IMONM > 0) CALL STOPTIME(30,1)
+      IF (IMONM > 0) CALL STOPTIME(TIMERS,30)
 C
        COUNT_CAND = INTBUF_TAB%I_STOK(1)
        CT         = INTBUF_TAB%I_STOK(1)
@@ -659,7 +668,7 @@ C mise a - de dist temporairement pour reperage dans partie frontiere
       IF(NSPMD>1)THEN
 C mono tache
 !$OMP SINGLE
-        IF (IMONM > 0) CALL STARTIME(26,1)
+        IF (IMONM > 0) CALL STARTIME(TIMERS,26)
         INTBUF_TAB%VARIABLES(5) = -INTBUF_TAB%VARIABLES(5)
 C
         INTFRIC = 0
@@ -667,13 +676,13 @@ C
      1      RESULT       ,NSN ,INTBUF_TAB%CAND_N,INTBUF_TAB%I_STOK(1),NIN,
      2      IPARI(21,NIN),NSNR,MULTIMP      ,NTY,IPARI(47,NIN),
      3      IDUM1   ,NSNFIOLD, IPARI, H3D_DATA,INTFRIC,
-     4      MULTI_FVM)
+     4      MULTI_FVM,NODADT_THERM)
         IPARI(24,NIN) = NSNR
 C
         IF (NUM_IMP>0) 
      .     CALL IMP_RNUMCD(INTBUF_TAB%CAND_N,NIN,NSN,NUM_IMP,IND_IMP )
 C
-        IF (IMONM > 0) CALL STOPTIME(26,1)
+        IF (IMONM > 0) CALL STOPTIME(TIMERS,26)
 !$OMP END SINGLE
       END IF
 

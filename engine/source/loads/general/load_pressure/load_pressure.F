@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,14 +34,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod               ../engine/share/modules/h3d_mod.F
       !||    python_funct_mod      ../common_source/modules/python_mod.F90
-      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||    th_surf_mod           ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE LOAD_PRESSURE (ILOADP          ,LOADP       ,LLOADP   ,NPC     ,TF        ,
      2                          A               ,V           ,X       ,SKEW     ,SENSOR_TAB,
      3                          IADC            ,FSKY        ,FEXT    ,TAGNCONT ,NSENSOR   ,
      4                          LOADP_HYD_INTER , H3D_DATA   , PYTHON, 
-     5                          NPRESLOAD       ,LOADP_TAGDEL,TH_SURF)
+     5                          NPRESLOAD       ,LOADP_TAGDEL,TH_SURF,PBLAST    ,WFEXT)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -49,6 +49,7 @@ C-----------------------------------------------
       USE H3D_MOD
       USE SENSOR_MOD
       USE TH_SURF_MOD , ONLY : TH_SURF_
+      USE PBLAST_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -59,7 +60,7 @@ C-----------------------------------------------
 C   C o m m o n   B l o c k s
 C-----------------------------------------------
 #include      "com04_c.inc"
-#include      "com06_c.inc"
+!#include      "com06_c.inc"
 #include      "com08_c.inc"
 #include      "impl1_c.inc"
 #include      "scr14_c.inc"
@@ -82,6 +83,8 @@ C-----------------------------------------------
       INTEGER, INTENT(IN) :: LOADP_TAGDEL(NPRESLOAD)
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
       TYPE (TH_SURF_) , INTENT(INOUT) :: TH_SURF
+      TYPE(PBLAST_), INTENT(IN) :: PBLAST
+      DOUBLE PRECISION,INTENT(INOUT) :: WFEXT
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -90,26 +93,24 @@ C-----------------------------------------------
      .        SEGCONT ,N ,IADN , IJK ,UP_BOUND,TAGN1,TAGN2,TAGN3,TAGN4,NUMPRESLOAD,
      .        IDEL, NSEGPL, NS, KSURF,NIDXLOAD
       INTEGER :: IS_TABULATED
-      my_real
-     .   NX, NY, NZ,  AA, FX, FY, FZ, DYDX, TS,
-     .   TFEXTT,F1, FCX,FCY,NORM,AREA 
-      my_real FINTER
-      EXTERNAL FINTER
-C=======================================================================
+      my_real  NX, NY, NZ,  AA, FX, FY, FZ, DYDX, TS, WFEXTT,F1, FCX,FCY,NORM,AREA
+      my_real,EXTERNAL :: FINTER
 C---------------------------------------------------------------------
 C   D e s c r i p t i o n
 C----------------------------------------------------------------------
 C     This subroutine is applying pressure load to
 C      a defined surface on dynamic zones which is not in contact
 C---------------------------------------------------------------------
-      TFEXTT = ZERO
-
+      WFEXTT = ZERO
+      FX = ZERO
+      FY = ZERO
+      FZ = ZERO
       IANIM  = ANIM_V(5)+OUTP_V(5)+H3D_DATA%N_VECT_FINT+
      .         ANIM_V(6)+OUTP_V(6)+H3D_DATA%N_VECT_FEXT
 C
       NUMPRESLOAD = 0
       NSEGPL = TH_SURF%NSEGLOADPF+TH_SURF%NSEGLOADPB
-      NIDXLOAD = NLOADP_F+NLOADP_B
+      NIDXLOAD = NLOADP_F+PBLAST%NLOADP_B
       IF(IPARIT==0) THEN
 C code SPMD Parith/OFF or SMP 
        DO  NP= 1,NLOADP_HYD
@@ -320,7 +321,7 @@ C
                     ENDDO
                   ENDIF
 C
-                  TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
+                  WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                         +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
      +                         +FZ*(V(3,N1)+V(3,N2)+V(3,N3)+V(3,N4)))
 C
@@ -441,7 +442,7 @@ C
                     ENDDO
                   ENDIF
 C
-                  TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)) 
+                  WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
      +                              + FY*(V(2,N1)+V(2,N2)+V(2,N3))
      +                              + FZ*(V(3,N1)+V(3,N2)+V(3,N3)))
                ENDIF
@@ -453,7 +454,7 @@ C
        ENDDO
 C
 #include "atomic.inc"
-       TFEXT = TFEXT + TFEXTT
+       WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
 C
       ELSE
@@ -692,7 +693,7 @@ C
                        th_surf%channels(5,KSURF)= th_surf%channels(5,KSURF) + AREA
                     ENDDO
                   ENDIF
-                  TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
+                  WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)+V(1,N4))
      +                         +FY*(V(2,N1)+V(2,N2)+V(2,N3)+V(2,N4))
      +                         +FZ*(V(3,N1)+V(3,N2)+V(3,N3)+V(3,N4)))
 C
@@ -817,7 +818,7 @@ C
                     ENDDO
                   ENDIF
 
-                  TFEXTT=TFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3)) 
+                  WFEXTT=WFEXTT+DT1*(FX*(V(1,N1)+V(1,N2)+V(1,N3))
      +                              + FY*(V(2,N1)+V(2,N2)+V(2,N3))
      +                              + FZ*(V(3,N1)+V(3,N2)+V(3,N3)))
 
@@ -830,7 +831,7 @@ C
        ENDDO
 C
 #include "atomic.inc"
-        TFEXT = TFEXT + TFEXTT
+        WFEXT = WFEXT + WFEXTT
 #include "atomend.inc"
 C
       ENDIF

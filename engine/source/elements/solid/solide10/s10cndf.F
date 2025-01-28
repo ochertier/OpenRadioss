@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -936,12 +936,15 @@ C----6---------------------------------------------------------------7---------8
       RETURN
       END
       !||====================================================================
-      !||    cndmasi2_dim    ../engine/source/elements/solid/solide10/s10cndf.F
+      !||    cndmasi2_dim         ../engine/source/elements/solid/solide10/s10cndf.F
       !||--- called by ------------------------------------------------------
-      !||    resol_init      ../engine/source/engine/resol_init.F
+      !||    resol_init           ../engine/source/engine/resol_init.F
+      !||--- calls      -----------------------------------------------------
+      !||    spmd_exch_tag_scnd   ../engine/source/mpi/elements/spmd_exch_tag_scnd.F
       !||--- uses       -----------------------------------------------------
       !||====================================================================
-      SUBROUTINE CNDMASI2_DIM(IPARI,INTBUF_TAB,ICNDS10,ITAGND,WEIGHT,NKEND)
+      SUBROUTINE CNDMASI2_DIM(IPARI,INTBUF_TAB,ICNDS10,ITAGND,WEIGHT,NKEND,
+     1                        IAD_CNDS,FR_CNDS,S_FR ,NSPMD)
 C-----------------------------------------------
 C   M o d u l e s
 C----------------------------------------------- 
@@ -958,6 +961,9 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      INTEGER  NSPMD,S_FR
+      INTEGER, INTENT(IN),DIMENSION(NSPMD+1) :: IAD_CNDS
+      INTEGER, INTENT(IN),DIMENSION(S_FR)    :: FR_CNDS
       INTEGER IPARI(NPARI,NINTER),ITAGND(*),ICNDS10(3,*),WEIGHT(*),
      1             NKEND 
       TYPE(INTBUF_STRUCT_), DIMENSION(NINTER) :: INTBUF_TAB
@@ -971,11 +977,10 @@ C=======================================================================
         IF (N > 0) THEN
          ITAGND(N) = I
         ELSEIF(N < 0) THEN 
-         ITAGND(-N) = I
+         ITAGND(-N) = -I
         END IF
        END DO
-       NKEND = 0
-C -------only cinematic--> mass condensation
+! ----tag first the middle nodes which are on the main side of int2 (added mass compute)
       DO N=1,NINTER
         NTY  = IPARI(7,N)
         IF (NTY == 2 ) THEN
@@ -985,34 +990,48 @@ C -------only cinematic--> mass condensation
          IF (ILEV == 27 .or. ILEV == 28) THEN
           DO I=1,NSN
            IF (INTBUF_TAB(N)%IRUPT(I) /= 1) THEN
+            NS = INTBUF_TAB(N)%NSV(I)
             L = INTBUF_TAB(N)%IRTLM(I)
               DO J = 1, 4
                II = 4*(L-1)+J
                IM = INTBUF_TAB(N)%IRECTM(II)
-             IF (WEIGHT(IM)==0) CYCLE
-             IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
-              NKEND = NKEND + 1
-              ITAGND(IM) =ITAGND(IM) + NS10E
-             END IF
+               IF (ITAGND(IM)>0.AND.ITAGND(IM)<= NS10E) THEN
+                ITAGND(IM) = ITAGND(IM) + NS10E
+               ELSEIF(ITAGND(IM)<0.AND.ITAGND(IM)>= -NS10E) THEN
+                ITAGND(IM) = ITAGND(IM) - NS10E
+               END IF
             END DO
-           END IF 
+           END IF !(INTBUF_TAB(N)%IRUPT(I) /= 1) THEN
           END DO 
          ELSEIF (ILEV <= 5 .or. ILEV == 30) THEN
           DO I=1,NSN
+           NS = INTBUF_TAB(N)%NSV(I)
            L = INTBUF_TAB(N)%IRTLM(I)
              DO J = 1, 4
               II = 4*(L-1)+J
               IM = INTBUF_TAB(N)%IRECTM(II)
-             IF (WEIGHT(IM)==0) CYCLE
-             IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
-              NKEND = NKEND + 1
-              ITAGND(IM) =ITAGND(IM) + NS10E
-             END IF
+              IF (ITAGND(IM)>0.AND.ITAGND(IM)<= NS10E) THEN
+               ITAGND(IM) = ITAGND(IM) + NS10E
+              ELSEIF(ITAGND(IM)<0.AND.ITAGND(IM)>= -NS10E) THEN
+               ITAGND(IM) = ITAGND(IM) - NS10E
+              END IF
            END DO 
           END DO 
          END IF
         END IF
       END DO 
+!--------comm to synchro the case iabs(ITAGND(Nd))>NS10E main of int2
+       IF (NSPMD>1) THEN
+        SIZ = IAD_CNDS(NSPMD+1)-IAD_CNDS(1)
+        CALL SPMD_EXCH_TAG_SCND(ITAGND,FR_CNDS,IAD_CNDS,SIZ)
+       END IF
+! ----change setting of IMAP2ND by adding a comm to avoid missing the case due to weight=0
+       NKEND = 0
+       DO I = 1, NS10E
+         N = IABS(ICNDS10(1,I))
+         II = IABS(ITAGND(N))
+         IF (II >NS10E  .AND. WEIGHT(N)/=0) NKEND = NKEND + 1
+       END DO
 C
       RETURN
       END
@@ -1051,58 +1070,18 @@ C-----------------------------------------------
       INTEGER I,J,N,NTY,NSN,NMN,IM,II,N1,N2,ND,NS,ILEV,IPEN,L,NK,SIZ
 C=======================================================================
 C -------only cinematic--> mass condensation
-C-----MASI2ND0 can be done here because DTNODA is called after INTTI1
+C-----MASI2ND0 will be modified (as added mass) after DTNODA 
+       NK = 0
        DO I = 1, NS10E
-        N = ICNDS10(1,I)
-        IF (N > 0) THEN
-         ITAGND(N) = I
-        ELSEIF(N < 0) THEN 
-         ITAGND(-N) = I
-        END IF
-       END DO
-      NK = 0
-      DO N=1,NINTER
-        NTY  = IPARI(7,N)
-        IF (NTY == 2 ) THEN
-         NMN =IPARI(6,N)                                 
-         NSN   = IPARI(5,N)
-         ILEV = IPARI(20,N)
-         IF (ILEV == 27 .or. ILEV == 28) THEN
-          DO I=1,NSN
-           IF (INTBUF_TAB(N)%IRUPT(I) /= 1) THEN
-            L = INTBUF_TAB(N)%IRTLM(I)
-              DO J = 1, 4
-               II = 4*(L-1)+J
-               IM = INTBUF_TAB(N)%IRECTM(II)
-             IF (WEIGHT(IM)==0) CYCLE
-             IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
-              NK = NK + 1
-              IMAP2ND(NK) = ITAGND(IM)
-              MASI2ND0(NK) = MS(IM)
-              ITAGND(IM) =ITAGND(IM) + NS10E
-             END IF
-            END DO
-           END IF 
-          END DO 
-         ELSEIF (ILEV <= 5 .or. ILEV == 30) THEN
-          DO I=1,NSN
-           L = INTBUF_TAB(N)%IRTLM(I)
-             DO J = 1, 4
-              II = 4*(L-1)+J
-              IM = INTBUF_TAB(N)%IRECTM(II)
-             IF (WEIGHT(IM)==0) CYCLE
-             IF (ITAGND(IM)>0 .AND.ITAGND(IM)<= NS10E) THEN
-              NK = NK + 1
-              IMAP2ND(NK) = ITAGND(IM)
-              MASI2ND0(NK) = MS(IM)
-              ITAGND(IM) =ITAGND(IM) + NS10E
-             END IF
-           END DO 
-          END DO 
+         N = IABS(ICNDS10(1,I))
+         II = IABS(ITAGND(N)) 
+         IF (II >NS10E .AND. WEIGHT(N)/=0) THEN
+            NK = NK + 1
+            IMAP2ND(NK) = I
+            MASI2ND0(NK) = MS(N)
          END IF
-        END IF
-      END DO 
-C
+       END DO
+!
       RETURN
       END
       !||====================================================================

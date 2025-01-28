@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    grelem_sav            ../engine/source/output/th/grelem_sav.F
       !||    sensor_energy_bilan   ../engine/source/tools/sensor/sensor_energy_bilan.F
       !||--- uses       -----------------------------------------------------
-      !||    sensor_mod            ../engine/share/modules/sensor_mod.F
+      !||    sensor_mod            ../common_source/modules/sensor_mod.F90
       !||====================================================================
       SUBROUTINE CBILAN(
      1   JFT,      JLT,      PM,       V,
@@ -47,7 +47,10 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      A   Y2G,      Y3G,      Y4G,      Z1G,
      B   Z2G,      Z3G,      Z4G,      IXFEM,
      C   IEXPAN,   EINTTH,   ITASK,    GVOL,
-     D   ACTIFXFEM,IGRE)
+     D   ACTIFXFEM,IGRE,SENSORS)
+C-----------------------------------------------
+C   M o d u l e s
+C-----------------------------------------------
       USE SENSOR_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
@@ -82,6 +85,7 @@ C     REAL
      .   VL1(MVSIZ,3),VL2(MVSIZ,3),VL3(MVSIZ,3),VL4(MVSIZ,3),
      .   VRL1(MVSIZ,3),VRL2(MVSIZ,3),VRL3(MVSIZ,3),VRL4(MVSIZ,3)
       my_real, INTENT(IN) :: GVOL(MVSIZ)
+      type (sensors_),INTENT(INOUT) :: SENSORS
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -471,7 +475,7 @@ C
         ENDIF
       ENDDO
 C
-      CALL SENSOR_ENERGY_BILAN(JFT,JLT,EI,EK,OFF,IPARTC,ITASK)      
+      CALL SENSOR_ENERGY_BILAN(JFT,JLT,EI,EK,OFF,IPARTC,ITASK,SENSORS)      
 C---
       RETURN
       END

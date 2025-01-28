@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -34,16 +34,17 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    i11dst3                    ../engine/source/interfaces/int11/i11dst3.F
       !||    i11for3                    ../engine/source/interfaces/int11/i11for3.F
       !||    i11therm                   ../engine/source/interfaces/int11/i11therm.F
-      !||    startime                   ../engine/source/system/timer.F
-      !||    stoptime                   ../engine/source/system/timer.F
+      !||    startime                   ../engine/source/system/timer_mod.F90
+      !||    stoptime                   ../engine/source/system/timer_mod.F90
       !||    sum_6_float_sens           ../engine/source/system/parit.F
       !||--- uses       -----------------------------------------------------
       !||    h3d_mod                    ../engine/share/modules/h3d_mod.F
       !||    intbuf_fric_mod            ../common_source/modules/interfaces/intbuf_fric_mod.F90
       !||    message_mod                ../engine/share/message_module/message_mod.F
       !||    my_alloc_mod               ../common_source/tools/memory/my_alloc.F90
+      !||    timer_mod                  ../engine/source/system/timer_mod.F90
       !||====================================================================
-      SUBROUTINE I11MAINF(
+      SUBROUTINE I11MAINF(TIMERS,
      1      IPARI   ,X         ,A       ,
      2      ICODT   ,FSAV      ,V        ,MS     ,DT2T    ,
      3      NELTST  ,ITYPTST   ,ITAB     ,STIFN  ,FSKYI   ,
@@ -55,10 +56,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      9      NPC     ,TF        ,CONDN    ,CONDNSKYI,FBSAV6,
      A      ISENSINT,DIMFB     ,FSAVSUB  ,H3D_DATA ,INTBUF_FRIC_TAB,
      B      ITASK   ,TAGNCONT  ,KLOADPINTER,LOADPINTER,LOADP_HYD_INTER,
-     C      DGAPLOADINT,S_LOADPINTER)
+     C      DGAPLOADINT,S_LOADPINTER,NODADT_THERM)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
+      USE TIMER_MOD
       USE INTBUFDEF_MOD
       USE H3D_MOD
       USE INTBUF_FRIC_MOD
@@ -87,6 +89,8 @@ C-----------------------------------------------
 C-----------------------------------------------
 C   D u m m y   A r g u m e n t s
 C-----------------------------------------------
+      TYPE(TIMER_), INTENT(IN) :: TIMERS
+      INTEGER ,INTENT(IN) :: NODADT_THERM
       INTEGER NELTST,ITYPTST,NIN,NEWFRONT,NSTRF(*)
       INTEGER IPARI(*), ICODT(*),
      .        ITAB(*), ISKY(*),ICONTACT(*),TAGNCONT(NLOADP_HYD_INTER,NUMNOD)
@@ -340,7 +344,7 @@ C preparation candidats retenus
 
           JLT = JLT_NEW
           IF(JLT_NEW/=0) THEN
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STARTIME(TIMERS,20)
             IPARI(29) = 1
             IF (DEBUG(3)>=1)
      .        NB_JLT_NEW = NB_JLT_NEW + JLT_NEW
@@ -348,7 +352,7 @@ C preparation candidats retenus
 C-------------------------------------------------------------------------------
 C Friction model : computation of friction coefficients based on Material of connected Parts
 C-------------------------------------------------------------------------------
-      IF(ITASK==1) CALL STARTIME(MACRO_TIMER_FRIC,1)
+      IF(ITASK==1) CALL STARTIME(TIMERS,MACRO_TIMER_FRIC)
        JJ = 0
       CALL FRICTIONPARTS_MODEL_ISOT(
      1   INTFRIC    ,JLT          ,IPARTFRICSI      ,IPARTFRICMI  ,ADPARTS_FRIC,
@@ -358,7 +362,7 @@ C-------------------------------------------------------------------------------
      5   JJ         , TINT        ,TEMPI1           ,NPC          ,TF          ,
      6   TEMP       , HS1         ,HS2              ,HM1          ,HM2         ,
      7   N1         , N2          ,M1               ,M2           ,IFORM       )  
-      IF(ITASK==1) CALL STOPTIME(MACRO_TIMER_FRIC,1)
+      IF(ITASK==1) CALL STOPTIME(TIMERS,MACRO_TIMER_FRIC)
 
       CALL I11FOR3(
      1  JLT          ,FSAV    ,GAP                 ,FRIC       ,MS      ,
@@ -410,7 +414,7 @@ C
      A  C2           ,C3           ,C4          ,INTTH       ,PHIS1    ,
      B  PHIS2        ,PHIM1        ,PHIM2       ,FTHE        ,FTHESKYI ,
      C  CONDINTS1    ,CONDINTS2    ,CONDINTM1   ,CONDINTM2   ,CONDN    ,
-     D  CONDNSKYI    ,JTASK        ,H3D_DATA    )
+     D  CONDNSKYI    ,JTASK        ,H3D_DATA    ,NODADT_THERM)
 C
             IF(IMPL_S==1) THEN
               DO I = 1 ,JLT_NEW
@@ -419,7 +423,7 @@ C
               ENDDO
               NUM_IMP=NUM_IMP+JLT_NEW
             ENDIF
-            IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(20,1)
+            IF (IMONM > 0 .AND. JTASK == 1) CALL STOPTIME(TIMERS,20)
           ENDIF
       ENDDO
       IF (SFSAVPARIT /= 0)THEN

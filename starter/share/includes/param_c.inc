@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>    
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -35,8 +35,8 @@ C
      .               NGJOINT,NUMMPC,NNPRW  ,NPEBC  ,NPROPGI,
      .               NPROPMI,NPARIR,LFXVELR,LFACCLD,NPEBCR ,
      .               NITHGR ,NRDAMP,LIPART,KSH4TREE,KSH3TREE,
-     .               KPADMESH,KIPADMESH,NIFT,NICONV,LFACTHER,
-     .               NRBE3L, NPLYMAX,NPLYXFE,EPLYXFE,NIRADIA,
+     .               KPADMESH,KIPADMESH,
+     .               NRBE3L, NPLYMAX,NPLYXFE,EPLYXFE,
      .               NRBE2L, NPLYNODG,LSKEW,LISKN,LFACLOAD,
      .               NCRKNODG, NIBSPH,NALENOVS,LLACCELM,
      .               LLGAUGE,NIXIG3D,NPT_STACK,NS_STACK,NUMMAT_OLD,
@@ -55,8 +55,8 @@ C
      .               NGJOINT,NUMMPC,NNPRW  ,NPEBC  ,NPROPGI,
      .               NPROPMI,NPARIR,LFXVELR,LFACCLD,NPEBCR ,
      .               NITHGR ,NRDAMP,LIPART,KSH4TREE,KSH3TREE,
-     .               KPADMESH,KIPADMESH,NIFT,NICONV,LFACTHER,
-     .               NRBE3L, NPLYMAX,NPLYXFE,EPLYXFE,NIRADIA,
+     .               KPADMESH,KIPADMESH,
+     .               NRBE3L, NPLYMAX,NPLYXFE,EPLYXFE,
      .               NRBE2L, NPLYNODG,LSKEW,LISKN,LFACLOAD,
      .               NCRKNODG, NIBSPH,NALENOVS,LLACCELM,
      .               LLGAUGE,NIXIG3D,NPT_STACK,NS_STACK,NUMMAT_OLD,

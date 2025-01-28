@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -587,7 +587,7 @@ c
             !     -> Derivative of FP with respect to KAP
             DFP_DKAP = DFP_DQH1*DQH1_DKAP + DFP_DQH2*DQH2_DKAP
             DFP_DKAP = MIN(DFP_DKAP,ZERO)
-            !     -> Computation of RH and XSIH parameters + Euclidian norm of derivative 
+            !     -> Computation of RH and XSIH parameters + Euclidean norm of derivative 
             RH = -(SIGM(I)/FC(I)) - THIRD
             IF (RH >= ZERO) THEN 
               XSIH = AH-(AH-BH)*EXP(-RH/CH)

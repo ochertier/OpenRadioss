@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -25,10 +25,12 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||--- called by ------------------------------------------------------
       !||    init_nodal_state            ../engine/source/interfaces/interf/init_nodal_state.F
       !||--- calls      -----------------------------------------------------
-      !||    sysfus2                     ../engine/source/system/sysfus.F
+      !||    get_local_node_id           ../engine/source/engine/node_spliting/nodal_arrays.F90
+      !||--- uses       -----------------------------------------------------
+      !||    nodal_arrays_mod            ../engine/source/engine/node_spliting/nodal_arrays.F90
       !||====================================================================
         SUBROUTINE COUNT_REMOTE_NB_ELEM_EDGE( SIZE_BUFFER,BUFFER,GEO,IXS,IXC,
-     .                                 IXT,IXP,IXR,IXTG,ADDCNEL,ITABM1,CNEL,CHUNK)
+     .                                 IXT,IXP,IXR,IXTG,ADDCNEL,NODES,CNEL,CHUNK)
 !$COMMENT
 !       COUNT_REMOTE_NB_ELEM_EDGE description
 !           check if a list of node is associated 
@@ -41,6 +43,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
 !           - if it's true, send to the remote processor "you need to deactivate
 !             the nodes from your interface!"
 !$ENDCOMMENT
+       USE nodal_arrays_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -64,7 +67,7 @@ C-----------------------------------------------
         INTEGER, DIMENSION(NIXR,NUMELR),TARGET, INTENT(in) :: IXR! spring array
         INTEGER, DIMENSION(NIXTG,NUMELTG),TARGET, INTENT(in) :: IXTG! triangle array
         INTEGER, DIMENSION(0:NUMNOD+1), INTENT(in) :: ADDCNEL ! address for the CNEL array
-        INTEGER, DIMENSION(NUMNOD), INTENT(in) :: ITABM1    ! array of global id
+        TYPE(nodal_arrays_), intent(inout) :: NODES
         my_real, DIMENSION(NPROPG,NUMGEO), INTENT(in) :: GEO
         INTEGER, DIMENSION(0:LCNEL), INTENT(in) :: CNEL ! connectivity node-->element
 C-----------------------------------------------
@@ -84,7 +87,6 @@ C-----------------------------------------------
         INTEGER, DIMENSION(:), ALLOCATABLE :: LIST_ELEMENT
         LOGICAL, DIMENSION(:), ALLOCATABLE :: ALREADY_HERE
 
-        INTEGER :: SYSFUS2 ! external function : give the local ID of a global node ID
 C-----------------------------------------------
         ! --------------------------
         OFFSET_SOLID = 0
@@ -110,12 +112,12 @@ C-----------------------------------------------
         DO J=1,SIZE_BUFFER,CHUNK
             NIN = BUFFER(J)
             GLOBAL_NODE(1:4) = BUFFER(J+2:J+CHUNK-1)
-            LOCAL_NODE(1) = SYSFUS2(GLOBAL_NODE(1),ITABM1,NUMNOD)
-            LOCAL_NODE(2) = SYSFUS2(GLOBAL_NODE(2),ITABM1,NUMNOD)
+            LOCAL_NODE(1) = GET_LOCAL_NODE_ID(NODES,GLOBAL_NODE(1))
+            LOCAL_NODE(2) = GET_LOCAL_NODE_ID(NODES,GLOBAL_NODE(2))
             LOCAL_NODE(3:4) = NUMNOD+1
             NUMBER_NODE = 2 ! for type 11, there are 2 nodes per segments
-            IF(GLOBAL_NODE(3)/=0) LOCAL_NODE(3) = SYSFUS2(GLOBAL_NODE(3),ITABM1,NUMNOD)
-            IF(GLOBAL_NODE(4)/=0) LOCAL_NODE(4) = SYSFUS2(GLOBAL_NODE(4),ITABM1,NUMNOD)
+            IF(GLOBAL_NODE(3)/=0) LOCAL_NODE(3) = GET_LOCAL_NODE_ID(NODES, GLOBAL_NODE(3))
+            IF(GLOBAL_NODE(4)/=0) LOCAL_NODE(4) = GET_LOCAL_NODE_ID(NODES, GLOBAL_NODE(4)) 
             IF( (GLOBAL_NODE(3)/=0).AND.(GLOBAL_NODE(4)/=0) ) NUMBER_NODE = 4 ! for type 7, there are 4 nodes per segments
             BUFFER(J+2:J+3) = 0
             N1 = LOCAL_NODE(1)

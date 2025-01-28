@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -38,6 +38,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    spmd_exch_a_int2h       ../engine/source/mpi/forces/spmd_exch_a_int2h.F
       !||    spmd_exch_a_int2h_ams   ../engine/source/mpi/forces/spmd_exch_a_int2h_ams.F
       !||--- uses       -----------------------------------------------------
+      !||    glob_therm_mod          ../common_source/modules/mat_elem/glob_therm_mod.F90
       !||    h3d_mod                 ../engine/share/modules/h3d_mod.F
       !||====================================================================
       SUBROUTINE INTTI1(
@@ -49,13 +50,14 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      6   FSAV     ,NPF      ,TF       ,FNCONT  ,IAD_ELEM ,FR_ELEM ,
      7   NODNX_SMS,DMINT2   ,PDAMA2   ,NB_FRI2M,FR_LOCI2M,
      8   DT2T     ,NELTST   ,ITYPTST  ,INTBUF_TAB,TEMP   ,MCP     ,
-     9   FTHE     ,CONDN    ,
+     9   FTHE     ,CONDN    ,GLOB_THERM,
      A   H3D_DATA ,T2FAC_SMS,FNCONTP  ,FTCONTP)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE INTBUFDEF_MOD
       USE H3D_MOD
+      use glob_therm_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -92,6 +94,7 @@ C     REAL
 
       TYPE(INTBUF_STRUCT_) INTBUF_TAB(*)
       TYPE (H3D_DATABASE) :: H3D_DATA
+      type (glob_therm_) ,intent(inout)   :: glob_therm
 C-----------------------------------------------
 C   L o c a l   V a r i a b l e s
 C-----------------------------------------------
@@ -179,7 +182,7 @@ C   correction pb poff si main dans plusieurs interfaces type2
      .              IPARI(1,N) ,X        ,V      ,  
      .              A          ,VR       ,AR     ,MS    ,IN    ,          
      .               WEIGHT     ,STIFN    ,STIFR  ,MCP   ,CONDN , 
-     .               FTHE       ,INTBUF_TAB(N)    )               
+     .               FTHE       ,INTBUF_TAB(N)    ,GLOB_THERM%ITHERM_FE,GLOB_THERM%NODADT_THERM)               
               ENDIF                                           
             ENDIF                                             
           ENDDO                                               
@@ -211,11 +214,11 @@ c       ELSEIF(IMACH == 3.AND.IPARIT /= 0.AND.NHIN2 /= 0)THEN
         END DO 
       ENDIF
 C
-      IF(IPARIT /= 0.AND.INTHEAT /= 0)THEN 
+      IF (IPARIT /= 0 .AND. GLOB_THERM%INTHEAT /= 0)THEN 
         DO I=1,LCNI2                                          
            FTHESKYI2(I)=ZERO                                  
         END DO  
-        IF(IDT_THERM == 1) THEN
+        IF (GLOB_THERM%IDT_THERM == 1) THEN
           DO I=1,LCNI2                                          
            CONDNSKYI2(I)=ZERO  
           ENDDO                                
@@ -260,7 +263,7 @@ C---
      6       MS_PENA   ,DT2T     ,NELTST   ,ITYPTST ,INTBUF_TAB(N),TEMP,
      7       FTHE      ,FTHESKYI2,CONDN    ,CONDNSKYI2,ITAB,
      8       SAV_INER_POFF     ,H3D_DATA,T2FAC_SMS,FNCONTP ,
-     A       FTCONTP)
+     A       FTCONTP,GLOB_THERM%IDT_THERM  ,GLOB_THERM%THEACCFACT)
             ELSE
         !       WARNING : if NSN==0 and ILEV==2 or 4, ones needs to save the mass 
                 ILEV = IPARI(20,N)
@@ -294,7 +297,7 @@ C---
       ENDDO 
       IF (INTTH2 == 1) THEN
         I2SIZETH = I2SIZE + 1
-        IF(IDT_THERM == 1) I2SIZETH = I2SIZETH + 1
+        IF (GLOB_THERM%IDT_THERM == 1) I2SIZETH = I2SIZETH + 1
       ELSE
           I2SIZETH = I2SIZE  
       ENDIF                                                           
@@ -309,13 +312,13 @@ C version spmd avec plus d'1 proc : sommer A et AR sur les noeuds main
      .            A    ,AR   ,MS      ,IN     ,STIFN,
      .            STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
      .            NB_FRI2M,FR_LOCI2M,INTTH2,FTHE,CONDN,
-     .            FNCONT,FNCONTP,FTCONTP,H3D_DATA)
+     .            FNCONT,FNCONTP,FTCONTP,H3D_DATA,GLOB_THERM%IDT_THERM)
             ELSE
               CALL SPMD_EXCH_A_INT2(
      .            A    ,AR   ,MS      ,IN     ,STIFN,
      .            STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
      .            INTTH2,FTHE ,CONDN  ,FNCONT ,FNCONTP ,
-     .            FTCONTP,H3D_DATA )
+     .            FTCONTP,H3D_DATA ,GLOB_THERM%IDT_THERM)
              ENDIF
           ELSE
             LCOMI2M = IAD_I2M(NSPMD+1)
@@ -324,13 +327,13 @@ C version spmd avec plus d'1 proc : sommer A et AR sur les noeuds main
      .         A    ,AR   ,MS      ,IN     ,STIFN,
      .         STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
      .         NB_FRI2M,FR_LOCI2M,TAGNOD,INTTH2,FTHE,
-     .         CONDN,FNCONT,FNCONTP,FTCONTP,H3D_DATA )
+     .         CONDN,FNCONT,FNCONTP,FTCONTP,H3D_DATA ,GLOB_THERM%IDT_THERM)
             ELSE
               CALL SPMD_EXCH_A_INT2H(
      .         A    ,AR   ,MS      ,IN     ,STIFN,
      .         STIFR,FR_I2M,IAD_I2M,LCOMI2M,I2SIZETH,
      .         TAGNOD,INTTH2,FTHE  ,CONDN  ,FNCONT  ,
-     .         FNCONTP,FTCONTP,H3D_DATA )
+     .         FNCONTP,FTCONTP,H3D_DATA ,GLOB_THERM%IDT_THERM)
             ENDIF
           END IF
         ELSEIF (IPARIT > 0) THEN
@@ -343,7 +346,7 @@ C         version spmd p/on
      1         FR_I2M  ,IAD_I2M,ADDCNI2,PROCNI2,FR_NBCCI2,
      2         I2SIZETH,LENR   ,LENS   ,FSKYI2 ,INTTH2   ,
      3         FTHESKYI2,CONDNSKYI2 ,I2SIZE,LCOMI2M,FNCONT,
-     4         FNCONTP,FTCONTP,H3D_DATA )
+     4         FNCONTP,FTCONTP,H3D_DATA ,GLOB_THERM%IDT_THERM)
           END IF
 C
 C Routine assemblage parith/ON
@@ -353,7 +356,7 @@ C Rare case where type2 interfaces are defined with no more active secnd nodes
      *    CALL ASSPARI2(
      1       A    ,AR    ,STIFN ,STIFR  ,MS               ,
      2       IN   ,FSKYI2,I2SIZE,ADDCNI2,ADDCNI2(NUMNOD+2),
-     3      FTHESKYI2, FTHE ,CONDNSKYI2,CONDN)
+     3       FTHESKYI2, FTHE ,CONDNSKYI2,CONDN,GLOB_THERM)
         ENDIF
       ENDIF
 C

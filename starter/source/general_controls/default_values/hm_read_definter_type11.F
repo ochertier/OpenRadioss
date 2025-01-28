@@ -1,5 +1,5 @@
 Copyright>        OpenRadioss
-Copyright>        Copyright (C) 1986-2024 Altair Engineering Inc.
+Copyright>        Copyright (C) 1986-2025 Altair Engineering Inc.
 Copyright>
 Copyright>        This program is free software: you can redistribute it and/or modify
 Copyright>        it under the terms of the GNU Affero General Public License as published by
@@ -103,8 +103,6 @@ C
       CALL HM_GET_INTV('NodDel11',IDEL11,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('IFORM',IFORM,IS_AVAILABLE,LSUBMODEL)
       CALL HM_GET_INTV('INACTIV',INACTI,IS_AVAILABLE,LSUBMODEL)
-C
-      IF(INTTH > 0 ) INTHEAT = 1
 C
       KEY1='IGSTI'
       CALL DEFINTER(KEY1     ,IGSTI    ,IASSIGN   ,IPRINT   ,
