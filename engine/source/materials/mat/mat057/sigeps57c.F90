@@ -142,6 +142,7 @@
         vp           = matparam%iparam(2)  !< Flag for plastic strain rate
         !< Recovering real model parameters
         young(1:nel) = matparam%young      !< Young modulus
+        nu           = matparam%nu         !< Poisson ratio
         shear(1:nel) = matparam%shear      !< Shear modulus
         a11(1:nel)   = matparam%uparam(1)  !< First term of stifness matrix
         a12(1:nel)   = matparam%uparam(2)  !< Second term of stifness matrix
@@ -184,16 +185,16 @@
         ipos(1:nel,2) = 1
         call table_mat_vinterp(matparam%table(1),nel,nel,ipos,xvec,yld0,dyld0_dp)
 !     
-        !=========================================================================
+        !=======================================================================
         !< - RECOVERING USER VARIABLES AND STATE VARIABLES
-        !=========================================================================
+        !=======================================================================
         dpla(1:nel)   = zero !< Cumulated plastic strain increment
         deplzz(1:nel) = zero !< Plastic strain increment component zz
         etse(1:nel)   = one  !< Coefficient for hourglass control
 !
-        !=========================================================================
+        !=======================================================================
         !< - ELASTIC PARAMETERS COMPUTATION
-        !=========================================================================
+        !=======================================================================
         !< Tabulated Young modulus evolution
         if (opte > 0) then
           xvec(1:nel,1) = pla(1:nel)
@@ -213,14 +214,14 @@
           enddo
         endif
 !
-        !=========================================================================
+        !=======================================================================
         !< - COMPUTATION OF TRIAL STRESS TENSOR, VON MISES AND PRESSURE
-        !=========================================================================
+        !=======================================================================
         !< Trial stress tensor computation
         do i=1,nel
-          signxx(i) = sigoxx(i)/max(one-dmg(i,3),em20) +   a11(i)*depsxx(i)      &
+          signxx(i) = sigoxx(i)/max(one-dmg(i,3),em20) +   a11(i)*depsxx(i)    &
                                                        +   a12(i)*depsyy(i)
-          signyy(i) = sigoyy(i)/max(one-dmg(i,3),em20) +   a12(i)*depsxx(i)      &
+          signyy(i) = sigoyy(i)/max(one-dmg(i,3),em20) +   a12(i)*depsxx(i)    &
                                                        +   a11(i)*depsyy(i)
           signxy(i) = sigoxy(i)/max(one-dmg(i,3),em20) + shear(i)*depsxy(i)               
           signyz(i) = sigoyz(i)/max(one-dmg(i,3),em20) + shear(i)*depsyz(i)*shf(i)
@@ -249,9 +250,9 @@
           k1(i) = half*(signxx(i) + h*signyy(i))/normsig(i)
           k2(i) = sqrt((half*(signxx(i)-h*signyy(i)))**2 +(p*signxy(i))**2)/   &
                      normsig(i)
-          seq(i) = a*exp(m*log(abs(k1(i)+k2(i)))) +                            &
-                   a*exp(m*log(abs(k1(i)-k2(i)))) +                            &
-                     c*exp(m*log(abs(two*k2(i))))
+          seq(i) = a*(abs(k1(i)+k2(i)))**m +                                   &
+                   a*(abs(k1(i)-k2(i)))**m +                                   &
+                     c*(abs(two*k2(i)))**m
           if (seq(i) > zero) then 
             seq(i) = exp((one/m)*log(half*seq(i)))  
           else
@@ -290,9 +291,9 @@
           endif
         enddo
 !
-        !=========================================================================
+        !=======================================================================
         !< - RETURN MAPPING PROCEDURES (PLASTIC CORRECTION)
-        !=========================================================================
+        !=======================================================================
         if (nindx > 0) then 
 !
           !< Loop over the iterations
@@ -317,13 +318,13 @@
               !-----------------------------------------------------------------
 !
               !< Derivative of equivalent stress w.r.t k1 and k2
-              dseq_dk1 = (exp((one-m)*log(seq(i)/normsig(i))))*(a/two)*(       &
-                sign(one,k1(i) + k2(i))*exp((m-one)*log(abs(k1(i) + k2(i))))   &
-               +sign(one,k1(i) - k2(i))*exp((m-one)*log(abs(k1(i) - k2(i)))))
-              dseq_dk2 = (exp((one-m)*log(seq(i)/normsig(i))))*((a/two)*(      &
-                sign(one,k1(i) + k2(i))*exp((m-one)*log(abs(k1(i) + k2(i))))   &
-               -sign(one,k1(i) - k2(i))*exp((m-one)*log(abs(k1(i) - k2(i)))))  &
-                          + c*exp((m-one)*log(abs(two*k2(i)))))
+              dseq_dk1 = ((seq(i)/normsig(i))**(one-m))*(a/two)*(              &
+                 sign(one,k1(i) + k2(i))*(abs(k1(i) + k2(i)))**(m-one)         &
+               + sign(one,k1(i) - k2(i))*(abs(k1(i) - k2(i)))**(m-one))
+              dseq_dk2 = ((seq(i)/normsig(i))**(one-m))*((a/two)*(             &
+                 sign(one,k1(i) + k2(i))*(abs(k1(i) + k2(i)))**(m-one)         &
+               - sign(one,k1(i) - k2(i))*(abs(k1(i) - k2(i)))**(m-one))        &
+               + c*(abs(two*k2(i)))**(m-one))
 !
               !< Derivative of k1 w.r.t stress tensor components
               dk1_dsigxx = half
@@ -446,9 +447,9 @@
               k1(i) = half*(signxx(i)+h*signyy(i))/normsig(i)
               k2(i) = sqrt((half*(signxx(i)-h*signyy(i)))**2                   &
                               +(p*signxy(i))**2)/normsig(i)
-              seq(i) = a*exp(m*log(abs(k1(i)+k2(i)))) +                        &
-                       a*exp(m*log(abs(k1(i)-k2(i)))) +                        &
-                         c*exp(m*log(abs(two*k2(i))))
+              seq(i) = a*(abs(k1(i)+k2(i)))**m +                               &
+                       a*(abs(k1(i)-k2(i)))**m +                               &
+                         c*(abs(two*k2(i)))**m
               if (seq(i) > zero) then 
                 seq(i) = exp((one/m)*log(half*seq(i)))  
               else
@@ -464,7 +465,7 @@
             enddo
 !
             !< Update of the yield stress
-            call table_mat_vinterp(matparam%table(1),nel,nindx,ipos,xvec,      &
+            call table_mat_vinterp(matparam%table(1),nindx,nindx,ipos,xvec,    &
                                    yld_i,dyld_dp_i)
 !
 #include "vectorize.inc" 
@@ -496,7 +497,7 @@
           do ii = 1,nindx
             i = indx(ii)
             !< Hourglass stiffness parameter
-            etse(i)  = dyld_dp(i) / (dyld_dp(i) + young(i))
+            etse(i)  = (dyld_dp(i)+hk(i)) / ((dyld_dp(i)+hk(i)) + young(i))
             dmg(i,2) = pla(i)/epsmax
             dmg(i,2) = min(one,dmg(i,2))
             if (pla(i) > epsmax .and. off(i) == one .and. inloc == 0) then 
@@ -557,13 +558,13 @@
               dmg(i,2) = min(one,dmg(i,2))
               !< Non-local thickness variation
               if (seq(i) > zero) then 
-                dseq_dk1 = (exp((one-m)*log(seq(i)/normsig(i))))*(a/two)*(     &
-                sign(one,k1(i) + k2(i))*exp((m-one)*log(abs(k1(i) + k2(i))))   &
-                +sign(one,k1(i) - k2(i))*exp((m-one)*log(abs(k1(i) - k2(i)))))
-                dseq_dk2 = (exp((one-m)*log(seq(i)/normsig(i))))*((a/two)*(    &
-                sign(one,k1(i) + k2(i))*exp((m-one)*log(abs(k1(i) + k2(i))))   &
-                -sign(one,k1(i) - k2(i))*exp((m-one)*log(abs(k1(i) - k2(i))))) &
-                          + c*exp((m-one)*log(abs(two*k2(i)))))
+                dseq_dk1 = ((seq(i)/normsig(i))**(one-m))*(a/two)*(            &
+                   sign(one,k1(i) + k2(i))*(abs(k1(i) + k2(i)))**(m-one)       &
+                 + sign(one,k1(i) - k2(i))*(abs(k1(i) - k2(i)))**(m-one))
+                dseq_dk2 = ((seq(i)/normsig(i))**(one-m))*((a/two)*(           &
+                   sign(one,k1(i) + k2(i))*(abs(k1(i) + k2(i)))**(m-one)       &
+                 - sign(one,k1(i) - k2(i))*(abs(k1(i) - k2(i)))**(m-one))      &
+                 + c*(abs(two*k2(i)))**(m-one))
                 dk1_dsigxx   = half
                 dk1_dsigyy   = h/two
                 dk2_dsigxx   = (signxx(i)-h*signyy(i))/                        &

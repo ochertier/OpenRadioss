@@ -73,6 +73,7 @@
       !||    fvmesh0                            ../engine/source/airbag/fvmesh0.F
       !||    genani                             ../engine/source/output/anim/generate/genani.F
       !||    genh3d                             ../engine/source/output/h3d/h3d_results/genh3d.F
+      !||    gpsstrain_skin                     ../engine/source/output/anim/generate/tensgpstrain.F
       !||    hireorbe3                          ../starter/source/constraints/general/rbe3/hm_read_rbe3.F
       !||    hm_grogro                          ../starter/source/groups/hm_grogro.F
       !||    hm_grogronod                       ../starter/source/groups/hm_grogronod.F
@@ -157,6 +158,7 @@
       !||    setrbyon                           ../starter/source/constraints/general/rbody/hm_read_rbody.F
       !||    sgrhead                            ../starter/source/elements/solid/solide/sgrhead.F
       !||    sgrtails                           ../starter/source/elements/solid/solide/sgrtails.F
+      !||    sms_check                          ../engine/source/ams/sms_fsa_inv.F
       !||    solid_surface_buffer               ../starter/source/model/sets/solid_surface_buffer.F
       !||    spgrhead                           ../starter/source/elements/sph/spgrhead.F
       !||    spgrtails                          ../starter/source/elements/sph/spgrtails.F
@@ -168,6 +170,9 @@
       !||    stackgroup                         ../starter/source/stack/stackgroup.F
       !||    t3grhead                           ../starter/source/elements/solid_2d/tria/t3grhead.F
       !||    t3grtails                          ../starter/source/elements/solid_2d/tria/t3grtails.F
+      !||    tensgps3                           ../engine/source/output/anim/generate/tensor6.F
+      !||    tensgps_skin                       ../engine/source/output/anim/generate/tensor6.F
+      !||    tensgpstrain                       ../engine/source/output/anim/generate/tensgpstrain.F
       !||    tensor0                            ../engine/source/output/anim/generate/tensor0.F
       !||    tensorc                            ../engine/source/output/anim/generate/tensorc.F
       !||    tensorc_crk                        ../engine/source/output/anim/generate/tensorc_crk.F

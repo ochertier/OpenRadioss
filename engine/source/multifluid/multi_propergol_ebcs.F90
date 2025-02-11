@@ -33,13 +33,14 @@
       !||--- uses       -----------------------------------------------------
       !||    constant_mod           ../common_source/modules/constant_mod.F
       !||    ebcs_mod               ../common_source/modules/boundary_conditions/ebcs_mod.F90
+      !||    matparam_def_mod       ../common_source/modules/mat_elem/matparam_def_mod.F90
       !||    multi_fvm_mod          ../common_source/modules/ale/multi_fvm_mod.F90
       !||    th_surf_mod            ../common_source/modules/interfaces/th_surf_mod.F
       !||====================================================================
       SUBROUTINE MULTI_PROPERGOL_EBCS(ITASK, EBCS_ID, MULTI_FVM, NELEM, ELEM_LIST, FACE_LIST, &
                                 FVM_INLET_DATA, IXS, IXQ, IXTG, XGRID, WGRID, IPM, PM, FUNC_VALUE, &
                                 EBCS,NPF,TF,FSAVSURF,TIMESTEP, NIXS, NIXQ, NIXTG, NPROPMI, NPROPM, NSURF, STF, SNPC, &
-                                NUMELS, NUMELQ, NUMELTG, NUMNOD, NCYCLE, NUMMAT)
+                                NUMELS, NUMELQ, NUMELTG, NUMNOD, NCYCLE, NUMMAT, MATPARAM)
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Modules
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -47,6 +48,7 @@
       USE EBCS_MOD
       USE TH_SURF_MOD , only : TH_SURF_NUM_CHANNEL
       USE CONSTANT_MOD , ONLY : EM20, EP20, ONE, ZERO, HALF
+      USE MATPARAM_DEF_MOD , ONLY :  MATPARAM_STRUCT_
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Implicit none
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -74,6 +76,7 @@
       TYPE(t_ebcs_nrf), INTENT(INOUT) :: EBCS
       INTEGER, INTENT(IN) :: NPF(SNPC)
       my_real, INTENT(IN) :: TF(STF), TIMESTEP
+      TYPE(MATPARAM_STRUCT_), DIMENSION(NUMMAT), INTENT(IN) :: MATPARAM !material data structure
 ! ----------------------------------------------------------------------------------------------------------------------
 !                                                   Local Variables
 ! ----------------------------------------------------------------------------------------------------------------------
@@ -195,7 +198,7 @@
                         NPROPM,             NPROPMI,                      DUMMY,                   ONE, &
                         DUMMY,              MULTI_FVM%BFRAC(IMAT,ELEMID), MULTI_FVM%TBURN(ELEMID), DUMMY, &
                         DUMMY,              DUMMY,                        NPF,                     TF, &
-                        DUMMY,              1)
+                        DUMMY,              1,                            MATPARAM(LOCAL_MATID(IMAT)))
                  SSPJJ = SSPJJ + PHASE_ALPHAJJ(IMAT) * PHASE_RHOJJ(IMAT) *  MAX(EM20, PHASE_SSPJJ(IMAT))
                  P_JJ = P_JJ + PHASE_PRESJJ(IMAT) * PHASE_ALPHAJJ(IMAT)
                  EINTJJ = EINTJJ + PHASE_ALPHAJJ(IMAT) * PHASE_EINTJJ(IMAT)

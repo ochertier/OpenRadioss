@@ -118,9 +118,6 @@ jobs:
           source /home/adminqa/.bashrc
           chmod 755 Compiling_tools/script/*
           chmod 755 ${{ matrix.binary }}/build_script.sh 
-          
-          # USED for development only (avoid using lfs)
-          test ! -e extlib && ln -s /__w/_tool/extlib .
 
           md5sum exec/* || echo "Nothing in exec/" 
           mkdir exec
@@ -173,6 +170,14 @@ jobs:
           name: bins-${{ matrix.os }}-${{ matrix.precision }}-${{ matrix.build }}
           path: ${{ env.WORKDIR }}/exec
         if: ${{ env.CLOSE_BRANCH == 0 }} 
+
+      # We upload extlib only once, arbitrary choice
+      - name: Upload extlib artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: extlib
+          path: ${{ env.WORKDIR }}/extlib
+        if: ${{ matrix.build == 'starter_linux64_gf' && env.CLOSE_BRANCH == 0 }}
 
       # Close the branch (= restrict push to team devopsadmins) if needed
       # Owner is not mandatory here ... PAT is sufficient ??? seems that as servbot has permissions on this repo so his PAT is sufficient ...
@@ -274,12 +279,14 @@ jobs:
           name: bins-${{ matrix.os }}-${{ matrix.precision }}-engine_linux64_gf_ompi
           path: exec
           merge-multiple: true
+      - name: Download extlib artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: extlib
+          path: extlib
 
       - name: Running qa
         run: |
-
-          # USED for development only (avoid using lfs)
-          test ! -e extlib && ln -s /__w/_tool/extlib .
 
           md5sum exec/* || echo "Nothing in exec/" 
           if [ "${{ matrix.precision }}" = "dp" ]
@@ -472,7 +479,9 @@ jobs:
           cd ${{ matrix.binary }}
           @"
           @echo off
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2019
+          call 'C:\Program Files (x86)\Intel\oneAPI\compiler\2025.0\env\vars.bat'
+          call 'C:\Program Files (x86)\Intel\oneAPI\mkl\2025.0\env\vars.bat'
+          call 'C:\Program Files (x86)\Intel\oneAPI\mpi\2021.10.0\env\vars.bat'
           cmake --version
           ninja --version
           if not '${{ matrix.mpi }}'=='' (
@@ -624,7 +633,12 @@ jobs:
           name: bins-${{ matrix.os }}-${{ matrix.precision }}-engine_win64_impi
           path: exec
           merge-multiple: true
-
+      - name: Download extlib artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: extlib
+          path: extlib
+          
       - name: Running qa
         # Running cygwin from powershell or cmd => neither identation nor comment !
         shell: cmd
@@ -750,7 +764,7 @@ jobs:
         run: |
           echo "DATEOFTHEDAY=`date +'%Y%m%d'`" >> $GITHUB_ENV
 
-      - name: Counter Download - Update values
+      - name:  
         run: |
             cd /github_download_counter
 
@@ -763,3 +777,4 @@ jobs:
               --git_user $SERVBOT_USER \
               --git_token $SERVBOT_PAT \
               --action update_values      
+                

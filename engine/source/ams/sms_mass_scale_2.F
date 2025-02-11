@@ -48,6 +48,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    startime           ../engine/source/system/timer_mod.F90
       !||    stoptime           ../engine/source/system/timer_mod.F90
       !||--- uses       -----------------------------------------------------
+      !||    ams_work_mod       ../engine/source/modules/ams_work_mod.F90
       !||    groupdef_mod       ../common_source/modules/groupdef_mod.F
       !||    intstamp_mod       ../engine/share/modules/intstamp_mod.F
       !||    message_mod        ../engine/share/message_module/message_mod.F
@@ -81,7 +82,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      P        RRBE3      ,RRBE3_PON,PREC_SMS3 ,DIAG_SMS3,IAD_RBY  ,
      Q        FR_RBY6    ,RBY6     ,R3SIZE ,BETATE      ,IBCSCYC  ,
      R        LBCSCYC    ,MSKYI_FI_SMS, LIST_SMS,LIST_RMS,CJWORK  ,
-     S        FREA       ,IRWL_WORK,VFI,sz_mw6,MW6,WFEXT)
+     S        FREA       ,IRWL_WORK,VFI,sz_mw6,MW6,WFEXT,ams_work)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -90,6 +91,7 @@ C-----------------------------------------------
       USE MESSAGE_MOD
       USE GROUPDEF_MOD
       USE SENSOR_MOD
+      USE ams_work_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -167,6 +169,7 @@ C-----------------------------------------------
       TYPE (SENSOR_STR_) ,DIMENSION(NSENSOR) ,INTENT(IN) :: SENSOR_TAB
 C-----------------------------------------------
       TYPE (GROUP_)  , DIMENSION(NGRNOD) :: IGRNOD
+      TYPE (AMS_WORK_) , INTENT(INOUT) :: AMS_WORK
 C-----------------------------------------------
 C   L o c a l  V a r i a b l e s
 C-----------------------------------------------
@@ -781,7 +784,7 @@ C-----------------------------------
      N            IAD_RBE3M ,FR_RBE3M ,FR_RBE3MP,RRBE3,RRBE3_PON,
      O            PREC_SMS3,DIAG_SMS3,IAD_RBY  ,FR_RBY6    ,RBY6,
      P            TAGSLV_RBY_SMS,R3SIZE,NODFT2_SMS,NODLT2_SMS,INDX2_SMS,
-     Q            NODII_SMS,IBCSCYC ,LBCSCYC ,WFEXT )
+     Q            NODII_SMS,IBCSCYC ,LBCSCYC ,WFEXT,AMS_WORK )
 C
       CALL MY_BARRIER
 

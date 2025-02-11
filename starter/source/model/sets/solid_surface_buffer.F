@@ -32,7 +32,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                        IXS      ,IXS10    ,IXC      ,IXTG      ,CLAUSE   ,
      .                        KNOD2ELS ,NOD2ELS  ,KNOD2ELC ,NOD2ELC   ,KNOD2ELTG,
      .                        NOD2ELTG ,NSEG     ,IEXT     ,BUFTMPSURF,IPARTS   ,
-     .                        IPARTC   ,IPARTG   ,IAD_SURF ,KEYSET)
+     .                        IAD_SURF ,KEYSET)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
@@ -50,8 +50,7 @@ C-----------------------------------------------
       INTEGER IEXT,NSEG,IAD_SURF
       INTEGER IXS(NIXS,*),IXS10(6,*),IXC(NIXC,*),IXTG(NIXTG,*),
      .        KNOD2ELS(*),NOD2ELS(*),KNOD2ELC(*),NOD2ELC(*),
-     .        KNOD2ELTG(*),NOD2ELTG(*),BUFTMPSURF(*),IPARTS(*),
-     .        IPARTC(*),IPARTG(*)
+     .        KNOD2ELTG(*),NOD2ELTG(*),BUFTMPSURF(*),IPARTS(*)
       CHARACTER(LEN=NCHARFIELD) :: KEYSET
 !
       TYPE (SET_) ::  CLAUSE
@@ -88,17 +87,14 @@ C=======================================================================
 
       SOLID_TAG(1:NUMELS)=0
       PART_TAG(1:NPART)=0
-      
-      IF(KEYSET == 'PART' )THEN
-        DO I=1, CLAUSE%NB_PART
-            PART_TAG(CLAUSE%PART(I))=1
-        ENDDO
-      ENDIF
-      IF(KEYSET == 'SOLID' )THEN
-        DO I=1, CLAUSE%NB_SOLID
-            SOLID_TAG(CLAUSE%SOLID(I))=1
-        ENDDO
-      ENDIF
+
+      DO I=1, CLAUSE%NB_PART
+        PART_TAG(CLAUSE%PART(I))=1
+      ENDDO
+
+      DO I=1, CLAUSE%NB_SOLID
+        SOLID_TAG(CLAUSE%SOLID(I))=1
+      ENDDO
 
       FASTAG=0
 C
@@ -107,6 +103,7 @@ C
         NB_SOLID = CLAUSE%NB_SOLID
         DO IND=1,NB_SOLID
           JS = CLAUSE%SOLID(IND)
+          IF (SOLID_TAG(JS)==0) CYCLE          !case of tagged elems
           DO JJ=1,6
             DO II=1,4
               NS(II)=IXS(FACES(II,JJ)+1,JS)
@@ -150,8 +147,6 @@ C
             DO K=KNOD2ELS(NI(1))+1,KNOD2ELS(NI(1)+1)
               KS=NOD2ELS(K)
               IF (KS==JS .OR. KS > NUMELS8+NUMELS10) CYCLE
-!!              IF (CLAUSE%NB_SOLID > 0 .AND. CLAUSE%SOLID(KS)==0) CYCLE
-!!              IF (CLAUSE%NB_PART > 0  .AND. CLAUSE%PART(IPARTS(KS))==0) CYCLE
               IF (KEYSET == 'SOLID' .AND. SOLID_TAG(KS)==0) CYCLE
               IF (KEYSET == 'PART'  .AND. PART_TAG(IPARTS(KS))==0) CYCLE
 !
@@ -228,6 +223,7 @@ C-----------
         NB_SOLID = CLAUSE%NB_SOLID
         DO IND=1,NB_SOLID
           JS = CLAUSE%SOLID(IND)
+          IF (SOLID_TAG(JS)==0) CYCLE
 !
           IF (JS > NUMELS8) CYCLE   ! HEXA8 ONLY
 !
@@ -272,13 +268,8 @@ C---   find shells SURF/PART/EXT
                 IF (ISHEL == 3)EXIT
                 KS = 0
               ENDDO
-              IF(KS == 0)THEN
-                NSEG = NSEG + 1
-                CALL SURF_SEGMENT(FACE(1)    ,FACE(2) ,FACE(3) ,FACE(3) ,JS  ,
-     .                         BUFTMPSURF ,IAD_SURF ,1)
-!!              ELSEIF (CLAUSE%NB_PART > 0 .AND.
-              ELSEIF (KEYSET == 'PART' .AND.
-     .                IABS(PART_TAG(IPARTG(KS))) /= 1)THEN
+              !print*,'Surf from solid ...',KS,PART_TAG(IPARTG(KS))
+              IF(KS == 0 .OR. ISHEL == 3)THEN
                 NSEG = NSEG + 1
                 CALL SURF_SEGMENT(FACE(1)    ,FACE(2) ,FACE(3) ,FACE(3) ,JS  ,
      .                         BUFTMPSURF ,IAD_SURF ,1)
@@ -297,13 +288,7 @@ C---   find shells SURF/PART/EXT
                 IF (ISHEL == 4)EXIT
                 KS = 0
               ENDDO
-              IF(KS == 0)THEN
-               NSEG = NSEG + 1
-                CALL SURF_SEGMENT(FACE(1)    ,FACE(2) ,FACE(3) ,FACE(4) ,JS  ,
-     .                         BUFTMPSURF ,IAD_SURF ,1)
-!!              ELSEIF (CLAUSE%NB_PART > 0 .AND.
-              ELSEIF (KEYSET == 'PART' .AND.
-     .                IABS(PART_TAG(IPARTC(KS))) /= 1 ) THEN
+              IF(KS == 0 .OR. ISHEL == 4)THEN
                NSEG = NSEG + 1
                 CALL SURF_SEGMENT(FACE(1)    ,FACE(2) ,FACE(3) ,FACE(4) ,JS  ,
      .                         BUFTMPSURF ,IAD_SURF ,1)
@@ -325,6 +310,7 @@ C---
         NB_SOLID = CLAUSE%NB_SOLID
         DO IND=1,NB_SOLID
           JS = CLAUSE%SOLID(IND)
+          IF (SOLID_TAG(JS)==0) CYCLE
 !
           J = JS - NUMELS8  ! TETRA10 ONLY
           IF (J <= 0) CYCLE  ! TETRA10 ONLY

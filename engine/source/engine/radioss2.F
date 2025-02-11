@@ -391,6 +391,8 @@ C                                   IF RELEASE WAS BUILT FROM SOURCE
       ABOUT = 0
 
       !External Foce Work
+      OUTPUT%WFEXT = 0.0D0
+      OUTPUT%WFEXT_MD = 0.0D0
       WFEXT => OUTPUT%WFEXT
       WFEXT_MD => OUTPUT%WFEXT_MD
 
@@ -958,32 +960,6 @@ C
         CALL ARRET(2)
       ENDIF
 
-!     ! Single Precision version : XDP = X in Double :
-!     IF (IRESP==1) THEN
-!       SXDP = 3*NUMNOD
-!       ALLOCATE(XDP(SXDP),STAT=IXDP)
-!       IF(IXDP/=0) THEN
-!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-!         CALL ARRET(2)
-!       ENDIF
-!       ALLOCATE(DDP(3*NUMNOD),STAT=IXDP)
-!       IF(IXDP/=0) THEN
-!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-!         CALL ARRET(2)
-!       ENDIF
-!     ELSE
-!       SXDP = 3
-!       ALLOCATE(XDP(SXDP),STAT=IXDP)
-!       IF(IXDP/=0) THEN
-!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-!         CALL ARRET(2)
-!       ENDIF
-!       ALLOCATE(DDP(1),STAT=IXDP)
-!       IF(IXDP/=0) THEN
-!         CALL ANCMSG(MSGID=20,ANMODE=ANINFO)
-!         CALL ARRET(2)
-!       ENDIF
-!     ENDIF
 
       ! Monvol / Airbag
       ALLOCATE(T_MONVOL(NVOLU))
@@ -1050,7 +1026,7 @@ C
       ! ---------------------------------------------------------------------------------------------
       !      .rst file reading 2
       ! ---------------------------------------------------------------------------------------------
-      CALL RDRESB(AF             ,IAF        ,LVARREA      ,XDP               ,IRUNN     , 
+      CALL RDRESB(AF             ,IAF        ,LVARREA       ,IRUNN     , 
      .            MULTI_FVM      ,H3D_DATA   ,PINCH_DATA    ,ALE_CONNECTIVITY ,T_MONVOL  ,
      .            SENSORS        ,EBCS_TAB   ,DYNAIN_DATA   ,USER_WINDOWS     ,OUTPUT    ,
      .            INTERFACES     ,LOADS      ,MAT_ELEM      ,PYTHON           ,IFLOW     ,
@@ -2182,7 +2158,7 @@ C---------------------------------------------------------------------
          ITASK=0
          IRUNN_BIS = IRUNN
 
-         CALL RESOL_HEAD(ELEMENT, NODES, ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,XDP ,
+         CALL RESOL_HEAD(ELEMENT, NODES, ITASK        ,AF              ,IAF             ,IDATA      ,RDATA,
      .                   GRAPHE       ,IFLOW           ,RFLOW           ,MCP        ,TEMP      ,
      .                   STACK        ,IRUNN_BIS       , TIMERS,
      .                   MULTI_FVM    ,H3D_DATA        ,SUBSETS    ,IGRNOD    ,

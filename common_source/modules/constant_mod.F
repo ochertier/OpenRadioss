@@ -48,6 +48,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    dttherm                                  ../engine/source/time_step/dttherm.F90
       !||    ebcs11                                   ../engine/source/boundary_conditions/ebcs/ebcs11.F90
       !||    eosexponential                           ../common_source/eos/eosexponential.F90
+      !||    fail_visual_b                            ../engine/source/materials/fail/visual/fail_visual_b.F90
+      !||    fail_visual_ib                           ../engine/source/materials/fail/visual/fail_visual_ib.F90
       !||    fill_voxel_local                         ../engine/source/interfaces/intsort/fill_voxel.F90
       !||    fill_voxel_local_partial                 ../engine/source/interfaces/intsort/fill_voxel.F90
       !||    fill_voxel_remote                        ../engine/source/interfaces/intsort/fill_voxel.F90
@@ -113,6 +115,9 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    mat25_crasurv_s                          ../engine/source/materials/mat/mat025/mat25_crasurv_s.F90
       !||    mat25_tsaiwu_c                           ../engine/source/materials/mat/mat025/mat25_tsaiwu_c.F90
       !||    mat25_tsaiwu_s                           ../engine/source/materials/mat/mat025/mat25_tsaiwu_s.F90
+      !||    mat87c_hansel                            ../engine/source/materials/mat/mat087/mat87c_hansel.F90
+      !||    mat87c_swift_voce                        ../engine/source/materials/mat/mat087/mat87c_swift_voce.F90
+      !||    mat87c_tabulated                         ../engine/source/materials/mat/mat087/mat87c_tabulated.F90
       !||    mat87c_tabulated_3dir_ortho              ../engine/source/materials/mat/mat087/mat87c_tabulated_3dir_ortho.F90
       !||    mmain                                    ../engine/source/materials/mat_share/mmain.F90
       !||    mulaw                                    ../engine/source/materials/mat_share/mulaw.F90

@@ -30,9 +30,11 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    fail_energy_ib       ../engine/source/materials/fail/energy/fail_energy_ib.F
       !||    fail_johnson_ib      ../engine/source/materials/fail/johnson_cook/fail_johnson_ib.F
       !||    fail_tensstrain_ib   ../engine/source/materials/fail/tensstrain/fail_tensstrain_ib.F
+      !||    fail_visual_ib       ../engine/source/materials/fail/visual/fail_visual_ib.F90
       !||    nvar                 ../engine/source/input/nvar.F
       !||--- uses       -----------------------------------------------------
       !||    elbufdef_mod         ../common_source/modules/mat_elem/elbufdef_mod.F90
+      !||    fail_visual_ib_mod   ../engine/source/materials/fail/visual/fail_visual_ib.F90
       !||    mat_elem_mod         ../common_source/modules/mat_elem/mat_elem_mod.F90
       !||====================================================================
       SUBROUTINE FAIL_BEAM18(ELBUF_STR,FAIL     ,NUMMAT   ,NUMGEO   ,
@@ -42,12 +44,13 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      .                       OFF      ,EPSD     ,NPF      ,TF       ,
      .                       DPLA     ,EINT     ,TIME     ,IOUT     ,ISTDO   ,
      .                       AL       ,ISMSTR   ,EXX      ,EXY      ,EXZ     ,
-     .                       KXX      ,KYY      ,KZZ      )
+     .                       KXX      ,KYY      ,KZZ      ,DTIME)
 C-----------------------------------------------
 C   M o d u l e s
 C-----------------------------------------------
       USE MAT_ELEM_MOD
       USE ELBUFDEF_MOD
+      USE FAIL_VISUAL_IB_MOD
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -86,6 +89,7 @@ C-----------------------------------------------
       my_real ,DIMENSION(NEL,NPT)        ,INTENT(IN)    :: DPLA
       my_real ,DIMENSION(NEL,2)          ,INTENT(IN)    :: EINT
       my_real ,DIMENSION(NEL)            ,INTENT(INOUT) :: OFF
+      my_real                            ,INTENT(IN)    :: DTIME  
 C
       TYPE (ELBUF_STRUCT_) ,INTENT(INOUT) :: ELBUF_STR
       TYPE (FAIL_PARAM_)   ,INTENT(IN)    :: FAIL
@@ -249,6 +253,16 @@ c---------------
             IF (FOFF(I) == 0) COUNT(I) = COUNT(I) + 1
           END DO
 
+C--------------
+        CASE (36)     ! visual failure model                                        
+        CALL FAIL_VISUAL_IB(
+     .                       NEL      ,NGL      ,NPARAM   ,FAIL%UPARAM,
+     .                       TIME     ,DFMAX,                        
+     .                       IOUT     ,ISTDO    ,
+     .                       SIGNXX   ,SIGNXY   ,SIGNXZ   ,
+     .                       EPSXX    ,EPSXY    ,EPSXZ    ,
+     .                       NVARF    ,
+     .                       UVARF    ,ISMSTR   ,DTIME    , IPT)
 c-------------
         END SELECT
 

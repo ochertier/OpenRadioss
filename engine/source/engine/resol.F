@@ -422,6 +422,7 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
       !||    aleflow_mod                                  ../engine/share/modules/aleflow_mod.F
       !||    alefvm_mod                                   ../common_source/modules/ale/alefvm_mod.F
       !||    alemuscl_mod                                 ../common_source/modules/ale/alemuscl_mod.F
+      !||    ams_work_mod                                 ../engine/source/modules/ams_work_mod.F90
       !||    anim_mod                                     ../common_source/modules/output/anim_mod.F
       !||    array_mod                                    ../common_source/modules/array_mod.F
       !||    bcs_mod                                      ../common_source/modules/boundary_conditions/bcs_mod.F90
@@ -597,8 +598,8 @@ Copyright>        commercial version may interest you: https://www.altair.com/ra
      R  GLOB_THERM ,PBLAST,RBE3)
 C-----------------------------------------------
 C   M o d u l e s
-C----------------------------------------------- 
-      
+C-----------------------------------------------
+
       USE CONNECTIVITY_MOD
       USE NODAL_ARRAYS_MOD
       USE detach_node_mod
@@ -701,6 +702,7 @@ C-----------------------------------------------
       USE TIMER_MOD
       USE rbe3_mod
       USE TH_SURF_MOD , ONLY : TH_SURF_NUM_CHANNEL
+      USE ams_work_mod
 C-----------------------------------------------
 C   I m p l i c i t   T y p e s
 C-----------------------------------------------
@@ -1288,7 +1290,8 @@ C-------------------------------------------------------------------------------
         my_real, DIMENSION(:), ALLOCATABLE :: admerr_AREA_SH4
         my_real, DIMENSION(:), ALLOCATABLE :: admerr_AREA_SH3
 C-----------------------------------------------------------------------------------       
-        type(SPH_WORK_) :: SPH_WORK   ! working Areas for SPLISSV and SPHPREP
+        type(SPH_WORK_)  :: SPH_WORK   !< working Areas for SPLISSV and SPHPREP
+        type (ams_work_) :: ams_work   !< Working areas for AMS
 C-----------------------------------------------------------------------------------       
 C         Node Spliting (hardcoded example) 
 c        integer :: fail_counter
@@ -4722,7 +4725,7 @@ C Init var parallel SMP
      9    GAUGE   ,NGROUNC ,IGROUNC ,SOL2SPH ,SPH2SOL   ,
      A    IXS     ,ELEMENT%PON%IADS    ,ELEMENT%PON%ADSKY   ,ELEMENT%PON%FSKYD   ,DMSPH(NDTSK),
      B    WASPH(KSPACTIV),ICONTACT_OLD,OFF_SPH_R2R,WSMCOMP,IRUNN_BIS,
-     C    SPH_IORD1,SPH_WORK)
+     C    SPH_IORD1,SPH_WORK,OUTPUT%WFEXT)
 !$OMP END PARALLEL
 
         IF (IMONM > 0) CALL STOPTIME(TIMERS,87)
@@ -5922,7 +5925,7 @@ C Assemblage TYPE21
 C
       IF(NINTSTAMP/=0)THEN
         CALL INTSTAMP_ASS(INTSTAMP,NODES%MS ,NODES%IN ,NODES%A ,NODES%AR ,
-     .                    NODES%STIFN   ,NODES%STIFR  ,NODES%WEIGHT)
+     .                    NODES%STIFN   ,NODES%STIFR  ,NODES%WEIGHT, OUTPUT%WFEXT)
       END IF
 C-----------------------------------------------------
 C         RIGID BODY: SUM forces, stiff.
@@ -6788,7 +6791,7 @@ C===============================================================================
      P        PREC_SMS3 ,DIAG_SMS3,IAD_RBY  ,FR_RBY6    ,RBY6     ,
      Q        RBE3%irotg_sz    ,BETATE   ,IBCSCYC    ,LBCSCYC,
      R        MSKYI_FI_SMS, LIST_SMS,LIST_RMS,CJWORK,FREA,
-     S        IRWL_WORK,SMS_VFI,sz_mw6,MW6,OUTPUT%WFEXT)
+     S        IRWL_WORK,SMS_VFI,sz_mw6,MW6,OUTPUT%WFEXT,ams_work)
 
 !$OMP END PARALLEL
 
@@ -8869,7 +8872,7 @@ C----       10,11,12:ELBUF_C,BUFMAT_C,X_C,13,14:DD,DDR,15,16:X_ac,V_zero,23,24:A
      Y  SENSORS%SFSAV,SENSORS%FSAV,SENSORS%STABSEN,SENSORS%TABSENSOR,DRAPE_SH4N  , DRAPE_SH3N,
      Z  H3D_DATA,MULTI_FVM,IGRBRIC,IGRSH4N,IGRSH3N,IGRBEAM,FORNEQS,MAXDGAP,
      A  NDDL0   ,NNZK0 ,IT_T   ,IMPBUF_TAB,CPTREAC,FTHREAC,NODREAC, DRAPEG,
-     B  INTERFACES,OUTPUT%TH%TH_SURF,DPL0CLD,VEL0CLD,SNPC,STF,GLOB_THERM)
+     B  INTERFACES,OUTPUT%TH%TH_SURF,DPL0CLD,VEL0CLD,SNPC,STF,GLOB_THERM,OUTPUT%WFEXT_MD)
 #else 
         WRITE(6,*) __LINE__,"Fatal error: MUMPS required"
         CALL FLUSH(6)
